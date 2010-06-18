@@ -1,0 +1,21 @@
+Bounder Notes;
+
+$5000 - $FFFF (bank 0): Game code and global data
+
+Game normally in bank 0, switches to bank 1 to access map and trig data.
+Any code that switches the bank must be located before < $8000
+
+
+Levels:
+-------
+
+Background, foreground and trigmap data is loaded from $8000 in Bank 1.
+The max length of the sum of this data is 32KB!
+
+Filenames:
+
+BGMAP_xx.BIN 
+FGMAP_xx.BIN
+TRIGS_xx.BIN
+
+Where xx = 00 to FF hex for level count (starts at $00)
