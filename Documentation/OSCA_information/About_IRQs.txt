@@ -1,0 +1,33 @@
+A note about the ROM interrupt vectors:
+---------------------------------------
+
+Locations $38 (IRQ) and $66 (NMI) in the default ROM hold the instructions:
+
+$38: JP irq_jp_inst
+
+$66: JP nmi_jp_inst
+
+(where irq_jp_inst is $A00 and nmi_irq_inst is $A03, as set up in the equates file)
+
+It is up to the user program to place appropriate code at $A00 and $A03, ordinarily
+this will be additional jumps to the actual location of the interrupt handler.
+
+EG:
+
+$A00 JP My_IRQ_routine ; C3 XX YY
+$A03 JP My_NMI_routine ; C3 XX YY
+
+Note also that the ROM disables normal interrupts (with the DI instruction)
+and NMI interrupts (using the "Disable NMI switch input" port bit) and it
+is up to the user program to enable the IRQs if interrupts are required.
+
+
+(Interrupt mode 0 is not currently supported)
+
+
+Update:
+------
+
+From OSCA v656 onwards, it is possible to access the system RAM "underneath"
+the ROM at $000-$1ff by paging out the Video palette. Therefore the IRQ
+vectors can be directly set if required.

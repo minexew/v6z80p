@@ -1,0 +1,5 @@
+
+Copy all the files from "external_files" to the same
+single folder as the Bounder.exe program.
+
+Bounder was developed for the 50Hz PAL TV system.

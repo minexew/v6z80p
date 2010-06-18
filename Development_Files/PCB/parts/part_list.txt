@@ -1,0 +1,87 @@
+------------------------------
+V6Z80P (rough) component list:
+------------------------------
+
+
+Part:						Package		Qty
+------------------------------------------------------------------------
+
+ICs:
+
+Xilinx Spartan 2 XC2S150 FPGA 			 PQFP 208	1
+Z80 CPU 20MHz					 QFP 44		1
+128KB SRAM 3.3 volt 10ns CY7C1019CV33-10ZSXI	 TSOP2 32 pin	1
+512KB SRAM 5 volt 25ns IS61C5128AS-25TLI   	 TSOP2 32 pin   1
+512KB SRAM 3.3 volt 10ns IS61WV5128BLL-10TLI  	 TSOP2 44 pin   1
+W25X40 SPI 3.3V 512KB Serial EEPROM		 DIP 8		1
+PIC16F628A (or PIC 16F627A) Microcontroller	 DIP 18		2
+16MHz 3.3V can oscillator			 DIP 8		1
+74HCT08 quad AND gate				 14 SOIC	1
+ST232CD RS232 transceiver (SMD MAX232)		 16 SOIC	1
+2.5V LDO regulator 1 Amp AP1117E25		 SOT223-3L	1
+3.3V LDO regulator 1 Amp AP1117E33		 SOT223-3L	1
+5.0v regulator 1 Amp AP1117E50		 	 SOT223-3L	1
+3.3v LDO regulator 800mA MC33269		 SO-8		1
+5.0v regulator	100mA LM78L05			 SO-8		1
+
+NPN SMT BC847 (Gen Purpose) Transistor 		 SOT-23		4
+PNP SMT BC807 (Gen Purpose) Transistor		 SOT-23		2
+
+SMD LED red					 0603		1
+SMD LED yellow					 0603		1
+SMD LED green					 0603		1
+
+1N5817 DIODE (1N4001 is OK if using 9v supply)	 TH		2
+
+CAPACITORS
+
+100nf SMT Capacitor				0603		60?
+10nf SMT Capacitor				0603		20?
+4.7nf SMT Capacitor				0603		2
+220uf 16v radial electrolytic capactitors			2
+10uf 10v tantalum capacitors					5
+
+
+RESISTORS
+
+550  OHM (For video DAC)			0805		3
+1100 OHM ""	     - ""			0805		3
+2200 OHM ""	     - ""			0805		3
+4400 OHM ""	     - ""			0805		3
+
+100 OHM	SMT resistor				0805		1
+750 OHM	SMT resistor				0603		1
+
+
+SOCKETS:
+
+18 pin chip socket 				TH DIP		2
+8 pin chip socket 				TH DIP		1
+9 pin right-angle D-SUB male for joysticks	TH DIP		2
+8 pin mini-DIN socket (for video)		TH DIP		1
+4 pin mini-DIN socket (for comms)		TH DIP		1
+6 pin mini-DIN socket (for KB and mouse)	TH DIP		2
+Stereo jack socket				TH 		1
+SD Card socket Toby Electronics 412D02F-09PC003	SMD		1
+2.1mm DC power jack				TH		1
+
+
+PINS:
+
+6 x 1 0.1" pin header (JTAG)			TH SIL		1
+5 x 2 0.1" pin header (Expansion/options)	TH DIP 		1
+2 x 1 0.1" pin header (for Jumpers)		TH SIL		2
+
+
+SWITCH:
+
+0.1" pin SPDT Slide switch (main power)		TH		1
+
+
+Misc other parts in various quantities:
+---------------------------------------
+
+0603 SMT resistors:  100 Ohm, 1K, 3.3K, 4.7K, 10K, 100K 
+0603 SMT capacitors  1uf
+
+

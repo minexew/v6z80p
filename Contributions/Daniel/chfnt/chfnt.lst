@@ -1,0 +1,305 @@
+		INCLUDE kernal_jump_table.asm
+os_start	EQU 1000
+kjt_print_string EQU 1013
+kjt_clear_screen EQU 1016
+kjt_page_in_video EQU 1019
+kjt_page_out_video EQU 101C
+kjt_wait_vrt	EQU 101F
+kjt_keyboard_irq_code EQU 1022
+kjt_hex_byte_to_ascii EQU 1025
+kjt_ascii_to_hex_word EQU 1028
+kjt_dont_store_registers EQU 102B
+kjt_get_input_string EQU 102E
+kjt_check_disk_pqfs EQU 1031
+kjt_change_drive EQU 1034
+kjt_check_disk_available EQU 1037
+kjt_get_drive	EQU 103A
+kjt_format	EQU 103D
+kjt_make_dir	EQU 1040
+kjt_change_dir	EQU 1043
+kjt_parent_dir	EQU 1046
+kjt_root_dir	EQU 1049
+kjt_delete_dir	EQU 104C
+kjt_find_file	EQU 104F
+kjt_load_file	EQU 1052
+kjt_save_file	EQU 1055
+kjt_erase_file	EQU 1058
+kjt_get_total_sectors EQU 105B
+kjt_wait_key_press EQU 105E
+kjt_get_key	EQU 1061
+kjt_forcebank	EQU 1064
+kjt_getbank	EQU 1067
+kjt_create_file	EQU 106A
+kjt_incbank	EQU 106D
+kjt_compare_strings EQU 1070
+kjt_write_bytes_to_file EQU 1073
+kjt_bchl_memfill EQU 1076
+kjt_force_load	EQU 1079
+kjt_set_file_pointer EQU 107C
+kjt_set_load_length EQU 107F
+kjt_serial_receive_header EQU 1082
+kjt_serial_receive_file EQU 1085
+kjt_serial_send_file EQU 1088
+kjt_init_mouse	EQU 108B
+kjt_get_mouse_position EQU 108E
+kjt_get_version	EQU 1091
+kjt_set_cursor_position EQU 1094
+kjt_serial_tx_byte EQU 1097
+kjt_serial_rx_byte EQU 109A
+kjt_dir_list_first_entry EQU 109D
+kjt_dir_list_get_entry EQU 10A0
+kjt_dir_list_next_entry EQU 10A3
+kjt_get_cursor_position EQU 10A6
+kjt_read_sector	EQU 10A9
+kjt_write_sector EQU 10AC
+kjt_set_sector_lba EQU 10AF
+kjt_plot_char	EQU 10B2
+kjt_set_pen	EQU 10B5
+kjt_background_colours EQU 10B8
+kjt_draw_cursor	EQU 10BB
+kjt_get_pen	EQU 10BE
+kjt_scroll_up	EQU 10C1
+kjt_flos_display EQU 10C4
+		End of INCLUDE
+		INCLUDE OSCA_hardware_equates.asm
+sys_mem_select	EQU 0000
+sys_irq_ps2_flags EQU 0001
+sys_irq_enable	EQU 0001
+sys_keyboard_data EQU 0002
+sys_clear_irq_flags EQU 0002
+sys_mouse_data	EQU 0003
+sys_ps2_joy_control EQU 0003
+sys_serial_port	EQU 0004
+sys_joy_com_flags EQU 0005
+sys_sdcard_ctrl1 EQU 0005
+sys_sdcard_ctrl2 EQU 0006
+sys_timer	EQU 0007
+sys_audio_enable EQU 0008
+sys_audio_flags	EQU 0008
+sys_hw_flags	EQU 0009
+sys_hw_settings	EQU 0009
+sys_spi_port	EQU 000A
+sys_alt_write_page EQU 000B
+sys_baud_rate	EQU 000C
+sys_pic_comms	EQU 000D
+sys_eeprom_byte	EQU 000D
+sys_io_pins	EQU 000E
+sys_io_dir	EQU 000F
+audchan0_loc	EQU 0010
+audchan0_len	EQU 0011
+audchan0_per	EQU 0012
+audchan0_vol	EQU 0013
+audchan1_loc	EQU 0014
+audchan1_len	EQU 0015
+audchan1_per	EQU 0016
+audchan1_vol	EQU 0017
+audchan2_loc	EQU 0018
+audchan2_len	EQU 0019
+audchan2_per	EQU 001A
+audchan2_vol	EQU 001B
+audchan3_loc	EQU 001C
+audchan3_len	EQU 001D
+audchan3_per	EQU 001E
+audchan3_vol	EQU 001F
+ide_register0	EQU 0020
+ide_register1	EQU 0021
+ide_register2	EQU 0022
+ide_register3	EQU 0023
+ide_register4	EQU 0024
+ide_register5	EQU 0025
+ide_register6	EQU 0026
+ide_register7	EQU 0027
+ide_high_byte	EQU 0028
+palette		EQU 0000
+video_registers	EQU 0200
+vreg_xhws	EQU 0200
+vreg_vidctrl	EQU 0201
+vreg_window	EQU 0202
+vreg_yhws_bplcount EQU 0203
+vreg_rasthi	EQU 0204
+vreg_rastlo	EQU 0205
+vreg_vidpage	EQU 0206
+vreg_sprctrl	EQU 0207
+mult_write	EQU 0208
+mult_index	EQU 020A
+linedraw_colour	EQU 020B
+vreg_ext_vidctrl EQU 020C
+vreg_linecop_lo	EQU 020D
+vreg_linecop_hi	EQU 020E
+vreg_palette_ctrl EQU 020F
+blit_src_loc	EQU 0210
+blit_dst_loc	EQU 0212
+blit_src_mod	EQU 0214
+blit_dst_mod	EQU 0215
+blit_height	EQU 0216
+blit_width	EQU 0217
+blit_misc	EQU 0218
+blit_src_msb	EQU 0219
+blit_dst_msb	EQU 021A
+linedraw_reg0	EQU 0220
+linedraw_reg1	EQU 0222
+linedraw_reg2	EQU 0224
+linedraw_reg3	EQU 0226
+linedraw_reg4	EQU 0228
+linedraw_reg5	EQU 022A
+linedraw_reg6	EQU 022C
+linedraw_reg7	EQU 022E
+linedraw_lut0	EQU 0230
+linedraw_lut1	EQU 0232
+linedraw_lut2	EQU 0234
+linedraw_lut3	EQU 0236
+linedraw_lut4	EQU 0238
+linedraw_lut5	EQU 023A
+linedraw_lut6	EQU 023C
+linedraw_lut7	EQU 023E
+bitplane0a_loc	EQU 0240
+bitplane1a_loc	EQU 0244
+bitplane2a_loc	EQU 0248
+bitplane3a_loc	EQU 024C
+bitplane4a_loc	EQU 0250
+bitplane5a_loc	EQU 0254
+bitplane6a_loc	EQU 0258
+bitplane7a_loc	EQU 025C
+bitplane0b_loc	EQU 0260
+bitplane1b_loc	EQU 0264
+bitplane2b_loc	EQU 0268
+bitplane3b_loc	EQU 026C
+bitplane4b_loc	EQU 0270
+bitplane5b_loc	EQU 0274
+bitplane6b_loc	EQU 0278
+bitplane7b_loc	EQU 027C
+bitplane_reset	EQU 0243
+bitplane_modulo	EQU 0247
+sprite_registers EQU 0400
+spr_registers	EQU 0400
+mult_table	EQU 0600
+vreg_read	EQU 0700
+mult_read	EQU 0704
+sprite_base	EQU 1000
+video_base	EQU 2000
+		End of INCLUDE
+		INCLUDE system_equates.asm
+bootcode_location EQU 0800
+bootcode_length	EQU 0800
+sector_buffer	EQU 0800
+irq_jp_inst	EQU 0A00
+irq_vector	EQU 0A01
+nmi_jp_inst	EQU 0A03
+nmi_vector	EQU 0A04
+ide_status	EQU 0A06
+stack		EQU 0AFF
+OS_variables	EQU 0B00
+OS_charmap	EQU 0C00
+OS_location	EQU 1000
+		End of INCLUDE
+		ORG 5000
+5000:		label fnd_para
+5000:7E		LD A, (HL)
+5001:B7		OR A
+5002:2807	JR Z, 500B
+5004:FE20	CP 20
+5006:200B	JR NZ, 5013
+5008:		label skp_spc
+5008:23		INC HL
+5009:18F5	JR 5000
+500B:		label no_fn
+500B:218650	LD HL, 5086
+500E:CD1310	CALL 1013
+5011:AF		XOR A
+5012:C9		RET
+5013:		label fn_ok
+5013:11B850	LD DE, 50B8
+5016:		label cpyfn
+5016:7E		LD A, (HL)
+5017:B7		OR A
+5018:280D	JR Z, 5027
+501A:FE20	CP 20
+501C:2809	JR Z, 5027
+501E:FE2E	CP 2E
+5020:2805	JR Z, 5027
+5022:12		LD (DE), A
+5023:13		INC DE
+5024:23		INC HL
+5025:18EF	JR 5016
+5027:		label fntex
+5027:219B50	LD HL, 509B
+502A:		label fntexlp
+502A:7E		LD A, (HL)
+502B:B7		OR A
+502C:2805	JR Z, 5033
+502E:12		LD (DE), A
+502F:23		INC HL
+5030:13		INC DE
+5031:18F7	JR 502A
+5033:		label fntexdone
+5033:21B850	LD HL, 50B8
+5036:CD4F10	CALL 104F
+5039:C27850	JP NZ, 5078
+503C:3E0F	LD A, 0F
+503E:320602	LD (0206), A
+5041:0600	LD B, 00
+5043:21D850	LD HL, 50D8
+5046:CD7910	CALL 1079
+5049:C27850	JP NZ, 5078
+504C:DB00	IN A, (00)
+504E:F640	OR 40
+5050:D300	OUT (00), A
+5052:010003	LD BC, 0300
+5055:21D850	LD HL, 50D8
+5058:110024	LD DE, 2400
+505B:EDB0	LDIR
+505D:010003	LD BC, 0300
+5060:210024	LD HL, 2400
+5063:110028	LD DE, 2800
+5066:		label invloop
+5066:7E		LD A, (HL)
+5067:2F		CPL
+5068:12		LD (DE), A
+5069:23		INC HL
+506A:13		INC DE
+506B:0B		DEC BC
+506C:78		LD A, B
+506D:B1		OR C
+506E:20F6	JR NZ, 5066
+5070:DB00	IN A, (00)
+5072:E61F	AND 1F
+5074:D300	OUT (00), A
+5076:AF		XOR A
+5077:C9		RET
+5078:		label load_problem
+5078:21A350	LD HL, 50A3
+507B:CD2510	CALL 1025
+507E:21A150	LD HL, 50A1
+5081:CD1310	CALL 1013
+5084:AF		XOR A
+5085:C9		RET
+5086:		label nfn_text
+5086:55736167	DEFB of 21 bytes
+508A:653A2063
+508E:68666E74
+5092:205B666F
+5096:6E745D0B
+509A:00
+509B:		label fntext
+509B:2E464E54	DEFB of 5 bytes
+509F:00
+50A0:		label oldbnk
+50A0:00		DEFB of 1 bytes
+50A1:		label load_error_text
+50A1:0B247878	DEFB of 23 bytes
+50A5:202D206C
+50A9:6F616469
+50AD:6E672065
+50B1:72726F72
+50B5:210B00
+50B8:		label filename
+50B8:00000000	DEFS of 32 bytes with value 00
+50BC:00000000
+50C0:00000000
+50C4:00000000
+50C8:00000000
+50CC:00000000
+50D0:00000000
+50D4:00000000
+50D8:		label fntdata
+Emiting raw binary from 5000 to 50D7

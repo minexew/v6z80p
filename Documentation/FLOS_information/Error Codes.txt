@@ -1,0 +1,45 @@
+FLOS error code list
+--------------------
+		
+$01 - Volume Full
+$02 - File Not Found
+$03 - Dir Full
+$04 - Not A Dir 
+$05 - Dir Is Not Empty
+$06 - Not A File
+$07 - File Length Is Zero
+$08 - Address out of range
+$09 - File Name Already Exists
+$0a - Already at root
+$0b - Unknown command
+$0c - Invalid Hex 
+$0d - No file name 
+$0e - Invalid Volume 
+$0f - Checksum bad 
+$10 - [Space] Bytes Loaded
+$11 - Comms error
+$12 - Bad arguments
+$13 - not FAT16 
+$14 - serial time out
+$15 - file name too long
+$16 - no start address
+$17 - no file length
+$18 - save aborted
+$19 - save error at destination
+$1a - bank [n] selected
+$1b - invalid bank
+$1c - no end address
+$1d - no destination address
+$1e - bad range 
+$1f - missing arguments
+$20 - ok
+$21 - Invalid Volume
+$22 - Device not present
+$23 - Dir not found
+$24 - aborted
+$25 - File name mismatch
+$26 - OS RAM protected
+$27 - Data after EOF request
+$28 - No Volumes
+$29 - None Found
+		

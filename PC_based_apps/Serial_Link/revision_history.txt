@@ -1,0 +1,18 @@
+V2.7
+----
+
+File buffer sizes are now unlimited.
+
+
+V2.6:
+-----
+
+As Purepbasic now includes its own internal serial comms library
+the serial link app uses that instead of the 3rd party library
+used previously. This will make it easier to port to other
+platforms that Purebasic supports. 
+
+
+(I was also forced to update some other parts as Purebasic has
+changed / obsoleted various commands..)
+
