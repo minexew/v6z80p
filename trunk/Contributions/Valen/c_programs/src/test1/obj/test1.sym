@@ -1,0 +1,146 @@
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+
+Symbol Table
+
+  0 _DiagMessage                                                   08C2 GR
+  0 _DiagMessage_end                                               0916 GR
+  0 _DiagMessage_start                                             08C2 GR
+    _FLOS_ChangeDir                                                **** GX
+    _FLOS_CheckDiskAvailable                                       **** GX
+    _FLOS_ClearScreen                                              **** GX
+    _FLOS_CreateFile                                               **** GX
+    _FLOS_DeleteDir                                                **** GX
+    _FLOS_DirListFirstEntry                                        **** GX
+    _FLOS_DirListGetEntry                                          **** GX
+    _FLOS_DirListNextEntry                                         **** GX
+    _FLOS_EraseFile                                                **** GX
+    _FLOS_FindFile                                                 **** GX
+    _FLOS_ForceLoad                                                **** GX
+    _FLOS_GetCmdLine                                               **** GX
+    _FLOS_GetDirName                                               **** GX
+    _FLOS_GetLastError                                             **** GX
+    _FLOS_GetTotalSectors                                          **** GX
+    _FLOS_GetVersion                                               **** GX
+    _FLOS_MakeDir                                                  **** GX
+    _FLOS_ParentDir                                                **** GX
+    _FLOS_PrintString                                              **** GX
+    _FLOS_PrintStringLFCR                                          **** GX
+    _FLOS_RootDir                                                  **** GX
+    _FLOS_SetCursorPos                                             **** GX
+    _FLOS_SetFilePointer                                           **** GX
+    _FLOS_SetLoadLength                                            **** GX
+    _FLOS_WaitKeyPress                                             **** GX
+    _FLOS_WriteBytesToFile                                         **** GX
+  0 _GetSP                                                         0984 GR
+  0 _GetSP_start                                                   0984 GR
+    _MarkFrameTime                                                 **** GX
+  0 _PrintCurDirName                                               06B4 GR
+  0 _PrintCurDirName_end                                           06DD GR
+  0 _PrintCurDirName_start                                         06B4 GR
+  0 _PrintNum                                                      0923 GR
+  0 _PrintNum_end                                                  0953 GR
+  0 _PrintNum_start                                                0923 GR
+  0 _TestVersion                                                   010E GR
+  0 _TestVersion_end                                               0178 GR
+  0 _TestVersion_start                                             010E GR
+  0 _WaitKeyPress                                                  0953 GR
+  0 _WaitKeyPress_end                                              0984 GR
+  0 _WaitKeyPress_start                                            0953 GR
+    __itoa                                                         **** GX
+  0 __str_0                                                        00C3 R
+  0 __str_1                                                        00CA R
+  0 __str_10                                                       0291 R
+  0 __str_11                                                       029C R
+  0 __str_12                                                       029E R
+  0 __str_13                                                       02A6 R
+  0 __str_14                                                       02AF R
+  0 __str_15                                                       03D0 R
+  0 __str_16                                                       03E3 R
+  0 __str_17                                                       03F3 R
+  0 __str_18                                                       03F5 R
+  0 __str_19                                                       03F8 R
+  0 __str_2                                                        00E5 R
+  0 __str_20                                                       04C3 R
+  0 __str_21                                                       04DA R
+  0 __str_22                                                       04DC R
+  0 __str_23                                                       04EE R
+  0 __str_24                                                       04F9 R
+  0 __str_25                                                       050D R
+  0 __str_26                                                       0526 R
+  0 __str_27                                                       0540 R
+  0 __str_28                                                       0551 R
+  0 __str_29                                                       0615 R
+  0 __str_3                                                        0107 R
+  0 __str_30                                                       061C R
+  0 __str_31                                                       062D R
+  0 __str_32                                                       063E R
+  0 __str_33                                                       064D R
+  0 __str_34                                                       0660 R
+  0 __str_35                                                       066F R
+  0 __str_36                                                       0682 R
+  0 __str_37                                                       0683 R
+  0 __str_38                                                       0694 R
+  0 __str_39                                                       06A7 R
+  0 __str_4                                                        0178 R
+  0 __str_40                                                       06DD R
+  0 __str_41                                                       06E7 R
+  0 __str_42                                                       0700 R
+  0 __str_43                                                       0793 R
+  0 __str_44                                                       07B6 R
+  0 __str_45                                                       07C2 R
+  0 __str_46                                                       07CC R
+  0 __str_47                                                       088C R
+  0 __str_48                                                       08AB R
+  0 __str_49                                                       08B5 R
+  0 __str_5                                                        017D R
+  0 __str_50                                                       08BD R
+  0 __str_51                                                       08C1 R
+  0 __str_52                                                       0916 R
+  0 __str_53                                                       0921 R
+  0 __str_6                                                        0185 R
+  0 __str_7                                                        0262 R
+  0 __str_8                                                        027E R
+  0 __str_9                                                        027F R
+    __uitoa                                                        **** GX
+    __ultoa                                                        **** GX
+  1 _buf                                                           002A GR
+  1 _buffer                                                        0009 GR
+  0 _main                                                          0000 GR
+  0 _main_end                                                      00C1 GR
+  0 _main_start                                                    0000 GR
+  1 _myFile                                                        0002 GR
+  0 _own_sp                                                        00C1 GR
+  1 _pFilename                                                     0000 GR
+  0 _proccess_cmd_line                                             00ED GR
+  0 _proccess_cmd_line_end                                         0107 GR
+  0 _proccess_cmd_line_start                                       00ED GR
+  0 _test1                                                         0186 GR
+  0 _test1_end                                                     0262 GR
+  0 _test1_start                                                   0186 GR
+  0 _test2                                                         02B8 GR
+  0 _test2_end                                                     03D0 GR
+  0 _test2_start                                                   02B8 GR
+  0 _test3                                                         0408 GR
+  0 _test3_end                                                     04C3 GR
+  0 _test3_start                                                   0408 GR
+  0 _test4                                                         0564 GR
+  0 _test4_end                                                     0615 GR
+  0 _test4_start                                                   0564 GR
+  0 _test5                                                         0701 GR
+  0 _test5_end                                                     0793 GR
+  0 _test5_start                                                   0701 GR
+  0 _test6                                                         07DD GR
+  0 _test6_end                                                     088C GR
+  0 _test6_start                                                   07DD GR
+
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+
+Area Table
+
+   0 _CODE                                                          size  989   flags 0
+   1 _DATA                                                          size   32   flags 0
+   2 _OVERLAY                                                       size    0   flags 0
+   3 _HOME                                                          size    0   flags 0
+   4 _GSINIT                                                        size    0   flags 0
+   5 _GSFINAL                                                       size    0   flags 0
+   6 _CABS                                                          size    0   flags 0

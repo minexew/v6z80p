@@ -1,0 +1,232 @@
+
+Hexadecimal
+
+Area                               Addr   Size   Decimal Bytes (Attributes)
+--------------------------------   ----   ----   ------- ----- ------------
+.  .ABS.                           0000   0000 =      0. bytes (ABS,CON)
+
+      Value  Global
+   --------  --------------------------------
+     0000    l__BSS
+     0000    l__CABS
+     0000    l__GSINIT
+     0000    l__HEAP
+     0000    l__HEAP_END
+     0000    l__HOME
+     0000    l__OVERLAY
+     0000    s__HEADER
+     0001    l__GSFINAL
+     0005    l__DATA
+     0759    l__FLOS_PROXY_CODE
+     088F    l__CODE
+     5044    l__HEADER
+     5080    s__FLOS_PROXY_CODE
+     5A80    s__CODE
+     630F    s__GSFINAL
+     630F    s__GSINIT
+     630F    s__HOME
+     A000    s__DATA
+     A005    s__BSS
+     A005    s__CABS
+     A005    s__HEAP
+     A005    s__HEAP_END
+     A005    s__OVERLAY
+
+Hexadecimal
+
+Area                               Addr   Size   Decimal Bytes (Attributes)
+--------------------------------   ----   ----   ------- ----- ------------
+_CODE                              5A80   088F =   2191. bytes (REL,CON)
+
+      Value  Global
+   --------  --------------------------------
+     5A80    __clock
+     5A81    _exit
+     5A93    flos_sp
+     5A95    _flos_cmdline
+     5A97    _flos_spawn_cmd
+     5ABF    _MarkFrameTime
+     5ABF    _MarkFrameTime_start
+     5ADA    _FLOS_GetLastError
+     5ADA    _FLOS_GetLastError_start
+     5ADA    _MarkFrameTime_end
+     5AE2    _FLOS_CheckDiskAvailable
+     5AE2    _FLOS_CheckDiskAvailable_start
+     5AE2    _FLOS_GetLastError_end
+     5B08    _FLOS_CheckDiskAvailable_end
+     5B08    _FLOS_MakeDir
+     5B08    _FLOS_MakeDir_start
+     5B52    _FLOS_ChangeDir
+     5B52    _FLOS_ChangeDir_start
+     5B52    _FLOS_MakeDir_end
+     5B9C    _FLOS_ChangeDir_end
+     5B9C    _FLOS_ParentDir
+     5B9C    _FLOS_ParentDir_start
+     5BCC    _FLOS_ParentDir_end
+     5BCC    _FLOS_RootDir
+     5BCC    _FLOS_RootDir_start
+     5BE2    _FLOS_DeleteDir
+     5BE2    _FLOS_DeleteDir_start
+     5BE2    _FLOS_RootDir_end
+     5C2C    _FLOS_DeleteDir_end
+     5C2C    _FLOS_StoreDirPosition
+     5C2C    _FLOS_StoreDirPosition_start
+     5C42    _FLOS_RestoreDirPosition
+     5C42    _FLOS_RestoreDirPosition_start
+     5C42    _FLOS_StoreDirPosition_end
+     5C58    _FLOS_GetTotalSectors
+     5C58    _FLOS_GetTotalSectors_start
+     5C58    _FLOS_RestoreDirPosition_end
+     5C7A    _FLOS_FindFile
+     5C7A    _FLOS_FindFile_start
+     5C7A    _FLOS_GetTotalSectors_end
+     5D0C    _FLOS_FindFile_end
+     5D0C    _FLOS_SetLoadLength
+     5D0C    _FLOS_SetLoadLength_start
+     5D48    _FLOS_SetFilePointer
+     5D48    _FLOS_SetFilePointer_start
+     5D48    _FLOS_SetLoadLength_end
+     5D84    _FLOS_ForceLoad
+     5D84    _FLOS_ForceLoad_start
+     5D84    _FLOS_SetFilePointer_end
+     5DD8    _FLOS_CreateFile
+     5DD8    _FLOS_CreateFile_start
+     5DD8    _FLOS_ForceLoad_end
+     5E36    _FLOS_CreateFile_end
+     5E36    _FLOS_EraseFile
+     5E36    _FLOS_EraseFile_start
+     5E80    _FLOS_EraseFile_end
+     5E80    _FLOS_WriteBytesToFile
+     5E80    _FLOS_WriteBytesToFile_start
+     5F00    _FLOS_PrintString
+     5F00    _FLOS_PrintString_start
+     5F00    _FLOS_WriteBytesToFile_end
+     5F30    _FLOS_ClearScreen
+     5F30    _FLOS_ClearScreen_start
+     5F30    _FLOS_PrintString_end
+     5F46    _FLOS_ClearScreen_end
+     5F46    _FLOS_FlosDisplay
+     5F46    _FLOS_FlosDisplay_start
+     5F5C    _FLOS_FlosDisplay_end
+     5F5C    _FLOS_WaitVRT
+     5F5C    _FLOS_WaitVRT_start
+     5F72    _FLOS_SetPen
+     5F72    _FLOS_SetPen_start
+     5F72    _FLOS_WaitVRT_end
+     5F9C    _FLOS_SetCursorPos
+     5F9C    _FLOS_SetCursorPos_start
+     5F9C    _FLOS_SetPen_end
+     5FD5    _FLOS_SetCursorPos_end
+     5FD5    _FLOS_WaitKeyPress
+     5FD5    _FLOS_WaitKeyPress_start
+     6014    _FLOS_GetKeyPress
+     6014    _FLOS_GetKeyPress_start
+     6014    _FLOS_WaitKeyPress_end
+     6064    _FLOS_DirListFirstEntry
+     6064    _FLOS_DirListFirstEntry_start
+     6064    _FLOS_GetKeyPress_end
+     607A    _FLOS_DirListFirstEntry_end
+     607A    _FLOS_DirListGetEntry
+     607A    _FLOS_DirListGetEntry_start
+     60F6    _FLOS_DirListGetEntry_end
+     60F6    _FLOS_DirListNextEntry
+     60F6    _FLOS_DirListNextEntry_start
+     6110    _FLOS_DirListNextEntry_end
+     6110    _FLOS_GetDirName
+     6110    _FLOS_GetDirName_start
+     613C    _FLOS_GetDirName_end
+     613C    _FLOS_GetVersion
+     613C    _FLOS_GetVersion_start
+     6186    _FLOS_GetVersion_end
+     6186    _FLOS_PrintStringLFCR
+     6186    _FLOS_PrintStringLFCR_start
+     61A4    _FLOS_PrintStringLFCR_end
+     61A6    _FLOS_GetCmdLine
+     61A6    _FLOS_GetCmdLine_start
+     61AA    _FLOS_GetCmdLine_end
+     61AA    _FLOS_SetSpawnCmdLine
+     61AA    _FLOS_SetSpawnCmdLine_start
+     61E5    _FLOS_SetSpawnCmdLine_end
+     61E5    _SetVideoMode
+     61E5    _SetVideoMode_start
+     620E    _SetVideoMode_end
+     620E    _own_sp
+     6210    _FillVideoMem
+     6210    _FillVideoMem_start
+     623E    _FillVideoMem_end
+     623E    _SetPalette
+     623E    _SetPalette_start
+     624A    _SetPalette_end
+     624A    _myPalette
+     625A    _main
+     625A    _main_start
+     6288    _main_end
+     6288    _memset
+     6288    _memset_start
+     62C9    _memset_end
+     62C9    _strcat
+     62C9    _strcat_start
+     62F4    _strcat_end
+     62F4    _strlen
+
+
+
+Hexadecimal
+
+Area                               Addr   Size   Decimal Bytes (Attributes)
+--------------------------------   ----   ----   ------- ----- ------------
+_GSINIT                            630F   0000 =      0. bytes (REL,CON)
+
+      Value  Global
+   --------  --------------------------------
+     630F    gsinit
+
+
+Hexadecimal
+
+Area                               Addr   Size   Decimal Bytes (Attributes)
+--------------------------------   ----   ----   ------- ----- ------------
+_DATA                              A000   0005 =      5. bytes (REL,CON)
+
+      Value  Global
+   --------  --------------------------------
+     A000    _g_a1_byte_result
+     A001    _g_flos_lasterror
+     A002    _g_flos_hw_lasterror
+     A003    _pFunc
+
+
+
+
+
+
+Hexadecimal
+
+Area                               Addr   Size   Decimal Bytes (Attributes)
+--------------------------------   ----   ----   ------- ----- ------------
+_FLOS_PROXY_CODE                   5080   0759 =   1881. bytes (REL,CON)
+
+      Value  Global
+   --------  --------------------------------
+     5080    _flos_proxy_code
+MODULES
+	FILE C:\_v6z80p_13_04_2009/Contributions/Valen/c_programs/c_support/crt/obj/crt0_v6z80p.o
+		NAME crt0
+	FILE C:\_v6z80p_13_04_2009/Contributions/Valen/c_programs/c_support/os_interface_for_c/obj/i_flos.o
+		NAME i_flos
+	FILE C:\_v6z80p_13_04_2009/Contributions/Valen/c_programs/c_support/os_proxy/obj/flos_proxy_code.o
+		NAME flos_proxy_code
+	FILE C:\_v6z80p_13_04_2009/Contributions/Valen/c_programs/src/tstgfx1/obj/myheap.o
+	FILE obj/tstgfx1.o
+		NAME tstgfx1
+LIBRARIES
+	LIBRARY C:\Program Files\SDCC\bin\..\lib\z80/z80.lib
+		MODULE _memset.o
+	LIBRARY C:\Program Files\SDCC\bin\..\lib\z80/z80.lib
+		MODULE _strcat.o
+	LIBRARY C:\Program Files\SDCC\bin\..\lib\z80/z80.lib
+		MODULE strlen.o
+USERBASEDEF
+	_CODE = 0x5a80
+	_DATA = 0xa000
+	_FLOS_PROXY_CODE=0x5080

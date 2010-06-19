@@ -1,0 +1,56 @@
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+
+Symbol Table
+
+    _FLOS_FlosDisplay                                              **** GX
+    _FLOS_WaitKeyPress                                             **** GX
+  0 _FillVideoMem                                                  002B GR
+  0 _FillVideoMem_end                                              0059 GR
+  0 _FillVideoMem_start                                            002B GR
+  0 _SetPalette                                                    0059 GR
+  0 _SetPalette_end                                                0065 GR
+  0 _SetPalette_start                                              0059 GR
+  0 _SetVideoMode                                                  0000 GR
+  0 _SetVideoMode_end                                              0029 GR
+  0 _SetVideoMode_start                                            0000 GR
+    _io__sys_clear_irq_flags                                    =  0002 
+    _io__sys_irq_enable                                         =  0001 
+    _io__sys_joy_com_flags                                      =  0005 
+    _io__sys_keyboard_data                                      =  0002 
+    _io__sys_mem_select                                         =  0000 
+    _io__sys_ps2_joy_control                                    =  0003 
+  0 _main                                                          0075 GR
+  0 _main_end                                                      00A3 GR
+  0 _main_start                                                    0075 GR
+    _memset                                                        **** GX
+    _mm__bitplane0a_loc__byte0                                  =  0240 
+    _mm__bitplane0a_loc__byte1                                  =  0241 
+    _mm__bitplane0a_loc__byte2                                  =  0242 
+    _mm__bitplane0a_loc__byte3                                  =  0243 
+    _mm__mult_index                                             =  020A 
+    _mm__mult_read                                              =  0704 
+    _mm__mult_table                                             =  0600 
+    _mm__mult_write                                             =  0208 
+    _mm__vreg_ext_vidctrl                                       =  020C 
+    _mm__vreg_rasthi                                            =  0204 
+    _mm__vreg_read                                              =  0700 
+    _mm__vreg_sprctrl                                           =  0207 
+    _mm__vreg_vidctrl                                           =  0201 
+    _mm__vreg_vidpage                                           =  0206 
+    _mm__vreg_window                                            =  0202 
+    _mm__vreg_xhws                                              =  0200 
+    _mm__vreg_yhws_bplcount                                     =  0203 
+  0 _myPalette                                                     0065 GR
+  0 _own_sp                                                        0029 GR
+
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+
+Area Table
+
+   0 _CODE                                                          size   A3   flags 0
+   1 _DATA                                                          size    0   flags 0
+   2 _OVERLAY                                                       size    0   flags 0
+   3 _HOME                                                          size    0   flags 0
+   4 _GSINIT                                                        size    0   flags 0
+   5 _GSFINAL                                                       size    0   flags 0
+   6 _CABS                                                          size    0   flags 0

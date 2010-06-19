@@ -1,0 +1,5 @@
+SDCC problem (error)
+
+            set_sprite_regs(50/*+this->offset*/, this->gobj.x /*+ i*16*/,  this->gobj.y, 
+                            this->spr_height, 
+this line ==>               this->spr_def_start + ((this->spr_anim_def_offset/256) * this->spr_height);

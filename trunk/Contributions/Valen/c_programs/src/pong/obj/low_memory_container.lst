@@ -1,0 +1,325 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 2.9.0 #5416 (Mar 22 2009) (MINGW32)
+                              4 ; This file was generated Tue Jun 08 18:28:01 2010
+                              5 ;--------------------------------------------------------
+                              6 	.module low_memory_container
+                              7 	.optsdcc -mz80
+                              8 	
+                              9 ;--------------------------------------------------------
+                             10 ; Public variables in this module
+                             11 ;--------------------------------------------------------
+                             12 	.globl _sound_fx__one
+                             13 	.globl _Sound_NewFx
+                             14 	.globl _Sound_PlayFx
+                             15 	.globl _Sound_AddFxDesc
+                             16 	.globl _Music_InitTracker
+                             17 	.globl _Music_PlayTracker
+                             18 	.globl _Music_UpdateSoundHardware
+                             19 	.globl _Music_SetForceSampleBase
+                             20 ;--------------------------------------------------------
+                             21 ; special function registers
+                             22 ;--------------------------------------------------------
+                    0000     23 _io__sys_mem_select	=	0x0000
+                    0002     24 _io__sys_keyboard_data	=	0x0002
+                    0003     25 _io__sys_ps2_joy_control	=	0x0003
+                    0005     26 _io__sys_joy_com_flags	=	0x0005
+                    0001     27 _io__sys_irq_enable	=	0x0001
+                    0002     28 _io__sys_clear_irq_flags	=	0x0002
+                             29 ;--------------------------------------------------------
+                             30 ;  ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area _DATA
+                    0200     33 _mm__vreg_xhws	=	0x0200
+                    0201     34 _mm__vreg_vidctrl	=	0x0201
+                    0202     35 _mm__vreg_window	=	0x0202
+                    0203     36 _mm__vreg_yhws_bplcount	=	0x0203
+                    0204     37 _mm__vreg_rasthi	=	0x0204
+                    0206     38 _mm__vreg_vidpage	=	0x0206
+                    0207     39 _mm__vreg_sprctrl	=	0x0207
+                    0208     40 _mm__mult_write	=	0x0208
+                    020A     41 _mm__mult_index	=	0x020a
+                    020C     42 _mm__vreg_ext_vidctrl	=	0x020c
+                    0700     43 _mm__vreg_read	=	0x0700
+                    0704     44 _mm__mult_read	=	0x0704
+                    0600     45 _mm__mult_table	=	0x0600
+   0000                      46 _btmp1:
+   0000                      47 	.ds 1
+   0001                      48 _wtmp1:
+   0001                      49 	.ds 2
+   0003                      50 _sound_fx__one::
+   0003                      51 	.ds 14
+                             52 ;--------------------------------------------------------
+                             53 ; overlayable items in  ram 
+                             54 ;--------------------------------------------------------
+                             55 	.area _OVERLAY
+                             56 ;--------------------------------------------------------
+                             57 ; external initialized ram data
+                             58 ;--------------------------------------------------------
+                             59 ;--------------------------------------------------------
+                             60 ; global & static initialisations
+                             61 ;--------------------------------------------------------
+                             62 	.area _HOME
+                             63 	.area _GSINIT
+                             64 	.area _GSFINAL
+                             65 	.area _GSINIT
+                             66 ;low_memory_container.c:85: } sound_fx__one = {
+   0000 21r03s00             67 	ld	hl,#_sound_fx__one
+   0003 36 80                68 	ld	(hl),#0x80
+   0005 3E 10                69 	ld	a,#0x10
+   0007 32r04s00             70 	ld	(#_sound_fx__one + 1),a
+   000A 3E FF                71 	ld	a,#0xFF
+   000C 32r05s00             72 	ld	(#_sound_fx__one + 2),a
+   000F 21r06s00             73 	ld	hl, #_sound_fx__one + 3
+   0012 36 00                74 	ld	(hl),#0x00
+   0014 23                   75 	inc	hl
+   0015 36 00                76 	ld	(hl),#0x00
+   0017 21r08s00             77 	ld	hl, #_sound_fx__one + 5
+   001A 36 12                78 	ld	(hl),#0x12
+   001C 23                   79 	inc	hl
+   001D 36 08                80 	ld	(hl),#0x08
+   001F 21r0As00             81 	ld	hl, #_sound_fx__one + 7
+   0022 36 D0                82 	ld	(hl),#0xD0
+   0024 23                   83 	inc	hl
+   0025 36 07                84 	ld	(hl),#0x07
+   0027 21r0Cs00             85 	ld	hl, #_sound_fx__one + 9
+   002A 36 00                86 	ld	(hl),#0x00
+   002C 23                   87 	inc	hl
+   002D 36 00                88 	ld	(hl),#0x00
+   002F 21r0Es00             89 	ld	hl, #_sound_fx__one + 11
+   0032 36 02                90 	ld	(hl),#0x02
+   0034 23                   91 	inc	hl
+   0035 36 00                92 	ld	(hl),#0x00
+   0037 01r10s00             93 	ld	bc,#_sound_fx__one + 13
+   003A 3E FF                94 	ld	a,#0xFF
+   003C 02                   95 	ld	(bc),a
+                             96 ;--------------------------------------------------------
+                             97 ; Home
+                             98 ;--------------------------------------------------------
+                             99 	.area _HOME
+                            100 	.area _HOME
+                            101 ;--------------------------------------------------------
+                            102 ; code
+                            103 ;--------------------------------------------------------
+                            104 	.area _LOW_MEM_CODE
+                            105 ;low_memory_container.c:42: void Sound_NewFx(byte fx_number)
+                            106 ;	---------------------------------
+                            107 ; Function Sound_NewFx
+                            108 ; ---------------------------------
+   0000                     109 _Sound_NewFx_start::
+   0000                     110 _Sound_NewFx:
+   0000 DD E5               111 	push	ix
+   0002 DD 21 00 00         112 	ld	ix,#0
+   0006 DD 39               113 	add	ix,sp
+                            114 ;low_memory_container.c:44: if(!game.isSoundfxEnabled) return;
+   0008 01r07s00            115 	ld	bc,#_game + 7
+   000B 0A                  116 	ld	a,(bc)
+   000C B7                  117 	or	a,a
+   000D 28 3A               118 	jr	Z,00103$
+                            119 ;low_memory_container.c:45: btmp1 = fx_number;
+   000F DD 7E 04            120 	ld	a,4 (ix)
+   0012 FD 21r00s00         121 	ld	iy,#_btmp1
+   0016 FD 77 00            122 	ld	0 (iy),a
+                            123 ;low_memory_container.c:57: ENDASM();
+                            124 ;;
+   0019 F5 C5 D5 E5 D9 F5   125 		   push af push bc push de push hl exx push af push bc push de push hl exx push ix push iy;
+        C5 D5 E5 D9 DD E5
+        FD E5
+   0027 3Ar00s00            126 		   ld a,(#_btmp1)
+   002A F3                  127 		   di
+   002B F5 3E 02 D3 00 F1   128 		   push af ld a,#1 + #1 out (#0x00), a pop af;
+                            129 	
+   0031 CD 00 81            130 		   call (0x8000 + 0x100 + 0)
+   0034 F5 3E 01 D3 00 F1   131 		   push af ld a,#0 + #1 out (#0x00), a pop af;
+   003A FB                  132 		   ei
+   003B FD E1 DD E1 D9 E1   133 		   pop iy pop ix exx pop hl pop de pop bc pop af exx pop hl pop de pop bc pop af;
+        D1 C1 F1 D9 E1 D1
+        C1 F1
+                            134 		   
+   0049                     135 00103$:
+   0049 DD E1               136 	pop	ix
+   004B C9                  137 	ret
+   004C                     138 _Sound_NewFx_end::
+                            139 ;low_memory_container.c:61: void Sound_PlayFx(void)
+                            140 ;	---------------------------------
+                            141 ; Function Sound_PlayFx
+                            142 ; ---------------------------------
+   004C                     143 _Sound_PlayFx_start::
+   004C                     144 _Sound_PlayFx:
+                            145 ;low_memory_container.c:63: if(!game.isSoundfxEnabled) return;
+   004C 01r07s00            146 	ld	bc,#_game + 7
+   004F 0A                  147 	ld	a,(bc)
+   0050 B7                  148 	or	a,a
+   0051 C8                  149 	ret	Z
+                            150 ;low_memory_container.c:65: DI();
+   0052 F3                  151 		di 
+                            152 ;low_memory_container.c:66: SET_MUSIC_BANK;
+   0053 3E 02               153 	ld	a,#0x02
+   0055 D3 00               154 	out	(_io__sys_mem_select),a
+                            155 ;low_memory_container.c:72: ENDASM();
+                            156 ;;
+   0057 F5 C5 D5 E5 D9 F5   157 		   push af push bc push de push hl exx push af push bc push de push hl exx push ix push iy;
+        C5 D5 E5 D9 DD E5
+        FD E5
+                            158 	
+   0065 CD 03 81            159 		   call (0x8000 + 0x100 + 3)
+   0068 FD E1 DD E1 D9 E1   160 		   pop iy pop ix exx pop hl pop de pop bc pop af exx pop hl pop de pop bc pop af;
+        D1 C1 F1 D9 E1 D1
+        C1 F1
+                            161 		   
+                            162 ;low_memory_container.c:73: SET_PONG_MAIN_BANK;
+   0076 3E 01               163 	ld	a,#0x01
+   0078 D3 00               164 	out	(_io__sys_mem_select),a
+                            165 ;low_memory_container.c:74: EI();
+   007A FB                  166 		ei 
+   007B C9                  167 	ret
+   007C                     168 _Sound_PlayFx_end::
+                            169 ;low_memory_container.c:90: void Sound_AddFxDesc(byte fx_number,  SOUND_FX* p)
+                            170 ;	---------------------------------
+                            171 ; Function Sound_AddFxDesc
+                            172 ; ---------------------------------
+   007C                     173 _Sound_AddFxDesc_start::
+   007C                     174 _Sound_AddFxDesc:
+   007C DD E5               175 	push	ix
+   007E DD 21 00 00         176 	ld	ix,#0
+   0082 DD 39               177 	add	ix,sp
+                            178 ;low_memory_container.c:92: DI();
+   0084 F3                  179 		di 
+                            180 ;low_memory_container.c:93: SET_MUSIC_BANK;
+   0085 3E 02               181 	ld	a,#0x02
+   0087 D3 00               182 	out	(_io__sys_mem_select),a
+                            183 ;low_memory_container.c:95: ((word*)SOUND_FX__FXLIST)[fx_number] = (word)p;
+   0089 DD 4E 04            184 	ld	c,4 (ix)
+   008C 06 00               185 	ld	b,#0x00
+   008E CB 21               186 	sla	c
+   0090 CB 10               187 	rl	b
+   0092 21 00 80            188 	ld	hl,#0x8000
+   0095 09                  189 	add	hl,bc
+   0096 4D                  190 	ld	c,l
+   0097 44                  191 	ld	b,h
+   0098 DD 5E 05            192 	ld	e,5 (ix)
+   009B DD 56 06            193 	ld	d,6 (ix)
+   009E 69                  194 	ld	l,c
+   009F 60                  195 	ld	h,b
+   00A0 73                  196 	ld	(hl),e
+   00A1 23                  197 	inc	hl
+   00A2 72                  198 	ld	(hl),d
+                            199 ;low_memory_container.c:96: SET_PONG_MAIN_BANK;
+   00A3 3E 01               200 	ld	a,#0x01
+   00A5 D3 00               201 	out	(_io__sys_mem_select),a
+                            202 ;low_memory_container.c:97: EI();
+   00A7 FB                  203 		ei 
+   00A8 DD E1               204 	pop	ix
+   00AA C9                  205 	ret
+   00AB                     206 _Sound_AddFxDesc_end::
+                            207 ;low_memory_container.c:103: void Music_InitTracker(void)
+                            208 ;	---------------------------------
+                            209 ; Function Music_InitTracker
+                            210 ; ---------------------------------
+   00AB                     211 _Music_InitTracker_start::
+   00AB                     212 _Music_InitTracker:
+                            213 ;low_memory_container.c:114: ENDASM();
+                            214 ;;
+   00AB F5 C5 D5 E5 D9 F5   215 		   push af push bc push de push hl exx push af push bc push de push hl exx push ix push iy;
+        C5 D5 E5 D9 DD E5
+        FD E5
+   00B9 F3                  216 		   di
+   00BA F5 3E 02 D3 00 F1   217 		   push af ld a,#1 + #1 out (#0x00), a pop af;
+                            218 	
+   00C0 CD 06 81            219 		   call (0x8000 + 0x100 + 3*2)
+   00C3 F5 3E 01 D3 00 F1   220 		   push af ld a,#0 + #1 out (#0x00), a pop af;
+   00C9 FB                  221 		   ei
+   00CA FD E1 DD E1 D9 E1   222 		   pop iy pop ix exx pop hl pop de pop bc pop af exx pop hl pop de pop bc pop af;
+        D1 C1 F1 D9 E1 D1
+        C1 F1
+                            223 		   
+   00D8 C9                  224 	ret
+   00D9                     225 _Music_InitTracker_end::
+                            226 ;low_memory_container.c:117: void Music_PlayTracker(void)
+                            227 ;	---------------------------------
+                            228 ; Function Music_PlayTracker
+                            229 ; ---------------------------------
+   00D9                     230 _Music_PlayTracker_start::
+   00D9                     231 _Music_PlayTracker:
+                            232 ;low_memory_container.c:128: ENDASM();
+                            233 ;;
+   00D9 F5 C5 D5 E5 D9 F5   234 		   push af push bc push de push hl exx push af push bc push de push hl exx push ix push iy;
+        C5 D5 E5 D9 DD E5
+        FD E5
+   00E7 F3                  235 		   di
+   00E8 F5 3E 02 D3 00 F1   236 		   push af ld a,#1 + #1 out (#0x00), a pop af;
+                            237 	
+   00EE CD 09 81            238 		   call (0x8000 + 0x100 + 3*3)
+   00F1 F5 3E 01 D3 00 F1   239 		   push af ld a,#0 + #1 out (#0x00), a pop af;
+   00F7 FB                  240 		   ei
+   00F8 FD E1 DD E1 D9 E1   241 		   pop iy pop ix exx pop hl pop de pop bc pop af exx pop hl pop de pop bc pop af;
+        D1 C1 F1 D9 E1 D1
+        C1 F1
+                            242 		   
+   0106 C9                  243 	ret
+   0107                     244 _Music_PlayTracker_end::
+                            245 ;low_memory_container.c:131: void Music_UpdateSoundHardware(void)
+                            246 ;	---------------------------------
+                            247 ; Function Music_UpdateSoundHardware
+                            248 ; ---------------------------------
+   0107                     249 _Music_UpdateSoundHardware_start::
+   0107                     250 _Music_UpdateSoundHardware:
+                            251 ;low_memory_container.c:142: ENDASM();
+                            252 ;;
+   0107 F5 C5 D5 E5 D9 F5   253 		   push af push bc push de push hl exx push af push bc push de push hl exx push ix push iy;
+        C5 D5 E5 D9 DD E5
+        FD E5
+   0115 F3                  254 		   di
+   0116 F5 3E 02 D3 00 F1   255 		   push af ld a,#1 + #1 out (#0x00), a pop af;
+                            256 	
+   011C CD 0C 81            257 		   call (0x8000 + 0x100 + 3*4)
+   011F F5 3E 01 D3 00 F1   258 		   push af ld a,#0 + #1 out (#0x00), a pop af;
+   0125 FB                  259 		   ei
+   0126 FD E1 DD E1 D9 E1   260 		   pop iy pop ix exx pop hl pop de pop bc pop af exx pop hl pop de pop bc pop af;
+        D1 C1 F1 D9 E1 D1
+        C1 F1
+                            261 		   
+                            262 ;low_memory_container.c:145: mm__mult_table = 0;     // restore sin table first entry
+   0134 21 00 06            263 	ld	hl,#_mm__mult_table + 0
+   0137 36 00               264 	ld	(hl), #0x00
+   0139 21 01 06            265 	ld	hl,#_mm__mult_table + 1
+   013C 36 00               266 	ld	(hl), #0x00
+   013E C9                  267 	ret
+   013F                     268 _Music_UpdateSoundHardware_end::
+                            269 ;low_memory_container.c:149: void Music_SetForceSampleBase(word base)
+                            270 ;	---------------------------------
+                            271 ; Function Music_SetForceSampleBase
+                            272 ; ---------------------------------
+   013F                     273 _Music_SetForceSampleBase_start::
+   013F                     274 _Music_SetForceSampleBase:
+   013F DD E5               275 	push	ix
+   0141 DD 21 00 00         276 	ld	ix,#0
+   0145 DD 39               277 	add	ix,sp
+                            278 ;low_memory_container.c:151: wtmp1 = base;
+   0147 DD 7E 04            279 	ld	a,4 (ix)
+   014A FD 21r01s00         280 	ld	iy,#_wtmp1
+   014E FD 77 00            281 	ld	0 (iy),a
+   0151 DD 7E 05            282 	ld	a,5 (ix)
+   0154 FD 21r01s00         283 	ld	iy,#_wtmp1
+   0158 FD 77 01            284 	ld	1 (iy),a
+                            285 ;low_memory_container.c:163: ENDASM();
+                            286 ;;
+   015B F5 C5 D5 E5 D9 F5   287 		   push af push bc push de push hl exx push af push bc push de push hl exx push ix push iy;
+        C5 D5 E5 D9 DD E5
+        FD E5
+   0169 2Ar01s00            288 		   ld hl,(#_wtmp1)
+   016C F3                  289 		   di
+   016D F5 3E 02 D3 00 F1   290 		   push af ld a,#1 + #1 out (#0x00), a pop af;
+                            291 	
+   0173 CD 0F 81            292 		   call (0x8000 + 0x100 + 3*5)
+   0176 F5 3E 01 D3 00 F1   293 		   push af ld a,#0 + #1 out (#0x00), a pop af;
+   017C FB                  294 		   ei
+   017D FD E1 DD E1 D9 E1   295 		   pop iy pop ix exx pop hl pop de pop bc pop af exx pop hl pop de pop bc pop af;
+        D1 C1 F1 D9 E1 D1
+        C1 F1
+                            296 		   
+   018B DD E1               297 	pop	ix
+   018D C9                  298 	ret
+   018E                     299 _Music_SetForceSampleBase_end::
+                            300 	.area _CODE
+                            301 	.area _CABS

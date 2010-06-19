@@ -1,0 +1,526 @@
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+
+Symbol Table
+
+  0 _Background_InitTilemap                                        0CAD GR
+  0 _Background_InitTilemap_end                                    0D6D GR
+  0 _Background_InitTilemap_start                                  0CAD GR
+  0 _Background_LoadTiles                                          0B2B GR
+  0 _Background_LoadTiles_end                                      0BFF GR
+  0 _Background_LoadTiles_start                                    0B2B GR
+  0 _ChunkLoader_Init                                              0405 GR
+  0 _ChunkLoader_Init_end                                          044E GR
+  0 _ChunkLoader_Init_start                                        0405 GR
+  0 _ChunkLoader_IsDone                                            057C GR
+  0 _ChunkLoader_IsDone_end                                        05C6 GR
+  0 _ChunkLoader_IsDone_start                                      057C GR
+  0 _ChunkLoader_LoadChunk                                         044E GR
+  0 _ChunkLoader_LoadChunk_end                                     057C GR
+  0 _ChunkLoader_LoadChunk_start                                   044E GR
+  0 _Debug_CheckCurrentBank                                        374D GR
+  0 _Debug_CheckCurrentBank_end                                    37B8 GR
+  0 _Debug_CheckCurrentBank_start                                  374D GR
+  0 _Debug_Draw                                                    3614 GR
+  1 _Debug_Draw_corner_1_1                                         0A6E R
+  1 _Debug_Draw_counter_1_1                                        0A6C R
+  0 _Debug_Draw_end                                                374D GR
+  0 _Debug_Draw_start                                              3614 GR
+  0 _Debug_Move                                                    35FB GR
+  0 _Debug_Move_end                                                3614 GR
+  0 _Debug_Move_start                                              35FB GR
+  0 _DiagMessage                                                   0225 GR
+  0 _DiagMessage_end                                               0280 GR
+  0 _DiagMessage_start                                             0225 GR
+  0 _DiskIO_BeginDiskOperation                                     05C6 GR
+  0 _DiskIO_BeginDiskOperation_end                                 05C8 GR
+  0 _DiskIO_BeginDiskOperation_start                               05C6 GR
+  0 _DiskIO_EndDiskOperation                                       05C8 GR
+  0 _DiskIO_EndDiskOperation_end                                   05DD GR
+  0 _DiskIO_EndDiskOperation_start                                 05C8 GR
+  0 _DiskIO_VisualizeDiskError                                     05DD GR
+  0 _DiskIO_VisualizeDiskError_end                                 063B GR
+  0 _DiskIO_VisualizeDiskError_start                               05DD GR
+  0 _DrawBall                                                      085C GR
+  0 _DrawBall_end                                                  08DF GR
+  0 _DrawBall_start                                                085C GR
+  0 _DrawBat                                                       07FA GR
+  0 _DrawBat_end                                                   085C GR
+  0 _DrawBat_start                                                 07FA GR
+    _FLOS_FindFile                                                 **** GX
+    _FLOS_ForceLoad                                                **** GX
+    _FLOS_GetLastError                                             **** GX
+    _FLOS_PrintString                                              **** GX
+    _FLOS_PrintStringLFCR                                          **** GX
+    _FLOS_SetFilePointer                                           **** GX
+    _FLOS_SetLoadLength                                            **** GX
+    _FLOS_WaitVRT                                                  **** GX
+  0 _GameObjAnim_Draw                                              1652 GR
+  0 _GameObjAnim_Draw_end                                          184C GR
+  0 _GameObjAnim_Draw_start                                        1652 GR
+  0 _GameObjAnim_EnableAnimation                                   184C GR
+  0 _GameObjAnim_EnableAnimation_end                               18A5 GR
+  0 _GameObjAnim_EnableAnimation_start                             184C GR
+  0 _GameObjAnim_Free                                              18EA GR
+  0 _GameObjAnim_Free_end                                          1900 GR
+  0 _GameObjAnim_Free_start                                        18EA GR
+  0 _GameObjAnim_Init                                              15F9 GR
+  0 _GameObjAnim_Init_end                                          1647 GR
+  0 _GameObjAnim_Init_start                                        15F9 GR
+  0 _GameObjAnim_Move                                              1647 GR
+  0 _GameObjAnim_Move_end                                          1652 GR
+  0 _GameObjAnim_Move_start                                        1647 GR
+  0 _GameObjAnim_ShowOnlyFirstFrame                                18BF GR
+  0 _GameObjAnim_ShowOnlyFirstFrame_end                            18EA GR
+  0 _GameObjAnim_ShowOnlyFirstFrame_start                          18BF GR
+  0 _GameObjAnim_init_animation                                    18A5 GR
+  0 _GameObjAnim_init_animation_end                                18BF GR
+  0 _GameObjAnim_init_animation_start                              18A5 GR
+  0 _GameObjBall_CheckCollision                                    29C4 GR
+  0 _GameObjBall_CheckCollision_end                                2BFE GR
+  0 _GameObjBall_CheckCollision_start                              29C4 GR
+  0 _GameObjBall_Draw                                              2BFE GR
+  0 _GameObjBall_Draw_end                                          2C43 GR
+  0 _GameObjBall_Draw_start                                        2BFE GR
+  0 _GameObjBall_Init                                              269F GR
+  0 _GameObjBall_Init_end                                          27F6 GR
+  0 _GameObjBall_Init_start                                        269F GR
+  0 _GameObjBall_Move                                              287B GR
+  0 _GameObjBall_Move_end                                          29C4 GR
+  0 _GameObjBall_Move_start                                        287B GR
+  0 _GameObjBall_SetState                                          27F6 GR
+  0 _GameObjBall_SetState_end                                      287B GR
+  0 _GameObjBall_SetState_start                                    27F6 GR
+  0 _GameObjBat_Draw                                               24EB GR
+  0 _GameObjBat_Draw_end                                           254F GR
+  0 _GameObjBat_Draw_start                                         24EB GR
+  0 _GameObjBat_Fire                                               254F GR
+  0 _GameObjBat_Fire_end                                           25FD GR
+  0 _GameObjBat_Fire_start                                         254F GR
+  0 _GameObjBat_Init                                               229B GR
+  0 _GameObjBat_Init_end                                           234B GR
+  0 _GameObjBat_Init_start                                         229B GR
+  0 _GameObjBat_IsCanFireWithRocket                                25FD GR
+  0 _GameObjBat_IsCanFireWithRocket_end                            2663 GR
+  0 _GameObjBat_IsCanFireWithRocket_start                          25FD GR
+  0 _GameObjBat_Move                                               2455 GR
+  0 _GameObjBat_MoveDown                                           249B GR
+  0 _GameObjBat_MoveDown_end                                       24EB GR
+  0 _GameObjBat_MoveDown_start                                     249B GR
+  0 _GameObjBat_MoveUp                                             246B GR
+  0 _GameObjBat_MoveUp_end                                         249B GR
+  0 _GameObjBat_MoveUp_start                                       246B GR
+  0 _GameObjBat_Move_end                                           246B GR
+  0 _GameObjBat_Move_start                                         2455 GR
+  0 _GameObjBat_SetState                                           234B GR
+  0 _GameObjBat_SetState_end                                       2455 GR
+  0 _GameObjBat_SetState_start                                     234B GR
+  0 _GameObjBat_state_handler                                      2663 GR
+  0 _GameObjBat_state_handler_end                                  269F GR
+  0 _GameObjBat_state_handler_start                                2663 GR
+  0 _GameObjGameMenu_Draw                                          3196 GR
+  0 _GameObjGameMenu_Draw_end                                      31A1 GR
+  0 _GameObjGameMenu_Draw_start                                    3196 GR
+  0 _GameObjGameMenu_Init                                          30BE GR
+  0 _GameObjGameMenu_Init_end                                      3119 GR
+  0 _GameObjGameMenu_Init_start                                    30BE GR
+  0 _GameObjGameMenu_Move                                          3119 GR
+  0 _GameObjGameMenu_Move_end                                      3196 GR
+  0 _GameObjGameMenu_Move_start                                    3119 GR
+  0 _GameObjRocket_AllocateAnimationObj                            2094 GR
+  0 _GameObjRocket_AllocateAnimationObj_end                        225B GR
+  0 _GameObjRocket_AllocateAnimationObj_start                      2094 GR
+  0 _GameObjRocket_CheckCollision                                  202A GR
+  0 _GameObjRocket_CheckCollision_end                              2089 GR
+  0 _GameObjRocket_CheckCollision_start                            202A GR
+  0 _GameObjRocket_Draw                                            2089 GR
+  0 _GameObjRocket_Draw_end                                        2094 GR
+  0 _GameObjRocket_Draw_start                                      2089 GR
+  0 _GameObjRocket_Free                                            2269 GR
+  0 _GameObjRocket_Free_end                                        229B GR
+  0 _GameObjRocket_Free_start                                      2269 GR
+  0 _GameObjRocket_Init                                            1CD7 GR
+  0 _GameObjRocket_Init_end                                        1E2A GR
+  0 _GameObjRocket_Init_start                                      1CD7 GR
+  0 _GameObjRocket_Move                                            1E2A GR
+  0 _GameObjRocket_Move_end                                        202A GR
+  0 _GameObjRocket_Move_start                                      1E2A GR
+  0 _GameObjScore_Draw                                             1A27 GR
+  0 _GameObjScore_Draw_PlayerRocketsIndicator                      1C2F GR
+  0 _GameObjScore_Draw_PlayerRocketsIndicator_end                  1CD7 GR
+  0 _GameObjScore_Draw_PlayerRocketsIndicator_start                1C2F GR
+  0 _GameObjScore_Draw_end                                         1A4C GR
+  0 _GameObjScore_Draw_start                                       1A27 GR
+  0 _GameObjScore_Init                                             1900 GR
+  0 _GameObjScore_Init_end                                         195E GR
+  0 _GameObjScore_Init_start                                       1900 GR
+  0 _GameObjScore_Move                                             195E GR
+  0 _GameObjScore_Move_end                                         1A27 GR
+  0 _GameObjScore_Move_start                                       195E GR
+  0 _GameObjScore_SetScore                                         1BB1 GR
+  0 _GameObjScore_SetScore_end                                     1BD4 GR
+  0 _GameObjScore_SetScore_start                                   1BB1 GR
+  0 _GameObjScore_SetState                                         1B58 GR
+  0 _GameObjScore_SetState_end                                     1BB1 GR
+  0 _GameObjScore_SetState_start                                   1B58 GR
+  0 _GameObjScore_UpdateScore                                      1B2F GR
+  0 _GameObjScore_UpdateScore_end                                  1B58 GR
+  0 _GameObjScore_UpdateScore_start                                1B2F GR
+  0 _GameObjScore_draw_score                                       1A4C GR
+  0 _GameObjScore_draw_score_end                                   1B2F GR
+  0 _GameObjScore_draw_score_start                                 1A4C GR
+  0 _GameObjYouWin_AllocateAnimObjects                             2E81 GR
+  0 _GameObjYouWin_AllocateAnimObjects_end                         3030 GR
+  0 _GameObjYouWin_AllocateAnimObjects_start                       2E81 GR
+  0 _GameObjYouWin_Draw                                            2E76 GR
+  0 _GameObjYouWin_Draw_end                                        2E81 GR
+  0 _GameObjYouWin_Draw_start                                      2E76 GR
+  0 _GameObjYouWin_Init                                            2C43 GR
+  0 _GameObjYouWin_Init_end                                        2CBD GR
+  0 _GameObjYouWin_Init_start                                      2C43 GR
+  0 _GameObjYouWin_Move                                            2CBD GR
+  0 _GameObjYouWin_Move_end                                        2E76 GR
+  0 _GameObjYouWin_Move_start                                      2CBD GR
+  0 _GameObjYouWin_SetState                                        3030 GR
+  0 _GameObjYouWin_SetState_end                                    3055 GR
+  0 _GameObjYouWin_SetState_start                                  3030 GR
+  0 _GameObj_Collide                                               1493 GR
+  0 _GameObj_Collide_end                                           15F9 GR
+  0 _GameObj_Collide_start                                         1493 GR
+  0 _GameObj_GetInUse                                              0047 GR
+  0 _GameObj_GetInUse_end                                          005F GR
+  0 _GameObj_GetInUse_start                                        0047 GR
+  0 _GameObj_Init                                                  1355 GR
+  0 _GameObj_InitCollideBox                                        136F GR
+  0 _GameObj_InitCollideBox_end                                    1493 GR
+  0 _GameObj_InitCollideBox_start                                  136F GR
+  0 _GameObj_Init_end                                              136F GR
+  0 _GameObj_Init_start                                            1355 GR
+  0 _GameObj_SetInUse                                              002D GR
+  0 _GameObj_SetInUse_end                                          0047 GR
+  0 _GameObj_SetInUse_start                                        002D GR
+  0 _GameObj_SetPos                                                0000 GR
+  0 _GameObj_SetPos_end                                            002B GR
+  0 _GameObj_SetPos_start                                          0000 GR
+  0 _Game_HandlePlayerInput_Bat                                    393A GR
+  0 _Game_HandlePlayerInput_Bat_end                                399E GR
+  0 _Game_HandlePlayerInput_Bat_start                              393A GR
+  0 _Game_HandlePlayerInput_PauseMode                              399E GR
+  0 _Game_HandlePlayerInput_PauseMode_end                          39CA GR
+  0 _Game_HandlePlayerInput_PauseMode_start                        399E GR
+  0 _Game_InitLevelBegining                                        3B8E GR
+  0 _Game_InitLevelBegining_end                                    3BA9 GR
+  0 _Game_InitLevelBegining_start                                  3B8E GR
+  0 _Game_Initialize                                               37E5 GR
+  0 _Game_InitializeLevelGameObjects                               383B GR
+  0 _Game_InitializeLevelGameObjects_end                           38EB GR
+  0 _Game_InitializeLevelGameObjects_start                         383B GR
+  0 _Game_InitializeMenuGameObjects                                381C GR
+  0 _Game_InitializeMenuGameObjects_end                            383B GR
+  0 _Game_InitializeMenuGameObjects_start                          381C GR
+  0 _Game_Initialize_end                                           381C GR
+  0 _Game_Initialize_start                                         37E5 GR
+  0 _Game_LoadSinTable                                             3E7D GR
+  0 _Game_LoadSinTable_end                                         3EAC GR
+  0 _Game_LoadSinTable_start                                       3E7D GR
+  0 _Game_LoadStateData                                            3C54 GR
+  0 _Game_LoadStateData_end                                        3D5D GR
+  1 _Game_LoadStateData_gameStateData_1_1                          0A83 R
+  0 _Game_LoadStateData_start                                      3C54 GR
+  1 _Game_LoadStateData_tilesLevel_1_1                             0A7B R
+  1 _Game_LoadStateData_tilesMenu_1_1                              0A6F R
+  0 _Game_MarkFrameTime                                            3EB9 GR
+  0 _Game_MarkFrameTime_end                                        3ED6 GR
+  0 _Game_MarkFrameTime_start                                      3EB9 GR
+  0 _Game_Movebat                                                  38EB GR
+  0 _Game_Movebat_end                                              393A GR
+  0 _Game_Movebat_start                                            38EB GR
+  0 _Game_Play                                                     3A1A GR
+  0 _Game_Play_end                                                 3B8E GR
+  0 _Game_Play_start                                               3A1A GR
+  0 _Game_ReInit_Watcher                                           39CA GR
+  0 _Game_ReInit_Watcher_end                                       3A1A GR
+  0 _Game_ReInit_Watcher_start                                     39CA GR
+  0 _Game_RequestSetState                                          3C3D GR
+  0 _Game_RequestSetState_end                                      3C54 GR
+  0 _Game_RequestSetState_start                                    3C3D GR
+  0 _Game_SetState                                                 3DA1 GR
+  0 _Game_SetState_end                                             3E64 GR
+  0 _Game_SetState_start                                           3DA1 GR
+  0 _GetR                                                          02E6 GR
+  0 _GetR_start                                                    02E6 GR
+  0 _HW_MATH_MUL                                                   01AB R
+  0 _HW_SIN_MUL                                                    01F9 R
+  0 _Input_ClearPlayersInput                                       0D6D GR
+  0 _Input_ClearPlayersInput_end                                   0D8C GR
+  0 _Input_ClearPlayersInput_start                                 0D6D GR
+  0 _Joystick_CheckInputAutoSwith                                  0FEE GR
+  0 _Joystick_CheckInputAutoSwithForPlayer                         1005 GR
+  0 _Joystick_CheckInputAutoSwithForPlayer_end                     104A GR
+  0 _Joystick_CheckInputAutoSwithForPlayer_start                   1005 GR
+  0 _Joystick_CheckInputAutoSwith_end                              1005 GR
+  0 _Joystick_CheckInputAutoSwith_start                            0FEE GR
+  0 _Joystick_GetInput                                             0F4F GR
+  0 _Joystick_GetInputForPlayer                                    0F7A GR
+  0 _Joystick_GetInputForPlayer_end                                0FEE GR
+  0 _Joystick_GetInputForPlayer_start                              0F7A GR
+  0 _Joystick_GetInput_end                                         0F7A GR
+  0 _Joystick_GetInput_start                                       0F4F GR
+  0 _Joystick_IsSecondJoyNeedToBeReaded                            104A GR
+  0 _Joystick_IsSecondJoyNeedToBeReaded_end                        107A GR
+  0 _Joystick_IsSecondJoyNeedToBeReaded_start                      104A GR
+  0 _Joystick_SelectJoystickPort                                   0F3D GR
+  0 _Joystick_SelectJoystickPort_end                               0F4F GR
+  0 _Joystick_SelectJoystickPort_start                             0F3D GR
+  0 _Keyboard_GetLastPressedScancode                               0D9A GR
+  0 _Keyboard_GetLastPressedScancode_end                           0D9F GR
+  0 _Keyboard_GetLastPressedScancode_start                         0D9A GR
+  0 _Keyboard_IRQ_Handler                                          0D9F GR
+  0 _Keyboard_IRQ_Handler_end                                      0EFE GR
+  0 _Keyboard_IRQ_Handler_start                                    0D9F GR
+  0 _Keyboard_Init                                                 0D8C GR
+  0 _Keyboard_Init_end                                             0D9A GR
+  0 _Keyboard_Init_start                                           0D8C GR
+  0 _LoadingIcon_Enable                                            069D GR
+  0 _LoadingIcon_Enable_end                                        0743 GR
+  0 _LoadingIcon_Enable_start                                      069D GR
+  0 _LoadingIcon_Load                                              0743 GR
+  0 _LoadingIcon_LoadSprites                                       063B GR
+  0 _LoadingIcon_LoadSprites_end                                   0690 GR
+  0 _LoadingIcon_LoadSprites_start                                 063B GR
+  0 _LoadingIcon_Load_end                                          0785 GR
+  0 _LoadingIcon_Load_start                                        0743 GR
+  0 _MUSIC_Init                                                    35F0 GR
+  0 _MUSIC_Init_end                                                35FB GR
+  0 _MUSIC_Init_start                                              35F0 GR
+  0 _MUSIC_Silence                                                 35EA GR
+  0 _MUSIC_Silence_end                                             35F0 GR
+  0 _MUSIC_Silence_start                                           35EA GR
+    _MarkFrameTime                                                 **** GX
+  0 _Math_IsBoxHitBox                                              0078 GR
+  0 _Math_IsBoxHitBox_end                                          01AB GR
+  0 _Math_IsBoxHitBox_start                                        0078 GR
+  0 _Mod_FindHighestUsedPattern                                    3484 GR
+  0 _Mod_FindHighestUsedPattern_end                                34AD GR
+  0 _Mod_FindHighestUsedPattern_start                              3484 GR
+  0 _Mod_LoadMusicModule                                           34AD GR
+  0 _Mod_LoadMusicModule_end                                       35EA GR
+  0 _Mod_LoadMusicModule_start                                     34AD GR
+    _Music_InitTracker                                             **** GX
+    _Music_PlayTracker                                             **** GX
+    _Music_SetForceSampleBase                                      **** GX
+    _Music_UpdateSoundHardware                                     **** GX
+  0 _PoolGameObj_AddObjToActiveObjects                             1177 GR
+  0 _PoolGameObj_AddObjToActiveObjects_end                         11EE GR
+  0 _PoolGameObj_AddObjToActiveObjects_start                       1177 GR
+  0 _PoolGameObj_AllocateGameObj                                   1134 GR
+  0 _PoolGameObj_AllocateGameObjAnim                               10EB GR
+  0 _PoolGameObj_AllocateGameObjAnim_end                           10FE GR
+  0 _PoolGameObj_AllocateGameObjAnim_start                         10EB GR
+  0 _PoolGameObj_AllocateGameObjRocket                             10FE GR
+  0 _PoolGameObj_AllocateGameObjRocket_end                         1111 GR
+  0 _PoolGameObj_AllocateGameObjRocket_start                       10FE GR
+  0 _PoolGameObj_AllocateGameObj_end                               1177 GR
+  0 _PoolGameObj_AllocateGameObj_start                             1134 GR
+  0 _PoolGameObj_ApplyFuncDrawToObjects                            12E0 GR
+  0 _PoolGameObj_ApplyFuncDrawToObjects_end                        1355 GR
+  0 _PoolGameObj_ApplyFuncDrawToObjects_start                      12E0 GR
+  0 _PoolGameObj_ApplyFuncMoveToObjects                            126B GR
+  0 _PoolGameObj_ApplyFuncMoveToObjects_end                        12E0 GR
+  0 _PoolGameObj_ApplyFuncMoveToObjects_start                      126B GR
+  0 _PoolGameObj_FreeGameObj                                       1111 GR
+  0 _PoolGameObj_FreeGameObj_end                                   1134 GR
+  0 _PoolGameObj_FreeGameObj_start                                 1111 GR
+  0 _PoolGameObj_Init                                              10D8 GR
+  0 _PoolGameObj_Init_end                                          10EB GR
+  0 _PoolGameObj_Init_start                                        10D8 GR
+  0 _PoolGameObj_RemoveObjFromActiveObjects                        11EE GR
+  0 _PoolGameObj_RemoveObjFromActiveObjects_end                    126B GR
+  0 _PoolGameObj_RemoveObjFromActiveObjects_start                  11EE GR
+  0 _PoolSprites_AllocateSpriteNumber                              108F GR
+  0 _PoolSprites_AllocateSpriteNumber_end                          10D2 GR
+  0 _PoolSprites_AllocateSpriteNumber_start                        108F GR
+  0 _PoolSprites_FreeAllSprites                                    10D2 GR
+  0 _PoolSprites_FreeAllSprites_end                                10D8 GR
+  0 _PoolSprites_FreeAllSprites_start                              10D2 GR
+  0 _PoolSprites_Init                                              107A GR
+  0 _PoolSprites_Init_end                                          108F GR
+  0 _PoolSprites_Init_start                                        107A GR
+    _Sound_AddFxDesc                                               **** GX
+  0 _Sound_InitFx                                                  33B3 GR
+  0 _Sound_InitFx_end                                              3484 GR
+  0 _Sound_InitFx_start                                            33B3 GR
+  0 _Sound_LoadFxDescriptors                                       3380 GR
+  0 _Sound_LoadFxDescriptors_end                                   33A8 GR
+  0 _Sound_LoadFxDescriptors_start                                 3380 GR
+  0 _Sound_LoadSoundCode                                           331D GR
+  0 _Sound_LoadSoundCode_end                                       3344 GR
+  0 _Sound_LoadSoundCode_start                                     331D GR
+  0 _Sound_LoadSounds                                              3351 GR
+  0 _Sound_LoadSounds_end                                          3378 GR
+  0 _Sound_LoadSounds_start                                        3351 GR
+    _Sound_NewFx                                                   **** GX
+    _Sound_PlayFx                                                  **** GX
+  0 _Sys_ClearIRQFlags                                             02D6 GR
+  0 _Sys_ClearIRQFlags_end                                         02E6 GR
+  0 _Sys_ClearIRQFlags_start                                       02D6 GR
+  0 _TileMap_Clear                                                 0C54 GR
+  0 _TileMap_Clear_end                                             0C6A GR
+  0 _TileMap_Clear_start                                           0C54 GR
+  0 _TileMap_Fill                                                  0C6A GR
+  0 _TileMap_FillTileDefinition                                    0BFF GR
+  0 _TileMap_FillTileDefinition_end                                0C54 GR
+  0 _TileMap_FillTileDefinition_start                              0BFF GR
+  0 _TileMap_Fill_end                                              0CAD GR
+  0 _TileMap_Fill_start                                            0C6A GR
+  0 _Util_LoadPalette                                              028D GR
+  0 _Util_LoadPalette_end                                          02D6 GR
+  0 _Util_LoadPalette_start                                        028D GR
+  1 _YouWinAnim                                                    02A7 GR
+    __divsint_rrx_s                                                **** GX
+    __divuint_rrx_s                                                **** GX
+    __modsint_rrx_s                                                **** GX
+    __mulint_rrx_s                                                 **** GX
+    __rlulong_rrx_s                                                **** GX
+    __rrulong_rrx_s                                                **** GX
+  0 __str_0                                                        0280 R
+  0 __str_1                                                        028B R
+  0 __str_10                                                       33A8 R
+  0 __str_11                                                       37B8 R
+  0 __str_12                                                       37D0 R
+  0 __str_13                                                       3D5D R
+  0 __str_14                                                       3D66 R
+  0 __str_15                                                       3D72 R
+  0 __str_16                                                       3D79 R
+  0 __str_17                                                       3D86 R
+  0 __str_18                                                       3D8F R
+  0 __str_19                                                       3D9A R
+  0 __str_2                                                        039F R
+  0 __str_20                                                       3EAC R
+  0 __str_3                                                        03F1 R
+  0 __str_4                                                        0404 R
+  0 __str_5                                                        0690 R
+  0 __str_6                                                        0785 R
+  0 __str_7                                                        0B1A R
+  0 __str_8                                                        3344 R
+  0 __str_9                                                        3378 R
+    __uitoa                                                        **** GX
+    __ultoa                                                        **** GX
+  0 _ai_update                                                     31A1 GR
+  0 _ai_update_end                                                 331D GR
+  0 _ai_update_start                                               31A1 GR
+  1 _allocatedSpriteNumbers                                        0355 GR
+  1 _ball1                                                         0287 GR
+  1 _batA                                                          0247 GR
+  1 _batB                                                          0267 GR
+  1 _btmp                                                          0A69 R
+  1 _bufModFileHeader                                              062D GR
+  1 _buffer                                                        02F9 GR
+  1 _cl                                                            031B GR
+  0 _clear_shadow_sprite_regs                                      07DD GR
+  0 _clear_shadow_sprite_regs_end                                  07FA GR
+  0 _clear_shadow_sprite_regs_start                                07DD GR
+  0 _clear_sprite_regs                                             07CD GR
+  0 _clear_sprite_regs_end                                         07DD GR
+  0 _clear_sprite_regs_start                                       07CD GR
+  1 _cur_color                                                     0A9B GR
+  1 _debug                                                         02F7 GR
+  0 _delay                                                         006D GR
+  0 _delay_end                                                     0078 GR
+  0 _delay_start                                                   006D GR
+  0 _diag__FLOS_FindFile                                           035A GR
+  0 _diag__FLOS_FindFile_end                                       039F GR
+  0 _diag__FLOS_FindFile_start                                     035A GR
+  0 _diag__FLOS_ForceLoad                                          03B1 GR
+  0 _diag__FLOS_ForceLoad_end                                      03F1 GR
+  0 _diag__FLOS_ForceLoad_start                                    03B1 GR
+  0 _g_ownAnimObjConst                                             225B GR
+  1 _game                                                          02E8 GR
+  1 _gameMenu                                                      02D1 GR
+  0 _helper_GameObjScore_IsScoreBlinkedAtLeast                     1BD4 GR
+  0 _helper_GameObjScore_IsScoreBlinkedAtLeast_end                 1C2F GR
+  0 _helper_GameObjScore_IsScoreBlinkedAtLeast_start               1BD4 GR
+  0 _helper_GameObjYouWin_StartAnimation                           3055 GR
+  0 _helper_GameObjYouWin_StartAnimation_end                       30BE GR
+  0 _helper_GameObjYouWin_StartAnimation_start                     3055 GR
+  0 _initgraph                                                     0792 GR
+  0 _initgraph_end                                                 07CD GR
+  0 _initgraph_start                                               0792 GR
+  0 _inportb                                                       005F GR
+  0 _inportb_end                                                   006D GR
+  0 _inportb_start                                                 005F GR
+  0 _install_irq_handler                                           0F28 GR
+  0 _install_irq_handler_end                                       0F3D GR
+  0 _install_irq_handler_start                                     0F28 GR
+    _io__sys_clear_irq_flags                                    =  0002 
+    _io__sys_irq_enable                                         =  0001 
+    _io__sys_joy_com_flags                                      =  0005 
+    _io__sys_keyboard_data                                      =  0002 
+    _io__sys_mem_select                                         =  0000 
+    _io__sys_ps2_joy_control                                    =  0003 
+  0 _irq_handler                                                   0EFE GR
+  0 _irq_handler_start                                             0EFE GR
+  1 _keyboard                                                      033C GR
+  1 _keyboard_input_map                                            033F GR
+  0 _load_file_to_buffer                                           02EC GR
+  0 _load_file_to_buffer_end                                       035A GR
+  0 _load_file_to_buffer_start                                     02EC GR
+  0 _load_sprites                                                  0AC6 GR
+  0 _load_sprites_end                                              0B1A GR
+  0 _load_sprites_start                                            0AC6 GR
+  1 _loadingIcon                                                   0000 GR
+  0 _main                                                          3BA9 GR
+  0 _main_end                                                      3C3D GR
+  0 _main_start                                                    3BA9 GR
+    _memset                                                        **** GX
+    _mm__mult_index                                             =  020A 
+    _mm__mult_read                                              =  0704 
+    _mm__mult_table                                             =  0600 
+    _mm__mult_write                                             =  0208 
+    _mm__vreg_ext_vidctrl                                       =  020C 
+    _mm__vreg_rasthi                                            =  0204 
+    _mm__vreg_read                                              =  0700 
+    _mm__vreg_sprctrl                                           =  0207 
+    _mm__vreg_vidctrl                                           =  0201 
+    _mm__vreg_vidpage                                           =  0206 
+    _mm__vreg_window                                            =  0202 
+    _mm__vreg_xhws                                              =  0200 
+    _mm__vreg_yhws_bplcount                                     =  0203 
+  0 _own_sp                                                        002B GR
+  1 _player1_input                                                 0334 GR
+  1 _player2_input                                                 0338 GR
+  1 _pool_game_obj                                                 0378 GR
+  1 _pool_sprites                                                  0354 GR
+    _rand                                                          **** GX
+  1 _request_exit                                                  031A GR
+  1 _scoreA                                                        0201 GR
+  1 _scoreB                                                        0224 GR
+  0 _set_sprite_regs                                               091F GR
+  0 _set_sprite_regs_end                                           09CC GR
+  0 _set_sprite_regs_hw                                            08DF GR
+  0 _set_sprite_regs_hw_end                                        091F GR
+  0 _set_sprite_regs_hw_start                                      08DF GR
+  0 _set_sprite_regs_optimized                                     09CC GR
+  0 _set_sprite_regs_optimized_end                                 0AC6 GR
+  0 _set_sprite_regs_optimized_start                               09CC GR
+  0 _set_sprite_regs_start                                         091F GR
+  0 _setfillstyle                                                  3E64 GR
+  0 _setfillstyle_end                                              3E7D GR
+  0 _setfillstyle_start                                            3E64 GR
+  1 _spr_reg                                                       032B GR
+    _srand                                                         **** GX
+  0 _wait_y_window                                                 0B23 GR
+  0 _wait_y_window_end                                             0B2B GR
+  0 _wait_y_window_start                                           0B23 GR
+  1 _wtmp                                                          0A6A R
+
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+
+Area Table
+
+   0 _CODE                                                          size 3ED6   flags 0
+   1 _DATA                                                          size  A9D   flags 0
+   2 _OVERLAY                                                       size    0   flags 0
+   3 _HOME                                                          size    0   flags 0
+   4 _GSINIT                                                        size  181   flags 0
+   5 _GSFINAL                                                       size    0   flags 0
+   6 _CABS                                                          size    0   flags 0

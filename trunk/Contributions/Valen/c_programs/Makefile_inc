@@ -1,0 +1,90 @@
+# Main makefile
+# This file must be "included" in user project makefile
+
+SHELL=cmd.exe
+
+basedir = $(v6z80pdir)/Contributions/Valen/c_programs
+
+
+
+
+objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.o                   \
+          $(basedir)/c_support/os_interface_for_c/obj/i_flos.o         \
+          $(basedir)/c_support/os_proxy/obj/flos_proxy_code.o          \
+          $(basedir)/src/$(prjname)/obj/myheap.o
+     
+v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)
+	@echo ----------------- Linking -------------------
+	del obj\*.ihx
+	del obj\*.bin
+	del obj\*.exe
+	sdcc  -o obj/ -mz80   --use-stdout  --no-std-crt0   $(linkopt)  -Wl-b_FLOS_PROXY_CODE=0x5080  $(objects) $(prjobjects)
+	ren obj\crt0_v6z80p.ihx $(prjname).ihx
+	@echo ------------- IHX to BIN convertion ---------
+#	..\..\c_support\tools\BINEX.EXE /X /%%+0 /!-  obj\$(prjname).ihx
+#	..\..\c_support\tools\binex.exe /B /!-        obj\$(prjname).ihx
+	..\..\c_support\tools\srec_cat obj\$(prjname).ihx -intel -offset -0x5000   -o obj\$(prjname).exe -binary  
+# -- copy to EXE dir
+#	ren obj\00005000.bin $(prjname).exe
+	copy obj\$(prjname).exe v6-exe\ > nul
+# this line is for copy exe to my z: disk, you can remove this line
+	copy v6-exe\*.exe z:\\
+
+
+
+
+# -------------------------------------------------
+
+
+# OS interface for C  (object file)
+myd1   = $(basedir)/c_support/os_interface_for_c
+myd1_  = $(subst /,\,$(myd1))
+$(myd1)/obj/i_flos.o : $(myd1)/i_flos.c 
+	cd $(myd1_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed --use-stdout     i_flos.c
+
+
+# Asm proxy (object file)
+myd2  = $(basedir)/c_support/os_proxy
+myd2_ = $(subst /,\,$(myd2))
+$(myd2)/obj/flos_proxy_code.o : $(myd2)/flos_proxy_code.c 
+	cd $(myd2_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed --use-stdout  --no-std-crt0   --constseg FLOS_PROXY_CODE flos_proxy_code.c
+
+
+# Asm proxy 
+# C source file <-- binary file <-- pasmo .asm files
+myd3  = $(basedir)/c_support/os_proxy
+myd3_ = $(subst /,\,$(myd3))
+$(myd3)/flos_proxy_code.c : $(myd3)/flos.asm $(myd3)/i__kernal_jump_table.asm $(myd3)/macro.asm
+	cd $(myd3_) && %v6z80pdir%\pasmo\pasmo.exe -d -I %v6z80pdir%\equates  flos.asm flos.asm.bin > a
+# Generate C source from binary file	
+	cd $(myd3_) && echo /* Machine generated. Dont edit. */ const > flos_proxy_code.c
+	cd $(myd3_) && "../tools/xd.exe" -dflos_proxy_code flos.asm.bin >> flos_proxy_code.c
+
+
+# C runtime (object file) 
+# .o file <-- .s file
+myd4  = $(basedir)/c_support/crt
+myd4_ = $(subst /,\,$(myd4))
+$(myd4)/obj/crt0_v6z80p.o : $(myd4)/crt0_v6z80p.s
+	cd $(myd4_) && as-z80.exe -o obj/crt0_v6z80p.o crt0_v6z80p.s
+
+
+
+# heap (obj file) 
+# .o file <-- heapsize file
+myd5  = $(basedir)/src/$(prjname)
+myd5_ = $(subst /,\,$(myd5))
+$(myd5)/obj/myheap.o : $(myd5)/heapsize
+	@echo ----------------- Heap allocation -------------------
+	cd $(myd5_) && cd obj && type ..\..\..\c_support\myheap.s > myheap.s
+	cd $(myd5_) && type heapsize             >> obj/myheap.s
+	cd $(myd5_) && cd obj && as-z80.exe -o myheap.o myheap.s
+
+
+# Default heapsize file (if no heapsize file exist, provide default file with heap size 0)
+# Generate heapsize file
+myd6  = $(basedir)/src/$(prjname)
+myd6_ = $(subst /,\,$(myd6))
+$(myd6)/heapsize : 
+	cd $(myd6_) && echo 0 > heapsize
+

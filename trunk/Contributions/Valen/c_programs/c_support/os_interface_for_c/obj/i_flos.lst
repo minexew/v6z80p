@@ -1,0 +1,1319 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 2.9.0 #5416 (Mar 22 2009) (MINGW32)
+                              4 ; This file was generated Tue Jun 08 18:57:11 2010
+                              5 ;--------------------------------------------------------
+                              6 	.module i_flos
+                              7 	.optsdcc -mz80
+                              8 	
+                              9 ;--------------------------------------------------------
+                             10 ; Public variables in this module
+                             11 ;--------------------------------------------------------
+                             12 	.globl _pFunc
+                             13 	.globl _g_flos_hw_lasterror
+                             14 	.globl _g_flos_lasterror
+                             15 	.globl _g_a1_byte_result
+                             16 	.globl _MarkFrameTime
+                             17 	.globl _FLOS_GetLastError
+                             18 	.globl _FLOS_CheckDiskAvailable
+                             19 	.globl _FLOS_MakeDir
+                             20 	.globl _FLOS_ChangeDir
+                             21 	.globl _FLOS_ParentDir
+                             22 	.globl _FLOS_RootDir
+                             23 	.globl _FLOS_DeleteDir
+                             24 	.globl _FLOS_StoreDirPosition
+                             25 	.globl _FLOS_RestoreDirPosition
+                             26 	.globl _FLOS_GetTotalSectors
+                             27 	.globl _FLOS_FindFile
+                             28 	.globl _FLOS_SetLoadLength
+                             29 	.globl _FLOS_SetFilePointer
+                             30 	.globl _FLOS_ForceLoad
+                             31 	.globl _FLOS_CreateFile
+                             32 	.globl _FLOS_EraseFile
+                             33 	.globl _FLOS_WriteBytesToFile
+                             34 	.globl _FLOS_PrintString
+                             35 	.globl _FLOS_ClearScreen
+                             36 	.globl _FLOS_FlosDisplay
+                             37 	.globl _FLOS_WaitVRT
+                             38 	.globl _FLOS_SetPen
+                             39 	.globl _FLOS_SetCursorPos
+                             40 	.globl _FLOS_WaitKeyPress
+                             41 	.globl _FLOS_GetKeyPress
+                             42 	.globl _FLOS_DirListFirstEntry
+                             43 	.globl _FLOS_DirListGetEntry
+                             44 	.globl _FLOS_DirListNextEntry
+                             45 	.globl _FLOS_GetDirName
+                             46 	.globl _FLOS_GetVersion
+                             47 	.globl _FLOS_PrintStringLFCR
+                             48 	.globl _FLOS_GetCmdLine
+                             49 	.globl _FLOS_SetSpawnCmdLine
+                             50 ;--------------------------------------------------------
+                             51 ; special function registers
+                             52 ;--------------------------------------------------------
+                             53 ;--------------------------------------------------------
+                             54 ;  ram data
+                             55 ;--------------------------------------------------------
+                             56 	.area _DATA
+   0000                      57 _g_a1_byte_result::
+   0000                      58 	.ds 1
+   0001                      59 _g_flos_lasterror::
+   0001                      60 	.ds 1
+   0002                      61 _g_flos_hw_lasterror::
+   0002                      62 	.ds 1
+   0003                      63 _pFunc::
+   0003                      64 	.ds 2
+                             65 ;--------------------------------------------------------
+                             66 ; overlayable items in  ram 
+                             67 ;--------------------------------------------------------
+                             68 	.area _OVERLAY
+                             69 ;--------------------------------------------------------
+                             70 ; external initialized ram data
+                             71 ;--------------------------------------------------------
+                             72 ;--------------------------------------------------------
+                             73 ; global & static initialisations
+                             74 ;--------------------------------------------------------
+                             75 	.area _HOME
+                             76 	.area _GSINIT
+                             77 	.area _GSFINAL
+                             78 	.area _GSINIT
+                             79 ;--------------------------------------------------------
+                             80 ; Home
+                             81 ;--------------------------------------------------------
+                             82 	.area _HOME
+                             83 	.area _HOME
+                             84 ;--------------------------------------------------------
+                             85 ; code
+                             86 ;--------------------------------------------------------
+                             87 	.area _CODE
+                             88 ;i_flos.c:44: void MarkFrameTime(ushort color)
+                             89 ;	---------------------------------
+                             90 ; Function MarkFrameTime
+                             91 ; ---------------------------------
+   0000                      92 _MarkFrameTime_start::
+   0000                      93 _MarkFrameTime:
+   0000 DD E5                94 	push	ix
+   0002 DD 21 00 00          95 	ld	ix,#0
+   0006 DD 39                96 	add	ix,sp
+                             97 ;i_flos.c:47: *p = color;
+   0008 FD 21 00 00          98 	ld	iy,#0x0000
+   000C DD 7E 04             99 	ld	a,4 (ix)
+   000F FD 77 00            100 	ld	0 (iy),a
+   0012 DD 7E 05            101 	ld	a,5 (ix)
+   0015 FD 77 01            102 	ld	1 (iy),a
+   0018 DD E1               103 	pop	ix
+   001A C9                  104 	ret
+   001B                     105 _MarkFrameTime_end::
+                            106 ;i_flos.c:55: byte FLOS_GetLastError(void) 
+                            107 ;	---------------------------------
+                            108 ; Function FLOS_GetLastError
+                            109 ; ---------------------------------
+   001B                     110 _FLOS_GetLastError_start::
+   001B                     111 _FLOS_GetLastError:
+                            112 ;i_flos.c:57: return g_flos_lasterror;
+   001B FD 21r01s00         113 	ld	iy,#_g_flos_lasterror
+   001F FD 6E 00            114 	ld	l,0 (iy)
+   0022 C9                  115 	ret
+   0023                     116 _FLOS_GetLastError_end::
+                            117 ;i_flos.c:76: BOOL FLOS_CheckDiskAvailable(void)
+                            118 ;	---------------------------------
+                            119 ; Function FLOS_CheckDiskAvailable
+                            120 ; ---------------------------------
+   0023                     121 _FLOS_CheckDiskAvailable_start::
+   0023                     122 _FLOS_CheckDiskAvailable:
+                            123 ;i_flos.c:79: CALL_FLOS_CODE(KJT_CHECK_DISK_AVAILABLE);
+   0023 21r03s00            124 	ld	hl,#_pFunc + 0
+   0026 36 D7               125 	ld	(hl), #0xD7
+   0028 FD 21r03s00         126 	ld	iy,#_pFunc
+   002C FD 36 01 50         127 	ld	1 (iy),#0x50
+   0030 21r38s00            128 	ld	hl,#00106$
+   0033 E5                  129 	push	hl
+   0034 2Ar03s00            130 	ld	hl,(_pFunc)
+   0037 E9                  131 	jp	(hl)
+   0038                     132 00106$:
+                            133 ;i_flos.c:81: result = *PTRTO_I_DATA(I_DATA, byte);
+   0038 21 80 50            134 	ld	hl,#0x5080
+   003B 4E                  135 	ld	c,(hl)
+                            136 ;i_flos.c:82: if(!result) {
+   003C AF                  137 	xor	a,a
+   003D B1                  138 	or	a,c
+   003E 20 07               139 	jr	NZ,00102$
+                            140 ;i_flos.c:83: g_flos_lasterror = *PTRTO_I_DATA(I_DATA+1, byte);
+   0040 2E 81               141 	ld	l, #0x81
+   0042 7E                  142 	ld	a,(hl)
+   0043 21r01s00            143 	ld	hl,#_g_flos_lasterror + 0
+   0046 77                  144 	ld	(hl), a
+   0047                     145 00102$:
+                            146 ;i_flos.c:86: return result;
+   0047 69                  147 	ld	l,c
+   0048 C9                  148 	ret
+   0049                     149 _FLOS_CheckDiskAvailable_end::
+                            150 ;i_flos.c:91: BOOL FLOS_MakeDir(const char* pDirName)
+                            151 ;	---------------------------------
+                            152 ; Function FLOS_MakeDir
+                            153 ; ---------------------------------
+   0049                     154 _FLOS_MakeDir_start::
+   0049                     155 _FLOS_MakeDir:
+   0049 DD E5               156 	push	ix
+   004B DD 21 00 00         157 	ld	ix,#0
+   004F DD 39               158 	add	ix,sp
+                            159 ;i_flos.c:94: *PTRTO_I_DATA(I_DATA, word) = (word) pDirName;
+   0051 FD 21 80 50         160 	ld	iy,#0x5080
+   0055 DD 4E 04            161 	ld	c,4 (ix)
+   0058 DD 46 05            162 	ld	b,5 (ix)
+   005B FD 71 00            163 	ld	0 (iy),c
+   005E FD 70 01            164 	ld	1 (iy),b
+                            165 ;i_flos.c:96: CALL_FLOS_CODE(KJT_MAKE_DIR);
+   0061 21r03s00            166 	ld	hl,#_pFunc + 0
+   0064 36 E0               167 	ld	(hl), #0xE0
+   0066 FD 21r03s00         168 	ld	iy,#_pFunc
+   006A FD 36 01 50         169 	ld	1 (iy),#0x50
+   006E 21r76s00            170 	ld	hl,#00106$
+   0071 E5                  171 	push	hl
+   0072 2Ar03s00            172 	ld	hl,(_pFunc)
+   0075 E9                  173 	jp	(hl)
+   0076                     174 00106$:
+                            175 ;i_flos.c:98: result = *PTRTO_I_DATA(I_DATA, byte);
+   0076 21 80 50            176 	ld	hl,#0x5080
+   0079 4E                  177 	ld	c,(hl)
+                            178 ;i_flos.c:99: if(!result) {
+   007A AF                  179 	xor	a,a
+   007B B1                  180 	or	a,c
+   007C 20 11               181 	jr	NZ,00102$
+                            182 ;i_flos.c:100: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   007E 2E 81               183 	ld	l, #0x81
+   0080 7E                  184 	ld	a,(hl)
+   0081 FD 21r01s00         185 	ld	iy,#_g_flos_lasterror
+   0085 FD 77 00            186 	ld	0 (iy),a
+                            187 ;i_flos.c:101: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   0088 2E 82               188 	ld	l, #0x82
+   008A 7E                  189 	ld	a,(hl)
+   008B 21r02s00            190 	ld	hl,#_g_flos_hw_lasterror + 0
+   008E 77                  191 	ld	(hl), a
+   008F                     192 00102$:
+                            193 ;i_flos.c:104: return result;
+   008F 69                  194 	ld	l,c
+   0090 DD E1               195 	pop	ix
+   0092 C9                  196 	ret
+   0093                     197 _FLOS_MakeDir_end::
+                            198 ;i_flos.c:107: BOOL FLOS_ChangeDir(const char* pDirName)
+                            199 ;	---------------------------------
+                            200 ; Function FLOS_ChangeDir
+                            201 ; ---------------------------------
+   0093                     202 _FLOS_ChangeDir_start::
+   0093                     203 _FLOS_ChangeDir:
+   0093 DD E5               204 	push	ix
+   0095 DD 21 00 00         205 	ld	ix,#0
+   0099 DD 39               206 	add	ix,sp
+                            207 ;i_flos.c:110: *PTRTO_I_DATA(I_DATA, word) = (word) pDirName;
+   009B FD 21 80 50         208 	ld	iy,#0x5080
+   009F DD 4E 04            209 	ld	c,4 (ix)
+   00A2 DD 46 05            210 	ld	b,5 (ix)
+   00A5 FD 71 00            211 	ld	0 (iy),c
+   00A8 FD 70 01            212 	ld	1 (iy),b
+                            213 ;i_flos.c:112: CALL_FLOS_CODE(KJT_CHANGE_DIR);
+   00AB 21r03s00            214 	ld	hl,#_pFunc + 0
+   00AE 36 E3               215 	ld	(hl), #0xE3
+   00B0 FD 21r03s00         216 	ld	iy,#_pFunc
+   00B4 FD 36 01 50         217 	ld	1 (iy),#0x50
+   00B8 21rC0s00            218 	ld	hl,#00106$
+   00BB E5                  219 	push	hl
+   00BC 2Ar03s00            220 	ld	hl,(_pFunc)
+   00BF E9                  221 	jp	(hl)
+   00C0                     222 00106$:
+                            223 ;i_flos.c:114: result = *PTRTO_I_DATA(I_DATA, byte);
+   00C0 21 80 50            224 	ld	hl,#0x5080
+   00C3 4E                  225 	ld	c,(hl)
+                            226 ;i_flos.c:115: if(!result) {
+   00C4 AF                  227 	xor	a,a
+   00C5 B1                  228 	or	a,c
+   00C6 20 11               229 	jr	NZ,00102$
+                            230 ;i_flos.c:116: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   00C8 2E 81               231 	ld	l, #0x81
+   00CA 7E                  232 	ld	a,(hl)
+   00CB FD 21r01s00         233 	ld	iy,#_g_flos_lasterror
+   00CF FD 77 00            234 	ld	0 (iy),a
+                            235 ;i_flos.c:117: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   00D2 2E 82               236 	ld	l, #0x82
+   00D4 7E                  237 	ld	a,(hl)
+   00D5 21r02s00            238 	ld	hl,#_g_flos_hw_lasterror + 0
+   00D8 77                  239 	ld	(hl), a
+   00D9                     240 00102$:
+                            241 ;i_flos.c:120: return result;
+   00D9 69                  242 	ld	l,c
+   00DA DD E1               243 	pop	ix
+   00DC C9                  244 	ret
+   00DD                     245 _FLOS_ChangeDir_end::
+                            246 ;i_flos.c:123: BOOL FLOS_ParentDir(void)
+                            247 ;	---------------------------------
+                            248 ; Function FLOS_ParentDir
+                            249 ; ---------------------------------
+   00DD                     250 _FLOS_ParentDir_start::
+   00DD                     251 _FLOS_ParentDir:
+                            252 ;i_flos.c:126: CALL_FLOS_CODE(KJT_PARENT_DIR);
+   00DD 21r03s00            253 	ld	hl,#_pFunc + 0
+   00E0 36 E6               254 	ld	(hl), #0xE6
+   00E2 FD 21r03s00         255 	ld	iy,#_pFunc
+   00E6 FD 36 01 50         256 	ld	1 (iy),#0x50
+   00EA 21rF2s00            257 	ld	hl,#00106$
+   00ED E5                  258 	push	hl
+   00EE 2Ar03s00            259 	ld	hl,(_pFunc)
+   00F1 E9                  260 	jp	(hl)
+   00F2                     261 00106$:
+                            262 ;i_flos.c:128: result = *PTRTO_I_DATA(I_DATA, byte);
+   00F2 21 80 50            263 	ld	hl,#0x5080
+   00F5 4E                  264 	ld	c,(hl)
+                            265 ;i_flos.c:129: if(!result) {
+   00F6 AF                  266 	xor	a,a
+   00F7 B1                  267 	or	a,c
+   00F8 20 11               268 	jr	NZ,00102$
+                            269 ;i_flos.c:130: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   00FA 2E 81               270 	ld	l, #0x81
+   00FC 7E                  271 	ld	a,(hl)
+   00FD FD 21r01s00         272 	ld	iy,#_g_flos_lasterror
+   0101 FD 77 00            273 	ld	0 (iy),a
+                            274 ;i_flos.c:131: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   0104 2E 82               275 	ld	l, #0x82
+   0106 7E                  276 	ld	a,(hl)
+   0107 21r02s00            277 	ld	hl,#_g_flos_hw_lasterror + 0
+   010A 77                  278 	ld	(hl), a
+   010B                     279 00102$:
+                            280 ;i_flos.c:134: return result;
+   010B 69                  281 	ld	l,c
+   010C C9                  282 	ret
+   010D                     283 _FLOS_ParentDir_end::
+                            284 ;i_flos.c:139: void FLOS_RootDir(void)
+                            285 ;	---------------------------------
+                            286 ; Function FLOS_RootDir
+                            287 ; ---------------------------------
+   010D                     288 _FLOS_RootDir_start::
+   010D                     289 _FLOS_RootDir:
+                            290 ;i_flos.c:142: CALL_FLOS_CODE(KJT_ROOT_DIR);
+   010D 21r03s00            291 	ld	hl,#_pFunc + 0
+   0110 36 E9               292 	ld	(hl), #0xE9
+   0112 FD 21r03s00         293 	ld	iy,#_pFunc
+   0116 FD 36 01 50         294 	ld	1 (iy),#0x50
+   011A 21r22s01            295 	ld	hl,#00103$
+   011D E5                  296 	push	hl
+   011E 2Ar03s00            297 	ld	hl,(_pFunc)
+   0121 E9                  298 	jp	(hl)
+   0122                     299 00103$:
+   0122 C9                  300 	ret
+   0123                     301 _FLOS_RootDir_end::
+                            302 ;i_flos.c:154: BOOL FLOS_DeleteDir(const char* pDirName)
+                            303 ;	---------------------------------
+                            304 ; Function FLOS_DeleteDir
+                            305 ; ---------------------------------
+   0123                     306 _FLOS_DeleteDir_start::
+   0123                     307 _FLOS_DeleteDir:
+   0123 DD E5               308 	push	ix
+   0125 DD 21 00 00         309 	ld	ix,#0
+   0129 DD 39               310 	add	ix,sp
+                            311 ;i_flos.c:157: *PTRTO_I_DATA(I_DATA, word) = (word) pDirName;
+   012B FD 21 80 50         312 	ld	iy,#0x5080
+   012F DD 4E 04            313 	ld	c,4 (ix)
+   0132 DD 46 05            314 	ld	b,5 (ix)
+   0135 FD 71 00            315 	ld	0 (iy),c
+   0138 FD 70 01            316 	ld	1 (iy),b
+                            317 ;i_flos.c:159: CALL_FLOS_CODE(KJT_DELETE_DIR);
+   013B 21r03s00            318 	ld	hl,#_pFunc + 0
+   013E 36 EC               319 	ld	(hl), #0xEC
+   0140 FD 21r03s00         320 	ld	iy,#_pFunc
+   0144 FD 36 01 50         321 	ld	1 (iy),#0x50
+   0148 21r50s01            322 	ld	hl,#00106$
+   014B E5                  323 	push	hl
+   014C 2Ar03s00            324 	ld	hl,(_pFunc)
+   014F E9                  325 	jp	(hl)
+   0150                     326 00106$:
+                            327 ;i_flos.c:161: result = *PTRTO_I_DATA(I_DATA, byte);
+   0150 21 80 50            328 	ld	hl,#0x5080
+   0153 4E                  329 	ld	c,(hl)
+                            330 ;i_flos.c:162: if(!result) {
+   0154 AF                  331 	xor	a,a
+   0155 B1                  332 	or	a,c
+   0156 20 11               333 	jr	NZ,00102$
+                            334 ;i_flos.c:163: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   0158 2E 81               335 	ld	l, #0x81
+   015A 7E                  336 	ld	a,(hl)
+   015B FD 21r01s00         337 	ld	iy,#_g_flos_lasterror
+   015F FD 77 00            338 	ld	0 (iy),a
+                            339 ;i_flos.c:164: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   0162 2E 82               340 	ld	l, #0x82
+   0164 7E                  341 	ld	a,(hl)
+   0165 21r02s00            342 	ld	hl,#_g_flos_hw_lasterror + 0
+   0168 77                  343 	ld	(hl), a
+   0169                     344 00102$:
+                            345 ;i_flos.c:167: return result;
+   0169 69                  346 	ld	l,c
+   016A DD E1               347 	pop	ix
+   016C C9                  348 	ret
+   016D                     349 _FLOS_DeleteDir_end::
+                            350 ;i_flos.c:171: void FLOS_StoreDirPosition(void)
+                            351 ;	---------------------------------
+                            352 ; Function FLOS_StoreDirPosition
+                            353 ; ---------------------------------
+   016D                     354 _FLOS_StoreDirPosition_start::
+   016D                     355 _FLOS_StoreDirPosition:
+                            356 ;i_flos.c:173: CALL_FLOS_CODE(KJT_STORE_DIR_POSITION);
+   016D 21r03s00            357 	ld	hl,#_pFunc + 0
+   0170 36 76               358 	ld	(hl), #0x76
+   0172 FD 21r03s00         359 	ld	iy,#_pFunc
+   0176 FD 36 01 51         360 	ld	1 (iy),#0x51
+   017A 21r82s01            361 	ld	hl,#00103$
+   017D E5                  362 	push	hl
+   017E 2Ar03s00            363 	ld	hl,(_pFunc)
+   0181 E9                  364 	jp	(hl)
+   0182                     365 00103$:
+   0182 C9                  366 	ret
+   0183                     367 _FLOS_StoreDirPosition_end::
+                            368 ;i_flos.c:176: void FLOS_RestoreDirPosition(void)
+                            369 ;	---------------------------------
+                            370 ; Function FLOS_RestoreDirPosition
+                            371 ; ---------------------------------
+   0183                     372 _FLOS_RestoreDirPosition_start::
+   0183                     373 _FLOS_RestoreDirPosition:
+                            374 ;i_flos.c:178: CALL_FLOS_CODE(KJT_RESTORE_DIR_POSITION);
+   0183 21r03s00            375 	ld	hl,#_pFunc + 0
+   0186 36 79               376 	ld	(hl), #0x79
+   0188 FD 21r03s00         377 	ld	iy,#_pFunc
+   018C FD 36 01 51         378 	ld	1 (iy),#0x51
+   0190 21r98s01            379 	ld	hl,#00103$
+   0193 E5                  380 	push	hl
+   0194 2Ar03s00            381 	ld	hl,(_pFunc)
+   0197 E9                  382 	jp	(hl)
+   0198                     383 00103$:
+   0198 C9                  384 	ret
+   0199                     385 _FLOS_RestoreDirPosition_end::
+                            386 ;i_flos.c:181: dword FLOS_GetTotalSectors(void)
+                            387 ;	---------------------------------
+                            388 ; Function FLOS_GetTotalSectors
+                            389 ; ---------------------------------
+   0199                     390 _FLOS_GetTotalSectors_start::
+   0199                     391 _FLOS_GetTotalSectors:
+                            392 ;i_flos.c:183: CALL_FLOS_CODE(KJT_GET_TOTAL_SECTORS);
+   0199 21r03s00            393 	ld	hl,#_pFunc + 0
+   019C 36 FB               394 	ld	(hl), #0xFB
+   019E FD 21r03s00         395 	ld	iy,#_pFunc
+   01A2 FD 36 01 50         396 	ld	1 (iy),#0x50
+   01A6 21rAEs01            397 	ld	hl,#00103$
+   01A9 E5                  398 	push	hl
+   01AA 2Ar03s00            399 	ld	hl,(_pFunc)
+   01AD E9                  400 	jp	(hl)
+   01AE                     401 00103$:
+                            402 ;i_flos.c:185: return  *PTRTO_I_DATA(I_DATA, dword);
+   01AE 21 80 50            403 	ld	hl,#0x5080
+   01B1 4E                  404 	ld	c,(hl)
+   01B2 23                  405 	inc	hl
+   01B3 46                  406 	ld	b,(hl)
+   01B4 23                  407 	inc	hl
+   01B5 5E                  408 	ld	e,(hl)
+   01B6 23                  409 	inc	hl
+   01B7 56                  410 	ld	d,(hl)
+   01B8 69                  411 	ld	l,c
+   01B9 60                  412 	ld	h,b
+   01BA C9                  413 	ret
+   01BB                     414 _FLOS_GetTotalSectors_end::
+                            415 ;i_flos.c:189: BOOL FLOS_FindFile(FLOS_FILE* const pFile, const char* pFileName)
+                            416 ;	---------------------------------
+                            417 ; Function FLOS_FindFile
+                            418 ; ---------------------------------
+   01BB                     419 _FLOS_FindFile_start::
+   01BB                     420 _FLOS_FindFile:
+   01BB DD E5               421 	push	ix
+   01BD DD 21 00 00         422 	ld	ix,#0
+   01C1 DD 39               423 	add	ix,sp
+   01C3 F5                  424 	push	af
+   01C4 3B                  425 	dec	sp
+                            426 ;i_flos.c:192: *PTRTO_I_DATA(I_DATA, word) = (word) pFileName;
+   01C5 FD 21 80 50         427 	ld	iy,#0x5080
+   01C9 DD 4E 06            428 	ld	c,6 (ix)
+   01CC DD 46 07            429 	ld	b,7 (ix)
+   01CF FD 71 00            430 	ld	0 (iy),c
+   01D2 FD 70 01            431 	ld	1 (iy),b
+                            432 ;i_flos.c:194: CALL_FLOS_CODE(KJT_FIND_FILE);
+   01D5 21r03s00            433 	ld	hl,#_pFunc + 0
+   01D8 36 EF               434 	ld	(hl), #0xEF
+   01DA FD 21r03s00         435 	ld	iy,#_pFunc
+   01DE FD 36 01 50         436 	ld	1 (iy),#0x50
+   01E2 21rEAs01            437 	ld	hl,#00107$
+   01E5 E5                  438 	push	hl
+   01E6 2Ar03s00            439 	ld	hl,(_pFunc)
+   01E9 E9                  440 	jp	(hl)
+   01EA                     441 00107$:
+                            442 ;i_flos.c:196: result = *PTRTO_I_DATA(I_DATA, byte);
+   01EA 21 80 50            443 	ld	hl,#0x5080
+   01ED 7E                  444 	ld	a,(hl)
+   01EE DD 77 FF            445 	ld	-1 (ix),a
+                            446 ;i_flos.c:197: if(result) {
+   01F1 AF                  447 	xor	a,a
+   01F2 DD B6 FF            448 	or	a,-1 (ix)
+   01F5 28 3C               449 	jr	Z,00102$
+                            450 ;i_flos.c:198: pFile->z80_address = *PTRTO_I_DATA(I_DATA+3, word);
+   01F7 DD 5E 04            451 	ld	e,4 (ix)
+   01FA DD 56 05            452 	ld	d,5 (ix)
+   01FD 2E 83               453 	ld	l, #0x83
+   01FF 4E                  454 	ld	c,(hl)
+   0200 23                  455 	inc	hl
+   0201 46                  456 	ld	b,(hl)
+   0202 6B                  457 	ld	l,e
+   0203 62                  458 	ld	h,d
+   0204 71                  459 	ld	(hl),c
+   0205 23                  460 	inc	hl
+   0206 70                  461 	ld	(hl),b
+                            462 ;i_flos.c:200: pFile->z80_bank    = *PTRTO_I_DATA(I_DATA+2, byte);
+   0207 4B                  463 	ld	c,e
+   0208 42                  464 	ld	b,d
+   0209 03                  465 	inc	bc
+   020A 03                  466 	inc	bc
+   020B 21 82 50            467 	ld	hl,#0x5082
+   020E 7E                  468 	ld	a,(hl)
+   020F 02                  469 	ld	(bc),a
+                            470 ;i_flos.c:201: pFile->size        = *PTRTO_I_DATA(I_DATA+5, dword);
+   0210 21 03 00            471 	ld	hl,#0x0003
+   0213 19                  472 	add	hl,de
+   0214 DD 75 FD            473 	ld	-3 (ix),l
+   0217 DD 74 FE            474 	ld	-2 (ix),h
+   021A 21 85 50            475 	ld	hl,#0x5085
+   021D 5E                  476 	ld	e,(hl)
+   021E 23                  477 	inc	hl
+   021F 56                  478 	ld	d,(hl)
+   0220 23                  479 	inc	hl
+   0221 4E                  480 	ld	c,(hl)
+   0222 23                  481 	inc	hl
+   0223 46                  482 	ld	b,(hl)
+   0224 DD 6E FD            483 	ld	l,-3 (ix)
+   0227 DD 66 FE            484 	ld	h,-2 (ix)
+   022A 73                  485 	ld	(hl),e
+   022B 23                  486 	inc	hl
+   022C 72                  487 	ld	(hl),d
+   022D 23                  488 	inc	hl
+   022E 71                  489 	ld	(hl),c
+   022F 23                  490 	inc	hl
+   0230 70                  491 	ld	(hl),b
+   0231 18 12               492 	jr	00103$
+   0233                     493 00102$:
+                            494 ;i_flos.c:204: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   0233 21 81 50            495 	ld	hl,#0x5081
+   0236 7E                  496 	ld	a,(hl)
+   0237 FD 21r01s00         497 	ld	iy,#_g_flos_lasterror
+   023B FD 77 00            498 	ld	0 (iy),a
+                            499 ;i_flos.c:205: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   023E 2E 82               500 	ld	l, #0x82
+   0240 7E                  501 	ld	a,(hl)
+   0241 21r02s00            502 	ld	hl,#_g_flos_hw_lasterror + 0
+   0244 77                  503 	ld	(hl), a
+   0245                     504 00103$:
+                            505 ;i_flos.c:208: return result; 
+   0245 DD 6E FF            506 	ld	l,-1 (ix)
+   0248 DD F9               507 	ld	sp,ix
+   024A DD E1               508 	pop	ix
+   024C C9                  509 	ret
+   024D                     510 _FLOS_FindFile_end::
+                            511 ;i_flos.c:211: void FLOS_SetLoadLength(const dword len)
+                            512 ;	---------------------------------
+                            513 ; Function FLOS_SetLoadLength
+                            514 ; ---------------------------------
+   024D                     515 _FLOS_SetLoadLength_start::
+   024D                     516 _FLOS_SetLoadLength:
+   024D DD E5               517 	push	ix
+   024F DD 21 00 00         518 	ld	ix,#0
+   0253 DD 39               519 	add	ix,sp
+                            520 ;i_flos.c:213: *PTRTO_I_DATA(I_DATA, dword) = (dword) len;
+   0255 FD 21 80 50         521 	ld	iy,#0x5080
+   0259 DD 7E 04            522 	ld	a,4 (ix)
+   025C FD 77 00            523 	ld	0 (iy),a
+   025F DD 7E 05            524 	ld	a,5 (ix)
+   0262 FD 77 01            525 	ld	1 (iy),a
+   0265 DD 7E 06            526 	ld	a,6 (ix)
+   0268 FD 77 02            527 	ld	2 (iy),a
+   026B DD 7E 07            528 	ld	a,7 (ix)
+   026E FD 77 03            529 	ld	3 (iy),a
+                            530 ;i_flos.c:215: CALL_FLOS_CODE(KJT_SET_LOAD_LENGTH);
+   0271 21r03s00            531 	ld	hl,#_pFunc + 0
+   0274 36 1F               532 	ld	(hl), #0x1F
+   0276 FD 21r03s00         533 	ld	iy,#_pFunc
+   027A FD 36 01 51         534 	ld	1 (iy),#0x51
+   027E 21r86s02            535 	ld	hl,#00103$
+   0281 E5                  536 	push	hl
+   0282 2Ar03s00            537 	ld	hl,(_pFunc)
+   0285 E9                  538 	jp	(hl)
+   0286                     539 00103$:
+   0286 DD E1               540 	pop	ix
+   0288 C9                  541 	ret
+   0289                     542 _FLOS_SetLoadLength_end::
+                            543 ;i_flos.c:219: void FLOS_SetFilePointer(const dword p)
+                            544 ;	---------------------------------
+                            545 ; Function FLOS_SetFilePointer
+                            546 ; ---------------------------------
+   0289                     547 _FLOS_SetFilePointer_start::
+   0289                     548 _FLOS_SetFilePointer:
+   0289 DD E5               549 	push	ix
+   028B DD 21 00 00         550 	ld	ix,#0
+   028F DD 39               551 	add	ix,sp
+                            552 ;i_flos.c:221: *PTRTO_I_DATA(I_DATA, dword) = (dword) p;
+   0291 FD 21 80 50         553 	ld	iy,#0x5080
+   0295 DD 7E 04            554 	ld	a,4 (ix)
+   0298 FD 77 00            555 	ld	0 (iy),a
+   029B DD 7E 05            556 	ld	a,5 (ix)
+   029E FD 77 01            557 	ld	1 (iy),a
+   02A1 DD 7E 06            558 	ld	a,6 (ix)
+   02A4 FD 77 02            559 	ld	2 (iy),a
+   02A7 DD 7E 07            560 	ld	a,7 (ix)
+   02AA FD 77 03            561 	ld	3 (iy),a
+                            562 ;i_flos.c:223: CALL_FLOS_CODE(KJT_SET_FILE_POINTER);
+   02AD 21r03s00            563 	ld	hl,#_pFunc + 0
+   02B0 36 1C               564 	ld	(hl), #0x1C
+   02B2 FD 21r03s00         565 	ld	iy,#_pFunc
+   02B6 FD 36 01 51         566 	ld	1 (iy),#0x51
+   02BA 21rC2s02            567 	ld	hl,#00103$
+   02BD E5                  568 	push	hl
+   02BE 2Ar03s00            569 	ld	hl,(_pFunc)
+   02C1 E9                  570 	jp	(hl)
+   02C2                     571 00103$:
+   02C2 DD E1               572 	pop	ix
+   02C4 C9                  573 	ret
+   02C5                     574 _FLOS_SetFilePointer_end::
+                            575 ;i_flos.c:226: BOOL FLOS_ForceLoad(const byte* address, const byte bank)
+                            576 ;	---------------------------------
+                            577 ; Function FLOS_ForceLoad
+                            578 ; ---------------------------------
+   02C5                     579 _FLOS_ForceLoad_start::
+   02C5                     580 _FLOS_ForceLoad:
+   02C5 DD E5               581 	push	ix
+   02C7 DD 21 00 00         582 	ld	ix,#0
+   02CB DD 39               583 	add	ix,sp
+                            584 ;i_flos.c:229: *PTRTO_I_DATA(I_DATA,   word) = (word) address;
+   02CD FD 21 80 50         585 	ld	iy,#0x5080
+   02D1 DD 4E 04            586 	ld	c,4 (ix)
+   02D4 DD 46 05            587 	ld	b,5 (ix)
+   02D7 FD 71 00            588 	ld	0 (iy),c
+   02DA FD 70 01            589 	ld	1 (iy),b
+                            590 ;i_flos.c:230: *PTRTO_I_DATA(I_DATA+2, byte) = (byte) bank;
+   02DD FD 21 82 50         591 	ld	iy,#0x5082
+   02E1 DD 7E 06            592 	ld	a,6 (ix)
+   02E4 FD 77 00            593 	ld	(iy),a
+                            594 ;i_flos.c:232: CALL_FLOS_CODE(KJT_FORCE_LOAD);
+   02E7 21r03s00            595 	ld	hl,#_pFunc + 0
+   02EA 36 19               596 	ld	(hl), #0x19
+   02EC FD 21r03s00         597 	ld	iy,#_pFunc
+   02F0 FD 36 01 51         598 	ld	1 (iy),#0x51
+   02F4 21rFCs02            599 	ld	hl,#00106$
+   02F7 E5                  600 	push	hl
+   02F8 2Ar03s00            601 	ld	hl,(_pFunc)
+   02FB E9                  602 	jp	(hl)
+   02FC                     603 00106$:
+                            604 ;i_flos.c:234: result = *PTRTO_I_DATA(I_DATA, byte);
+   02FC 21 80 50            605 	ld	hl,#0x5080
+   02FF 4E                  606 	ld	c,(hl)
+                            607 ;i_flos.c:235: if(!result) {
+   0300 AF                  608 	xor	a,a
+   0301 B1                  609 	or	a,c
+   0302 20 11               610 	jr	NZ,00102$
+                            611 ;i_flos.c:236: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   0304 2E 81               612 	ld	l, #0x81
+   0306 7E                  613 	ld	a,(hl)
+   0307 FD 21r01s00         614 	ld	iy,#_g_flos_lasterror
+   030B FD 77 00            615 	ld	0 (iy),a
+                            616 ;i_flos.c:237: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   030E 2E 82               617 	ld	l, #0x82
+   0310 7E                  618 	ld	a,(hl)
+   0311 21r02s00            619 	ld	hl,#_g_flos_hw_lasterror + 0
+   0314 77                  620 	ld	(hl), a
+   0315                     621 00102$:
+                            622 ;i_flos.c:240: return result; 
+   0315 69                  623 	ld	l,c
+   0316 DD E1               624 	pop	ix
+   0318 C9                  625 	ret
+   0319                     626 _FLOS_ForceLoad_end::
+                            627 ;i_flos.c:249: BOOL FLOS_CreateFile(const byte* pFilename)
+                            628 ;	---------------------------------
+                            629 ; Function FLOS_CreateFile
+                            630 ; ---------------------------------
+   0319                     631 _FLOS_CreateFile_start::
+   0319                     632 _FLOS_CreateFile:
+   0319 DD E5               633 	push	ix
+   031B DD 21 00 00         634 	ld	ix,#0
+   031F DD 39               635 	add	ix,sp
+                            636 ;i_flos.c:255: *PTRTO_I_DATA(I_DATA,   word) = (word) pFilename;
+   0321 FD 21 80 50         637 	ld	iy,#0x5080
+   0325 DD 4E 04            638 	ld	c,4 (ix)
+   0328 DD 46 05            639 	ld	b,5 (ix)
+   032B FD 71 00            640 	ld	0 (iy),c
+   032E FD 70 01            641 	ld	1 (iy),b
+                            642 ;i_flos.c:256: *PTRTO_I_DATA(I_DATA+2, word) = (word) default_z80_address;
+   0331 FD 21 82 50         643 	ld	iy,#0x5082
+   0335 FD 36 00 00         644 	ld	0 (iy),#0x00
+   0339 FD 36 01 00         645 	ld	1 (iy),#0x00
+                            646 ;i_flos.c:257: *PTRTO_I_DATA(I_DATA+4, byte) = (byte) default_z80_bank;
+   033D FD 21 84 50         647 	ld	iy,#0x5084
+   0341 FD 36 00 00         648 	ld	(iy),#0x00
+                            649 ;i_flos.c:259: CALL_FLOS_CODE(KJT_CREATE_FILE);
+   0345 21r03s00            650 	ld	hl,#_pFunc + 0
+   0348 36 0A               651 	ld	(hl), #0x0A
+   034A FD 21r03s00         652 	ld	iy,#_pFunc
+   034E FD 36 01 51         653 	ld	1 (iy),#0x51
+   0352 21r5As03            654 	ld	hl,#00106$
+   0355 E5                  655 	push	hl
+   0356 2Ar03s00            656 	ld	hl,(_pFunc)
+   0359 E9                  657 	jp	(hl)
+   035A                     658 00106$:
+                            659 ;i_flos.c:261: result = *PTRTO_I_DATA(I_DATA, byte);
+   035A 21 80 50            660 	ld	hl,#0x5080
+   035D 4E                  661 	ld	c,(hl)
+                            662 ;i_flos.c:262: if(!result) {
+   035E AF                  663 	xor	a,a
+   035F B1                  664 	or	a,c
+   0360 20 11               665 	jr	NZ,00102$
+                            666 ;i_flos.c:263: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   0362 2E 81               667 	ld	l, #0x81
+   0364 7E                  668 	ld	a,(hl)
+   0365 FD 21r01s00         669 	ld	iy,#_g_flos_lasterror
+   0369 FD 77 00            670 	ld	0 (iy),a
+                            671 ;i_flos.c:264: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   036C 2E 82               672 	ld	l, #0x82
+   036E 7E                  673 	ld	a,(hl)
+   036F 21r02s00            674 	ld	hl,#_g_flos_hw_lasterror + 0
+   0372 77                  675 	ld	(hl), a
+   0373                     676 00102$:
+                            677 ;i_flos.c:267: return result; 
+   0373 69                  678 	ld	l,c
+   0374 DD E1               679 	pop	ix
+   0376 C9                  680 	ret
+   0377                     681 _FLOS_CreateFile_end::
+                            682 ;i_flos.c:271: BOOL FLOS_EraseFile(const byte* pFilename)
+                            683 ;	---------------------------------
+                            684 ; Function FLOS_EraseFile
+                            685 ; ---------------------------------
+   0377                     686 _FLOS_EraseFile_start::
+   0377                     687 _FLOS_EraseFile:
+   0377 DD E5               688 	push	ix
+   0379 DD 21 00 00         689 	ld	ix,#0
+   037D DD 39               690 	add	ix,sp
+                            691 ;i_flos.c:274: *PTRTO_I_DATA(I_DATA,   word) = (word) pFilename;
+   037F FD 21 80 50         692 	ld	iy,#0x5080
+   0383 DD 4E 04            693 	ld	c,4 (ix)
+   0386 DD 46 05            694 	ld	b,5 (ix)
+   0389 FD 71 00            695 	ld	0 (iy),c
+   038C FD 70 01            696 	ld	1 (iy),b
+                            697 ;i_flos.c:276: CALL_FLOS_CODE(KJT_ERASE_FILE);
+   038F 21r03s00            698 	ld	hl,#_pFunc + 0
+   0392 36 F8               699 	ld	(hl), #0xF8
+   0394 FD 21r03s00         700 	ld	iy,#_pFunc
+   0398 FD 36 01 50         701 	ld	1 (iy),#0x50
+   039C 21rA4s03            702 	ld	hl,#00106$
+   039F E5                  703 	push	hl
+   03A0 2Ar03s00            704 	ld	hl,(_pFunc)
+   03A3 E9                  705 	jp	(hl)
+   03A4                     706 00106$:
+                            707 ;i_flos.c:278: result = *PTRTO_I_DATA(I_DATA, byte);
+   03A4 21 80 50            708 	ld	hl,#0x5080
+   03A7 4E                  709 	ld	c,(hl)
+                            710 ;i_flos.c:279: if(!result) {
+   03A8 AF                  711 	xor	a,a
+   03A9 B1                  712 	or	a,c
+   03AA 20 11               713 	jr	NZ,00102$
+                            714 ;i_flos.c:280: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   03AC 2E 81               715 	ld	l, #0x81
+   03AE 7E                  716 	ld	a,(hl)
+   03AF FD 21r01s00         717 	ld	iy,#_g_flos_lasterror
+   03B3 FD 77 00            718 	ld	0 (iy),a
+                            719 ;i_flos.c:281: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   03B6 2E 82               720 	ld	l, #0x82
+   03B8 7E                  721 	ld	a,(hl)
+   03B9 21r02s00            722 	ld	hl,#_g_flos_hw_lasterror + 0
+   03BC 77                  723 	ld	(hl), a
+   03BD                     724 00102$:
+                            725 ;i_flos.c:284: return result; 
+   03BD 69                  726 	ld	l,c
+   03BE DD E1               727 	pop	ix
+   03C0 C9                  728 	ret
+   03C1                     729 _FLOS_EraseFile_end::
+                            730 ;i_flos.c:289: BOOL FLOS_WriteBytesToFile(const byte* pFilename, byte* address, const byte bank, const dword len)
+                            731 ;	---------------------------------
+                            732 ; Function FLOS_WriteBytesToFile
+                            733 ; ---------------------------------
+   03C1                     734 _FLOS_WriteBytesToFile_start::
+   03C1                     735 _FLOS_WriteBytesToFile:
+   03C1 DD E5               736 	push	ix
+   03C3 DD 21 00 00         737 	ld	ix,#0
+   03C7 DD 39               738 	add	ix,sp
+                            739 ;i_flos.c:292: *PTRTO_I_DATA(I_DATA,   word)  = (word) pFilename;
+   03C9 FD 21 80 50         740 	ld	iy,#0x5080
+   03CD DD 4E 04            741 	ld	c,4 (ix)
+   03D0 DD 46 05            742 	ld	b,5 (ix)
+   03D3 FD 71 00            743 	ld	0 (iy),c
+   03D6 FD 70 01            744 	ld	1 (iy),b
+                            745 ;i_flos.c:293: *PTRTO_I_DATA(I_DATA+2, word)  = (word) address;
+   03D9 FD 21 82 50         746 	ld	iy,#0x5082
+   03DD DD 4E 06            747 	ld	c,6 (ix)
+   03E0 DD 46 07            748 	ld	b,7 (ix)
+   03E3 FD 71 00            749 	ld	0 (iy),c
+   03E6 FD 70 01            750 	ld	1 (iy),b
+                            751 ;i_flos.c:294: *PTRTO_I_DATA(I_DATA+4, byte)  = bank;
+   03E9 FD 21 84 50         752 	ld	iy,#0x5084
+   03ED DD 7E 08            753 	ld	a,8 (ix)
+   03F0 FD 77 00            754 	ld	(iy),a
+                            755 ;i_flos.c:295: *PTRTO_I_DATA(I_DATA+5, dword) = len;
+   03F3 FD 21 85 50         756 	ld	iy,#0x5085
+   03F7 DD 7E 09            757 	ld	a,9 (ix)
+   03FA FD 77 00            758 	ld	0 (iy),a
+   03FD DD 7E 0A            759 	ld	a,10 (ix)
+   0400 FD 77 01            760 	ld	1 (iy),a
+   0403 DD 7E 0B            761 	ld	a,11 (ix)
+   0406 FD 77 02            762 	ld	2 (iy),a
+   0409 DD 7E 0C            763 	ld	a,12 (ix)
+   040C FD 77 03            764 	ld	3 (iy),a
+                            765 ;i_flos.c:297: CALL_FLOS_CODE(KJT_WRITE_BYTES_TO_FILE);
+   040F 21r03s00            766 	ld	hl,#_pFunc + 0
+   0412 36 13               767 	ld	(hl), #0x13
+   0414 FD 21r03s00         768 	ld	iy,#_pFunc
+   0418 FD 36 01 51         769 	ld	1 (iy),#0x51
+   041C 21r24s04            770 	ld	hl,#00106$
+   041F E5                  771 	push	hl
+   0420 2Ar03s00            772 	ld	hl,(_pFunc)
+   0423 E9                  773 	jp	(hl)
+   0424                     774 00106$:
+                            775 ;i_flos.c:299: result = *PTRTO_I_DATA(I_DATA, byte);
+   0424 21 80 50            776 	ld	hl,#0x5080
+   0427 4E                  777 	ld	c,(hl)
+                            778 ;i_flos.c:300: if(!result) {
+   0428 AF                  779 	xor	a,a
+   0429 B1                  780 	or	a,c
+   042A 20 11               781 	jr	NZ,00102$
+                            782 ;i_flos.c:301: g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+   042C 2E 81               783 	ld	l, #0x81
+   042E 7E                  784 	ld	a,(hl)
+   042F FD 21r01s00         785 	ld	iy,#_g_flos_lasterror
+   0433 FD 77 00            786 	ld	0 (iy),a
+                            787 ;i_flos.c:302: g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+   0436 2E 82               788 	ld	l, #0x82
+   0438 7E                  789 	ld	a,(hl)
+   0439 21r02s00            790 	ld	hl,#_g_flos_hw_lasterror + 0
+   043C 77                  791 	ld	(hl), a
+   043D                     792 00102$:
+                            793 ;i_flos.c:305: return result; 
+   043D 69                  794 	ld	l,c
+   043E DD E1               795 	pop	ix
+   0440 C9                  796 	ret
+   0441                     797 _FLOS_WriteBytesToFile_end::
+                            798 ;i_flos.c:311: void FLOS_PrintString(const char* string)
+                            799 ;	---------------------------------
+                            800 ; Function FLOS_PrintString
+                            801 ; ---------------------------------
+   0441                     802 _FLOS_PrintString_start::
+   0441                     803 _FLOS_PrintString:
+   0441 DD E5               804 	push	ix
+   0443 DD 21 00 00         805 	ld	ix,#0
+   0447 DD 39               806 	add	ix,sp
+                            807 ;i_flos.c:313: *PTRTO_I_DATA(I_DATA, word) = (word) string;
+   0449 FD 21 80 50         808 	ld	iy,#0x5080
+   044D DD 4E 04            809 	ld	c,4 (ix)
+   0450 DD 46 05            810 	ld	b,5 (ix)
+   0453 FD 71 00            811 	ld	0 (iy),c
+   0456 FD 70 01            812 	ld	1 (iy),b
+                            813 ;i_flos.c:315: CALL_FLOS_CODE(KJT_PRINT_STRING);
+   0459 21r03s00            814 	ld	hl,#_pFunc + 0
+   045C 36 B3               815 	ld	(hl), #0xB3
+   045E FD 21r03s00         816 	ld	iy,#_pFunc
+   0462 FD 36 01 50         817 	ld	1 (iy),#0x50
+   0466 21r6Es04            818 	ld	hl,#00103$
+   0469 E5                  819 	push	hl
+   046A 2Ar03s00            820 	ld	hl,(_pFunc)
+   046D E9                  821 	jp	(hl)
+   046E                     822 00103$:
+   046E DD E1               823 	pop	ix
+   0470 C9                  824 	ret
+   0471                     825 _FLOS_PrintString_end::
+                            826 ;i_flos.c:319: void FLOS_ClearScreen(void)
+                            827 ;	---------------------------------
+                            828 ; Function FLOS_ClearScreen
+                            829 ; ---------------------------------
+   0471                     830 _FLOS_ClearScreen_start::
+   0471                     831 _FLOS_ClearScreen:
+                            832 ;i_flos.c:321: CALL_FLOS_CODE(KJT_CLEAR_SCREEN);
+   0471 21r03s00            833 	ld	hl,#_pFunc + 0
+   0474 36 B6               834 	ld	(hl), #0xB6
+   0476 FD 21r03s00         835 	ld	iy,#_pFunc
+   047A FD 36 01 50         836 	ld	1 (iy),#0x50
+   047E 21r86s04            837 	ld	hl,#00103$
+   0481 E5                  838 	push	hl
+   0482 2Ar03s00            839 	ld	hl,(_pFunc)
+   0485 E9                  840 	jp	(hl)
+   0486                     841 00103$:
+   0486 C9                  842 	ret
+   0487                     843 _FLOS_ClearScreen_end::
+                            844 ;i_flos.c:326: void FLOS_FlosDisplay(void)
+                            845 ;	---------------------------------
+                            846 ; Function FLOS_FlosDisplay
+                            847 ; ---------------------------------
+   0487                     848 _FLOS_FlosDisplay_start::
+   0487                     849 _FLOS_FlosDisplay:
+                            850 ;i_flos.c:328: CALL_FLOS_CODE(KJT_FLOS_DISPLAY);
+   0487 21r03s00            851 	ld	hl,#_pFunc + 0
+   048A 36 64               852 	ld	(hl), #0x64
+   048C FD 21r03s00         853 	ld	iy,#_pFunc
+   0490 FD 36 01 51         854 	ld	1 (iy),#0x51
+   0494 21r9Cs04            855 	ld	hl,#00103$
+   0497 E5                  856 	push	hl
+   0498 2Ar03s00            857 	ld	hl,(_pFunc)
+   049B E9                  858 	jp	(hl)
+   049C                     859 00103$:
+   049C C9                  860 	ret
+   049D                     861 _FLOS_FlosDisplay_end::
+                            862 ;i_flos.c:334: void FLOS_WaitVRT(void)
+                            863 ;	---------------------------------
+                            864 ; Function FLOS_WaitVRT
+                            865 ; ---------------------------------
+   049D                     866 _FLOS_WaitVRT_start::
+   049D                     867 _FLOS_WaitVRT:
+                            868 ;i_flos.c:336: CALL_FLOS_CODE(KJT_WAIT_VRT);
+   049D 21r03s00            869 	ld	hl,#_pFunc + 0
+   04A0 36 BF               870 	ld	(hl), #0xBF
+   04A2 FD 21r03s00         871 	ld	iy,#_pFunc
+   04A6 FD 36 01 50         872 	ld	1 (iy),#0x50
+   04AA 21rB2s04            873 	ld	hl,#00103$
+   04AD E5                  874 	push	hl
+   04AE 2Ar03s00            875 	ld	hl,(_pFunc)
+   04B1 E9                  876 	jp	(hl)
+   04B2                     877 00103$:
+   04B2 C9                  878 	ret
+   04B3                     879 _FLOS_WaitVRT_end::
+                            880 ;i_flos.c:340: void FLOS_SetPen(byte color)
+                            881 ;	---------------------------------
+                            882 ; Function FLOS_SetPen
+                            883 ; ---------------------------------
+   04B3                     884 _FLOS_SetPen_start::
+   04B3                     885 _FLOS_SetPen:
+   04B3 DD E5               886 	push	ix
+   04B5 DD 21 00 00         887 	ld	ix,#0
+   04B9 DD 39               888 	add	ix,sp
+                            889 ;i_flos.c:343: *PTRTO_I_DATA(I_DATA,   byte) = color;
+   04BB FD 21 80 50         890 	ld	iy,#0x5080
+   04BF DD 7E 04            891 	ld	a,4 (ix)
+   04C2 FD 77 00            892 	ld	(iy),a
+                            893 ;i_flos.c:345: CALL_FLOS_CODE(KJT_SET_PEN);
+   04C5 21r03s00            894 	ld	hl,#_pFunc + 0
+   04C8 36 55               895 	ld	(hl), #0x55
+   04CA FD 21r03s00         896 	ld	iy,#_pFunc
+   04CE FD 36 01 51         897 	ld	1 (iy),#0x51
+   04D2 21rDAs04            898 	ld	hl,#00103$
+   04D5 E5                  899 	push	hl
+   04D6 2Ar03s00            900 	ld	hl,(_pFunc)
+   04D9 E9                  901 	jp	(hl)
+   04DA                     902 00103$:
+   04DA DD E1               903 	pop	ix
+   04DC C9                  904 	ret
+   04DD                     905 _FLOS_SetPen_end::
+                            906 ;i_flos.c:349: BOOL FLOS_SetCursorPos(byte x, byte y)
+                            907 ;	---------------------------------
+                            908 ; Function FLOS_SetCursorPos
+                            909 ; ---------------------------------
+   04DD                     910 _FLOS_SetCursorPos_start::
+   04DD                     911 _FLOS_SetCursorPos:
+   04DD DD E5               912 	push	ix
+   04DF DD 21 00 00         913 	ld	ix,#0
+   04E3 DD 39               914 	add	ix,sp
+                            915 ;i_flos.c:353: *PTRTO_I_DATA(I_DATA,   byte) = (byte) x;
+   04E5 FD 21 80 50         916 	ld	iy,#0x5080
+   04E9 DD 7E 04            917 	ld	a,4 (ix)
+   04EC FD 77 00            918 	ld	(iy),a
+                            919 ;i_flos.c:354: *PTRTO_I_DATA(I_DATA+1, byte) = (byte) y;
+   04EF FD 21 81 50         920 	ld	iy,#0x5081
+   04F3 DD 7E 05            921 	ld	a,5 (ix)
+   04F6 FD 77 00            922 	ld	(iy),a
+                            923 ;i_flos.c:356: CALL_FLOS_CODE(KJT_SET_CURSOR_POSITION);
+   04F9 21r03s00            924 	ld	hl,#_pFunc + 0
+   04FC 36 34               925 	ld	(hl), #0x34
+   04FE FD 21r03s00         926 	ld	iy,#_pFunc
+   0502 FD 36 01 51         927 	ld	1 (iy),#0x51
+   0506 21r0Es05            928 	ld	hl,#00103$
+   0509 E5                  929 	push	hl
+   050A 2Ar03s00            930 	ld	hl,(_pFunc)
+   050D E9                  931 	jp	(hl)
+   050E                     932 00103$:
+                            933 ;i_flos.c:358: result = *PTRTO_I_DATA(I_DATA, byte);
+   050E 21 80 50            934 	ld	hl,#0x5080
+   0511 4E                  935 	ld	c,(hl)
+                            936 ;i_flos.c:360: return result; 
+   0512 69                  937 	ld	l,c
+   0513 DD E1               938 	pop	ix
+   0515 C9                  939 	ret
+   0516                     940 _FLOS_SetCursorPos_end::
+                            941 ;i_flos.c:366: void FLOS_WaitKeyPress(byte* pASCII, byte* pScancode)
+                            942 ;	---------------------------------
+                            943 ; Function FLOS_WaitKeyPress
+                            944 ; ---------------------------------
+   0516                     945 _FLOS_WaitKeyPress_start::
+   0516                     946 _FLOS_WaitKeyPress:
+   0516 DD E5               947 	push	ix
+   0518 DD 21 00 00         948 	ld	ix,#0
+   051C DD 39               949 	add	ix,sp
+                            950 ;i_flos.c:369: CALL_FLOS_CODE(KJT_WAIT_KEY_PRESS);
+   051E 21r03s00            951 	ld	hl,#_pFunc + 0
+   0521 36 FE               952 	ld	(hl), #0xFE
+   0523 FD 21r03s00         953 	ld	iy,#_pFunc
+   0527 FD 36 01 50         954 	ld	1 (iy),#0x50
+   052B 21r33s05            955 	ld	hl,#00103$
+   052E E5                  956 	push	hl
+   052F 2Ar03s00            957 	ld	hl,(_pFunc)
+   0532 E9                  958 	jp	(hl)
+   0533                     959 00103$:
+                            960 ;i_flos.c:371: *pScancode = *PTRTO_I_DATA(I_DATA,   byte);
+   0533 DD 4E 06            961 	ld	c,6 (ix)
+   0536 DD 46 07            962 	ld	b,7 (ix)
+   0539 C5                  963 	push	bc
+   053A FD E1               964 	pop	iy
+   053C 21 80 50            965 	ld	hl,#0x5080
+   053F 7E                  966 	ld	a,(hl)
+   0540 FD 77 00            967 	ld	(iy),a
+                            968 ;i_flos.c:372: *pASCII    = *PTRTO_I_DATA(I_DATA+1, byte);
+   0543 DD 4E 04            969 	ld	c,4 (ix)
+   0546 DD 46 05            970 	ld	b,5 (ix)
+   0549 C5                  971 	push	bc
+   054A FD E1               972 	pop	iy
+   054C 2E 81               973 	ld	l, #0x81
+   054E 7E                  974 	ld	a,(hl)
+   054F FD 77 00            975 	ld	(iy),a
+   0552 DD E1               976 	pop	ix
+   0554 C9                  977 	ret
+   0555                     978 _FLOS_WaitKeyPress_end::
+                            979 ;i_flos.c:377: BOOL FLOS_GetKeyPress(byte* pASCII, byte* pScancode)
+                            980 ;	---------------------------------
+                            981 ; Function FLOS_GetKeyPress
+                            982 ; ---------------------------------
+   0555                     983 _FLOS_GetKeyPress_start::
+   0555                     984 _FLOS_GetKeyPress:
+   0555 DD E5               985 	push	ix
+   0557 DD 21 00 00         986 	ld	ix,#0
+   055B DD 39               987 	add	ix,sp
+                            988 ;i_flos.c:380: CALL_FLOS_CODE(KJT_GET_KEY);
+   055D 21r03s00            989 	ld	hl,#_pFunc + 0
+   0560 36 01               990 	ld	(hl), #0x01
+   0562 FD 21r03s00         991 	ld	iy,#_pFunc
+   0566 FD 36 01 51         992 	ld	1 (iy),#0x51
+   056A 21r72s05            993 	ld	hl,#00106$
+   056D E5                  994 	push	hl
+   056E 2Ar03s00            995 	ld	hl,(_pFunc)
+   0571 E9                  996 	jp	(hl)
+   0572                     997 00106$:
+                            998 ;i_flos.c:382: *pScancode = *PTRTO_I_DATA(I_DATA,   byte);
+   0572 DD 4E 06            999 	ld	c,6 (ix)
+   0575 DD 46 07           1000 	ld	b,7 (ix)
+   0578 C5                 1001 	push	bc
+   0579 FD E1              1002 	pop	iy
+   057B 21 80 50           1003 	ld	hl,#0x5080
+   057E 4E                 1004 	ld	c,(hl)
+   057F FD 71 00           1005 	ld	(iy),c
+                           1006 ;i_flos.c:383: *pASCII    = *PTRTO_I_DATA(I_DATA+1, byte);
+   0582 DD 5E 04           1007 	ld	e,4 (ix)
+   0585 DD 56 05           1008 	ld	d,5 (ix)
+   0588 D5                 1009 	push	de
+   0589 FD E1              1010 	pop	iy
+   058B 2E 81              1011 	ld	l, #0x81
+   058D 7E                 1012 	ld	a,(hl)
+   058E FD 77 00           1013 	ld	(iy),a
+                           1014 ;i_flos.c:386: return (*pScancode == 0) ?  FALSE : TRUE;
+   0591 AF                 1015 	xor	a,a
+   0592 B1                 1016 	or	a,c
+   0593 D6 01              1017 	sub	a,#0x01
+   0595 3E 00              1018 	ld	a,#0x00
+   0597 17                 1019 	rla
+   0598 B7                 1020 	or	a,a
+   0599 28 04              1021 	jr	Z,00103$
+   059B 0E 00              1022 	ld	c,#0x00
+   059D 18 02              1023 	jr	00104$
+   059F                    1024 00103$:
+   059F 0E 01              1025 	ld	c,#0x01
+   05A1                    1026 00104$:
+   05A1 69                 1027 	ld	l,c
+   05A2 DD E1              1028 	pop	ix
+   05A4 C9                 1029 	ret
+   05A5                    1030 _FLOS_GetKeyPress_end::
+                           1031 ;i_flos.c:391: void FLOS_DirListFirstEntry(void)
+                           1032 ;	---------------------------------
+                           1033 ; Function FLOS_DirListFirstEntry
+                           1034 ; ---------------------------------
+   05A5                    1035 _FLOS_DirListFirstEntry_start::
+   05A5                    1036 _FLOS_DirListFirstEntry:
+                           1037 ;i_flos.c:393: CALL_FLOS_CODE(KJT_DIR_LIST_FIRST_ENTRY);
+   05A5 21r03s00           1038 	ld	hl,#_pFunc + 0
+   05A8 36 3D              1039 	ld	(hl), #0x3D
+   05AA FD 21r03s00        1040 	ld	iy,#_pFunc
+   05AE FD 36 01 51        1041 	ld	1 (iy),#0x51
+   05B2 21rBAs05           1042 	ld	hl,#00103$
+   05B5 E5                 1043 	push	hl
+   05B6 2Ar03s00           1044 	ld	hl,(_pFunc)
+   05B9 E9                 1045 	jp	(hl)
+   05BA                    1046 00103$:
+   05BA C9                 1047 	ret
+   05BB                    1048 _FLOS_DirListFirstEntry_end::
+                           1049 ;i_flos.c:399: BOOL FLOS_DirListGetEntry(FLOS_DIR_ENTRY* pEntry)
+                           1050 ;	---------------------------------
+                           1051 ; Function FLOS_DirListGetEntry
+                           1052 ; ---------------------------------
+   05BB                    1053 _FLOS_DirListGetEntry_start::
+   05BB                    1054 _FLOS_DirListGetEntry:
+   05BB DD E5              1055 	push	ix
+   05BD DD 21 00 00        1056 	ld	ix,#0
+   05C1 DD 39              1057 	add	ix,sp
+   05C3 F5                 1058 	push	af
+   05C4 3B                 1059 	dec	sp
+                           1060 ;i_flos.c:403: CALL_FLOS_CODE(KJT_DIR_LIST_GET_ENTRY);
+   05C5 21r03s00           1061 	ld	hl,#_pFunc + 0
+   05C8 36 40              1062 	ld	(hl), #0x40
+   05CA FD 21r03s00        1063 	ld	iy,#_pFunc
+   05CE FD 36 01 51        1064 	ld	1 (iy),#0x51
+   05D2 21rDAs05           1065 	ld	hl,#00106$
+   05D5 E5                 1066 	push	hl
+   05D6 2Ar03s00           1067 	ld	hl,(_pFunc)
+   05D9 E9                 1068 	jp	(hl)
+   05DA                    1069 00106$:
+                           1070 ;i_flos.c:405: result = *PTRTO_I_DATA(I_DATA, byte);
+   05DA 21 80 50           1071 	ld	hl,#0x5080
+   05DD 7E                 1072 	ld	a,(hl)
+   05DE DD 77 FF           1073 	ld	-1 (ix),a
+                           1074 ;i_flos.c:406: if(result) {
+   05E1 AF                 1075 	xor	a,a
+   05E2 DD B6 FF           1076 	or	a,-1 (ix)
+   05E5 CAr2Fs06           1077 	jp	Z,00102$
+                           1078 ;i_flos.c:407: pEntry->pFilename = (const char*) ( *PTRTO_I_DATA(I_DATA+1, word) );
+   05E8 DD 5E 04           1079 	ld	e,4 (ix)
+   05EB DD 56 05           1080 	ld	d,5 (ix)
+   05EE 2E 81              1081 	ld	l, #0x81
+   05F0 4E                 1082 	ld	c,(hl)
+   05F1 23                 1083 	inc	hl
+   05F2 46                 1084 	ld	b,(hl)
+   05F3 6B                 1085 	ld	l,e
+   05F4 62                 1086 	ld	h,d
+   05F5 71                 1087 	ld	(hl),c
+   05F6 23                 1088 	inc	hl
+   05F7 70                 1089 	ld	(hl),b
+                           1090 ;i_flos.c:408: pEntry->file_flag =                 *PTRTO_I_DATA(I_DATA+3, byte);
+   05F8 21 06 00           1091 	ld	hl,#0x0006
+   05FB 19                 1092 	add	hl,de
+   05FC 4D                 1093 	ld	c,l
+   05FD 44                 1094 	ld	b,h
+   05FE 21 83 50           1095 	ld	hl,#0x5083
+   0601 7E                 1096 	ld	a,(hl)
+   0602 02                 1097 	ld	(bc),a
+                           1098 ;i_flos.c:409: pEntry->err_code  =                 *PTRTO_I_DATA(I_DATA+4, byte);
+   0603 21 07 00           1099 	ld	hl,#0x0007
+   0606 19                 1100 	add	hl,de
+   0607 4D                 1101 	ld	c,l
+   0608 44                 1102 	ld	b,h
+   0609 21 84 50           1103 	ld	hl,#0x5084
+   060C 7E                 1104 	ld	a,(hl)
+   060D 02                 1105 	ld	(bc),a
+                           1106 ;i_flos.c:410: pEntry->len       =                 *PTRTO_I_DATA(I_DATA+5, dword);
+   060E 21 02 00           1107 	ld	hl,#0x0002
+   0611 19                 1108 	add	hl,de
+   0612 DD 75 FD           1109 	ld	-3 (ix),l
+   0615 DD 74 FE           1110 	ld	-2 (ix),h
+   0618 21 85 50           1111 	ld	hl,#0x5085
+   061B 5E                 1112 	ld	e,(hl)
+   061C 23                 1113 	inc	hl
+   061D 56                 1114 	ld	d,(hl)
+   061E 23                 1115 	inc	hl
+   061F 4E                 1116 	ld	c,(hl)
+   0620 23                 1117 	inc	hl
+   0621 46                 1118 	ld	b,(hl)
+   0622 DD 6E FD           1119 	ld	l,-3 (ix)
+   0625 DD 66 FE           1120 	ld	h,-2 (ix)
+   0628 73                 1121 	ld	(hl),e
+   0629 23                 1122 	inc	hl
+   062A 72                 1123 	ld	(hl),d
+   062B 23                 1124 	inc	hl
+   062C 71                 1125 	ld	(hl),c
+   062D 23                 1126 	inc	hl
+   062E 70                 1127 	ld	(hl),b
+   062F                    1128 00102$:
+                           1129 ;i_flos.c:416: return result; 
+   062F DD 6E FF           1130 	ld	l,-1 (ix)
+   0632 DD F9              1131 	ld	sp,ix
+   0634 DD E1              1132 	pop	ix
+   0636 C9                 1133 	ret
+   0637                    1134 _FLOS_DirListGetEntry_end::
+                           1135 ;i_flos.c:422: byte FLOS_DirListNextEntry(void)
+                           1136 ;	---------------------------------
+                           1137 ; Function FLOS_DirListNextEntry
+                           1138 ; ---------------------------------
+   0637                    1139 _FLOS_DirListNextEntry_start::
+   0637                    1140 _FLOS_DirListNextEntry:
+                           1141 ;i_flos.c:426: CALL_FLOS_CODE(KJT_DIR_LIST_NEXT_ENTRY);
+   0637 21r03s00           1142 	ld	hl,#_pFunc + 0
+   063A 36 43              1143 	ld	(hl), #0x43
+   063C FD 21r03s00        1144 	ld	iy,#_pFunc
+   0640 FD 36 01 51        1145 	ld	1 (iy),#0x51
+   0644 21r4Cs06           1146 	ld	hl,#00103$
+   0647 E5                 1147 	push	hl
+   0648 2Ar03s00           1148 	ld	hl,(_pFunc)
+   064B E9                 1149 	jp	(hl)
+   064C                    1150 00103$:
+                           1151 ;i_flos.c:428: result = *PTRTO_I_DATA(I_DATA, byte);
+   064C 21 80 50           1152 	ld	hl,#0x5080
+                           1153 ;i_flos.c:430: return result; 
+   064F 6E                 1154 	ld	l,(hl)
+   0650 C9                 1155 	ret
+   0651                    1156 _FLOS_DirListNextEntry_end::
+                           1157 ;i_flos.c:436: const char* FLOS_GetDirName(void)
+                           1158 ;	---------------------------------
+                           1159 ; Function FLOS_GetDirName
+                           1160 ; ---------------------------------
+   0651                    1161 _FLOS_GetDirName_start::
+   0651                    1162 _FLOS_GetDirName:
+                           1163 ;i_flos.c:441: CALL_FLOS_CODE(KJT_GET_DIR_NAME);
+   0651 21r03s00           1164 	ld	hl,#_pFunc + 0
+   0654 36 67              1165 	ld	(hl), #0x67
+   0656 FD 21r03s00        1166 	ld	iy,#_pFunc
+   065A FD 36 01 51        1167 	ld	1 (iy),#0x51
+   065E 21r66s06           1168 	ld	hl,#00106$
+   0661 E5                 1169 	push	hl
+   0662 2Ar03s00           1170 	ld	hl,(_pFunc)
+   0665 E9                 1171 	jp	(hl)
+   0666                    1172 00106$:
+                           1173 ;i_flos.c:443: result = *PTRTO_I_DATA(I_DATA,   byte);
+   0666 21 80 50           1174 	ld	hl,#0x5080
+   0669 4E                 1175 	ld	c,(hl)
+                           1176 ;i_flos.c:444: w      = *PTRTO_I_DATA(I_DATA+1, word);
+   066A 2E 81              1177 	ld	l, #0x81
+   066C 5E                 1178 	ld	e,(hl)
+   066D 23                 1179 	inc	hl
+   066E 56                 1180 	ld	d,(hl)
+                           1181 ;i_flos.c:446: return (result ? (const char*)w : NULL);
+   066F AF                 1182 	xor	a,a
+   0670 B1                 1183 	or	a,c
+   0671 28 04              1184 	jr	Z,00103$
+   0673 4B                 1185 	ld	c,e
+   0674 42                 1186 	ld	b,d
+   0675 18 03              1187 	jr	00104$
+   0677                    1188 00103$:
+   0677 01 00 00           1189 	ld	bc,#0x0000
+   067A                    1190 00104$:
+   067A 69                 1191 	ld	l,c
+   067B 60                 1192 	ld	h,b
+   067C C9                 1193 	ret
+   067D                    1194 _FLOS_GetDirName_end::
+                           1195 ;i_flos.c:452: void FLOS_GetVersion(word* os_version_word, word* hw_version_word)
+                           1196 ;	---------------------------------
+                           1197 ; Function FLOS_GetVersion
+                           1198 ; ---------------------------------
+   067D                    1199 _FLOS_GetVersion_start::
+   067D                    1200 _FLOS_GetVersion:
+   067D DD E5              1201 	push	ix
+   067F DD 21 00 00        1202 	ld	ix,#0
+   0683 DD 39              1203 	add	ix,sp
+                           1204 ;i_flos.c:455: CALL_FLOS_CODE(KJT_GET_VERSION);
+   0685 21r03s00           1205 	ld	hl,#_pFunc + 0
+   0688 36 31              1206 	ld	(hl), #0x31
+   068A FD 21r03s00        1207 	ld	iy,#_pFunc
+   068E FD 36 01 51        1208 	ld	1 (iy),#0x51
+   0692 21r9As06           1209 	ld	hl,#00103$
+   0695 E5                 1210 	push	hl
+   0696 2Ar03s00           1211 	ld	hl,(_pFunc)
+   0699 E9                 1212 	jp	(hl)
+   069A                    1213 00103$:
+                           1214 ;i_flos.c:457: *os_version_word = *PTRTO_I_DATA(I_DATA+0, word);
+   069A DD 4E 04           1215 	ld	c,4 (ix)
+   069D DD 46 05           1216 	ld	b,5 (ix)
+   06A0 C5                 1217 	push	bc
+   06A1 FD E1              1218 	pop	iy
+   06A3 21 80 50           1219 	ld	hl,#0x5080
+   06A6 4E                 1220 	ld	c,(hl)
+   06A7 23                 1221 	inc	hl
+   06A8 46                 1222 	ld	b,(hl)
+   06A9 FD 71 00           1223 	ld	0 (iy),c
+   06AC FD 70 01           1224 	ld	1 (iy),b
+                           1225 ;i_flos.c:458: *hw_version_word = *PTRTO_I_DATA(I_DATA+2, word);
+   06AF DD 4E 06           1226 	ld	c,6 (ix)
+   06B2 DD 46 07           1227 	ld	b,7 (ix)
+   06B5 C5                 1228 	push	bc
+   06B6 FD E1              1229 	pop	iy
+   06B8 21 82 50           1230 	ld	hl,#0x5082
+   06BB 4E                 1231 	ld	c,(hl)
+   06BC 23                 1232 	inc	hl
+   06BD 46                 1233 	ld	b,(hl)
+   06BE FD 71 00           1234 	ld	0 (iy),c
+   06C1 FD 70 01           1235 	ld	1 (iy),b
+   06C4 DD E1              1236 	pop	ix
+   06C6 C9                 1237 	ret
+   06C7                    1238 _FLOS_GetVersion_end::
+                           1239 ;i_flos.c:465: void FLOS_PrintStringLFCR(const char* string)
+                           1240 ;	---------------------------------
+                           1241 ; Function FLOS_PrintStringLFCR
+                           1242 ; ---------------------------------
+   06C7                    1243 _FLOS_PrintStringLFCR_start::
+   06C7                    1244 _FLOS_PrintStringLFCR:
+   06C7 DD E5              1245 	push	ix
+   06C9 DD 21 00 00        1246 	ld	ix,#0
+   06CD DD 39              1247 	add	ix,sp
+                           1248 ;i_flos.c:467: FLOS_PrintString(string);
+   06CF DD 6E 04           1249 	ld	l,4 (ix)
+   06D2 DD 66 05           1250 	ld	h,5 (ix)
+   06D5 E5                 1251 	push	hl
+   06D6 CDr41s04           1252 	call	_FLOS_PrintString
+   06D9 F1                 1253 	pop	af
+                           1254 ;i_flos.c:468: FLOS_PrintString(PS_LFCR);
+   06DA 21rE5s06           1255 	ld	hl,#__str_0
+   06DD E5                 1256 	push	hl
+   06DE CDr41s04           1257 	call	_FLOS_PrintString
+   06E1 F1                 1258 	pop	af
+   06E2 DD E1              1259 	pop	ix
+   06E4 C9                 1260 	ret
+   06E5                    1261 _FLOS_PrintStringLFCR_end::
+   06E5                    1262 __str_0:
+   06E5 0B                 1263 	.db 0x0B
+   06E6 00                 1264 	.db 0x00
+                           1265 ;i_flos.c:474: char* FLOS_GetCmdLine(void)
+                           1266 ;	---------------------------------
+                           1267 ; Function FLOS_GetCmdLine
+                           1268 ; ---------------------------------
+   06E7                    1269 _FLOS_GetCmdLine_start::
+   06E7                    1270 _FLOS_GetCmdLine:
+                           1271 ;i_flos.c:476: return flos_cmdline;
+   06E7 2Ar00s00           1272 	ld	hl,(_flos_cmdline)
+   06EA C9                 1273 	ret
+   06EB                    1274 _FLOS_GetCmdLine_end::
+                           1275 ;i_flos.c:481: BOOL FLOS_SetSpawnCmdLine(const char* line)
+                           1276 ;	---------------------------------
+                           1277 ; Function FLOS_SetSpawnCmdLine
+                           1278 ; ---------------------------------
+   06EB                    1279 _FLOS_SetSpawnCmdLine_start::
+   06EB                    1280 _FLOS_SetSpawnCmdLine:
+   06EB DD E5              1281 	push	ix
+   06ED DD 21 00 00        1282 	ld	ix,#0
+   06F1 DD 39              1283 	add	ix,sp
+                           1284 ;i_flos.c:483: if(strlen(line) >= SPAWN_CMD_LINE_BUFFER_LEN)
+   06F3 DD 6E 04           1285 	ld	l,4 (ix)
+   06F6 DD 66 05           1286 	ld	h,5 (ix)
+   06F9 E5                 1287 	push	hl
+   06FA CDr00s00           1288 	call	_strlen
+   06FD F1                 1289 	pop	af
+   06FE 44                 1290 	ld	b,h
+   06FF 7D                 1291 	ld	a,l
+   0700 D6 28              1292 	sub	a,#0x28
+   0702 78                 1293 	ld	a,b
+   0703 DE 00              1294 	sbc	a,#0x00
+   0705 FAr0Cs07           1295 	jp	M,00102$
+                           1296 ;i_flos.c:484: return FALSE;
+   0708 2E 00              1297 	ld	l,#0x00
+   070A 18 17              1298 	jr	00103$
+   070C                    1299 00102$:
+                           1300 ;i_flos.c:486: flos_spawn_cmd[0] = 0;              // reset string len (in buffer) len to 0
+   070C 21r00s00           1301 	ld	hl,#_flos_spawn_cmd
+   070F 36 00              1302 	ld	(hl),#0x00
+                           1303 ;i_flos.c:487: strcat(flos_spawn_cmd, line);
+   0711 DD 6E 04           1304 	ld	l,4 (ix)
+   0714 DD 66 05           1305 	ld	h,5 (ix)
+   0717 E5                 1306 	push	hl
+   0718 21r00s00           1307 	ld	hl,#_flos_spawn_cmd
+   071B E5                 1308 	push	hl
+   071C CDr00s00           1309 	call	_strcat
+   071F F1                 1310 	pop	af
+   0720 F1                 1311 	pop	af
+                           1312 ;i_flos.c:488: return TRUE;
+   0721 2E 01              1313 	ld	l,#0x01
+   0723                    1314 00103$:
+   0723 DD E1              1315 	pop	ix
+   0725 C9                 1316 	ret
+   0726                    1317 _FLOS_SetSpawnCmdLine_end::
+                           1318 	.area _CODE
+                           1319 	.area _CABS
