@@ -1,0 +1,127 @@
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
+
+Symbol Table
+
+  0 _FLOS_ChangeDir                                                0093 GR
+  0 _FLOS_ChangeDir_end                                            00DD GR
+  0 _FLOS_ChangeDir_start                                          0093 GR
+  0 _FLOS_CheckDiskAvailable                                       0023 GR
+  0 _FLOS_CheckDiskAvailable_end                                   0049 GR
+  0 _FLOS_CheckDiskAvailable_start                                 0023 GR
+  0 _FLOS_ClearScreen                                              0471 GR
+  0 _FLOS_ClearScreen_end                                          0487 GR
+  0 _FLOS_ClearScreen_start                                        0471 GR
+  0 _FLOS_CreateFile                                               0319 GR
+  0 _FLOS_CreateFile_end                                           0377 GR
+  0 _FLOS_CreateFile_start                                         0319 GR
+  0 _FLOS_DeleteDir                                                0123 GR
+  0 _FLOS_DeleteDir_end                                            016D GR
+  0 _FLOS_DeleteDir_start                                          0123 GR
+  0 _FLOS_DirListFirstEntry                                        05A5 GR
+  0 _FLOS_DirListFirstEntry_end                                    05BB GR
+  0 _FLOS_DirListFirstEntry_start                                  05A5 GR
+  0 _FLOS_DirListGetEntry                                          05BB GR
+  0 _FLOS_DirListGetEntry_end                                      0637 GR
+  0 _FLOS_DirListGetEntry_start                                    05BB GR
+  0 _FLOS_DirListNextEntry                                         0637 GR
+  0 _FLOS_DirListNextEntry_end                                     0651 GR
+  0 _FLOS_DirListNextEntry_start                                   0637 GR
+  0 _FLOS_EraseFile                                                0377 GR
+  0 _FLOS_EraseFile_end                                            03C1 GR
+  0 _FLOS_EraseFile_start                                          0377 GR
+  0 _FLOS_FindFile                                                 01BB GR
+  0 _FLOS_FindFile_end                                             024D GR
+  0 _FLOS_FindFile_start                                           01BB GR
+  0 _FLOS_FlosDisplay                                              0487 GR
+  0 _FLOS_FlosDisplay_end                                          049D GR
+  0 _FLOS_FlosDisplay_start                                        0487 GR
+  0 _FLOS_ForceLoad                                                02C5 GR
+  0 _FLOS_ForceLoad_end                                            0319 GR
+  0 _FLOS_ForceLoad_start                                          02C5 GR
+  0 _FLOS_GetCmdLine                                               06E7 GR
+  0 _FLOS_GetCmdLine_end                                           06EB GR
+  0 _FLOS_GetCmdLine_start                                         06E7 GR
+  0 _FLOS_GetDirName                                               0651 GR
+  0 _FLOS_GetDirName_end                                           067D GR
+  0 _FLOS_GetDirName_start                                         0651 GR
+  0 _FLOS_GetKeyPress                                              0555 GR
+  0 _FLOS_GetKeyPress_end                                          05A5 GR
+  0 _FLOS_GetKeyPress_start                                        0555 GR
+  0 _FLOS_GetLastError                                             001B GR
+  0 _FLOS_GetLastError_end                                         0023 GR
+  0 _FLOS_GetLastError_start                                       001B GR
+  0 _FLOS_GetTotalSectors                                          0199 GR
+  0 _FLOS_GetTotalSectors_end                                      01BB GR
+  0 _FLOS_GetTotalSectors_start                                    0199 GR
+  0 _FLOS_GetVersion                                               067D GR
+  0 _FLOS_GetVersion_end                                           06C7 GR
+  0 _FLOS_GetVersion_start                                         067D GR
+  0 _FLOS_MakeDir                                                  0049 GR
+  0 _FLOS_MakeDir_end                                              0093 GR
+  0 _FLOS_MakeDir_start                                            0049 GR
+  0 _FLOS_ParentDir                                                00DD GR
+  0 _FLOS_ParentDir_end                                            010D GR
+  0 _FLOS_ParentDir_start                                          00DD GR
+  0 _FLOS_PrintString                                              0441 GR
+  0 _FLOS_PrintStringLFCR                                          06C7 GR
+  0 _FLOS_PrintStringLFCR_end                                      06E5 GR
+  0 _FLOS_PrintStringLFCR_start                                    06C7 GR
+  0 _FLOS_PrintString_end                                          0471 GR
+  0 _FLOS_PrintString_start                                        0441 GR
+  0 _FLOS_RestoreDirPosition                                       0183 GR
+  0 _FLOS_RestoreDirPosition_end                                   0199 GR
+  0 _FLOS_RestoreDirPosition_start                                 0183 GR
+  0 _FLOS_RootDir                                                  010D GR
+  0 _FLOS_RootDir_end                                              0123 GR
+  0 _FLOS_RootDir_start                                            010D GR
+  0 _FLOS_SetCursorPos                                             04DD GR
+  0 _FLOS_SetCursorPos_end                                         0516 GR
+  0 _FLOS_SetCursorPos_start                                       04DD GR
+  0 _FLOS_SetFilePointer                                           0289 GR
+  0 _FLOS_SetFilePointer_end                                       02C5 GR
+  0 _FLOS_SetFilePointer_start                                     0289 GR
+  0 _FLOS_SetLoadLength                                            024D GR
+  0 _FLOS_SetLoadLength_end                                        0289 GR
+  0 _FLOS_SetLoadLength_start                                      024D GR
+  0 _FLOS_SetPen                                                   04B3 GR
+  0 _FLOS_SetPen_end                                               04DD GR
+  0 _FLOS_SetPen_start                                             04B3 GR
+  0 _FLOS_SetSpawnCmdLine                                          06EB GR
+  0 _FLOS_SetSpawnCmdLine_end                                      0726 GR
+  0 _FLOS_SetSpawnCmdLine_start                                    06EB GR
+  0 _FLOS_StoreDirPosition                                         016D GR
+  0 _FLOS_StoreDirPosition_end                                     0183 GR
+  0 _FLOS_StoreDirPosition_start                                   016D GR
+  0 _FLOS_WaitKeyPress                                             0516 GR
+  0 _FLOS_WaitKeyPress_end                                         0555 GR
+  0 _FLOS_WaitKeyPress_start                                       0516 GR
+  0 _FLOS_WaitVRT                                                  049D GR
+  0 _FLOS_WaitVRT_end                                              04B3 GR
+  0 _FLOS_WaitVRT_start                                            049D GR
+  0 _FLOS_WriteBytesToFile                                         03C1 GR
+  0 _FLOS_WriteBytesToFile_end                                     0441 GR
+  0 _FLOS_WriteBytesToFile_start                                   03C1 GR
+  0 _MarkFrameTime                                                 0000 GR
+  0 _MarkFrameTime_end                                             001B GR
+  0 _MarkFrameTime_start                                           0000 GR
+  0 __str_0                                                        06E5 R
+    _flos_cmdline                                                  **** GX
+    _flos_spawn_cmd                                                **** GX
+  1 _g_a1_byte_result                                              0000 GR
+  1 _g_flos_hw_lasterror                                           0002 GR
+  1 _g_flos_lasterror                                              0001 GR
+  1 _pFunc                                                         0003 GR
+    _strcat                                                        **** GX
+    _strlen                                                        **** GX
+
+ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
+
+Area Table
+
+   0 _CODE                                                          size  726   flags 0
+   1 _DATA                                                          size    5   flags 0
+   2 _OVERLAY                                                       size    0   flags 0
+   3 _HOME                                                          size    0   flags 0
+   4 _GSINIT                                                        size    0   flags 0
+   5 _GSFINAL                                                       size    0   flags 0
+   6 _CABS                                                          size    0   flags 0

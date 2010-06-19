@@ -1,0 +1,1 @@
+C:\splint-3.1.1\bin\splint.exe -booltype BOOL  -DOWN_SP=0x7000 -D__naked test1.c > a_splint_err

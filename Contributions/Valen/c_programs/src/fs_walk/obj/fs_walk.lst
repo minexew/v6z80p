@@ -1,0 +1,3383 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ANSI-C Compiler
+                              3 ; Version 2.9.0 #5416 (Mar 22 2009) (MINGW32)
+                              4 ; This file was generated Tue Jun 08 18:26:07 2010
+                              5 ;--------------------------------------------------------
+                              6 	.module fs_walk
+                              7 	.optsdcc -mz80
+                              8 	
+                              9 ;--------------------------------------------------------
+                             10 ; Public variables in this module
+                             11 ;--------------------------------------------------------
+                             12 	.globl _main
+                             13 	.globl _delete_dir_entry
+                             14 	.globl _print_box
+                             15 	.globl _load_config_file
+                             16 	.globl _init_config_file_parser
+                             17 	.globl _get_user_action_based_on_ext
+                             18 	.globl _iterate_trough_extensions
+                             19 	.globl _replace_new_lines_with_zero_bytes
+                             20 	.globl _lview
+                             21 	.globl _config
+                             22 	.globl _config_file_buffer
+                             23 	.globl _numStrings
+                             24 	.globl _tmp1
+                             25 	.globl _buf
+                             26 	.globl _buffer
+                             27 	.globl _myFile
+                             28 	.globl _request_spawn_command
+                             29 	.globl _request_exit
+                             30 	.globl _own_sp
+                             31 	.globl _DiagMessage
+                             32 	.globl _load_file_to_buffer
+                             33 	.globl _RequestToExitAndExecuteCommandString
+                             34 	.globl _do_dir
+                             35 	.globl _split_string_to_many_strings
+                             36 	.globl _PrintMessage
+                             37 	.globl _ListView_Update
+                             38 	.globl _ListView_GetNumItems
+                             39 	.globl _ListView_GetSelectedIndex
+                             40 	.globl _ListView_SetSelectedIndex
+                             41 	.globl _ListView_Init
+                             42 	.globl _ListView_GetItem
+                             43 	.globl _ListView_GetSelectedItem
+                             44 	.globl _ListView_check_visible_part
+                             45 	.globl _ListView_get_item_by_index
+                             46 	.globl _ListView_update_own_textfield
+                             47 	.globl _add_user_action_based_on_ext
+                             48 	.globl _enter_pressed
+                             49 	.globl _extract_filename_from_buffer
+                             50 	.globl _do_action_based_on_file_extension
+                             51 	.globl _request_to_exit_and_execute_command_with_filename
+                             52 	.globl _f4_pressed
+                             53 	.globl _IsSelectedItem_DIR
+                             54 	.globl _GetFilenameOfSelectedItem
+                             55 	.globl _fill_ListView_by_entries_from_current_dir
+                             56 	.globl _main_loop
+                             57 	.globl _clear_area
+                             58 	.globl _check_OS_version
+                             59 	.globl _clear_keyboard_buffer
+                             60 ;--------------------------------------------------------
+                             61 ; special function registers
+                             62 ;--------------------------------------------------------
+                             63 ;--------------------------------------------------------
+                             64 ;  ram data
+                             65 ;--------------------------------------------------------
+                             66 	.area _DATA
+   0000                      67 _request_exit::
+   0000                      68 	.ds 1
+   0001                      69 _request_spawn_command::
+   0001                      70 	.ds 1
+   0002                      71 _myFile::
+   0002                      72 	.ds 7
+   0009                      73 _buffer::
+   0009                      74 	.ds 33
+   002A                      75 _buf::
+   002A                      76 	.ds 8
+   0032                      77 _tmp1::
+   0032                      78 	.ds 2
+   0034                      79 _numStrings::
+   0034                      80 	.ds 2
+   0036                      81 _config_file_buffer::
+   0036                      82 	.ds 1024
+   0436                      83 _config::
+   0436                      84 	.ds 260
+   053A                      85 _lview::
+   053A                      86 	.ds 14
+   0548                      87 _GetFilenameOfSelectedItem_filename_1_1:
+   0548                      88 	.ds 13
+                             89 ;--------------------------------------------------------
+                             90 ; overlayable items in  ram 
+                             91 ;--------------------------------------------------------
+                             92 	.area _OVERLAY
+                             93 ;--------------------------------------------------------
+                             94 ; external initialized ram data
+                             95 ;--------------------------------------------------------
+                             96 ;--------------------------------------------------------
+                             97 ; global & static initialisations
+                             98 ;--------------------------------------------------------
+                             99 	.area _HOME
+                            100 	.area _GSINIT
+                            101 	.area _GSFINAL
+                            102 	.area _GSINIT
+                            103 ;fs_walk.c:44: BOOL request_exit = FALSE;              // exit program request flag
+   0000 FD 21r00s00         104 	ld	iy,#_request_exit
+   0004 FD 36 00 00         105 	ld	0 (iy),#0x00
+                            106 ;fs_walk.c:45: BOOL request_spawn_command = FALSE;     // spawn command request flag
+   0008 FD 21r01s00         107 	ld	iy,#_request_spawn_command
+   000C FD 36 00 00         108 	ld	0 (iy),#0x00
+                            109 ;fs_walk.c:54: byte* tmp1 = (byte*) 0x8800;
+   0010 FD 21r32s00         110 	ld	iy,#_tmp1
+   0014 FD 36 00 00         111 	ld	0 (iy),#0x00
+   0018 FD 21r32s00         112 	ld	iy,#_tmp1
+   001C FD 36 01 88         113 	ld	1 (iy),#0x88
+                            114 ;--------------------------------------------------------
+                            115 ; Home
+                            116 ;--------------------------------------------------------
+                            117 	.area _HOME
+                            118 	.area _HOME
+                            119 ;--------------------------------------------------------
+                            120 ; code
+                            121 ;--------------------------------------------------------
+                            122 	.area _CODE
+                            123 ;util.c:4: void DiagMessage(char* pMsg, char* pFilename)
+                            124 ;	---------------------------------
+                            125 ; Function DiagMessage
+                            126 ; ---------------------------------
+   0000                     127 _DiagMessage_start::
+   0000                     128 _DiagMessage:
+   0000 DD E5               129 	push	ix
+   0002 DD 21 00 00         130 	ld	ix,#0
+   0006 DD 39               131 	add	ix,sp
+                            132 ;util.c:8: err = FLOS_GetLastError();
+   0008 CDr00s00            133 	call	_FLOS_GetLastError
+   000B 4D                  134 	ld	c,l
+                            135 ;util.c:10: FLOS_PrintString(pMsg);
+   000C C5                  136 	push	bc
+   000D DD 6E 04            137 	ld	l,4 (ix)
+   0010 DD 66 05            138 	ld	h,5 (ix)
+   0013 E5                  139 	push	hl
+   0014 CDr00s00            140 	call	_FLOS_PrintString
+   0017 F1                  141 	pop	af
+   0018 C1                  142 	pop	bc
+                            143 ;util.c:11: FLOS_PrintString(pFilename);
+   0019 C5                  144 	push	bc
+   001A DD 6E 06            145 	ld	l,6 (ix)
+   001D DD 66 07            146 	ld	h,7 (ix)
+   0020 E5                  147 	push	hl
+   0021 CDr00s00            148 	call	_FLOS_PrintString
+   0024 F1                  149 	pop	af
+   0025 C1                  150 	pop	bc
+                            151 ;util.c:13: FLOS_PrintString(" OS_err: $");
+   0026 C5                  152 	push	bc
+   0027 21r56s00            153 	ld	hl,#__str_0
+   002A E5                  154 	push	hl
+   002B CDr00s00            155 	call	_FLOS_PrintString
+   002E F1                  156 	pop	af
+   002F C1                  157 	pop	bc
+                            158 ;util.c:14: _uitoa(err, buffer, 16);
+   0030 06 00               159 	ld	b,#0x00
+   0032 3E 10               160 	ld	a,#0x10
+   0034 F5                  161 	push	af
+   0035 33                  162 	inc	sp
+   0036 21r09s00            163 	ld	hl,#_buffer
+   0039 E5                  164 	push	hl
+   003A C5                  165 	push	bc
+   003B CDr00s00            166 	call	__uitoa
+   003E F1                  167 	pop	af
+   003F F1                  168 	pop	af
+   0040 33                  169 	inc	sp
+                            170 ;util.c:15: FLOS_PrintString(buffer);
+   0041 21r09s00            171 	ld	hl,#_buffer
+   0044 E5                  172 	push	hl
+   0045 CDr00s00            173 	call	_FLOS_PrintString
+   0048 F1                  174 	pop	af
+                            175 ;util.c:16: FLOS_PrintString(PS_LFCR);
+   0049 21r61s00            176 	ld	hl,#__str_1
+   004C E5                  177 	push	hl
+   004D CDr00s00            178 	call	_FLOS_PrintString
+   0050 F1                  179 	pop	af
+   0051 DD E1               180 	pop	ix
+   0053 C9                  181 	ret
+   0054                     182 _DiagMessage_end::
+   0054                     183 _own_sp:
+   0054 FF FF               184 	.dw #0xFFFF
+   0056                     185 __str_0:
+   0056 20 4F 53 5F 65 72   186 	.ascii " OS_err: $"
+        72 3A 20 24
+   0060 00                  187 	.db 0x00
+   0061                     188 __str_1:
+   0061 0B                  189 	.db 0x0B
+   0062 00                  190 	.db 0x00
+                            191 ;util.c:23: BOOL load_file_to_buffer(char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
+                            192 ;	---------------------------------
+                            193 ; Function load_file_to_buffer
+                            194 ; ---------------------------------
+   0063                     195 _load_file_to_buffer_start::
+   0063                     196 _load_file_to_buffer:
+   0063 DD E5               197 	push	ix
+   0065 DD 21 00 00         198 	ld	ix,#0
+   0069 DD 39               199 	add	ix,sp
+   006B 21 F9 FF            200 	ld	hl,#-7
+   006E 39                  201 	add	hl,sp
+   006F F9                  202 	ld	sp,hl
+                            203 ;util.c:28: r = FLOS_FindFile(&myFile, pFilename);
+   0070 21 00 00            204 	ld	hl,#0x0000
+   0073 39                  205 	add	hl,sp
+   0074 4D                  206 	ld	c,l
+   0075 44                  207 	ld	b,h
+   0076 DD 6E 04            208 	ld	l,4 (ix)
+   0079 DD 66 05            209 	ld	h,5 (ix)
+   007C E5                  210 	push	hl
+   007D C5                  211 	push	bc
+   007E CDr00s00            212 	call	_FLOS_FindFile
+   0081 F1                  213 	pop	af
+   0082 F1                  214 	pop	af
+                            215 ;util.c:29: if(!r) {
+   0083 AF                  216 	xor	a,a
+   0084 B5                  217 	or	a,l
+   0085 20 15               218 	jr	NZ,00102$
+                            219 ;util.c:30: DiagMessage("FindFile failed: ", pFilename);
+   0087 DD 6E 04            220 	ld	l,4 (ix)
+   008A DD 66 05            221 	ld	h,5 (ix)
+   008D E5                  222 	push	hl
+   008E 21rF4s00            223 	ld	hl,#__str_2
+   0091 E5                  224 	push	hl
+   0092 CDr00s00            225 	call	_DiagMessage
+   0095 F1                  226 	pop	af
+   0096 F1                  227 	pop	af
+                            228 ;util.c:31: return FALSE;
+   0097 2E 00               229 	ld	l,#0x00
+   0099 C3rEFs00            230 	jp	00105$
+   009C                     231 00102$:
+                            232 ;util.c:34: FLOS_SetLoadLength(len);
+   009C DD 6E 0E            233 	ld	l,14 (ix)
+   009F DD 66 0F            234 	ld	h,15 (ix)
+   00A2 E5                  235 	push	hl
+   00A3 DD 6E 0C            236 	ld	l,12 (ix)
+   00A6 DD 66 0D            237 	ld	h,13 (ix)
+   00A9 E5                  238 	push	hl
+   00AA CDr00s00            239 	call	_FLOS_SetLoadLength
+   00AD F1                  240 	pop	af
+   00AE F1                  241 	pop	af
+                            242 ;util.c:35: FLOS_SetFilePointer(file_offset);
+   00AF DD 6E 08            243 	ld	l,8 (ix)
+   00B2 DD 66 09            244 	ld	h,9 (ix)
+   00B5 E5                  245 	push	hl
+   00B6 DD 6E 06            246 	ld	l,6 (ix)
+   00B9 DD 66 07            247 	ld	h,7 (ix)
+   00BC E5                  248 	push	hl
+   00BD CDr00s00            249 	call	_FLOS_SetFilePointer
+   00C0 F1                  250 	pop	af
+   00C1 F1                  251 	pop	af
+                            252 ;util.c:37: r = FLOS_ForceLoad( buf, bank );
+   00C2 DD 7E 10            253 	ld	a,16 (ix)
+   00C5 F5                  254 	push	af
+   00C6 33                  255 	inc	sp
+   00C7 DD 6E 0A            256 	ld	l,10 (ix)
+   00CA DD 66 0B            257 	ld	h,11 (ix)
+   00CD E5                  258 	push	hl
+   00CE CDr00s00            259 	call	_FLOS_ForceLoad
+   00D1 F1                  260 	pop	af
+   00D2 33                  261 	inc	sp
+   00D3 45                  262 	ld	b,l
+   00D4 48                  263 	ld	c,b
+                            264 ;util.c:38: if(!r) {
+   00D5 AF                  265 	xor	a,a
+   00D6 B1                  266 	or	a,c
+   00D7 20 14               267 	jr	NZ,00104$
+                            268 ;util.c:39: DiagMessage("ForceLoad failed: ", pFilename);
+   00D9 DD 6E 04            269 	ld	l,4 (ix)
+   00DC DD 66 05            270 	ld	h,5 (ix)
+   00DF E5                  271 	push	hl
+   00E0 21r06s01            272 	ld	hl,#__str_3
+   00E3 E5                  273 	push	hl
+   00E4 CDr00s00            274 	call	_DiagMessage
+   00E7 F1                  275 	pop	af
+   00E8 F1                  276 	pop	af
+                            277 ;util.c:40: return FALSE;
+   00E9 2E 00               278 	ld	l,#0x00
+   00EB 18 02               279 	jr	00105$
+   00ED                     280 00104$:
+                            281 ;util.c:43: return TRUE;
+   00ED 2E 01               282 	ld	l,#0x01
+   00EF                     283 00105$:
+   00EF DD F9               284 	ld	sp,ix
+   00F1 DD E1               285 	pop	ix
+   00F3 C9                  286 	ret
+   00F4                     287 _load_file_to_buffer_end::
+   00F4                     288 __str_2:
+   00F4 46 69 6E 64 46 69   289 	.ascii "FindFile failed: "
+        6C 65 20 66 61 69
+        6C 65 64 3A 20
+   0105 00                  290 	.db 0x00
+   0106                     291 __str_3:
+   0106 46 6F 72 63 65 4C   292 	.ascii "ForceLoad failed: "
+        6F 61 64 20 66 61
+        69 6C 65 64 3A 20
+   0118 00                  293 	.db 0x00
+                            294 ;os_onexit.c:20: void RequestToExitAndExecuteCommandString(const char* cmd)
+                            295 ;	---------------------------------
+                            296 ; Function RequestToExitAndExecuteCommandString
+                            297 ; ---------------------------------
+   0119                     298 _RequestToExitAndExecuteCommandString_start::
+   0119                     299 _RequestToExitAndExecuteCommandString:
+   0119 DD E5               300 	push	ix
+   011B DD 21 00 00         301 	ld	ix,#0
+   011F DD 39               302 	add	ix,sp
+                            303 ;os_onexit.c:22: FLOS_ClearScreen();
+   0121 CDr00s00            304 	call	_FLOS_ClearScreen
+                            305 ;os_onexit.c:24: FLOS_SetSpawnCmdLine(cmd);
+   0124 DD 6E 04            306 	ld	l,4 (ix)
+   0127 DD 66 05            307 	ld	h,5 (ix)
+   012A E5                  308 	push	hl
+   012B CDr00s00            309 	call	_FLOS_SetSpawnCmdLine
+   012E F1                  310 	pop	af
+                            311 ;os_onexit.c:25: FLOS_PrintStringLFCR(flos_spawn_cmd);
+   012F 21r00s00            312 	ld	hl,#_flos_spawn_cmd
+   0132 E5                  313 	push	hl
+   0133 CDr00s00            314 	call	_FLOS_PrintStringLFCR
+   0136 F1                  315 	pop	af
+                            316 ;os_onexit.c:27: request_exit = TRUE;
+   0137 21r00s00            317 	ld	hl,#_request_exit + 0
+   013A 36 01               318 	ld	(hl), #0x01
+                            319 ;os_onexit.c:28: request_spawn_command = TRUE;
+   013C 21r01s00            320 	ld	hl,#_request_spawn_command + 0
+   013F 36 01               321 	ld	(hl), #0x01
+   0141 DD E1               322 	pop	ix
+   0143 C9                  323 	ret
+   0144                     324 _RequestToExitAndExecuteCommandString_end::
+                            325 ;os_cmd.c:25: word do_dir(void)
+                            326 ;	---------------------------------
+                            327 ; Function do_dir
+                            328 ; ---------------------------------
+   0144                     329 _do_dir_start::
+   0144                     330 _do_dir:
+   0144 DD E5               331 	push	ix
+   0146 DD 21 00 00         332 	ld	ix,#0
+   014A DD 39               333 	add	ix,sp
+   014C 21 C5 FF            334 	ld	hl,#-59
+   014F 39                  335 	add	hl,sp
+   0150 F9                  336 	ld	sp,hl
+                            337 ;os_cmd.c:32: FLOS_DirListFirstEntry();
+   0151 CDr00s00            338 	call	_FLOS_DirListFirstEntry
+                            339 ;os_cmd.c:33: while(1) {
+   0154 21 0A 00            340 	ld	hl,#0x000A
+   0157 39                  341 	add	hl,sp
+   0158 DD 75 C7            342 	ld	-57 (ix),l
+   015B DD 74 C8            343 	ld	-56 (ix),h
+   015E 21 0A 00            344 	ld	hl,#0x000A
+   0161 39                  345 	add	hl,sp
+   0162 EB                  346 	ex	de,hl
+   0163 21 06 00            347 	ld	hl,#0x0006
+   0166 19                  348 	add	hl,de
+   0167 DD 75 CD            349 	ld	-51 (ix),l
+   016A DD 74 CE            350 	ld	-50 (ix),h
+   016D 21 07 00            351 	ld	hl,#0x0007
+   0170 19                  352 	add	hl,de
+   0171 DD 75 C5            353 	ld	-59 (ix),l
+   0174 DD 74 C6            354 	ld	-58 (ix),h
+   0177 DD 7E CD            355 	ld	a,-51 (ix)
+   017A DD 77 CB            356 	ld	-53 (ix),a
+   017D DD 7E CE            357 	ld	a,-50 (ix)
+   0180 DD 77 CC            358 	ld	-52 (ix),a
+   0183                     359 00116$:
+                            360 ;os_cmd.c:34: str[0] = 0;
+   0183 21 12 00            361 	ld	hl,#0x0012
+   0186 39                  362 	add	hl,sp
+   0187 DD 75 C9            363 	ld	-55 (ix),l
+   018A DD 74 CA            364 	ld	-54 (ix),h
+   018D 36 00               365 	ld	(hl),#0x00
+                            366 ;os_cmd.c:35: FLOS_DirListGetEntry(&e);
+   018F 21 0A 00            367 	ld	hl,#0x000A
+   0192 39                  368 	add	hl,sp
+   0193 E5                  369 	push	hl
+   0194 CDr00s00            370 	call	_FLOS_DirListGetEntry
+   0197 F1                  371 	pop	af
+                            372 ;os_cmd.c:36: if(e.err_code == END_OF_DIR) break;
+   0198 DD 6E C5            373 	ld	l,-59 (ix)
+   019B DD 66 C6            374 	ld	h,-58 (ix)
+   019E 7E                  375 	ld	a,(hl)
+   019F D6 24               376 	sub	a,#0x24
+   01A1 CArA6s02            377 	jp	Z,00117$
+                            378 ;os_cmd.c:38: if( e.pFilename[0]=='.' && e.pFilename[1]==0 && e.file_flag == 1) {
+   01A4 DD 6E C7            379 	ld	l,-57 (ix)
+   01A7 DD 66 C8            380 	ld	h,-56 (ix)
+   01AA 4E                  381 	ld	c,(hl)
+   01AB 23                  382 	inc	hl
+   01AC 46                  383 	ld	b,(hl)
+   01AD 0A                  384 	ld	a,(bc)
+   01AE D6 2E               385 	sub	a,#0x2E
+   01B0 20 15               386 	jr	NZ,00104$
+   01B2 03                  387 	inc	bc
+   01B3 0A                  388 	ld	a,(bc)
+   01B4 B7                  389 	or	a,a
+   01B5 20 10               390 	jr	NZ,00104$
+   01B7 DD 6E CD            391 	ld	l,-51 (ix)
+   01BA DD 66 CE            392 	ld	h,-50 (ix)
+   01BD 7E                  393 	ld	a,(hl)
+   01BE D6 01               394 	sub	a,#0x01
+   01C0 20 05               395 	jr	NZ,00104$
+                            396 ;os_cmd.c:39: FLOS_DirListNextEntry();
+   01C2 CDr00s00            397 	call	_FLOS_DirListNextEntry
+                            398 ;os_cmd.c:40: continue;
+   01C5 18 BC               399 	jr	00116$
+   01C7                     400 00104$:
+                            401 ;os_cmd.c:44: strcat(str, e.pFilename);
+   01C7 21 0A 00            402 	ld	hl,#0x000A
+   01CA 39                  403 	add	hl,sp
+   01CB 4E                  404 	ld	c,(hl)
+   01CC 23                  405 	inc	hl
+   01CD 46                  406 	ld	b,(hl)
+   01CE C5                  407 	push	bc
+   01CF DD 6E C9            408 	ld	l,-55 (ix)
+   01D2 DD 66 CA            409 	ld	h,-54 (ix)
+   01D5 E5                  410 	push	hl
+   01D6 CDr00s00            411 	call	_strcat
+   01D9 F1                  412 	pop	af
+   01DA F1                  413 	pop	af
+                            414 ;os_cmd.c:46: num_spaces = FILENAME_LEN - strlen(e.pFilename);
+   01DB 21 0A 00            415 	ld	hl,#0x000A
+   01DE 39                  416 	add	hl,sp
+   01DF 4E                  417 	ld	c,(hl)
+   01E0 23                  418 	inc	hl
+   01E1 46                  419 	ld	b,(hl)
+   01E2 C5                  420 	push	bc
+   01E3 CDr00s00            421 	call	_strlen
+   01E6 F1                  422 	pop	af
+   01E7 4D                  423 	ld	c,l
+   01E8 3E 0C               424 	ld	a,#0x0C
+   01EA 91                  425 	sub	a,c
+   01EB 4F                  426 	ld	c,a
+                            427 ;os_cmd.c:47: for(k=0; k<num_spaces; k++) strcat(str, " ");
+   01EC 06 00               428 	ld	b,#0x00
+   01EE                     429 00118$:
+   01EE 78                  430 	ld	a,b
+   01EF 91                  431 	sub	a,c
+   01F0 30 15               432 	jr	NC,00121$
+   01F2 C5                  433 	push	bc
+   01F3 21rAEs02            434 	ld	hl,#__str_4
+   01F6 E5                  435 	push	hl
+   01F7 DD 6E C9            436 	ld	l,-55 (ix)
+   01FA DD 66 CA            437 	ld	h,-54 (ix)
+   01FD E5                  438 	push	hl
+   01FE CDr00s00            439 	call	_strcat
+   0201 F1                  440 	pop	af
+   0202 F1                  441 	pop	af
+   0203 C1                  442 	pop	bc
+   0204 04                  443 	inc	b
+   0205 18 E7               444 	jr	00118$
+   0207                     445 00121$:
+                            446 ;os_cmd.c:50: if(e.file_flag == 1)
+   0207 DD 6E CB            447 	ld	l,-53 (ix)
+   020A DD 66 CC            448 	ld	h,-52 (ix)
+   020D 7E                  449 	ld	a,(hl)
+   020E D6 01               450 	sub	a,#0x01
+   0210 20 12               451 	jr	NZ,00108$
+                            452 ;os_cmd.c:51: strcat(str, "  [DIR]");
+   0212 21rB0s02            453 	ld	hl,#__str_5
+   0215 E5                  454 	push	hl
+   0216 DD 6E C9            455 	ld	l,-55 (ix)
+   0219 DD 66 CA            456 	ld	h,-54 (ix)
+   021C E5                  457 	push	hl
+   021D CDr00s00            458 	call	_strcat
+   0220 F1                  459 	pop	af
+   0221 F1                  460 	pop	af
+   0222 18 3E               461 	jr	00109$
+   0224                     462 00108$:
+                            463 ;os_cmd.c:53: strcat(str, "  $");
+   0224 21rB8s02            464 	ld	hl,#__str_6
+   0227 E5                  465 	push	hl
+   0228 DD 6E C9            466 	ld	l,-55 (ix)
+   022B DD 66 CA            467 	ld	h,-54 (ix)
+   022E E5                  468 	push	hl
+   022F CDr00s00            469 	call	_strcat
+   0232 F1                  470 	pop	af
+   0233 F1                  471 	pop	af
+                            472 ;os_cmd.c:55: _ultoa(e.len, buffer, 16);
+   0234 21 0A 00            473 	ld	hl,#0x000A
+   0237 39                  474 	add	hl,sp
+   0238 23                  475 	inc	hl
+   0239 23                  476 	inc	hl
+   023A 4E                  477 	ld	c,(hl)
+   023B 23                  478 	inc	hl
+   023C 46                  479 	ld	b,(hl)
+   023D 23                  480 	inc	hl
+   023E 5E                  481 	ld	e,(hl)
+   023F 23                  482 	inc	hl
+   0240 56                  483 	ld	d,(hl)
+   0241 3E 10               484 	ld	a,#0x10
+   0243 F5                  485 	push	af
+   0244 33                  486 	inc	sp
+   0245 21r09s00            487 	ld	hl,#_buffer
+   0248 E5                  488 	push	hl
+   0249 D5                  489 	push	de
+   024A C5                  490 	push	bc
+   024B CDr00s00            491 	call	__ultoa
+   024E F1                  492 	pop	af
+   024F F1                  493 	pop	af
+   0250 F1                  494 	pop	af
+   0251 33                  495 	inc	sp
+                            496 ;os_cmd.c:56: strcat(str, buffer);
+   0252 21 12 00            497 	ld	hl,#0x0012
+   0255 39                  498 	add	hl,sp
+   0256 4D                  499 	ld	c,l
+   0257 44                  500 	ld	b,h
+   0258 21r09s00            501 	ld	hl,#_buffer
+   025B E5                  502 	push	hl
+   025C C5                  503 	push	bc
+   025D CDr00s00            504 	call	_strcat
+   0260 F1                  505 	pop	af
+   0261 F1                  506 	pop	af
+   0262                     507 00109$:
+                            508 ;os_cmd.c:58: strcat(str, PS_LFCR);
+   0262 21rBCs02            509 	ld	hl,#__str_7
+   0265 E5                  510 	push	hl
+   0266 DD 6E C9            511 	ld	l,-55 (ix)
+   0269 DD 66 CA            512 	ld	h,-54 (ix)
+   026C E5                  513 	push	hl
+   026D CDr00s00            514 	call	_strcat
+   0270 F1                  515 	pop	af
+   0271 F1                  516 	pop	af
+                            517 ;os_cmd.c:62: if( (strlen(tmp1) + 32) < DIRBUF_LEN )
+   0272 ED 4Br32s00         518 	ld	bc,(_tmp1)
+   0276 C5                  519 	push	bc
+   0277 CDr00s00            520 	call	_strlen
+   027A F1                  521 	pop	af
+   027B 44                  522 	ld	b,h
+   027C 4D                  523 	ld	c,l
+   027D 21 20 00            524 	ld	hl,#0x0020
+   0280 09                  525 	add	hl,bc
+   0281 4D                  526 	ld	c,l
+   0282 44                  527 	ld	b,h
+   0283 79                  528 	ld	a,c
+   0284 D6 00               529 	sub	a,#0x00
+   0286 78                  530 	ld	a,b
+   0287 DE 08               531 	sbc	a,#0x08
+   0289 F2rA6s02            532 	jp	P,00117$
+                            533 ;os_cmd.c:63: strcat(tmp1, str);
+   028C ED 4Br32s00         534 	ld	bc,(_tmp1)
+   0290 DD 6E C9            535 	ld	l,-55 (ix)
+   0293 DD 66 CA            536 	ld	h,-54 (ix)
+   0296 E5                  537 	push	hl
+   0297 C5                  538 	push	bc
+   0298 CDr00s00            539 	call	_strcat
+   029B F1                  540 	pop	af
+   029C F1                  541 	pop	af
+                            542 ;os_cmd.c:67: if(FLOS_DirListNextEntry() == END_OF_DIR) break;
+   029D CDr00s00            543 	call	_FLOS_DirListNextEntry
+   02A0 7D                  544 	ld	a,l
+   02A1 D6 24               545 	sub	a,#0x24
+   02A3 C2r83s01            546 	jp	NZ,00116$
+   02A6                     547 00117$:
+                            548 ;os_cmd.c:71: return split_string_to_many_strings();
+   02A6 CDrBEs02            549 	call	_split_string_to_many_strings
+   02A9 DD F9               550 	ld	sp,ix
+   02AB DD E1               551 	pop	ix
+   02AD C9                  552 	ret
+   02AE                     553 _do_dir_end::
+   02AE                     554 __str_4:
+   02AE 20                  555 	.ascii " "
+   02AF 00                  556 	.db 0x00
+   02B0                     557 __str_5:
+   02B0 20 20 5B 44 49 52   558 	.ascii "  [DIR]"
+        5D
+   02B7 00                  559 	.db 0x00
+   02B8                     560 __str_6:
+   02B8 20 20 24            561 	.ascii "  $"
+   02BB 00                  562 	.db 0x00
+   02BC                     563 __str_7:
+   02BC 0B                  564 	.db 0x0B
+   02BD 00                  565 	.db 0x00
+                            566 ;os_cmd.c:81: word split_string_to_many_strings(void) {
+                            567 ;	---------------------------------
+                            568 ; Function split_string_to_many_strings
+                            569 ; ---------------------------------
+   02BE                     570 _split_string_to_many_strings_start::
+   02BE                     571 _split_string_to_many_strings:
+   02BE DD E5               572 	push	ix
+   02C0 DD 21 00 00         573 	ld	ix,#0
+   02C4 DD 39               574 	add	ix,sp
+   02C6 21 FA FF            575 	ld	hl,#-6
+   02C9 39                  576 	add	hl,sp
+   02CA F9                  577 	ld	sp,hl
+                            578 ;os_cmd.c:84: len = strlen(tmp1);
+   02CB ED 4Br32s00         579 	ld	bc,(_tmp1)
+   02CF C5                  580 	push	bc
+   02D0 CDr00s00            581 	call	_strlen
+   02D3 F1                  582 	pop	af
+   02D4 44                  583 	ld	b,h
+   02D5 DD 75 FC            584 	ld	-4 (ix),l
+   02D8 DD 70 FD            585 	ld	-3 (ix),b
+                            586 ;os_cmd.c:85: for(i=0; i<len; i++) {
+   02DB DD 36 FA 00         587 	ld	-6 (ix),#0x00
+   02DF DD 36 FB 00         588 	ld	-5 (ix),#0x00
+   02E3 DD 36 FE 00         589 	ld	-2 (ix),#0x00
+   02E7 DD 36 FF 00         590 	ld	-1 (ix),#0x00
+   02EB                     591 00103$:
+   02EB DD 7E FE            592 	ld	a,-2 (ix)
+   02EE DD 96 FC            593 	sub	a,-4 (ix)
+   02F1 DD 7E FF            594 	ld	a,-1 (ix)
+   02F4 DD 9E FD            595 	sbc	a,-3 (ix)
+   02F7 30 28               596 	jr	NC,00106$
+                            597 ;os_cmd.c:86: if(tmp1[i] == 0x0b) {
+   02F9 3Ar32s00            598 	ld	a,(#_tmp1+0)
+   02FC DD 86 FE            599 	add	a,-2 (ix)
+   02FF 5F                  600 	ld	e,a
+   0300 3Ar33s00            601 	ld	a,(#_tmp1+1)
+   0303 DD 8E FF            602 	adc	a,-1 (ix)
+   0306 57                  603 	ld	d,a
+   0307 1A                  604 	ld	a,(de)
+   0308 D6 0B               605 	sub	a,#0x0B
+   030A 20 0B               606 	jr	NZ,00105$
+                            607 ;os_cmd.c:87: tmp1[i] = 0;                 // replace LFCR code to 0
+   030C 3E 00               608 	ld	a,#0x00
+   030E 12                  609 	ld	(de),a
+                            610 ;os_cmd.c:88: num++;
+   030F DD 34 FA            611 	inc	-6 (ix)
+   0312 20 03               612 	jr	NZ,00115$
+   0314 DD 34 FB            613 	inc	-5 (ix)
+   0317                     614 00115$:
+   0317                     615 00105$:
+                            616 ;os_cmd.c:85: for(i=0; i<len; i++) {
+   0317 DD 34 FE            617 	inc	-2 (ix)
+   031A 20 03               618 	jr	NZ,00116$
+   031C DD 34 FF            619 	inc	-1 (ix)
+   031F                     620 00116$:
+   031F 18 CA               621 	jr	00103$
+   0321                     622 00106$:
+                            623 ;os_cmd.c:92: return num;
+   0321 DD 6E FA            624 	ld	l,-6 (ix)
+   0324 DD 66 FB            625 	ld	h,-5 (ix)
+   0327 DD F9               626 	ld	sp,ix
+   0329 DD E1               627 	pop	ix
+   032B C9                  628 	ret
+   032C                     629 _split_string_to_many_strings_end::
+                            630 ;os_cmd.c:97: void PrintMessage(const char* str)
+                            631 ;	---------------------------------
+                            632 ; Function PrintMessage
+                            633 ; ---------------------------------
+   032C                     634 _PrintMessage_start::
+   032C                     635 _PrintMessage:
+   032C DD E5               636 	push	ix
+   032E DD 21 00 00         637 	ld	ix,#0
+   0332 DD 39               638 	add	ix,sp
+                            639 ;os_cmd.c:99: FLOS_PrintString(str);
+   0334 DD 6E 04            640 	ld	l,4 (ix)
+   0337 DD 66 05            641 	ld	h,5 (ix)
+   033A E5                  642 	push	hl
+   033B CDr00s00            643 	call	_FLOS_PrintString
+   033E F1                  644 	pop	af
+                            645 ;os_cmd.c:100: FLOS_PrintString(PS_LFCR);
+   033F 21r4As03            646 	ld	hl,#__str_8
+   0342 E5                  647 	push	hl
+   0343 CDr00s00            648 	call	_FLOS_PrintString
+   0346 F1                  649 	pop	af
+   0347 DD E1               650 	pop	ix
+   0349 C9                  651 	ret
+   034A                     652 _PrintMessage_end::
+   034A                     653 __str_8:
+   034A 0B                  654 	.db 0x0B
+   034B 00                  655 	.db 0x00
+                            656 ;list_view.c:38: void ListView_Update(ListView* this) {
+                            657 ;	---------------------------------
+                            658 ; Function ListView_Update
+                            659 ; ---------------------------------
+   034C                     660 _ListView_Update_start::
+   034C                     661 _ListView_Update:
+   034C DD E5               662 	push	ix
+   034E DD 21 00 00         663 	ld	ix,#0
+   0352 DD 39               664 	add	ix,sp
+   0354 21 E5 FF            665 	ld	hl,#-27
+   0357 39                  666 	add	hl,sp
+   0358 F9                  667 	ld	sp,hl
+                            668 ;list_view.c:41: byte x = this->x, y = this->y;
+   0359 DD 4E 04            669 	ld	c,4 (ix)
+   035C DD 46 05            670 	ld	b,5 (ix)
+   035F 21 06 00            671 	ld	hl,#0x0006
+   0362 09                  672 	add	hl,bc
+   0363 7E                  673 	ld	a,(hl)
+   0364 DD 77 FC            674 	ld	-4 (ix),a
+   0367 21 07 00            675 	ld	hl,#0x0007
+   036A 09                  676 	add	hl,bc
+   036B 7E                  677 	ld	a,(hl)
+   036C DD 77 FB            678 	ld	-5 (ix),a
+                            679 ;list_view.c:42: byte width = this->width, height = this->height;
+   036F 21 08 00            680 	ld	hl,#0x0008
+   0372 09                  681 	add	hl,bc
+   0373 7E                  682 	ld	a,(hl)
+   0374 DD 77 FA            683 	ld	-6 (ix),a
+   0377 21 09 00            684 	ld	hl,#0x0009
+   037A 09                  685 	add	hl,bc
+   037B 7E                  686 	ld	a,(hl)
+   037C DD 77 F9            687 	ld	-7 (ix),a
+                            688 ;list_view.c:46: ListView_check_visible_part(this);
+   037F C5                  689 	push	bc
+   0380 CDr5Cs06            690 	call	_ListView_check_visible_part
+   0383 F1                  691 	pop	af
+                            692 ;list_view.c:47: p = this->firstVisibleStr;
+   0384 DD 4E 04            693 	ld	c,4 (ix)
+   0387 DD 46 05            694 	ld	b,5 (ix)
+   038A 21 0C 00            695 	ld	hl,#0x000C
+   038D 09                  696 	add	hl,bc
+   038E 5E                  697 	ld	e,(hl)
+   038F 23                  698 	inc	hl
+   0390 56                  699 	ld	d,(hl)
+   0391 DD 73 F7            700 	ld	-9 (ix),e
+   0394 DD 72 F8            701 	ld	-8 (ix),d
+                            702 ;list_view.c:50: i=this->firstVisibleIndex;
+   0397 21 0A 00            703 	ld	hl,#0x000A
+   039A 09                  704 	add	hl,bc
+   039B DD 75 F4            705 	ld	-12 (ix),l
+   039E DD 74 F5            706 	ld	-11 (ix),h
+   03A1 5E                  707 	ld	e,(hl)
+   03A2 23                  708 	inc	hl
+   03A3 56                  709 	ld	d,(hl)
+   03A4 DD 73 FE            710 	ld	-2 (ix),e
+   03A7 DD 72 FF            711 	ld	-1 (ix),d
+                            712 ;list_view.c:51: while( i < (this->firstVisibleIndex+height) &&  i < this->numItems ) {
+   03AA 21 02 00            713 	ld	hl,#0x0002
+   03AD 09                  714 	add	hl,bc
+   03AE DD 75 F2            715 	ld	-14 (ix),l
+   03B1 DD 74 F3            716 	ld	-13 (ix),h
+   03B4 DD 7E FC            717 	ld	a,-4 (ix)
+   03B7 DD 86 FA            718 	add	a,-6 (ix)
+   03BA 3D                  719 	dec	a
+   03BB DD 77 EA            720 	ld	-22 (ix),a
+   03BE 21 04 00            721 	ld	hl,#0x0004
+   03C1 09                  722 	add	hl,bc
+   03C2 DD 75 F0            723 	ld	-16 (ix),l
+   03C5 DD 74 F1            724 	ld	-15 (ix),h
+   03C8 DD 7E FC            725 	ld	a,-4 (ix)
+   03CB 3C                  726 	inc	a
+   03CC DD 77 E9            727 	ld	-23 (ix),a
+   03CF 21 08 00            728 	ld	hl,#0x0008
+   03D2 09                  729 	add	hl,bc
+   03D3 DD 75 EE            730 	ld	-18 (ix),l
+   03D6 DD 74 EF            731 	ld	-17 (ix),h
+   03D9 DD 7E FB            732 	ld	a,-5 (ix)
+   03DC DD 77 ED            733 	ld	-19 (ix),a
+   03DF DD 7E FE            734 	ld	a,-2 (ix)
+   03E2 DD 77 EB            735 	ld	-21 (ix),a
+   03E5 DD 7E FF            736 	ld	a,-1 (ix)
+   03E8 DD 77 EC            737 	ld	-20 (ix),a
+   03EB                     738 00107$:
+   03EB DD 6E F4            739 	ld	l,-12 (ix)
+   03EE DD 66 F5            740 	ld	h,-11 (ix)
+   03F1 7E                  741 	ld	a,(hl)
+   03F2 DD 77 E7            742 	ld	-25 (ix),a
+   03F5 23                  743 	inc	hl
+   03F6 7E                  744 	ld	a,(hl)
+   03F7 DD 77 E8            745 	ld	-24 (ix),a
+   03FA DD 5E F9            746 	ld	e,-7 (ix)
+   03FD 16 00               747 	ld	d,#0x00
+   03FF DD 7E E7            748 	ld	a,-25 (ix)
+   0402 83                  749 	add	a,e
+   0403 5F                  750 	ld	e,a
+   0404 DD 7E E8            751 	ld	a,-24 (ix)
+   0407 8A                  752 	adc	a,d
+   0408 57                  753 	ld	d,a
+   0409 DD 7E EB            754 	ld	a,-21 (ix)
+   040C 93                  755 	sub	a,e
+   040D DD 7E EC            756 	ld	a,-20 (ix)
+   0410 9A                  757 	sbc	a,d
+   0411 D2r8Cs05            758 	jp	NC,00109$
+   0414 DD 6E F2            759 	ld	l,-14 (ix)
+   0417 DD 66 F3            760 	ld	h,-13 (ix)
+   041A 5E                  761 	ld	e,(hl)
+   041B 23                  762 	inc	hl
+   041C 56                  763 	ld	d,(hl)
+   041D DD 7E EB            764 	ld	a,-21 (ix)
+   0420 93                  765 	sub	a,e
+   0421 DD 7E EC            766 	ld	a,-20 (ix)
+   0424 9A                  767 	sbc	a,d
+   0425 D2r8Cs05            768 	jp	NC,00109$
+                            769 ;list_view.c:53: FLOS_SetCursorPos(x, y);
+   0428 C5                  770 	push	bc
+   0429 DD 66 ED            771 	ld	h,-19 (ix)
+   042C DD 6E FC            772 	ld	l,-4 (ix)
+   042F E5                  773 	push	hl
+   0430 CDr00s00            774 	call	_FLOS_SetCursorPos
+   0433 F1                  775 	pop	af
+   0434 C1                  776 	pop	bc
+                            777 ;list_view.c:54: FLOS_PrintString(" "); 
+   0435 C5                  778 	push	bc
+   0436 21r96s05            779 	ld	hl,#__str_9
+   0439 E5                  780 	push	hl
+   043A CDr00s00            781 	call	_FLOS_PrintString
+   043D F1                  782 	pop	af
+   043E C1                  783 	pop	bc
+                            784 ;list_view.c:55: FLOS_SetCursorPos(x+width-1, y);
+   043F C5                  785 	push	bc
+   0440 DD 66 ED            786 	ld	h,-19 (ix)
+   0443 DD 6E EA            787 	ld	l,-22 (ix)
+   0446 E5                  788 	push	hl
+   0447 CDr00s00            789 	call	_FLOS_SetCursorPos
+   044A F1                  790 	pop	af
+   044B C1                  791 	pop	bc
+                            792 ;list_view.c:56: FLOS_PrintString(" "); 
+   044C C5                  793 	push	bc
+   044D 21r96s05            794 	ld	hl,#__str_9
+   0450 E5                  795 	push	hl
+   0451 CDr00s00            796 	call	_FLOS_PrintString
+   0454 F1                  797 	pop	af
+   0455 C1                  798 	pop	bc
+                            799 ;list_view.c:59: (i == this->selectedIndex) ? FLOS_SetPen(PEN_SELECTED) : FLOS_SetPen(PEN_DEFAULT); 
+   0456 DD 6E F0            800 	ld	l,-16 (ix)
+   0459 DD 66 F1            801 	ld	h,-15 (ix)
+   045C 5E                  802 	ld	e,(hl)
+   045D 23                  803 	inc	hl
+   045E 56                  804 	ld	d,(hl)
+   045F DD 7E EB            805 	ld	a,-21 (ix)
+   0462 93                  806 	sub	e
+   0463 20 06               807 	jr	NZ,00129$
+   0465 DD 7E EC            808 	ld	a,-20 (ix)
+   0468 92                  809 	sub	d
+   0469 28 02               810 	jr	Z,00130$
+   046B                     811 00129$:
+   046B 18 0C               812 	jr	00116$
+   046D                     813 00130$:
+   046D C5                  814 	push	bc
+   046E 3E A0               815 	ld	a,#0xA0
+   0470 F5                  816 	push	af
+   0471 33                  817 	inc	sp
+   0472 CDr00s00            818 	call	_FLOS_SetPen
+   0475 33                  819 	inc	sp
+   0476 C1                  820 	pop	bc
+   0477 18 0A               821 	jr	00117$
+   0479                     822 00116$:
+   0479 C5                  823 	push	bc
+   047A 3E 07               824 	ld	a,#0x07
+   047C F5                  825 	push	af
+   047D 33                  826 	inc	sp
+   047E CDr00s00            827 	call	_FLOS_SetPen
+   0481 33                  828 	inc	sp
+   0482 C1                  829 	pop	bc
+   0483                     830 00117$:
+                            831 ;list_view.c:61: if(strstr(p, ".EXE") != NULL && i != this->selectedIndex) FLOS_SetPen(PEN_FILE_EXE); 
+   0483 C5                  832 	push	bc
+   0484 21r98s05            833 	ld	hl,#__str_10
+   0487 E5                  834 	push	hl
+   0488 DD 6E F7            835 	ld	l,-9 (ix)
+   048B DD 66 F8            836 	ld	h,-8 (ix)
+   048E E5                  837 	push	hl
+   048F CDr00s00            838 	call	_strstr
+   0492 F1                  839 	pop	af
+   0493 F1                  840 	pop	af
+   0494 EB                  841 	ex	de,hl
+   0495 C1                  842 	pop	bc
+   0496 7B                  843 	ld	a,e
+   0497 B2                  844 	or	a,d
+   0498 28 1F               845 	jr	Z,00102$
+   049A DD 6E F0            846 	ld	l,-16 (ix)
+   049D DD 66 F1            847 	ld	h,-15 (ix)
+   04A0 5E                  848 	ld	e,(hl)
+   04A1 23                  849 	inc	hl
+   04A2 56                  850 	ld	d,(hl)
+   04A3 DD 7E EB            851 	ld	a,-21 (ix)
+   04A6 93                  852 	sub	e
+   04A7 20 06               853 	jr	NZ,00132$
+   04A9 DD 7E EC            854 	ld	a,-20 (ix)
+   04AC 92                  855 	sub	d
+   04AD 28 0A               856 	jr	Z,00102$
+   04AF                     857 00132$:
+   04AF C5                  858 	push	bc
+   04B0 3E 05               859 	ld	a,#0x05
+   04B2 F5                  860 	push	af
+   04B3 33                  861 	inc	sp
+   04B4 CDr00s00            862 	call	_FLOS_SetPen
+   04B7 33                  863 	inc	sp
+   04B8 C1                  864 	pop	bc
+   04B9                     865 00102$:
+                            866 ;list_view.c:65: FLOS_SetCursorPos(x+1, y);
+   04B9 C5                  867 	push	bc
+   04BA DD 66 ED            868 	ld	h,-19 (ix)
+   04BD DD 6E E9            869 	ld	l,-23 (ix)
+   04C0 E5                  870 	push	hl
+   04C1 CDr00s00            871 	call	_FLOS_SetCursorPos
+   04C4 F1                  872 	pop	af
+   04C5 C1                  873 	pop	bc
+                            874 ;list_view.c:66: FLOS_PrintStringLFCR(p); 
+   04C6 C5                  875 	push	bc
+   04C7 DD 6E F7            876 	ld	l,-9 (ix)
+   04CA DD 66 F8            877 	ld	h,-8 (ix)
+   04CD E5                  878 	push	hl
+   04CE CDr00s00            879 	call	_FLOS_PrintStringLFCR
+   04D1 F1                  880 	pop	af
+   04D2 C1                  881 	pop	bc
+                            882 ;list_view.c:68: strl = strlen(p);
+   04D3 C5                  883 	push	bc
+   04D4 DD 6E F7            884 	ld	l,-9 (ix)
+   04D7 DD 66 F8            885 	ld	h,-8 (ix)
+   04DA E5                  886 	push	hl
+   04DB CDr00s00            887 	call	_strlen
+   04DE F1                  888 	pop	af
+   04DF 5D                  889 	ld	e,l
+   04E0 C1                  890 	pop	bc
+   04E1 DD 73 F6            891 	ld	-10 (ix),e
+                            892 ;list_view.c:70: if(strl < this->width-2) {
+   04E4 DD 6E EE            893 	ld	l,-18 (ix)
+   04E7 DD 66 EF            894 	ld	h,-17 (ix)
+   04EA 5E                  895 	ld	e,(hl)
+   04EB 16 00               896 	ld	d,#0x00
+   04ED 1B                  897 	dec	de
+   04EE 1B                  898 	dec	de
+   04EF DD 7E F6            899 	ld	a,-10 (ix)
+   04F2 DD 77 E7            900 	ld	-25 (ix),a
+   04F5 DD 36 E8 00         901 	ld	-24 (ix),#0x00
+   04F9 DD 7E E7            902 	ld	a,-25 (ix)
+   04FC 93                  903 	sub	a,e
+   04FD DD 7E E8            904 	ld	a,-24 (ix)
+   0500 9A                  905 	sbc	a,d
+   0501 F2r52s05            906 	jp	P,00105$
+                            907 ;list_view.c:71: FLOS_SetCursorPos(x+1+strl, y);
+   0504 DD 7E E9            908 	ld	a,-23 (ix)
+   0507 DD 86 F6            909 	add	a,-10 (ix)
+   050A 5F                  910 	ld	e,a
+   050B C5                  911 	push	bc
+   050C DD 7E ED            912 	ld	a,-19 (ix)
+   050F 57                  913 	ld	d,a
+   0510 D5                  914 	push	de
+   0511 CDr00s00            915 	call	_FLOS_SetCursorPos
+   0514 F1                  916 	pop	af
+   0515 C1                  917 	pop	bc
+                            918 ;list_view.c:72: for(k=0; k<(this->width-2-strl); k++) FLOS_PrintString(" "); 
+   0516 DD 36 FD 00         919 	ld	-3 (ix),#0x00
+   051A                     920 00110$:
+   051A DD 6E EE            921 	ld	l,-18 (ix)
+   051D DD 66 EF            922 	ld	h,-17 (ix)
+   0520 5E                  923 	ld	e,(hl)
+   0521 16 00               924 	ld	d,#0x00
+   0523 1B                  925 	dec	de
+   0524 1B                  926 	dec	de
+   0525 7B                  927 	ld	a,e
+   0526 DD 96 E7            928 	sub	a,-25 (ix)
+   0529 DD 77 E5            929 	ld	-27 (ix),a
+   052C 7A                  930 	ld	a,d
+   052D DD 9E E8            931 	sbc	a,-24 (ix)
+   0530 DD 77 E6            932 	ld	-26 (ix),a
+   0533 DD 5E FD            933 	ld	e,-3 (ix)
+   0536 16 00               934 	ld	d,#0x00
+   0538 7B                  935 	ld	a,e
+   0539 DD 96 E5            936 	sub	a,-27 (ix)
+   053C 7A                  937 	ld	a,d
+   053D DD 9E E6            938 	sbc	a,-26 (ix)
+   0540 F2r52s05            939 	jp	P,00105$
+   0543 C5                  940 	push	bc
+   0544 21r96s05            941 	ld	hl,#__str_9
+   0547 E5                  942 	push	hl
+   0548 CDr00s00            943 	call	_FLOS_PrintString
+   054B F1                  944 	pop	af
+   054C C1                  945 	pop	bc
+   054D DD 34 FD            946 	inc	-3 (ix)
+   0550 18 C8               947 	jr	00110$
+   0552                     948 00105$:
+                            949 ;list_view.c:76: FLOS_SetPen(PEN_DEFAULT);
+   0552 C5                  950 	push	bc
+   0553 3E 07               951 	ld	a,#0x07
+   0555 F5                  952 	push	af
+   0556 33                  953 	inc	sp
+   0557 CDr00s00            954 	call	_FLOS_SetPen
+   055A 33                  955 	inc	sp
+   055B C1                  956 	pop	bc
+                            957 ;list_view.c:78: p = p + strlen(p) + 1;
+   055C C5                  958 	push	bc
+   055D DD 6E F7            959 	ld	l,-9 (ix)
+   0560 DD 66 F8            960 	ld	h,-8 (ix)
+   0563 E5                  961 	push	hl
+   0564 CDr00s00            962 	call	_strlen
+   0567 F1                  963 	pop	af
+   0568 EB                  964 	ex	de,hl
+   0569 C1                  965 	pop	bc
+   056A DD 7E F7            966 	ld	a,-9 (ix)
+   056D 83                  967 	add	a,e
+   056E 5F                  968 	ld	e,a
+   056F DD 7E F8            969 	ld	a,-8 (ix)
+   0572 8A                  970 	adc	a,d
+   0573 57                  971 	ld	d,a
+   0574 21 01 00            972 	ld	hl,#0x0001
+   0577 19                  973 	add	hl,de
+   0578 DD 75 F7            974 	ld	-9 (ix),l
+   057B DD 74 F8            975 	ld	-8 (ix),h
+                            976 ;list_view.c:92: y++;
+   057E DD 34 ED            977 	inc	-19 (ix)
+                            978 ;list_view.c:93: i++;
+   0581 DD 34 EB            979 	inc	-21 (ix)
+   0584 20 03               980 	jr	NZ,00133$
+   0586 DD 34 EC            981 	inc	-20 (ix)
+   0589                     982 00133$:
+   0589 C3rEBs03            983 	jp	00107$
+   058C                     984 00109$:
+                            985 ;list_view.c:96: ListView_update_own_textfield(this);
+   058C C5                  986 	push	bc
+   058D CDr60s07            987 	call	_ListView_update_own_textfield
+   0590 F1                  988 	pop	af
+   0591 DD F9               989 	ld	sp,ix
+   0593 DD E1               990 	pop	ix
+   0595 C9                  991 	ret
+   0596                     992 _ListView_Update_end::
+   0596                     993 __str_9:
+   0596 20                  994 	.ascii " "
+   0597 00                  995 	.db 0x00
+   0598                     996 __str_10:
+   0598 2E 45 58 45         997 	.ascii ".EXE"
+   059C 00                  998 	.db 0x00
+                            999 ;list_view.c:99: word ListView_GetNumItems(ListView* this) {
+                           1000 ;	---------------------------------
+                           1001 ; Function ListView_GetNumItems
+                           1002 ; ---------------------------------
+   059D                    1003 _ListView_GetNumItems_start::
+   059D                    1004 _ListView_GetNumItems:
+   059D DD E5              1005 	push	ix
+   059F DD 21 00 00        1006 	ld	ix,#0
+   05A3 DD 39              1007 	add	ix,sp
+                           1008 ;list_view.c:100: return this->numItems;
+   05A5 DD 6E 04           1009 	ld	l, 4 (ix)
+   05A8 DD 66 05           1010 	ld	h, 5 (ix)
+   05AB 23                 1011 	inc	hl
+   05AC 23                 1012 	inc	hl
+   05AD 4E                 1013 	ld	c,(hl)
+   05AE 23                 1014 	inc	hl
+   05AF 46                 1015 	ld	b,(hl)
+   05B0 69                 1016 	ld	l,c
+   05B1 60                 1017 	ld	h,b
+   05B2 DD E1              1018 	pop	ix
+   05B4 C9                 1019 	ret
+   05B5                    1020 _ListView_GetNumItems_end::
+                           1021 ;list_view.c:103: word ListView_GetSelectedIndex(ListView* this)
+                           1022 ;	---------------------------------
+                           1023 ; Function ListView_GetSelectedIndex
+                           1024 ; ---------------------------------
+   05B5                    1025 _ListView_GetSelectedIndex_start::
+   05B5                    1026 _ListView_GetSelectedIndex:
+   05B5 DD E5              1027 	push	ix
+   05B7 DD 21 00 00        1028 	ld	ix,#0
+   05BB DD 39              1029 	add	ix,sp
+                           1030 ;list_view.c:105: return this->selectedIndex;
+   05BD DD 6E 04           1031 	ld	l, 4 (ix)
+   05C0 DD 66 05           1032 	ld	h, 5 (ix)
+   05C3 23                 1033 	inc	hl
+   05C4 23                 1034 	inc	hl
+   05C5 23                 1035 	inc	hl
+   05C6 23                 1036 	inc	hl
+   05C7 4E                 1037 	ld	c,(hl)
+   05C8 23                 1038 	inc	hl
+   05C9 46                 1039 	ld	b,(hl)
+   05CA 69                 1040 	ld	l,c
+   05CB 60                 1041 	ld	h,b
+   05CC DD E1              1042 	pop	ix
+   05CE C9                 1043 	ret
+   05CF                    1044 _ListView_GetSelectedIndex_end::
+                           1045 ;list_view.c:107: void ListView_SetSelectedIndex(ListView* this, word selectedIndex)
+                           1046 ;	---------------------------------
+                           1047 ; Function ListView_SetSelectedIndex
+                           1048 ; ---------------------------------
+   05CF                    1049 _ListView_SetSelectedIndex_start::
+   05CF                    1050 _ListView_SetSelectedIndex:
+   05CF DD E5              1051 	push	ix
+   05D1 DD 21 00 00        1052 	ld	ix,#0
+   05D5 DD 39              1053 	add	ix,sp
+                           1054 ;list_view.c:109: this->selectedIndex = selectedIndex;
+   05D7 DD 6E 04           1055 	ld	l, 4 (ix)
+   05DA DD 66 05           1056 	ld	h, 5 (ix)
+   05DD 23                 1057 	inc	hl
+   05DE 23                 1058 	inc	hl
+   05DF 23                 1059 	inc	hl
+   05E0 23                 1060 	inc	hl
+   05E1 DD 7E 06           1061 	ld	a,6 (ix)
+   05E4 77                 1062 	ld	(hl),a
+   05E5 23                 1063 	inc	hl
+   05E6 DD 7E 07           1064 	ld	a,7 (ix)
+   05E9 77                 1065 	ld	(hl),a
+   05EA DD E1              1066 	pop	ix
+   05EC C9                 1067 	ret
+   05ED                    1068 _ListView_SetSelectedIndex_end::
+                           1069 ;list_view.c:112: void ListView_Init(ListView* this)
+                           1070 ;	---------------------------------
+                           1071 ; Function ListView_Init
+                           1072 ; ---------------------------------
+   05ED                    1073 _ListView_Init_start::
+   05ED                    1074 _ListView_Init:
+   05ED DD E5              1075 	push	ix
+   05EF DD 21 00 00        1076 	ld	ix,#0
+   05F3 DD 39              1077 	add	ix,sp
+                           1078 ;list_view.c:114: this->firstVisibleIndex = 0;
+   05F5 DD 4E 04           1079 	ld	c,4 (ix)
+   05F8 DD 46 05           1080 	ld	b,5 (ix)
+   05FB 21 0A 00           1081 	ld	hl,#0x000A
+   05FE 09                 1082 	add	hl,bc
+   05FF 36 00              1083 	ld	(hl),#0x00
+   0601 23                 1084 	inc	hl
+   0602 36 00              1085 	ld	(hl),#0x00
+                           1086 ;list_view.c:115: this->firstVisibleStr = this->strArr;
+   0604 21 0C 00           1087 	ld	hl,#0x000C
+   0607 09                 1088 	add	hl,bc
+   0608 EB                 1089 	ex	de,hl
+   0609 69                 1090 	ld	l,c
+   060A 60                 1091 	ld	h,b
+   060B 4E                 1092 	ld	c,(hl)
+   060C 23                 1093 	inc	hl
+   060D 46                 1094 	ld	b,(hl)
+   060E EB                 1095 	ex	de,hl
+   060F 71                 1096 	ld	(hl),c
+   0610 23                 1097 	inc	hl
+   0611 70                 1098 	ld	(hl),b
+   0612 DD E1              1099 	pop	ix
+   0614 C9                 1100 	ret
+   0615                    1101 _ListView_Init_end::
+                           1102 ;list_view.c:118: char* ListView_GetItem(ListView* this, word itemIndex)
+                           1103 ;	---------------------------------
+                           1104 ; Function ListView_GetItem
+                           1105 ; ---------------------------------
+   0615                    1106 _ListView_GetItem_start::
+   0615                    1107 _ListView_GetItem:
+   0615 DD E5              1108 	push	ix
+   0617 DD 21 00 00        1109 	ld	ix,#0
+   061B DD 39              1110 	add	ix,sp
+                           1111 ;list_view.c:120: return ListView_get_item_by_index(this, itemIndex);
+   061D DD 6E 06           1112 	ld	l,6 (ix)
+   0620 DD 66 07           1113 	ld	h,7 (ix)
+   0623 E5                 1114 	push	hl
+   0624 DD 6E 04           1115 	ld	l,4 (ix)
+   0627 DD 66 05           1116 	ld	h,5 (ix)
+   062A E5                 1117 	push	hl
+   062B CDr11s07           1118 	call	_ListView_get_item_by_index
+   062E F1                 1119 	pop	af
+   062F F1                 1120 	pop	af
+   0630 DD E1              1121 	pop	ix
+   0632 C9                 1122 	ret
+   0633                    1123 _ListView_GetItem_end::
+                           1124 ;list_view.c:125: char* ListView_GetSelectedItem(ListView* this)
+                           1125 ;	---------------------------------
+                           1126 ; Function ListView_GetSelectedItem
+                           1127 ; ---------------------------------
+   0633                    1128 _ListView_GetSelectedItem_start::
+   0633                    1129 _ListView_GetSelectedItem:
+   0633 DD E5              1130 	push	ix
+   0635 DD 21 00 00        1131 	ld	ix,#0
+   0639 DD 39              1132 	add	ix,sp
+                           1133 ;list_view.c:131: selectedIndex = ListView_GetSelectedIndex(this);
+   063B DD 6E 04           1134 	ld	l,4 (ix)
+   063E DD 66 05           1135 	ld	h,5 (ix)
+   0641 E5                 1136 	push	hl
+   0642 CDrB5s05           1137 	call	_ListView_GetSelectedIndex
+   0645 F1                 1138 	pop	af
+   0646 44                 1139 	ld	b,h
+   0647 4D                 1140 	ld	c,l
+                           1141 ;list_view.c:132: p = ListView_GetItem(this, selectedIndex);
+   0648 C5                 1142 	push	bc
+   0649 DD 6E 04           1143 	ld	l,4 (ix)
+   064C DD 66 05           1144 	ld	h,5 (ix)
+   064F E5                 1145 	push	hl
+   0650 CDr15s06           1146 	call	_ListView_GetItem
+   0653 F1                 1147 	pop	af
+   0654 F1                 1148 	pop	af
+   0655 44                 1149 	ld	b,h
+   0656 4D                 1150 	ld	c,l
+   0657 69                 1151 	ld	l,c
+   0658 60                 1152 	ld	h,b
+                           1153 ;list_view.c:133: return p;
+   0659 DD E1              1154 	pop	ix
+   065B C9                 1155 	ret
+   065C                    1156 _ListView_GetSelectedItem_end::
+                           1157 ;list_view.c:137: void ListView_check_visible_part(ListView* this)
+                           1158 ;	---------------------------------
+                           1159 ; Function ListView_check_visible_part
+                           1160 ; ---------------------------------
+   065C                    1161 _ListView_check_visible_part_start::
+   065C                    1162 _ListView_check_visible_part:
+   065C DD E5              1163 	push	ix
+   065E DD 21 00 00        1164 	ld	ix,#0
+   0662 DD 39              1165 	add	ix,sp
+   0664 21 F8 FF           1166 	ld	hl,#-8
+   0667 39                 1167 	add	hl,sp
+   0668 F9                 1168 	ld	sp,hl
+                           1169 ;list_view.c:143: if( this->selectedIndex >= (this->firstVisibleIndex+this->height) ) {
+   0669 DD 4E 04           1170 	ld	c,4 (ix)
+   066C DD 46 05           1171 	ld	b,5 (ix)
+   066F 21 04 00           1172 	ld	hl,#0x0004
+   0672 09                 1173 	add	hl,bc
+   0673 7E                 1174 	ld	a,(hl)
+   0674 DD 77 FC           1175 	ld	-4 (ix),a
+   0677 23                 1176 	inc	hl
+   0678 7E                 1177 	ld	a,(hl)
+   0679 DD 77 FD           1178 	ld	-3 (ix),a
+   067C 21 0A 00           1179 	ld	hl,#0x000A
+   067F 09                 1180 	add	hl,bc
+   0680 DD 75 FE           1181 	ld	-2 (ix),l
+   0683 DD 74 FF           1182 	ld	-1 (ix),h
+   0686 7E                 1183 	ld	a,(hl)
+   0687 DD 77 FA           1184 	ld	-6 (ix),a
+   068A 23                 1185 	inc	hl
+   068B 7E                 1186 	ld	a,(hl)
+   068C DD 77 FB           1187 	ld	-5 (ix),a
+   068F 21 09 00           1188 	ld	hl,#0x0009
+   0692 09                 1189 	add	hl,bc
+   0693 7E                 1190 	ld	a,(hl)
+   0694 DD 77 F8           1191 	ld	-8 (ix),a
+   0697 DD 36 F9 00        1192 	ld	-7 (ix),#0x00
+   069B DD 7E FA           1193 	ld	a,-6 (ix)
+   069E DD 86 F8           1194 	add	a,-8 (ix)
+   06A1 5F                 1195 	ld	e,a
+   06A2 DD 7E FB           1196 	ld	a,-5 (ix)
+   06A5 DD 8E F9           1197 	adc	a,-7 (ix)
+   06A8 57                 1198 	ld	d,a
+   06A9 DD 7E FC           1199 	ld	a,-4 (ix)
+   06AC 93                 1200 	sub	a,e
+   06AD DD 7E FD           1201 	ld	a,-3 (ix)
+   06B0 9A                 1202 	sbc	a,d
+   06B1 38 18              1203 	jr	C,00102$
+                           1204 ;list_view.c:144: this->firstVisibleIndex = this->selectedIndex - this->height + 1;
+   06B3 DD 7E FC           1205 	ld	a,-4 (ix)
+   06B6 DD 96 F8           1206 	sub	a,-8 (ix)
+   06B9 5F                 1207 	ld	e,a
+   06BA DD 7E FD           1208 	ld	a,-3 (ix)
+   06BD DD 9E F9           1209 	sbc	a,-7 (ix)
+   06C0 57                 1210 	ld	d,a
+   06C1 13                 1211 	inc	de
+   06C2 DD 6E FE           1212 	ld	l,-2 (ix)
+   06C5 DD 66 FF           1213 	ld	h,-1 (ix)
+   06C8 73                 1214 	ld	(hl),e
+   06C9 23                 1215 	inc	hl
+   06CA 72                 1216 	ld	(hl),d
+   06CB                    1217 00102$:
+                           1218 ;list_view.c:147: if( this->selectedIndex < this->firstVisibleIndex ) 
+   06CB DD 6E FE           1219 	ld	l,-2 (ix)
+   06CE DD 66 FF           1220 	ld	h,-1 (ix)
+   06D1 5E                 1221 	ld	e,(hl)
+   06D2 23                 1222 	inc	hl
+   06D3 56                 1223 	ld	d,(hl)
+   06D4 DD 7E FC           1224 	ld	a,-4 (ix)
+   06D7 93                 1225 	sub	a,e
+   06D8 DD 7E FD           1226 	ld	a,-3 (ix)
+   06DB 9A                 1227 	sbc	a,d
+   06DC 30 0F              1228 	jr	NC,00104$
+                           1229 ;list_view.c:148: this->firstVisibleIndex = this->selectedIndex;
+   06DE DD 6E FE           1230 	ld	l,-2 (ix)
+   06E1 DD 66 FF           1231 	ld	h,-1 (ix)
+   06E4 DD 7E FC           1232 	ld	a,-4 (ix)
+   06E7 77                 1233 	ld	(hl),a
+   06E8 23                 1234 	inc	hl
+   06E9 DD 7E FD           1235 	ld	a,-3 (ix)
+   06EC 77                 1236 	ld	(hl),a
+   06ED                    1237 00104$:
+                           1238 ;list_view.c:151: p = ListView_get_item_by_index(this, this->firstVisibleIndex);
+   06ED DD 6E FE           1239 	ld	l,-2 (ix)
+   06F0 DD 66 FF           1240 	ld	h,-1 (ix)
+   06F3 5E                 1241 	ld	e,(hl)
+   06F4 23                 1242 	inc	hl
+   06F5 56                 1243 	ld	d,(hl)
+   06F6 D5                 1244 	push	de
+   06F7 C5                 1245 	push	bc
+   06F8 CDr11s07           1246 	call	_ListView_get_item_by_index
+   06FB F1                 1247 	pop	af
+   06FC F1                 1248 	pop	af
+   06FD 44                 1249 	ld	b,h
+   06FE 4D                 1250 	ld	c,l
+                           1251 ;list_view.c:152: this->firstVisibleStr = p;    
+   06FF DD 5E 04           1252 	ld	e,4 (ix)
+   0702 DD 56 05           1253 	ld	d,5 (ix)
+   0705 21 0C 00           1254 	ld	hl,#0x000C
+   0708 19                 1255 	add	hl,de
+   0709 71                 1256 	ld	(hl),c
+   070A 23                 1257 	inc	hl
+   070B 70                 1258 	ld	(hl),b
+   070C DD F9              1259 	ld	sp,ix
+   070E DD E1              1260 	pop	ix
+   0710 C9                 1261 	ret
+   0711                    1262 _ListView_check_visible_part_end::
+                           1263 ;list_view.c:157: char* ListView_get_item_by_index(ListView* this, word itemIndex)
+                           1264 ;	---------------------------------
+                           1265 ; Function ListView_get_item_by_index
+                           1266 ; ---------------------------------
+   0711                    1267 _ListView_get_item_by_index_start::
+   0711                    1268 _ListView_get_item_by_index:
+   0711 DD E5              1269 	push	ix
+   0713 DD 21 00 00        1270 	ld	ix,#0
+   0717 DD 39              1271 	add	ix,sp
+   0719 F5                 1272 	push	af
+                           1273 ;list_view.c:162: p = this->strArr;
+   071A DD 4E 04           1274 	ld	c,4 (ix)
+   071D DD 46 05           1275 	ld	b,5 (ix)
+   0720 C5                 1276 	push	bc
+   0721 FD E1              1277 	pop	iy
+   0723 FD 4E 00           1278 	ld	c,0 (iy)
+   0726 FD 46 01           1279 	ld	b,1 (iy)
+                           1280 ;list_view.c:163: for(i=0; i<itemIndex; i++)
+   0729 DD 36 FE 00        1281 	ld	-2 (ix),#0x00
+   072D DD 36 FF 00        1282 	ld	-1 (ix),#0x00
+   0731                    1283 00101$:
+   0731 DD 7E FE           1284 	ld	a,-2 (ix)
+   0734 DD 96 06           1285 	sub	a,6 (ix)
+   0737 DD 7E FF           1286 	ld	a,-1 (ix)
+   073A DD 9E 07           1287 	sbc	a,7 (ix)
+   073D 30 1A              1288 	jr	NC,00104$
+                           1289 ;list_view.c:164: p = p + strlen(p) + 1;
+   073F C5                 1290 	push	bc
+   0740 C5                 1291 	push	bc
+   0741 CDr00s00           1292 	call	_strlen
+   0744 F1                 1293 	pop	af
+   0745 EB                 1294 	ex	de,hl
+   0746 C1                 1295 	pop	bc
+   0747 79                 1296 	ld	a,c
+   0748 83                 1297 	add	a,e
+   0749 5F                 1298 	ld	e,a
+   074A 78                 1299 	ld	a,b
+   074B 8A                 1300 	adc	a,d
+   074C 4B                 1301 	ld	c,e
+   074D 47                 1302 	ld	b,a
+   074E 03                 1303 	inc	bc
+                           1304 ;list_view.c:163: for(i=0; i<itemIndex; i++)
+   074F DD 34 FE           1305 	inc	-2 (ix)
+   0752 20 03              1306 	jr	NZ,00110$
+   0754 DD 34 FF           1307 	inc	-1 (ix)
+   0757                    1308 00110$:
+   0757 18 D8              1309 	jr	00101$
+   0759                    1310 00104$:
+                           1311 ;list_view.c:166: return p;
+   0759 69                 1312 	ld	l,c
+   075A 60                 1313 	ld	h,b
+   075B DD F9              1314 	ld	sp,ix
+   075D DD E1              1315 	pop	ix
+   075F C9                 1316 	ret
+   0760                    1317 _ListView_get_item_by_index_end::
+                           1318 ;list_view.c:169: void ListView_update_own_textfield(ListView* this)
+                           1319 ;	---------------------------------
+                           1320 ; Function ListView_update_own_textfield
+                           1321 ; ---------------------------------
+   0760                    1322 _ListView_update_own_textfield_start::
+   0760                    1323 _ListView_update_own_textfield:
+   0760 DD E5              1324 	push	ix
+   0762 DD 21 00 00        1325 	ld	ix,#0
+   0766 DD 39              1326 	add	ix,sp
+   0768 3B                 1327 	dec	sp
+                           1328 ;list_view.c:174: FLOS_SetCursorPos(this->x, this->y+this->height);
+   0769 DD 4E 04           1329 	ld	c,4 (ix)
+   076C DD 46 05           1330 	ld	b,5 (ix)
+   076F 21 07 00           1331 	ld	hl,#0x0007
+   0772 09                 1332 	add	hl,bc
+   0773 7E                 1333 	ld	a,(hl)
+   0774 DD 77 FF           1334 	ld	-1 (ix),a
+   0777 21 09 00           1335 	ld	hl,#0x0009
+   077A 09                 1336 	add	hl,bc
+   077B 5E                 1337 	ld	e,(hl)
+   077C DD 7E FF           1338 	ld	a,-1 (ix)
+   077F 83                 1339 	add	a,e
+   0780 DD 77 FF           1340 	ld	-1 (ix),a
+   0783 21 06 00           1341 	ld	hl,#0x0006
+   0786 09                 1342 	add	hl,bc
+   0787 5E                 1343 	ld	e,(hl)
+   0788 C5                 1344 	push	bc
+   0789 DD 7E FF           1345 	ld	a,-1 (ix)
+   078C 57                 1346 	ld	d,a
+   078D D5                 1347 	push	de
+   078E CDr00s00           1348 	call	_FLOS_SetCursorPos
+   0791 F1                 1349 	pop	af
+   0792 C1                 1350 	pop	bc
+                           1351 ;list_view.c:175: FLOS_PrintString("---> ");
+   0793 C5                 1352 	push	bc
+   0794 21rC8s07           1353 	ld	hl,#__str_11
+   0797 E5                 1354 	push	hl
+   0798 CDr00s00           1355 	call	_FLOS_PrintString
+   079B F1                 1356 	pop	af
+   079C C1                 1357 	pop	bc
+                           1358 ;list_view.c:177: numitems = ListView_GetNumItems(this); 
+   079D C5                 1359 	push	bc
+   079E CDr9Ds05           1360 	call	_ListView_GetNumItems
+   07A1 F1                 1361 	pop	af
+   07A2 44                 1362 	ld	b,h
+   07A3 4D                 1363 	ld	c,l
+                           1364 ;list_view.c:178: _uitoa(numitems, buffer, 10);
+   07A4 3E 0A              1365 	ld	a,#0x0A
+   07A6 F5                 1366 	push	af
+   07A7 33                 1367 	inc	sp
+   07A8 21r09s00           1368 	ld	hl,#_buffer
+   07AB E5                 1369 	push	hl
+   07AC C5                 1370 	push	bc
+   07AD CDr00s00           1371 	call	__uitoa
+   07B0 F1                 1372 	pop	af
+   07B1 F1                 1373 	pop	af
+   07B2 33                 1374 	inc	sp
+                           1375 ;list_view.c:179: FLOS_PrintString(buffer);
+   07B3 21r09s00           1376 	ld	hl,#_buffer
+   07B6 E5                 1377 	push	hl
+   07B7 CDr00s00           1378 	call	_FLOS_PrintString
+   07BA F1                 1379 	pop	af
+                           1380 ;list_view.c:181: FLOS_PrintString(" entries");
+   07BB 21rCEs07           1381 	ld	hl,#__str_12
+   07BE E5                 1382 	push	hl
+   07BF CDr00s00           1383 	call	_FLOS_PrintString
+   07C2 F1                 1384 	pop	af
+   07C3 DD F9              1385 	ld	sp,ix
+   07C5 DD E1              1386 	pop	ix
+   07C7 C9                 1387 	ret
+   07C8                    1388 _ListView_update_own_textfield_end::
+   07C8                    1389 __str_11:
+   07C8 2D 2D 2D 3E 20     1390 	.ascii "---> "
+   07CD 00                 1391 	.db 0x00
+   07CE                    1392 __str_12:
+   07CE 20 65 6E 74 72 69  1393 	.ascii " entries"
+        65 73
+   07D6 00                 1394 	.db 0x00
+                           1395 ;config.c:20: void replace_new_lines_with_zero_bytes(void)
+                           1396 ;	---------------------------------
+                           1397 ; Function replace_new_lines_with_zero_bytes
+                           1398 ; ---------------------------------
+   07D7                    1399 _replace_new_lines_with_zero_bytes_start::
+   07D7                    1400 _replace_new_lines_with_zero_bytes:
+   07D7 DD E5              1401 	push	ix
+   07D9 DD 21 00 00        1402 	ld	ix,#0
+   07DD DD 39              1403 	add	ix,sp
+   07DF F5                 1404 	push	af
+                           1405 ;config.c:23: for(i=0; i<CONFIG_FILE_MAX_SIZE; i++) {
+   07E0 01 00 00           1406 	ld	bc,#0x0000
+   07E3 DD 36 FE 00        1407 	ld	-2 (ix),#0x00
+   07E7 DD 36 FF 00        1408 	ld	-1 (ix),#0x00
+   07EB                    1409 00106$:
+   07EB DD 7E FE           1410 	ld	a,-2 (ix)
+   07EE D6 00              1411 	sub	a,#0x00
+   07F0 DD 7E FF           1412 	ld	a,-1 (ix)
+   07F3 DE 04              1413 	sbc	a,#0x04
+   07F5 30 42              1414 	jr	NC,00110$
+                           1415 ;config.c:24: if(config_file_buffer[i] == 0) {
+   07F7 3Er36              1416 	ld	a,#<_config_file_buffer
+   07F9 DD 86 FE           1417 	add	a,-2 (ix)
+   07FC 5F                 1418 	ld	e,a
+   07FD 3Es00              1419 	ld	a,#>_config_file_buffer
+   07FF DD 8E FF           1420 	adc	a,-1 (ix)
+   0802 57                 1421 	ld	d,a
+   0803 1A                 1422 	ld	a,(de)
+   0804 5F                 1423 	ld	e,a
+   0805 B7                 1424 	or	a,a
+   0806 20 08              1425 	jr	NZ,00102$
+                           1426 ;config.c:25: config.config_file_buffer_size = i;
+   0808 21r36s04           1427 	ld	hl,#_config
+   080B 71                 1428 	ld	(hl),c
+   080C 23                 1429 	inc	hl
+   080D 70                 1430 	ld	(hl),b
+                           1431 ;config.c:26: return;
+   080E 18 29              1432 	jr	00110$
+   0810                    1433 00102$:
+                           1434 ;config.c:28: if(config_file_buffer[i] == '\x0D' || config_file_buffer[i] == '\x0A') {
+   0810 7B                 1435 	ld	a,e
+   0811 D6 0D              1436 	sub	a,#0x0D
+   0813 28 05              1437 	jr	Z,00103$
+   0815 7B                 1438 	ld	a,e
+   0816 D6 0A              1439 	sub	a,#0x0A
+   0818 20 0F              1440 	jr	NZ,00108$
+   081A                    1441 00103$:
+                           1442 ;config.c:29: config_file_buffer[i] = 0;
+   081A 3Er36              1443 	ld	a,#<_config_file_buffer
+   081C DD 86 FE           1444 	add	a,-2 (ix)
+   081F 5F                 1445 	ld	e,a
+   0820 3Es00              1446 	ld	a,#>_config_file_buffer
+   0822 DD 8E FF           1447 	adc	a,-1 (ix)
+   0825 57                 1448 	ld	d,a
+   0826 3E 00              1449 	ld	a,#0x00
+   0828 12                 1450 	ld	(de),a
+   0829                    1451 00108$:
+                           1452 ;config.c:23: for(i=0; i<CONFIG_FILE_MAX_SIZE; i++) {
+   0829 DD 34 FE           1453 	inc	-2 (ix)
+   082C 20 03              1454 	jr	NZ,00119$
+   082E DD 34 FF           1455 	inc	-1 (ix)
+   0831                    1456 00119$:
+   0831 DD 4E FE           1457 	ld	c,-2 (ix)
+   0834 DD 46 FF           1458 	ld	b,-1 (ix)
+   0837 18 B2              1459 	jr	00106$
+   0839                    1460 00110$:
+   0839 DD F9              1461 	ld	sp,ix
+   083B DD E1              1462 	pop	ix
+   083D C9                 1463 	ret
+   083E                    1464 _replace_new_lines_with_zero_bytes_end::
+                           1465 ;config.c:37: void iterate_trough_extensions(void)
+                           1466 ;	---------------------------------
+                           1467 ; Function iterate_trough_extensions
+                           1468 ; ---------------------------------
+   083E                    1469 _iterate_trough_extensions_start::
+   083E                    1470 _iterate_trough_extensions:
+   083E DD E5              1471 	push	ix
+   0840 DD 21 00 00        1472 	ld	ix,#0
+   0844 DD 39              1473 	add	ix,sp
+   0846 F5                 1474 	push	af
+                           1475 ;config.c:41: byte *p = config_file_buffer;
+   0847 DD 36 FEr36        1476 	ld	-2 (ix),#<_config_file_buffer
+   084B DD 36 FFs00        1477 	ld	-1 (ix),#>_config_file_buffer
+                           1478 ;config.c:42: config.is_in_ext_section = FALSE;
+   084F 11r38s04           1479 	ld	de,#_config + 2
+   0852 3E 00              1480 	ld	a,#0x00
+   0854 12                 1481 	ld	(de),a
+                           1482 ;config.c:44: while(p < p + config.config_file_buffer_size) {
+   0855                    1483 00113$:
+   0855 21r36s04           1484 	ld	hl,#_config
+   0858 4E                 1485 	ld	c,(hl)
+   0859 23                 1486 	inc	hl
+   085A 46                 1487 	ld	b,(hl)
+   085B DD 7E FE           1488 	ld	a,-2 (ix)
+   085E 81                 1489 	add	a,c
+   085F 4F                 1490 	ld	c,a
+   0860 DD 7E FF           1491 	ld	a,-1 (ix)
+   0863 88                 1492 	adc	a,b
+   0864 47                 1493 	ld	b,a
+   0865 DD 7E FE           1494 	ld	a,-2 (ix)
+   0868 91                 1495 	sub	a,c
+   0869 DD 7E FF           1496 	ld	a,-1 (ix)
+   086C 98                 1497 	sbc	a,b
+   086D D2r26s09           1498 	jp	NC,00116$
+                           1499 ;config.c:45: if(strcmp(p, "[Ext]") == 0) config.is_in_ext_section = TRUE;
+   0870 D5                 1500 	push	de
+   0871 21r2Bs09           1501 	ld	hl,#__str_13
+   0874 E5                 1502 	push	hl
+   0875 DD 6E FE           1503 	ld	l,-2 (ix)
+   0878 DD 66 FF           1504 	ld	h,-1 (ix)
+   087B E5                 1505 	push	hl
+   087C CDr00s00           1506 	call	_strcmp
+   087F F1                 1507 	pop	af
+   0880 F1                 1508 	pop	af
+   0881 44                 1509 	ld	b,h
+   0882 4D                 1510 	ld	c,l
+   0883 D1                 1511 	pop	de
+   0884 79                 1512 	ld	a,c
+   0885 B0                 1513 	or	a,b
+   0886 20 05              1514 	jr	NZ,00102$
+   0888 3E 01              1515 	ld	a,#0x01
+   088A 32r38s04           1516 	ld	(#_config + 2),a
+   088D                    1517 00102$:
+                           1518 ;config.c:46: p += strlen(p);
+   088D D5                 1519 	push	de
+   088E DD 6E FE           1520 	ld	l,-2 (ix)
+   0891 DD 66 FF           1521 	ld	h,-1 (ix)
+   0894 E5                 1522 	push	hl
+   0895 CDr00s00           1523 	call	_strlen
+   0898 F1                 1524 	pop	af
+   0899 44                 1525 	ld	b,h
+   089A 4D                 1526 	ld	c,l
+   089B D1                 1527 	pop	de
+   089C DD 7E FE           1528 	ld	a,-2 (ix)
+   089F 81                 1529 	add	a,c
+   08A0 DD 77 FE           1530 	ld	-2 (ix),a
+   08A3 DD 7E FF           1531 	ld	a,-1 (ix)
+   08A6 88                 1532 	adc	a,b
+   08A7 DD 77 FF           1533 	ld	-1 (ix),a
+                           1534 ;config.c:47: if(*p == 0) p++;
+   08AA DD 6E FE           1535 	ld	l,-2 (ix)
+   08AD DD 66 FF           1536 	ld	h,-1 (ix)
+   08B0 7E                 1537 	ld	a,(hl)
+   08B1 B7                 1538 	or	a,a
+   08B2 20 08              1539 	jr	NZ,00104$
+   08B4 DD 34 FE           1540 	inc	-2 (ix)
+   08B7 20 03              1541 	jr	NZ,00126$
+   08B9 DD 34 FF           1542 	inc	-1 (ix)
+   08BC                    1543 00126$:
+   08BC                    1544 00104$:
+                           1545 ;config.c:48: if(*p == 0) p++;
+   08BC DD 6E FE           1546 	ld	l,-2 (ix)
+   08BF DD 66 FF           1547 	ld	h,-1 (ix)
+   08C2 7E                 1548 	ld	a,(hl)
+   08C3 B7                 1549 	or	a,a
+   08C4 20 08              1550 	jr	NZ,00106$
+   08C6 DD 34 FE           1551 	inc	-2 (ix)
+   08C9 20 03              1552 	jr	NZ,00127$
+   08CB DD 34 FF           1553 	inc	-1 (ix)
+   08CE                    1554 00127$:
+   08CE                    1555 00106$:
+                           1556 ;config.c:49: if(*p == 0) return;
+   08CE DD 6E FE           1557 	ld	l,-2 (ix)
+   08D1 DD 66 FF           1558 	ld	h,-1 (ix)
+   08D4 7E                 1559 	ld	a,(hl)
+   08D5 B7                 1560 	or	a,a
+   08D6 CAr26s09           1561 	jp	Z,00116$
+                           1562 ;config.c:50: if(config.is_in_ext_section) {
+   08D9 1A                 1563 	ld	a,(de)
+   08DA B7                 1564 	or	a,a
+   08DB CAr55s08           1565 	jp	Z,00113$
+                           1566 ;config.c:52: pEqualChar = strstr(p, "=");
+   08DE D5                 1567 	push	de
+   08DF 21r31s09           1568 	ld	hl,#__str_14
+   08E2 E5                 1569 	push	hl
+   08E3 DD 6E FE           1570 	ld	l,-2 (ix)
+   08E6 DD 66 FF           1571 	ld	h,-1 (ix)
+   08E9 E5                 1572 	push	hl
+   08EA CDr00s00           1573 	call	_strstr
+   08ED F1                 1574 	pop	af
+   08EE F1                 1575 	pop	af
+   08EF 44                 1576 	ld	b,h
+   08F0 4D                 1577 	ld	c,l
+   08F1 D1                 1578 	pop	de
+                           1579 ;config.c:53: if(pEqualChar) {
+   08F2 79                 1580 	ld	a,c
+   08F3 B0                 1581 	or	a,b
+   08F4 CAr55s08           1582 	jp	Z,00113$
+                           1583 ;config.c:54: *pEqualChar = 0;        // split string to two, e.g "BMP=SHOWBMP" to "BMP",0,"SHOWBMP"
+   08F7 3E 00              1584 	ld	a,#0x00
+   08F9 02                 1585 	ld	(bc),a
+                           1586 ;config.c:55: add_user_action_based_on_ext(p, p+strlen(p)+1);
+   08FA D5                 1587 	push	de
+   08FB DD 6E FE           1588 	ld	l,-2 (ix)
+   08FE DD 66 FF           1589 	ld	h,-1 (ix)
+   0901 E5                 1590 	push	hl
+   0902 CDr00s00           1591 	call	_strlen
+   0905 F1                 1592 	pop	af
+   0906 44                 1593 	ld	b,h
+   0907 4D                 1594 	ld	c,l
+   0908 D1                 1595 	pop	de
+   0909 DD 7E FE           1596 	ld	a,-2 (ix)
+   090C 81                 1597 	add	a,c
+   090D 4F                 1598 	ld	c,a
+   090E DD 7E FF           1599 	ld	a,-1 (ix)
+   0911 88                 1600 	adc	a,b
+   0912 47                 1601 	ld	b,a
+   0913 03                 1602 	inc	bc
+   0914 D5                 1603 	push	de
+   0915 C5                 1604 	push	bc
+   0916 DD 6E FE           1605 	ld	l,-2 (ix)
+   0919 DD 66 FF           1606 	ld	h,-1 (ix)
+   091C E5                 1607 	push	hl
+   091D CDr33s09           1608 	call	_add_user_action_based_on_ext
+   0920 F1                 1609 	pop	af
+   0921 F1                 1610 	pop	af
+   0922 D1                 1611 	pop	de
+   0923 C3r55s08           1612 	jp	00113$
+   0926                    1613 00116$:
+   0926 DD F9              1614 	ld	sp,ix
+   0928 DD E1              1615 	pop	ix
+   092A C9                 1616 	ret
+   092B                    1617 _iterate_trough_extensions_end::
+   092B                    1618 __str_13:
+   092B 5B 45 78 74 5D     1619 	.ascii "[Ext]"
+   0930 00                 1620 	.db 0x00
+   0931                    1621 __str_14:
+   0931 3D                 1622 	.ascii "="
+   0932 00                 1623 	.db 0x00
+                           1624 ;config.c:65: void add_user_action_based_on_ext(const char *pExt, const char *pAction)
+                           1625 ;	---------------------------------
+                           1626 ; Function add_user_action_based_on_ext
+                           1627 ; ---------------------------------
+   0933                    1628 _add_user_action_based_on_ext_start::
+   0933                    1629 _add_user_action_based_on_ext:
+   0933 DD E5              1630 	push	ix
+   0935 DD 21 00 00        1631 	ld	ix,#0
+   0939 DD 39              1632 	add	ix,sp
+   093B 21 F9 FF           1633 	ld	hl,#-7
+   093E 39                 1634 	add	hl,sp
+   093F F9                 1635 	ld	sp,hl
+                           1636 ;config.c:68: config.user_action_based_on_ext[config.user_action_based_on_ext_index][0] = pExt;
+   0940 01r39s04           1637 	ld	bc,#_config + 3
+   0943 21r39s05           1638 	ld	hl,#_config + 259
+   0946 DD 75 FD           1639 	ld	-3 (ix),l
+   0949 DD 74 FE           1640 	ld	-2 (ix),h
+   094C 7E                 1641 	ld	a,(hl)
+   094D DD 77 FF           1642 	ld	-1 (ix),a
+   0950 DD 77 FB           1643 	ld	-5 (ix),a
+   0953 DD 36 FC 00        1644 	ld	-4 (ix),#0x00
+   0957 DD 7E FB           1645 	ld	a,-5 (ix)
+   095A DD 77 F9           1646 	ld	-7 (ix),a
+   095D DD 7E FC           1647 	ld	a,-4 (ix)
+   0960 DD 77 FA           1648 	ld	-6 (ix),a
+   0963 3E 03              1649 	ld	a,#0x02+1
+   0965 18 08              1650 	jr	00107$
+   0967                    1651 00106$:
+   0967 DD CB F9 26        1652 	sla	-7 (ix)
+   096B DD CB FA 16        1653 	rl	-6 (ix)
+   096F                    1654 00107$:
+   096F 3D                 1655 	dec	a
+   0970 20 F5              1656 	jr	NZ,00106$
+   0972 79                 1657 	ld	a,c
+   0973 DD 86 F9           1658 	add	a,-7 (ix)
+   0976 5F                 1659 	ld	e,a
+   0977 78                 1660 	ld	a,b
+   0978 DD 8E FA           1661 	adc	a,-6 (ix)
+   097B 6B                 1662 	ld	l,e
+   097C 67                 1663 	ld	h,a
+   097D DD 7E 04           1664 	ld	a,4 (ix)
+   0980 77                 1665 	ld	(hl),a
+   0981 23                 1666 	inc	hl
+   0982 DD 7E 05           1667 	ld	a,5 (ix)
+   0985 77                 1668 	ld	(hl),a
+                           1669 ;config.c:69: config.user_action_based_on_ext[config.user_action_based_on_ext_index][1] = pAction;
+   0986 79                 1670 	ld	a,c
+   0987 DD 86 F9           1671 	add	a,-7 (ix)
+   098A 4F                 1672 	ld	c,a
+   098B 78                 1673 	ld	a,b
+   098C DD 8E FA           1674 	adc	a,-6 (ix)
+   098F 69                 1675 	ld	l,c
+   0990 67                 1676 	ld	h,a
+   0991 23                 1677 	inc	hl
+   0992 23                 1678 	inc	hl
+   0993 DD 7E 06           1679 	ld	a,6 (ix)
+   0996 77                 1680 	ld	(hl),a
+   0997 23                 1681 	inc	hl
+   0998 DD 7E 07           1682 	ld	a,7 (ix)
+   099B 77                 1683 	ld	(hl),a
+                           1684 ;config.c:71: if(config.user_action_based_on_ext_index+1 < CONFIG_FILE_MAX_EXT_ACTIONS)
+   099C DD 4E FB           1685 	ld	c,-5 (ix)
+   099F DD 46 FC           1686 	ld	b,-4 (ix)
+   09A2 03                 1687 	inc	bc
+   09A3 79                 1688 	ld	a,c
+   09A4 D6 40              1689 	sub	a,#0x40
+   09A6 78                 1690 	ld	a,b
+   09A7 DE 00              1691 	sbc	a,#0x00
+   09A9 F2rB7s09           1692 	jp	P,00103$
+                           1693 ;config.c:72: config.user_action_based_on_ext_index++;
+   09AC DD 7E FF           1694 	ld	a,-1 (ix)
+   09AF 3C                 1695 	inc	a
+   09B0 DD 6E FD           1696 	ld	l,-3 (ix)
+   09B3 DD 66 FE           1697 	ld	h,-2 (ix)
+   09B6 77                 1698 	ld	(hl),a
+   09B7                    1699 00103$:
+   09B7 DD F9              1700 	ld	sp,ix
+   09B9 DD E1              1701 	pop	ix
+   09BB C9                 1702 	ret
+   09BC                    1703 _add_user_action_based_on_ext_end::
+                           1704 ;config.c:76: const char* get_user_action_based_on_ext(const char *pExt)
+                           1705 ;	---------------------------------
+                           1706 ; Function get_user_action_based_on_ext
+                           1707 ; ---------------------------------
+   09BC                    1708 _get_user_action_based_on_ext_start::
+   09BC                    1709 _get_user_action_based_on_ext:
+   09BC DD E5              1710 	push	ix
+   09BE DD 21 00 00        1711 	ld	ix,#0
+   09C2 DD 39              1712 	add	ix,sp
+   09C4 3B                 1713 	dec	sp
+                           1714 ;config.c:80: for(i=0; i<CONFIG_FILE_MAX_EXT_ACTIONS; i++) {
+   09C5 DD 36 FF 00        1715 	ld	-1 (ix),#0x00
+   09C9                    1716 00103$:
+   09C9 DD 7E FF           1717 	ld	a,-1 (ix)
+   09CC D6 40              1718 	sub	a,#0x40
+   09CE D2r18s0A           1719 	jp	NC,00106$
+                           1720 ;config.c:81: r = strcmp(config.user_action_based_on_ext[i][0], pExt);
+   09D1 11r39s04           1721 	ld	de,#_config + 3
+   09D4 DD 4E FF           1722 	ld	c,-1 (ix)
+   09D7 06 00              1723 	ld	b,#0x00
+   09D9 CB 21              1724 	sla	c
+   09DB CB 10              1725 	rl	b
+   09DD CB 21              1726 	sla	c
+   09DF CB 10              1727 	rl	b
+   09E1 7B                 1728 	ld	a,e
+   09E2 81                 1729 	add	a,c
+   09E3 5F                 1730 	ld	e,a
+   09E4 7A                 1731 	ld	a,d
+   09E5 88                 1732 	adc	a,b
+   09E6 6B                 1733 	ld	l,e
+   09E7 67                 1734 	ld	h,a
+   09E8 5E                 1735 	ld	e,(hl)
+   09E9 23                 1736 	inc	hl
+   09EA 56                 1737 	ld	d,(hl)
+   09EB C5                 1738 	push	bc
+   09EC DD 6E 04           1739 	ld	l,4 (ix)
+   09EF DD 66 05           1740 	ld	h,5 (ix)
+   09F2 E5                 1741 	push	hl
+   09F3 D5                 1742 	push	de
+   09F4 CDr00s00           1743 	call	_strcmp
+   09F7 F1                 1744 	pop	af
+   09F8 F1                 1745 	pop	af
+   09F9 EB                 1746 	ex	de,hl
+   09FA C1                 1747 	pop	bc
+                           1748 ;config.c:82: if(r==0) return config.user_action_based_on_ext[i][1];
+   09FB 7B                 1749 	ld	a,e
+   09FC B2                 1750 	or	a,d
+   09FD 20 13              1751 	jr	NZ,00105$
+   09FF 11r39s04           1752 	ld	de,#_config + 3
+   0A02 7B                 1753 	ld	a,e
+   0A03 81                 1754 	add	a,c
+   0A04 4F                 1755 	ld	c,a
+   0A05 7A                 1756 	ld	a,d
+   0A06 88                 1757 	adc	a,b
+   0A07 69                 1758 	ld	l,c
+   0A08 67                 1759 	ld	h,a
+   0A09 23                 1760 	inc	hl
+   0A0A 23                 1761 	inc	hl
+   0A0B 4E                 1762 	ld	c,(hl)
+   0A0C 23                 1763 	inc	hl
+   0A0D 46                 1764 	ld	b,(hl)
+   0A0E 69                 1765 	ld	l,c
+   0A0F 60                 1766 	ld	h,b
+   0A10 18 09              1767 	jr	00107$
+   0A12                    1768 00105$:
+                           1769 ;config.c:80: for(i=0; i<CONFIG_FILE_MAX_EXT_ACTIONS; i++) {
+   0A12 DD 34 FF           1770 	inc	-1 (ix)
+   0A15 C3rC9s09           1771 	jp	00103$
+   0A18                    1772 00106$:
+                           1773 ;config.c:85: return NULL;
+   0A18 21 00 00           1774 	ld	hl,#0x0000
+   0A1B                    1775 00107$:
+   0A1B DD F9              1776 	ld	sp,ix
+   0A1D DD E1              1777 	pop	ix
+   0A1F C9                 1778 	ret
+   0A20                    1779 _get_user_action_based_on_ext_end::
+                           1780 ;config.c:90: void init_config_file_parser(void) {
+                           1781 ;	---------------------------------
+                           1782 ; Function init_config_file_parser
+                           1783 ; ---------------------------------
+   0A20                    1784 _init_config_file_parser_start::
+   0A20                    1785 _init_config_file_parser:
+                           1786 ;config.c:91: config.user_action_based_on_ext_index = 0;
+   0A20 3E 00              1787 	ld	a,#0x00
+   0A22 32r39s05           1788 	ld	(#_config + 259),a
+                           1789 ;config.c:93: memset(config.user_action_based_on_ext, 0 , sizeof(config.user_action_based_on_ext));
+   0A25 01r39s04           1790 	ld	bc,#_config + 3
+   0A28 21 00 01           1791 	ld	hl,#0x0100
+   0A2B E5                 1792 	push	hl
+   0A2C 3E 00              1793 	ld	a,#0x00
+   0A2E F5                 1794 	push	af
+   0A2F 33                 1795 	inc	sp
+   0A30 C5                 1796 	push	bc
+   0A31 CDr00s00           1797 	call	_memset
+   0A34 F1                 1798 	pop	af
+   0A35 F1                 1799 	pop	af
+   0A36 33                 1800 	inc	sp
+   0A37 C9                 1801 	ret
+   0A38                    1802 _init_config_file_parser_end::
+                           1803 ;config.c:99: BOOL load_config_file(void)
+                           1804 ;	---------------------------------
+                           1805 ; Function load_config_file
+                           1806 ; ---------------------------------
+   0A38                    1807 _load_config_file_start::
+   0A38                    1808 _load_config_file:
+                           1809 ;config.c:101: init_config_file_parser();
+   0A38 CDr20s0A           1810 	call	_init_config_file_parser
+                           1811 ;config.c:103: FLOS_RootDir();
+   0A3B CDr00s00           1812 	call	_FLOS_RootDir
+                           1813 ;config.c:104: if(!FLOS_ChangeDir(CONFIG_FILE_DIR))
+   0A3E 21r9Ds0A           1814 	ld	hl,#__str_15
+   0A41 E5                 1815 	push	hl
+   0A42 CDr00s00           1816 	call	_FLOS_ChangeDir
+   0A45 F1                 1817 	pop	af
+   0A46 AF                 1818 	xor	a,a
+   0A47 B5                 1819 	or	a,l
+   0A48 20 0B              1820 	jr	NZ,00102$
+                           1821 ;config.c:106: FLOS_PrintStringLFCR("Failed to cahange dir to /" CONFIG_FILE_DIR);
+   0A4A 21rA6s0A           1822 	ld	hl,#__str_16
+   0A4D E5                 1823 	push	hl
+   0A4E CDr00s00           1824 	call	_FLOS_PrintStringLFCR
+   0A51 F1                 1825 	pop	af
+                           1826 ;config.c:107: return FALSE;
+   0A52 2E 00              1827 	ld	l,#0x00
+   0A54 C9                 1828 	ret
+   0A55                    1829 00102$:
+                           1830 ;config.c:110: memset(config_file_buffer, 0, CONFIG_FILE_MAX_SIZE);
+   0A55 21 00 04           1831 	ld	hl,#0x0400
+   0A58 E5                 1832 	push	hl
+   0A59 3E 00              1833 	ld	a,#0x00
+   0A5B F5                 1834 	push	af
+   0A5C 33                 1835 	inc	sp
+   0A5D 21r36s00           1836 	ld	hl,#_config_file_buffer
+   0A60 E5                 1837 	push	hl
+   0A61 CDr00s00           1838 	call	_memset
+   0A64 F1                 1839 	pop	af
+   0A65 F1                 1840 	pop	af
+   0A66 33                 1841 	inc	sp
+                           1842 ;config.c:111: if(!load_file_to_buffer("FS_WALK.CFG", 0, config_file_buffer, CONFIG_FILE_MAX_SIZE, 0))
+   0A67 3E 00              1843 	ld	a,#0x00
+   0A69 F5                 1844 	push	af
+   0A6A 33                 1845 	inc	sp
+   0A6B 21 00 00           1846 	ld	hl,#0x0000
+   0A6E E5                 1847 	push	hl
+   0A6F 21 00 04           1848 	ld	hl,#0x0400
+   0A72 E5                 1849 	push	hl
+   0A73 21r36s00           1850 	ld	hl,#_config_file_buffer
+   0A76 E5                 1851 	push	hl
+   0A77 21 00 00           1852 	ld	hl,#0x0000
+   0A7A E5                 1853 	push	hl
+   0A7B 21 00 00           1854 	ld	hl,#0x0000
+   0A7E E5                 1855 	push	hl
+   0A7F 21rC9s0A           1856 	ld	hl,#__str_17
+   0A82 E5                 1857 	push	hl
+   0A83 CDr63s00           1858 	call	_load_file_to_buffer
+   0A86 FD 21 0D 00        1859 	ld	iy,#0x000D
+   0A8A FD 39              1860 	add	iy,sp
+   0A8C FD F9              1861 	ld	sp,iy
+                           1862 ;config.c:112: return FALSE;
+   0A8E AF                 1863 	xor	a,a
+   0A8F B5                 1864 	or	a,l
+   0A90 20 02              1865 	jr	NZ,00104$
+   0A92 6F                 1866 	ld	l,a
+   0A93 C9                 1867 	ret
+   0A94                    1868 00104$:
+                           1869 ;config.c:115: replace_new_lines_with_zero_bytes();
+   0A94 CDrD7s07           1870 	call	_replace_new_lines_with_zero_bytes
+                           1871 ;config.c:116: iterate_trough_extensions();
+   0A97 CDr3Es08           1872 	call	_iterate_trough_extensions
+                           1873 ;config.c:119: return TRUE;
+   0A9A 2E 01              1874 	ld	l,#0x01
+   0A9C C9                 1875 	ret
+   0A9D                    1876 _load_config_file_end::
+   0A9D                    1877 __str_15:
+   0A9D 43 4F 4D 4D 41 4E  1878 	.ascii "COMMANDS"
+        44 53
+   0AA5 00                 1879 	.db 0x00
+   0AA6                    1880 __str_16:
+   0AA6 46 61 69 6C 65 64  1881 	.ascii "Failed to cahange dir to /COMMANDS"
+        20 74 6F 20 63 61
+        68 61 6E 67 65 20
+        64 69 72 20 74 6F
+        20 2F 43 4F 4D 4D
+        41 4E 44 53
+   0AC8 00                 1882 	.db 0x00
+   0AC9                    1883 __str_17:
+   0AC9 46 53 5F 57 41 4C  1884 	.ascii "FS_WALK.CFG"
+        4B 2E 43 46 47
+   0AD4 00                 1885 	.db 0x00
+                           1886 ;user_actions.c:14: BOOL enter_pressed(void)
+                           1887 ;	---------------------------------
+                           1888 ; Function enter_pressed
+                           1889 ; ---------------------------------
+   0AD5                    1890 _enter_pressed_start::
+   0AD5                    1891 _enter_pressed:
+   0AD5 DD E5              1892 	push	ix
+   0AD7 DD 21 00 00        1893 	ld	ix,#0
+   0ADB DD 39              1894 	add	ix,sp
+   0ADD 21 E6 FF           1895 	ld	hl,#-26
+   0AE0 39                 1896 	add	hl,sp
+   0AE1 F9                 1897 	ld	sp,hl
+                           1898 ;user_actions.c:21: char dirname[FILENAME_LEN +1] = "";
+   0AE2 21 00 00           1899 	ld	hl,#0x0000
+   0AE5 39                 1900 	add	hl,sp
+   0AE6 4D                 1901 	ld	c,l
+   0AE7 44                 1902 	ld	b,h
+   0AE8 3E 00              1903 	ld	a,#0x00
+   0AEA 02                 1904 	ld	(bc),a
+                           1905 ;user_actions.c:23: p = ListView_GetSelectedItem(&lview);
+   0AEB 21r3As05           1906 	ld	hl,#_lview
+   0AEE E5                 1907 	push	hl
+   0AEF CDr33s06           1908 	call	_ListView_GetSelectedItem
+   0AF2 F1                 1909 	pop	af
+   0AF3 44                 1910 	ld	b,h
+   0AF4 4D                 1911 	ld	c,l
+                           1912 ;user_actions.c:26: if(!extract_filename_from_buffer(p, filename))
+   0AF5 21 0D 00           1913 	ld	hl,#0x000D
+   0AF8 39                 1914 	add	hl,sp
+   0AF9 C5                 1915 	push	bc
+   0AFA E5                 1916 	push	hl
+   0AFB C5                 1917 	push	bc
+   0AFC CDr5Ds0B           1918 	call	_extract_filename_from_buffer
+   0AFF F1                 1919 	pop	af
+   0B00 F1                 1920 	pop	af
+   0B01 5D                 1921 	ld	e,l
+   0B02 C1                 1922 	pop	bc
+   0B03 AF                 1923 	xor	a,a
+                           1924 ;user_actions.c:27: return FALSE;
+   0B04 B3                 1925 	or	a,e
+   0B05 20 04              1926 	jr	NZ,00102$
+   0B07 6F                 1927 	ld	l,a
+   0B08 C3r52s0B           1928 	jp	00109$
+   0B0B                    1929 00102$:
+                           1930 ;user_actions.c:29: if(strstr(p, "[DIR]") != NULL) {
+   0B0B 21r57s0B           1931 	ld	hl,#__str_19
+   0B0E E5                 1932 	push	hl
+   0B0F C5                 1933 	push	bc
+   0B10 CDr00s00           1934 	call	_strstr
+   0B13 F1                 1935 	pop	af
+   0B14 F1                 1936 	pop	af
+   0B15 44                 1937 	ld	b,h
+   0B16 7D                 1938 	ld	a,l
+   0B17 B0                 1939 	or	a,b
+   0B18 28 26              1940 	jr	Z,00106$
+                           1941 ;user_actions.c:36: if(filename[0] == '.') {
+   0B1A 21 0D 00           1942 	ld	hl,#0x000D
+   0B1D 39                 1943 	add	hl,sp
+   0B1E 4D                 1944 	ld	c,l
+   0B1F 44                 1945 	ld	b,h
+   0B20 0A                 1946 	ld	a,(bc)
+   0B21 D6 2E              1947 	sub	a,#0x2E
+   0B23 20 0C              1948 	jr	NZ,00104$
+                           1949 ;user_actions.c:40: r = FLOS_ParentDir();
+   0B25 CDr00s00           1950 	call	_FLOS_ParentDir
+   0B28 5D                 1951 	ld	e,l
+                           1952 ;user_actions.c:41: fill_ListView_by_entries_from_current_dir();
+   0B29 D5                 1953 	push	de
+   0B2A CDr2Ds10           1954 	call	_fill_ListView_by_entries_from_current_dir
+   0B2D D1                 1955 	pop	de
+                           1956 ;user_actions.c:46: return r;
+   0B2E 6B                 1957 	ld	l,e
+   0B2F 18 21              1958 	jr	00109$
+   0B31                    1959 00104$:
+                           1960 ;user_actions.c:51: r = FLOS_ChangeDir(filename);
+   0B31 C5                 1961 	push	bc
+   0B32 CDr00s00           1962 	call	_FLOS_ChangeDir
+   0B35 F1                 1963 	pop	af
+   0B36 4D                 1964 	ld	c,l
+   0B37 59                 1965 	ld	e,c
+                           1966 ;user_actions.c:52: fill_ListView_by_entries_from_current_dir();
+   0B38 D5                 1967 	push	de
+   0B39 CDr2Ds10           1968 	call	_fill_ListView_by_entries_from_current_dir
+   0B3C D1                 1969 	pop	de
+                           1970 ;user_actions.c:53: return r;
+   0B3D 6B                 1971 	ld	l,e
+   0B3E 18 12              1972 	jr	00109$
+   0B40                    1973 00106$:
+                           1974 ;user_actions.c:57: if(!do_action_based_on_file_extension(filename))
+   0B40 21 0D 00           1975 	ld	hl,#0x000D
+   0B43 39                 1976 	add	hl,sp
+   0B44 E5                 1977 	push	hl
+   0B45 CDrC1s0B           1978 	call	_do_action_based_on_file_extension
+   0B48 F1                 1979 	pop	af
+                           1980 ;user_actions.c:58: return FALSE;
+   0B49 AF                 1981 	xor	a,a
+   0B4A B5                 1982 	or	a,l
+   0B4B 20 03              1983 	jr	NZ,00108$
+   0B4D 6F                 1984 	ld	l,a
+   0B4E 18 02              1985 	jr	00109$
+   0B50                    1986 00108$:
+                           1987 ;user_actions.c:60: return TRUE;
+   0B50 2E 01              1988 	ld	l,#0x01
+   0B52                    1989 00109$:
+   0B52 DD F9              1990 	ld	sp,ix
+   0B54 DD E1              1991 	pop	ix
+   0B56 C9                 1992 	ret
+   0B57                    1993 _enter_pressed_end::
+   0B57                    1994 __str_19:
+   0B57 5B 44 49 52 5D     1995 	.ascii "[DIR]"
+   0B5C 00                 1996 	.db 0x00
+                           1997 ;user_actions.c:63: BOOL extract_filename_from_buffer(const char* pFrom, char* pTo)
+                           1998 ;	---------------------------------
+                           1999 ; Function extract_filename_from_buffer
+                           2000 ; ---------------------------------
+   0B5D                    2001 _extract_filename_from_buffer_start::
+   0B5D                    2002 _extract_filename_from_buffer:
+   0B5D DD E5              2003 	push	ix
+   0B5F DD 21 00 00        2004 	ld	ix,#0
+   0B63 DD 39              2005 	add	ix,sp
+                           2006 ;user_actions.c:68: pFromEnd = strstr(pFrom, " ");
+   0B65 21rBFs0B           2007 	ld	hl,#__str_20
+   0B68 E5                 2008 	push	hl
+   0B69 DD 6E 04           2009 	ld	l,4 (ix)
+   0B6C DD 66 05           2010 	ld	h,5 (ix)
+   0B6F E5                 2011 	push	hl
+   0B70 CDr00s00           2012 	call	_strstr
+   0B73 F1                 2013 	pop	af
+   0B74 F1                 2014 	pop	af
+   0B75 44                 2015 	ld	b,h
+   0B76 4D                 2016 	ld	c,l
+                           2017 ;user_actions.c:69: if(pFromEnd == NULL)
+   0B77 79                 2018 	ld	a,c
+   0B78 B0                 2019 	or	a,b
+   0B79 20 04              2020 	jr	NZ,00102$
+                           2021 ;user_actions.c:70: return FALSE;
+   0B7B 2E 00              2022 	ld	l,#0x00
+   0B7D 18 3D              2023 	jr	00105$
+   0B7F                    2024 00102$:
+                           2025 ;user_actions.c:72: pFromLen = pFromEnd - pFrom;
+   0B7F 79                 2026 	ld	a,c
+   0B80 DD 96 04           2027 	sub	a,4 (ix)
+   0B83 4F                 2028 	ld	c,a
+   0B84 78                 2029 	ld	a,b
+   0B85 DD 9E 05           2030 	sbc	a,5 (ix)
+   0B88 47                 2031 	ld	b,a
+                           2032 ;user_actions.c:73: if(pFromLen > FILENAME_LEN)
+   0B89 3E 0C              2033 	ld	a,#0x0C
+   0B8B 91                 2034 	sub	a,c
+   0B8C 30 04              2035 	jr	NC,00104$
+                           2036 ;user_actions.c:74: return FALSE;
+   0B8E 2E 00              2037 	ld	l,#0x00
+   0B90 18 2A              2038 	jr	00105$
+   0B92                    2039 00104$:
+                           2040 ;user_actions.c:76: memset(pTo, 0, FILENAME_LEN +1);
+   0B92 DD 5E 06           2041 	ld	e,6 (ix)
+   0B95 DD 56 07           2042 	ld	d,7 (ix)
+   0B98 C5                 2043 	push	bc
+   0B99 21 0D 00           2044 	ld	hl,#0x000D
+   0B9C E5                 2045 	push	hl
+   0B9D 3E 00              2046 	ld	a,#0x00
+   0B9F F5                 2047 	push	af
+   0BA0 33                 2048 	inc	sp
+   0BA1 D5                 2049 	push	de
+   0BA2 CDr00s00           2050 	call	_memset
+   0BA5 F1                 2051 	pop	af
+   0BA6 F1                 2052 	pop	af
+   0BA7 33                 2053 	inc	sp
+   0BA8 C1                 2054 	pop	bc
+                           2055 ;user_actions.c:77: memcpy(pTo, pFrom, pFromLen);
+   0BA9 DD 6E 06           2056 	ld	l,6 (ix)
+   0BAC DD 66 07           2057 	ld	h,7 (ix)
+   0BAF DD 5E 04           2058 	ld	e,4 (ix)
+   0BB2 DD 56 05           2059 	ld	d,5 (ix)
+   0BB5 06 00              2060 	ld	b,#0x00
+   0BB7 EB                 2061 	ex	de,hl
+   0BB8 ED B0              2062 	ldir
+                           2063 ;user_actions.c:79: return TRUE;
+   0BBA 2E 01              2064 	ld	l,#0x01
+   0BBC                    2065 00105$:
+   0BBC DD E1              2066 	pop	ix
+   0BBE C9                 2067 	ret
+   0BBF                    2068 _extract_filename_from_buffer_end::
+   0BBF                    2069 __str_20:
+   0BBF 20                 2070 	.ascii " "
+   0BC0 00                 2071 	.db 0x00
+                           2072 ;user_actions.c:84: BOOL do_action_based_on_file_extension(const char* filename)
+                           2073 ;	---------------------------------
+                           2074 ; Function do_action_based_on_file_extension
+                           2075 ; ---------------------------------
+   0BC1                    2076 _do_action_based_on_file_extension_start::
+   0BC1                    2077 _do_action_based_on_file_extension:
+   0BC1 DD E5              2078 	push	ix
+   0BC3 DD 21 00 00        2079 	ld	ix,#0
+   0BC7 DD 39              2080 	add	ix,sp
+   0BC9 21 A9 FF           2081 	ld	hl,#-87
+   0BCC 39                 2082 	add	hl,sp
+   0BCD F9                 2083 	ld	sp,hl
+                           2084 ;user_actions.c:91: const char* p = filename;           // just alias
+   0BCE DD 7E 04           2085 	ld	a,4 (ix)
+   0BD1 DD 77 FB           2086 	ld	-5 (ix),a
+   0BD4 DD 7E 05           2087 	ld	a,5 (ix)
+   0BD7 DD 77 FC           2088 	ld	-4 (ix),a
+                           2089 ;user_actions.c:93: char full_command_str[80] = "";     // big enough string (hm..)
+   0BDA 21 02 00           2090 	ld	hl,#0x0002
+   0BDD 39                 2091 	add	hl,sp
+   0BDE DD 75 A9           2092 	ld	-87 (ix),l
+   0BE1 DD 74 AA           2093 	ld	-86 (ix),h
+   0BE4 36 00              2094 	ld	(hl),#0x00
+                           2095 ;user_actions.c:95: pExt = strstr(p, ".") + 1;
+   0BE6 21r9Cs0C           2096 	ld	hl,#__str_22
+   0BE9 E5                 2097 	push	hl
+   0BEA DD 6E FB           2098 	ld	l,-5 (ix)
+   0BED DD 66 FC           2099 	ld	h,-4 (ix)
+   0BF0 E5                 2100 	push	hl
+   0BF1 CDr00s00           2101 	call	_strstr
+   0BF4 F1                 2102 	pop	af
+   0BF5 F1                 2103 	pop	af
+   0BF6 44                 2104 	ld	b,h
+   0BF7 4D                 2105 	ld	c,l
+   0BF8 21 01 00           2106 	ld	hl,#0x0001
+   0BFB 09                 2107 	add	hl,bc
+   0BFC DD 75 FE           2108 	ld	-2 (ix),l
+   0BFF DD 74 FF           2109 	ld	-1 (ix),h
+                           2110 ;user_actions.c:96: if(strstr(p, ".EXE") != NULL) {
+   0C02 21r9Es0C           2111 	ld	hl,#__str_23
+   0C05 E5                 2112 	push	hl
+   0C06 DD 6E FB           2113 	ld	l,-5 (ix)
+   0C09 DD 66 FC           2114 	ld	h,-4 (ix)
+   0C0C E5                 2115 	push	hl
+   0C0D CDr00s00           2116 	call	_strstr
+   0C10 F1                 2117 	pop	af
+   0C11 F1                 2118 	pop	af
+   0C12 44                 2119 	ld	b,h
+   0C13 7D                 2120 	ld	a,l
+   0C14 B0                 2121 	or	a,b
+   0C15 28 09              2122 	jr	Z,00107$
+                           2123 ;user_actions.c:97: isExecuteCommand = TRUE;
+   0C17 DD 36 FD 01        2124 	ld	-3 (ix),#0x01
+                           2125 ;user_actions.c:98: command = "";
+   0C1B 01r9Bs0C           2126 	ld	bc,#__str_21
+   0C1E 18 37              2127 	jr	00108$
+   0C20                    2128 00107$:
+                           2129 ;user_actions.c:100: if(pExt == NULL || strlen(pExt) == 0) return TRUE;
+   0C20 DD 7E FE           2130 	ld	a,-2 (ix)
+   0C23 DD B6 FF           2131 	or	a,-1 (ix)
+   0C26 28 10              2132 	jr	Z,00101$
+   0C28 DD 6E FE           2133 	ld	l,-2 (ix)
+   0C2B DD 66 FF           2134 	ld	h,-1 (ix)
+   0C2E E5                 2135 	push	hl
+   0C2F CDr00s00           2136 	call	_strlen
+   0C32 F1                 2137 	pop	af
+   0C33 54                 2138 	ld	d,h
+   0C34 7D                 2139 	ld	a,l
+   0C35 B2                 2140 	or	a,d
+   0C36 20 05              2141 	jr	NZ,00102$
+   0C38                    2142 00101$:
+   0C38 2E 01              2143 	ld	l,#0x01
+   0C3A C3r96s0C           2144 	jp	00113$
+   0C3D                    2145 00102$:
+                           2146 ;user_actions.c:101: pAction = get_user_action_based_on_ext(pExt);
+   0C3D DD 6E FE           2147 	ld	l,-2 (ix)
+   0C40 DD 66 FF           2148 	ld	h,-1 (ix)
+   0C43 E5                 2149 	push	hl
+   0C44 CDrBCs09           2150 	call	_get_user_action_based_on_ext
+   0C47 F1                 2151 	pop	af
+   0C48 EB                 2152 	ex	de,hl
+                           2153 ;user_actions.c:102: if(pAction == NULL) return TRUE;
+   0C49 7B                 2154 	ld	a,e
+   0C4A B2                 2155 	or	a,d
+   0C4B 20 04              2156 	jr	NZ,00105$
+   0C4D 2E 01              2157 	ld	l,#0x01
+   0C4F 18 45              2158 	jr	00113$
+   0C51                    2159 00105$:
+                           2160 ;user_actions.c:104: isExecuteCommand = TRUE;
+   0C51 DD 36 FD 01        2161 	ld	-3 (ix),#0x01
+                           2162 ;user_actions.c:105: command = pAction;
+   0C55 4B                 2163 	ld	c,e
+   0C56 42                 2164 	ld	b,d
+   0C57                    2165 00108$:
+                           2166 ;user_actions.c:117: strcat(full_command_str, command);
+   0C57 C5                 2167 	push	bc
+   0C58 DD 6E A9           2168 	ld	l,-87 (ix)
+   0C5B DD 66 AA           2169 	ld	h,-86 (ix)
+   0C5E E5                 2170 	push	hl
+   0C5F CDr00s00           2171 	call	_strcat
+   0C62 F1                 2172 	pop	af
+   0C63 F1                 2173 	pop	af
+                           2174 ;user_actions.c:118: strcat(full_command_str, " ");
+   0C64 21 02 00           2175 	ld	hl,#0x0002
+   0C67 39                 2176 	add	hl,sp
+   0C68 4D                 2177 	ld	c,l
+   0C69 44                 2178 	ld	b,h
+   0C6A 21rA3s0C           2179 	ld	hl,#__str_24
+   0C6D E5                 2180 	push	hl
+   0C6E C5                 2181 	push	bc
+   0C6F CDr00s00           2182 	call	_strcat
+   0C72 F1                 2183 	pop	af
+   0C73 F1                 2184 	pop	af
+                           2185 ;user_actions.c:120: if(isExecuteCommand) {
+   0C74 AF                 2186 	xor	a,a
+   0C75 DD B6 FD           2187 	or	a,-3 (ix)
+   0C78 28 1A              2188 	jr	Z,00112$
+                           2189 ;user_actions.c:121: if(!request_to_exit_and_execute_command_with_filename(full_command_str, p))
+   0C7A DD 6E FB           2190 	ld	l,-5 (ix)
+   0C7D DD 66 FC           2191 	ld	h,-4 (ix)
+   0C80 E5                 2192 	push	hl
+   0C81 DD 6E A9           2193 	ld	l,-87 (ix)
+   0C84 DD 66 AA           2194 	ld	h,-86 (ix)
+   0C87 E5                 2195 	push	hl
+   0C88 CDrA5s0C           2196 	call	_request_to_exit_and_execute_command_with_filename
+   0C8B F1                 2197 	pop	af
+   0C8C F1                 2198 	pop	af
+                           2199 ;user_actions.c:122: return FALSE;
+   0C8D AF                 2200 	xor	a,a
+   0C8E B5                 2201 	or	a,l
+   0C8F 20 03              2202 	jr	NZ,00112$
+   0C91 6F                 2203 	ld	l,a
+   0C92 18 02              2204 	jr	00113$
+   0C94                    2205 00112$:
+                           2206 ;user_actions.c:125: return TRUE;
+   0C94 2E 01              2207 	ld	l,#0x01
+   0C96                    2208 00113$:
+   0C96 DD F9              2209 	ld	sp,ix
+   0C98 DD E1              2210 	pop	ix
+   0C9A C9                 2211 	ret
+   0C9B                    2212 _do_action_based_on_file_extension_end::
+   0C9B                    2213 __str_21:
+   0C9B 00                 2214 	.db 0x00
+   0C9C                    2215 __str_22:
+   0C9C 2E                 2216 	.ascii "."
+   0C9D 00                 2217 	.db 0x00
+   0C9E                    2218 __str_23:
+   0C9E 2E 45 58 45        2219 	.ascii ".EXE"
+   0CA2 00                 2220 	.db 0x00
+   0CA3                    2221 __str_24:
+   0CA3 20                 2222 	.ascii " "
+   0CA4 00                 2223 	.db 0x00
+                           2224 ;user_actions.c:131: BOOL request_to_exit_and_execute_command_with_filename(const char* command, const char* filename)
+                           2225 ;	---------------------------------
+                           2226 ; Function request_to_exit_and_execute_command_with_filename
+                           2227 ; ---------------------------------
+   0CA5                    2228 _request_to_exit_and_execute_command_with_filename_start::
+   0CA5                    2229 _request_to_exit_and_execute_command_with_filename:
+   0CA5 DD E5              2230 	push	ix
+   0CA7 DD 21 00 00        2231 	ld	ix,#0
+   0CAB DD 39              2232 	add	ix,sp
+   0CAD 21 E0 FF           2233 	ld	hl,#-32
+   0CB0 39                 2234 	add	hl,sp
+   0CB1 F9                 2235 	ld	sp,hl
+                           2236 ;user_actions.c:133: char cmd[32] = "";
+   0CB2 21 00 00           2237 	ld	hl,#0x0000
+   0CB5 39                 2238 	add	hl,sp
+   0CB6 4D                 2239 	ld	c,l
+   0CB7 44                 2240 	ld	b,h
+   0CB8 3E 00              2241 	ld	a,#0x00
+   0CBA 02                 2242 	ld	(bc),a
+                           2243 ;user_actions.c:135: if(strlen(filename) > FILENAME_LEN)
+   0CBB C5                 2244 	push	bc
+   0CBC DD 6E 06           2245 	ld	l,6 (ix)
+   0CBF DD 66 07           2246 	ld	h,7 (ix)
+   0CC2 E5                 2247 	push	hl
+   0CC3 CDr00s00           2248 	call	_strlen
+   0CC6 F1                 2249 	pop	af
+   0CC7 EB                 2250 	ex	de,hl
+   0CC8 C1                 2251 	pop	bc
+   0CC9 3E 0C              2252 	ld	a,#0x0C
+   0CCB 93                 2253 	sub	a,e
+   0CCC 3E 00              2254 	ld	a,#0x00
+   0CCE 9A                 2255 	sbc	a,d
+   0CCF F2rD6s0C           2256 	jp	P,00102$
+                           2257 ;user_actions.c:136: return FALSE;
+   0CD2 2E 00              2258 	ld	l,#0x00
+   0CD4 18 2B              2259 	jr	00103$
+   0CD6                    2260 00102$:
+                           2261 ;user_actions.c:139: strcat(cmd, command);
+   0CD6 DD 6E 04           2262 	ld	l,4 (ix)
+   0CD9 DD 66 05           2263 	ld	h,5 (ix)
+   0CDC E5                 2264 	push	hl
+   0CDD C5                 2265 	push	bc
+   0CDE CDr00s00           2266 	call	_strcat
+   0CE1 F1                 2267 	pop	af
+   0CE2 F1                 2268 	pop	af
+                           2269 ;user_actions.c:140: strcat(cmd, filename);
+   0CE3 21 00 00           2270 	ld	hl,#0x0000
+   0CE6 39                 2271 	add	hl,sp
+   0CE7 4D                 2272 	ld	c,l
+   0CE8 44                 2273 	ld	b,h
+   0CE9 DD 6E 06           2274 	ld	l,6 (ix)
+   0CEC DD 66 07           2275 	ld	h,7 (ix)
+   0CEF E5                 2276 	push	hl
+   0CF0 C5                 2277 	push	bc
+   0CF1 CDr00s00           2278 	call	_strcat
+   0CF4 F1                 2279 	pop	af
+   0CF5 F1                 2280 	pop	af
+                           2281 ;user_actions.c:141: RequestToExitAndExecuteCommandString(cmd);
+   0CF6 21 00 00           2282 	ld	hl,#0x0000
+   0CF9 39                 2283 	add	hl,sp
+   0CFA E5                 2284 	push	hl
+   0CFB CDr19s01           2285 	call	_RequestToExitAndExecuteCommandString
+   0CFE F1                 2286 	pop	af
+                           2287 ;user_actions.c:143: return TRUE;
+   0CFF 2E 01              2288 	ld	l,#0x01
+   0D01                    2289 00103$:
+   0D01 DD F9              2290 	ld	sp,ix
+   0D03 DD E1              2291 	pop	ix
+   0D05 C9                 2292 	ret
+   0D06                    2293 _request_to_exit_and_execute_command_with_filename_end::
+                           2294 ;user_actions.c:147: BOOL f4_pressed(void)
+                           2295 ;	---------------------------------
+                           2296 ; Function f4_pressed
+                           2297 ; ---------------------------------
+   0D06                    2298 _f4_pressed_start::
+   0D06                    2299 _f4_pressed:
+                           2300 ;user_actions.c:149: const char *p = GetFilenameOfSelectedItem(&lview);
+   0D06 21r3As05           2301 	ld	hl,#_lview
+   0D09 E5                 2302 	push	hl
+   0D0A CDr78s0D           2303 	call	_GetFilenameOfSelectedItem
+   0D0D F1                 2304 	pop	af
+   0D0E 44                 2305 	ld	b,h
+   0D0F 4D                 2306 	ld	c,l
+                           2307 ;user_actions.c:150: if(!p) return FALSE;
+   0D10 79                 2308 	ld	a,c
+   0D11 B0                 2309 	or	a,b
+   0D12 20 02              2310 	jr	NZ,00102$
+   0D14 6F                 2311 	ld	l,a
+   0D15 C9                 2312 	ret
+   0D16                    2313 00102$:
+                           2314 ;user_actions.c:154: if(IsSelectedItem_DIR(&lview))
+   0D16 C5                 2315 	push	bc
+   0D17 21r3As05           2316 	ld	hl,#_lview
+   0D1A E5                 2317 	push	hl
+   0D1B CDr45s0D           2318 	call	_IsSelectedItem_DIR
+   0D1E F1                 2319 	pop	af
+   0D1F 5D                 2320 	ld	e,l
+   0D20 C1                 2321 	pop	bc
+   0D21 AF                 2322 	xor	a,a
+   0D22 B3                 2323 	or	a,e
+   0D23 28 03              2324 	jr	Z,00104$
+                           2325 ;user_actions.c:155: return TRUE;
+   0D25 2E 01              2326 	ld	l,#0x01
+   0D27 C9                 2327 	ret
+   0D28                    2328 00104$:
+                           2329 ;user_actions.c:157: if(!request_to_exit_and_execute_command_with_filename("TEXTEDIT ", p))
+   0D28 C5                 2330 	push	bc
+   0D29 21r3Bs0D           2331 	ld	hl,#__str_26
+   0D2C E5                 2332 	push	hl
+   0D2D CDrA5s0C           2333 	call	_request_to_exit_and_execute_command_with_filename
+   0D30 F1                 2334 	pop	af
+   0D31 F1                 2335 	pop	af
+                           2336 ;user_actions.c:158: return FALSE;
+   0D32 AF                 2337 	xor	a,a
+   0D33 B5                 2338 	or	a,l
+   0D34 20 02              2339 	jr	NZ,00106$
+   0D36 6F                 2340 	ld	l,a
+   0D37 C9                 2341 	ret
+   0D38                    2342 00106$:
+                           2343 ;user_actions.c:161: return TRUE;
+   0D38 2E 01              2344 	ld	l,#0x01
+   0D3A C9                 2345 	ret
+   0D3B                    2346 _f4_pressed_end::
+   0D3B                    2347 __str_26:
+   0D3B 54 45 58 54 45 44  2348 	.ascii "TEXTEDIT "
+        49 54 20
+   0D44 00                 2349 	.db 0x00
+                           2350 ;user_actions.c:165: BOOL IsSelectedItem_DIR(ListView* pLview)
+                           2351 ;	---------------------------------
+                           2352 ; Function IsSelectedItem_DIR
+                           2353 ; ---------------------------------
+   0D45                    2354 _IsSelectedItem_DIR_start::
+   0D45                    2355 _IsSelectedItem_DIR:
+   0D45 DD E5              2356 	push	ix
+   0D47 DD 21 00 00        2357 	ld	ix,#0
+   0D4B DD 39              2358 	add	ix,sp
+                           2359 ;user_actions.c:167: char *p = ListView_GetSelectedItem(pLview);
+   0D4D DD 6E 04           2360 	ld	l,4 (ix)
+   0D50 DD 66 05           2361 	ld	h,5 (ix)
+   0D53 E5                 2362 	push	hl
+   0D54 CDr33s06           2363 	call	_ListView_GetSelectedItem
+   0D57 F1                 2364 	pop	af
+   0D58 44                 2365 	ld	b,h
+   0D59 4D                 2366 	ld	c,l
+                           2367 ;user_actions.c:169: if(strstr(p, "[DIR]") != NULL)
+   0D5A 21r72s0D           2368 	ld	hl,#__str_27
+   0D5D E5                 2369 	push	hl
+   0D5E C5                 2370 	push	bc
+   0D5F CDr00s00           2371 	call	_strstr
+   0D62 F1                 2372 	pop	af
+   0D63 F1                 2373 	pop	af
+   0D64 44                 2374 	ld	b,h
+   0D65 7D                 2375 	ld	a,l
+   0D66 B0                 2376 	or	a,b
+   0D67 28 04              2377 	jr	Z,00102$
+                           2378 ;user_actions.c:170: return TRUE;
+   0D69 2E 01              2379 	ld	l,#0x01
+   0D6B 18 02              2380 	jr	00104$
+   0D6D                    2381 00102$:
+                           2382 ;user_actions.c:172: return FALSE;
+   0D6D 2E 00              2383 	ld	l,#0x00
+   0D6F                    2384 00104$:
+   0D6F DD E1              2385 	pop	ix
+   0D71 C9                 2386 	ret
+   0D72                    2387 _IsSelectedItem_DIR_end::
+   0D72                    2388 __str_27:
+   0D72 5B 44 49 52 5D     2389 	.ascii "[DIR]"
+   0D77 00                 2390 	.db 0x00
+                           2391 ;user_actions.c:182: const char* GetFilenameOfSelectedItem(ListView* pLview)
+                           2392 ;	---------------------------------
+                           2393 ; Function GetFilenameOfSelectedItem
+                           2394 ; ---------------------------------
+   0D78                    2395 _GetFilenameOfSelectedItem_start::
+   0D78                    2396 _GetFilenameOfSelectedItem:
+   0D78 DD E5              2397 	push	ix
+   0D7A DD 21 00 00        2398 	ld	ix,#0
+   0D7E DD 39              2399 	add	ix,sp
+                           2400 ;user_actions.c:187: char *p = ListView_GetSelectedItem(pLview);
+   0D80 DD 6E 04           2401 	ld	l,4 (ix)
+   0D83 DD 66 05           2402 	ld	h,5 (ix)
+   0D86 E5                 2403 	push	hl
+   0D87 CDr33s06           2404 	call	_ListView_GetSelectedItem
+   0D8A F1                 2405 	pop	af
+   0D8B 44                 2406 	ld	b,h
+   0D8C 4D                 2407 	ld	c,l
+                           2408 ;user_actions.c:192: if(!extract_filename_from_buffer(p, filename))
+   0D8D 21r48s05           2409 	ld	hl,#_GetFilenameOfSelectedItem_filename_1_1
+   0D90 E5                 2410 	push	hl
+   0D91 C5                 2411 	push	bc
+   0D92 CDr5Ds0B           2412 	call	_extract_filename_from_buffer
+   0D95 F1                 2413 	pop	af
+   0D96 F1                 2414 	pop	af
+   0D97 AF                 2415 	xor	a,a
+   0D98 B5                 2416 	or	a,l
+   0D99 20 05              2417 	jr	NZ,00102$
+                           2418 ;user_actions.c:193: return NULL;
+   0D9B 21 00 00           2419 	ld	hl,#0x0000
+   0D9E 18 03              2420 	jr	00103$
+   0DA0                    2421 00102$:
+                           2422 ;user_actions.c:195: return filename;
+   0DA0 21r48s05           2423 	ld	hl,#_GetFilenameOfSelectedItem_filename_1_1
+   0DA3                    2424 00103$:
+   0DA3 DD E1              2425 	pop	ix
+   0DA5 C9                 2426 	ret
+   0DA6                    2427 _GetFilenameOfSelectedItem_end::
+                           2428 ;user_actions.c:199: void print_box(byte x, byte y, byte w, byte h)
+                           2429 ;	---------------------------------
+                           2430 ; Function print_box
+                           2431 ; ---------------------------------
+   0DA6                    2432 _print_box_start::
+   0DA6                    2433 _print_box:
+   0DA6 DD E5              2434 	push	ix
+   0DA8 DD 21 00 00        2435 	ld	ix,#0
+   0DAC DD 39              2436 	add	ix,sp
+   0DAE F5                 2437 	push	af
+                           2438 ;user_actions.c:203: for(i=0; i<h; i++) {
+   0DAF DD 36 FF 00        2439 	ld	-1 (ix),#0x00
+   0DB3                    2440 00105$:
+   0DB3 DD 7E FF           2441 	ld	a,-1 (ix)
+   0DB6 DD 96 07           2442 	sub	a,7 (ix)
+   0DB9 D2r4Es0E           2443 	jp	NC,00121$
+                           2444 ;user_actions.c:204: FLOS_SetCursorPos(x, y+i); 
+   0DBC DD 7E 05           2445 	ld	a,5 (ix)
+   0DBF DD 86 FF           2446 	add	a,-1 (ix)
+   0DC2 47                 2447 	ld	b,a
+   0DC3 C5                 2448 	push	bc
+   0DC4 33                 2449 	inc	sp
+   0DC5 DD 7E 04           2450 	ld	a,4 (ix)
+   0DC8 F5                 2451 	push	af
+   0DC9 33                 2452 	inc	sp
+   0DCA CDr00s00           2453 	call	_FLOS_SetCursorPos
+   0DCD F1                 2454 	pop	af
+                           2455 ;user_actions.c:205: if(i == 0)   { for(j=0; j<w; j++) FLOS_PrintString("-"); continue; }
+   0DCE AF                 2456 	xor	a,a
+   0DCF DD B6 FF           2457 	or	a,-1 (ix)
+   0DD2 20 16              2458 	jr	NZ,00102$
+   0DD4 06 00              2459 	ld	b,#0x00
+   0DD6                    2460 00109$:
+   0DD6 78                 2461 	ld	a,b
+   0DD7 DD 96 06           2462 	sub	a,6 (ix)
+   0DDA D2r48s0E           2463 	jp	NC,00107$
+   0DDD C5                 2464 	push	bc
+   0DDE 21r53s0E           2465 	ld	hl,#__str_28
+   0DE1 E5                 2466 	push	hl
+   0DE2 CDr00s00           2467 	call	_FLOS_PrintString
+   0DE5 F1                 2468 	pop	af
+   0DE6 C1                 2469 	pop	bc
+   0DE7 04                 2470 	inc	b
+   0DE8 18 EC              2471 	jr	00109$
+   0DEA                    2472 00102$:
+                           2473 ;user_actions.c:206: if(i == h-1) { for(j=0; j<w; j++) FLOS_PrintString("-"); continue; }
+   0DEA DD 5E 07           2474 	ld	e,7 (ix)
+   0DED 16 00              2475 	ld	d,#0x00
+   0DEF 1B                 2476 	dec	de
+   0DF0 DD 4E FF           2477 	ld	c,-1 (ix)
+   0DF3 06 00              2478 	ld	b,#0x00
+   0DF5 79                 2479 	ld	a,c
+   0DF6 93                 2480 	sub	e
+   0DF7 20 04              2481 	jr	NZ,00137$
+   0DF9 78                 2482 	ld	a,b
+   0DFA 92                 2483 	sub	d
+   0DFB 28 02              2484 	jr	Z,00138$
+   0DFD                    2485 00137$:
+   0DFD 18 15              2486 	jr	00104$
+   0DFF                    2487 00138$:
+   0DFF 0E 00              2488 	ld	c,#0x00
+   0E01                    2489 00113$:
+   0E01 79                 2490 	ld	a,c
+   0E02 DD 96 06           2491 	sub	a,6 (ix)
+   0E05 30 41              2492 	jr	NC,00107$
+   0E07 C5                 2493 	push	bc
+   0E08 21r53s0E           2494 	ld	hl,#__str_28
+   0E0B E5                 2495 	push	hl
+   0E0C CDr00s00           2496 	call	_FLOS_PrintString
+   0E0F F1                 2497 	pop	af
+   0E10 C1                 2498 	pop	bc
+   0E11 0C                 2499 	inc	c
+   0E12 18 ED              2500 	jr	00113$
+   0E14                    2501 00104$:
+                           2502 ;user_actions.c:207: FLOS_PrintString("+"); for(j=0; j<w-2; j++) FLOS_PrintString(" "); FLOS_PrintString("+");
+   0E14 21r55s0E           2503 	ld	hl,#__str_29
+   0E17 E5                 2504 	push	hl
+   0E18 CDr00s00           2505 	call	_FLOS_PrintString
+   0E1B F1                 2506 	pop	af
+   0E1C DD 36 FE 00        2507 	ld	-2 (ix),#0x00
+   0E20                    2508 00117$:
+   0E20 DD 5E 06           2509 	ld	e,6 (ix)
+   0E23 16 00              2510 	ld	d,#0x00
+   0E25 1B                 2511 	dec	de
+   0E26 1B                 2512 	dec	de
+   0E27 DD 4E FE           2513 	ld	c,-2 (ix)
+   0E2A 06 00              2514 	ld	b,#0x00
+   0E2C 79                 2515 	ld	a,c
+   0E2D 93                 2516 	sub	a,e
+   0E2E 78                 2517 	ld	a,b
+   0E2F 9A                 2518 	sbc	a,d
+   0E30 F2r40s0E           2519 	jp	P,00120$
+   0E33 21r57s0E           2520 	ld	hl,#__str_30
+   0E36 E5                 2521 	push	hl
+   0E37 CDr00s00           2522 	call	_FLOS_PrintString
+   0E3A F1                 2523 	pop	af
+   0E3B DD 34 FE           2524 	inc	-2 (ix)
+   0E3E 18 E0              2525 	jr	00117$
+   0E40                    2526 00120$:
+   0E40 21r55s0E           2527 	ld	hl,#__str_29
+   0E43 E5                 2528 	push	hl
+   0E44 CDr00s00           2529 	call	_FLOS_PrintString
+   0E47 F1                 2530 	pop	af
+   0E48                    2531 00107$:
+                           2532 ;user_actions.c:203: for(i=0; i<h; i++) {
+   0E48 DD 34 FF           2533 	inc	-1 (ix)
+   0E4B C3rB3s0D           2534 	jp	00105$
+   0E4E                    2535 00121$:
+   0E4E DD F9              2536 	ld	sp,ix
+   0E50 DD E1              2537 	pop	ix
+   0E52 C9                 2538 	ret
+   0E53                    2539 _print_box_end::
+   0E53                    2540 __str_28:
+   0E53 2D                 2541 	.ascii "-"
+   0E54 00                 2542 	.db 0x00
+   0E55                    2543 __str_29:
+   0E55 2B                 2544 	.ascii "+"
+   0E56 00                 2545 	.db 0x00
+   0E57                    2546 __str_30:
+   0E57 20                 2547 	.ascii " "
+   0E58 00                 2548 	.db 0x00
+                           2549 ;user_actions.c:213: BOOL delete_dir_entry(void)
+                           2550 ;	---------------------------------
+                           2551 ; Function delete_dir_entry
+                           2552 ; ---------------------------------
+   0E59                    2553 _delete_dir_entry_start::
+   0E59                    2554 _delete_dir_entry:
+   0E59 DD E5              2555 	push	ix
+   0E5B DD 21 00 00        2556 	ld	ix,#0
+   0E5F DD 39              2557 	add	ix,sp
+   0E61 21 FA FF           2558 	ld	hl,#-6
+   0E64 39                 2559 	add	hl,sp
+   0E65 F9                 2560 	ld	sp,hl
+                           2561 ;user_actions.c:215: BOOL r = TRUE;
+   0E66 DD 36 FB 01        2562 	ld	-5 (ix),#0x01
+                           2563 ;user_actions.c:218: const char *p = GetFilenameOfSelectedItem(&lview);
+   0E6A 21r3As05           2564 	ld	hl,#_lview
+   0E6D E5                 2565 	push	hl
+   0E6E CDr78s0D           2566 	call	_GetFilenameOfSelectedItem
+   0E71 F1                 2567 	pop	af
+   0E72 54                 2568 	ld	d,h
+   0E73 DD 75 FC           2569 	ld	-4 (ix),l
+   0E76 DD 72 FD           2570 	ld	-3 (ix),d
+                           2571 ;user_actions.c:219: if(!p) return FALSE;
+   0E79 DD 7E FC           2572 	ld	a,-4 (ix)
+   0E7C DD B6 FD           2573 	or	a,-3 (ix)
+   0E7F 20 05              2574 	jr	NZ,00102$
+   0E81 2E 00              2575 	ld	l,#0x00
+   0E83 C3r56s0F           2576 	jp	00111$
+   0E86                    2577 00102$:
+                           2578 ;user_actions.c:221: if(strstr(p, "..") != NULL)
+   0E86 21r5Bs0F           2579 	ld	hl,#__str_31
+   0E89 E5                 2580 	push	hl
+   0E8A DD 6E FC           2581 	ld	l,-4 (ix)
+   0E8D DD 66 FD           2582 	ld	h,-3 (ix)
+   0E90 E5                 2583 	push	hl
+   0E91 CDr00s00           2584 	call	_strstr
+   0E94 F1                 2585 	pop	af
+   0E95 F1                 2586 	pop	af
+   0E96 5C                 2587 	ld	e,h
+   0E97 7D                 2588 	ld	a,l
+   0E98 B3                 2589 	or	a,e
+   0E99 28 05              2590 	jr	Z,00104$
+                           2591 ;user_actions.c:222: return TRUE;
+   0E9B 2E 01              2592 	ld	l,#0x01
+   0E9D C3r56s0F           2593 	jp	00111$
+   0EA0                    2594 00104$:
+                           2595 ;user_actions.c:226: print_box(x, y, 20, 4+2);
+   0EA0 21 14 06           2596 	ld	hl,#0x0614
+   0EA3 E5                 2597 	push	hl
+   0EA4 21 01 01           2598 	ld	hl,#0x0101
+   0EA7 E5                 2599 	push	hl
+   0EA8 CDrA6s0D           2600 	call	_print_box
+   0EAB F1                 2601 	pop	af
+   0EAC F1                 2602 	pop	af
+                           2603 ;user_actions.c:227: FLOS_SetCursorPos(x+2, y+1);  FLOS_PrintString("Delete "); 
+   0EAD 21 03 02           2604 	ld	hl,#0x0203
+   0EB0 E5                 2605 	push	hl
+   0EB1 CDr00s00           2606 	call	_FLOS_SetCursorPos
+   0EB4 F1                 2607 	pop	af
+   0EB5 21r5Es0F           2608 	ld	hl,#__str_32
+   0EB8 E5                 2609 	push	hl
+   0EB9 CDr00s00           2610 	call	_FLOS_PrintString
+   0EBC F1                 2611 	pop	af
+                           2612 ;user_actions.c:228: FLOS_SetCursorPos(x+2, y+2);  FLOS_PrintString(p); 
+   0EBD 21 03 03           2613 	ld	hl,#0x0303
+   0EC0 E5                 2614 	push	hl
+   0EC1 CDr00s00           2615 	call	_FLOS_SetCursorPos
+   0EC4 F1                 2616 	pop	af
+   0EC5 DD 6E FC           2617 	ld	l,-4 (ix)
+   0EC8 DD 66 FD           2618 	ld	h,-3 (ix)
+   0ECB E5                 2619 	push	hl
+   0ECC CDr00s00           2620 	call	_FLOS_PrintString
+   0ECF F1                 2621 	pop	af
+                           2622 ;user_actions.c:229: FLOS_SetCursorPos(x+2, y+3);
+   0ED0 21 03 04           2623 	ld	hl,#0x0403
+   0ED3 E5                 2624 	push	hl
+   0ED4 CDr00s00           2625 	call	_FLOS_SetCursorPos
+   0ED7 F1                 2626 	pop	af
+                           2627 ;user_actions.c:230: FLOS_PrintString("Y/N ?"); 
+   0ED8 21r66s0F           2628 	ld	hl,#__str_33
+   0EDB E5                 2629 	push	hl
+   0EDC CDr00s00           2630 	call	_FLOS_PrintString
+   0EDF F1                 2631 	pop	af
+                           2632 ;user_actions.c:232: FLOS_WaitKeyPress(&asciicode, &scancode);
+   0EE0 21 04 00           2633 	ld	hl,#0x0004
+   0EE3 39                 2634 	add	hl,sp
+   0EE4 EB                 2635 	ex	de,hl
+   0EE5 21 05 00           2636 	ld	hl,#0x0005
+   0EE8 39                 2637 	add	hl,sp
+   0EE9 4D                 2638 	ld	c,l
+   0EEA 44                 2639 	ld	b,h
+   0EEB D5                 2640 	push	de
+   0EEC C5                 2641 	push	bc
+   0EED CDr00s00           2642 	call	_FLOS_WaitKeyPress
+   0EF0 F1                 2643 	pop	af
+   0EF1 F1                 2644 	pop	af
+                           2645 ;user_actions.c:233: if(scancode == SC_Y) {
+   0EF2 DD 7E FE           2646 	ld	a,-2 (ix)
+   0EF5 D6 35              2647 	sub	a,#0x35
+   0EF7 20 2F              2648 	jr	NZ,00109$
+                           2649 ;user_actions.c:236: if(IsSelectedItem_DIR(&lview))
+   0EF9 21r3As05           2650 	ld	hl,#_lview
+   0EFC E5                 2651 	push	hl
+   0EFD CDr45s0D           2652 	call	_IsSelectedItem_DIR
+   0F00 F1                 2653 	pop	af
+   0F01 AF                 2654 	xor	a,a
+   0F02 B5                 2655 	or	a,l
+   0F03 28 10              2656 	jr	Z,00106$
+                           2657 ;user_actions.c:237: r = FLOS_DeleteDir(p);
+   0F05 DD 6E FC           2658 	ld	l,-4 (ix)
+   0F08 DD 66 FD           2659 	ld	h,-3 (ix)
+   0F0B E5                 2660 	push	hl
+   0F0C CDr00s00           2661 	call	_FLOS_DeleteDir
+   0F0F F1                 2662 	pop	af
+   0F10 DD 75 FB           2663 	ld	-5 (ix),l
+   0F13 18 0E              2664 	jr	00107$
+   0F15                    2665 00106$:
+                           2666 ;user_actions.c:239: r = FLOS_EraseFile(p);
+   0F15 DD 6E FC           2667 	ld	l,-4 (ix)
+   0F18 DD 66 FD           2668 	ld	h,-3 (ix)
+   0F1B E5                 2669 	push	hl
+   0F1C CDr00s00           2670 	call	_FLOS_EraseFile
+   0F1F F1                 2671 	pop	af
+   0F20 DD 75 FB           2672 	ld	-5 (ix),l
+   0F23                    2673 00107$:
+                           2674 ;user_actions.c:241: fill_ListView_by_entries_from_current_dir();
+   0F23 CDr2Ds10           2675 	call	_fill_ListView_by_entries_from_current_dir
+   0F26 18 23              2676 	jr	00110$
+   0F28                    2677 00109$:
+                           2678 ;user_actions.c:244: clear_area(lview.x, lview.y, lview.width, lview.height);     
+   0F28 21r43s05           2679 	ld	hl,#_lview + 9
+   0F2B 4E                 2680 	ld	c,(hl)
+   0F2C 11r42s05           2681 	ld	de,#_lview + 8
+   0F2F 1A                 2682 	ld	a,(de)
+   0F30 47                 2683 	ld	b,a
+   0F31 11r41s05           2684 	ld	de,#_lview + 7
+   0F34 1A                 2685 	ld	a,(de)
+   0F35 DD 77 FA           2686 	ld	-6 (ix),a
+   0F38 21r40s05           2687 	ld	hl,#_lview + 6
+   0F3B 5E                 2688 	ld	e,(hl)
+   0F3C 79                 2689 	ld	a,c
+   0F3D F5                 2690 	push	af
+   0F3E 33                 2691 	inc	sp
+   0F3F C5                 2692 	push	bc
+   0F40 33                 2693 	inc	sp
+   0F41 DD 7E FA           2694 	ld	a,-6 (ix)
+   0F44 57                 2695 	ld	d,a
+   0F45 D5                 2696 	push	de
+   0F46 CDr6Bs12           2697 	call	_clear_area
+   0F49 F1                 2698 	pop	af
+   0F4A F1                 2699 	pop	af
+   0F4B                    2700 00110$:
+                           2701 ;user_actions.c:248: ListView_Update(&lview);
+   0F4B 21r3As05           2702 	ld	hl,#_lview
+   0F4E E5                 2703 	push	hl
+   0F4F CDr4Cs03           2704 	call	_ListView_Update
+   0F52 F1                 2705 	pop	af
+                           2706 ;user_actions.c:250: return r;
+   0F53 DD 6E FB           2707 	ld	l,-5 (ix)
+   0F56                    2708 00111$:
+   0F56 DD F9              2709 	ld	sp,ix
+   0F58 DD E1              2710 	pop	ix
+   0F5A C9                 2711 	ret
+   0F5B                    2712 _delete_dir_entry_end::
+   0F5B                    2713 __str_31:
+   0F5B 2E 2E              2714 	.ascii ".."
+   0F5D 00                 2715 	.db 0x00
+   0F5E                    2716 __str_32:
+   0F5E 44 65 6C 65 74 65  2717 	.ascii "Delete "
+        20
+   0F65 00                 2718 	.db 0x00
+   0F66                    2719 __str_33:
+   0F66 59 2F 4E 20 3F     2720 	.ascii "Y/N ?"
+   0F6B 00                 2721 	.db 0x00
+                           2722 ;fs_walk.c:74: int main (void)
+                           2723 ;	---------------------------------
+                           2724 ; Function main
+                           2725 ; ---------------------------------
+   0F6C                    2726 _main_start::
+   0F6C                    2727 _main:
+                           2728 ;fs_walk.c:79: if(!check_OS_version()) {
+   0F6C CDrF3s12           2729 	call	_check_OS_version
+   0F6F AF                 2730 	xor	a,a
+   0F70 B5                 2731 	or	a,l
+   0F71 20 2E              2732 	jr	NZ,00102$
+                           2733 ;fs_walk.c:80: FLOS_PrintString("FLOS v");
+   0F73 21rEFs0F           2734 	ld	hl,#__str_34
+   0F76 E5                 2735 	push	hl
+   0F77 CDr00s00           2736 	call	_FLOS_PrintString
+   0F7A F1                 2737 	pop	af
+                           2738 ;fs_walk.c:81: _uitoa(OS_VERSION_REQ, buffer, 16);
+   0F7B 3E 10              2739 	ld	a,#0x10
+   0F7D F5                 2740 	push	af
+   0F7E 33                 2741 	inc	sp
+   0F7F 21r09s00           2742 	ld	hl,#_buffer
+   0F82 E5                 2743 	push	hl
+   0F83 21 60 05           2744 	ld	hl,#0x0560
+   0F86 E5                 2745 	push	hl
+   0F87 CDr00s00           2746 	call	__uitoa
+   0F8A F1                 2747 	pop	af
+   0F8B F1                 2748 	pop	af
+   0F8C 33                 2749 	inc	sp
+                           2750 ;fs_walk.c:82: FLOS_PrintString(buffer);
+   0F8D 21r09s00           2751 	ld	hl,#_buffer
+   0F90 E5                 2752 	push	hl
+   0F91 CDr00s00           2753 	call	_FLOS_PrintString
+   0F94 F1                 2754 	pop	af
+                           2755 ;fs_walk.c:83: FLOS_PrintStringLFCR("+ req. to run this program");
+   0F95 21rF6s0F           2756 	ld	hl,#__str_35
+   0F98 E5                 2757 	push	hl
+   0F99 CDr00s00           2758 	call	_FLOS_PrintStringLFCR
+   0F9C F1                 2759 	pop	af
+                           2760 ;fs_walk.c:84: return NO_REBOOT;
+   0F9D 21 00 00           2761 	ld	hl,#0x0000
+   0FA0 C9                 2762 	ret
+   0FA1                    2763 00102$:
+                           2764 ;fs_walk.c:87: FLOS_StoreDirPosition();
+   0FA1 CDr00s00           2765 	call	_FLOS_StoreDirPosition
+                           2766 ;fs_walk.c:88: if(!load_config_file()) {
+   0FA4 CDr38s0A           2767 	call	_load_config_file
+   0FA7 AF                 2768 	xor	a,a
+   0FA8 B5                 2769 	or	a,l
+   0FA9 20 0C              2770 	jr	NZ,00104$
+                           2771 ;fs_walk.c:89: FLOS_PrintStringLFCR("Failed to load config file.");
+   0FAB 21r11s10           2772 	ld	hl,#__str_36
+   0FAE E5                 2773 	push	hl
+   0FAF CDr00s00           2774 	call	_FLOS_PrintStringLFCR
+   0FB2 F1                 2775 	pop	af
+                           2776 ;fs_walk.c:90: return NO_REBOOT;
+   0FB3 21 00 00           2777 	ld	hl,#0x0000
+   0FB6 C9                 2778 	ret
+   0FB7                    2779 00104$:
+                           2780 ;fs_walk.c:92: FLOS_RestoreDirPosition();
+   0FB7 CDr00s00           2781 	call	_FLOS_RestoreDirPosition
+                           2782 ;fs_walk.c:95: MarkFrameTime(0x00f);
+   0FBA 21 0F 00           2783 	ld	hl,#0x000F
+   0FBD E5                 2784 	push	hl
+   0FBE CDr00s00           2785 	call	_MarkFrameTime
+   0FC1 F1                 2786 	pop	af
+                           2787 ;fs_walk.c:96: FLOS_ClearScreen();
+   0FC2 CDr00s00           2788 	call	_FLOS_ClearScreen
+                           2789 ;fs_walk.c:97: clear_keyboard_buffer();
+   0FC5 CDr25s13           2790 	call	_clear_keyboard_buffer
+                           2791 ;fs_walk.c:107: lview.width = 24; lview.height = 23;
+   0FC8 3E 18              2792 	ld	a,#0x18
+   0FCA 32r42s05           2793 	ld	(#_lview + 8),a
+   0FCD 3E 17              2794 	ld	a,#0x17
+   0FCF 32r43s05           2795 	ld	(#_lview + 9),a
+                           2796 ;fs_walk.c:108: lview.x = 1;      lview.y = 1;
+   0FD2 3E 01              2797 	ld	a,#0x01
+   0FD4 32r40s05           2798 	ld	(#_lview + 6),a
+   0FD7 32r41s05           2799 	ld	(#_lview + 7),a
+                           2800 ;fs_walk.c:113: fill_ListView_by_entries_from_current_dir();
+   0FDA CDr2Ds10           2801 	call	_fill_ListView_by_entries_from_current_dir
+                           2802 ;fs_walk.c:114: main_loop();
+   0FDD CDrC5s10           2803 	call	_main_loop
+                           2804 ;fs_walk.c:123: if(request_spawn_command)
+   0FE0 AF                 2805 	xor	a,a
+   0FE1 21r01s00           2806 	ld	hl,#_request_spawn_command + 0
+   0FE4 B6                 2807 	or	a,(hl)
+   0FE5 28 04              2808 	jr	Z,00106$
+                           2809 ;fs_walk.c:124: return SPAWN_COMMAND;
+   0FE7 21 FE 00           2810 	ld	hl,#0x00FE
+   0FEA C9                 2811 	ret
+   0FEB                    2812 00106$:
+                           2813 ;fs_walk.c:126: return NO_REBOOT;
+   0FEB 21 00 00           2814 	ld	hl,#0x0000
+   0FEE C9                 2815 	ret
+   0FEF                    2816 _main_end::
+   0FEF                    2817 __str_34:
+   0FEF 46 4C 4F 53 20 76  2818 	.ascii "FLOS v"
+   0FF5 00                 2819 	.db 0x00
+   0FF6                    2820 __str_35:
+   0FF6 2B 20 72 65 71 2E  2821 	.ascii "+ req. to run this program"
+        20 74 6F 20 72 75
+        6E 20 74 68 69 73
+        20 70 72 6F 67 72
+        61 6D
+   1010 00                 2822 	.db 0x00
+   1011                    2823 __str_36:
+   1011 46 61 69 6C 65 64  2824 	.ascii "Failed to load config file."
+        20 74 6F 20 6C 6F
+        61 64 20 63 6F 6E
+        66 69 67 20 66 69
+        6C 65 2E
+   102C 00                 2825 	.db 0x00
+                           2826 ;fs_walk.c:130: void fill_ListView_by_entries_from_current_dir(void)
+                           2827 ;	---------------------------------
+                           2828 ; Function fill_ListView_by_entries_from_current_dir
+                           2829 ; ---------------------------------
+   102D                    2830 _fill_ListView_by_entries_from_current_dir_start::
+   102D                    2831 _fill_ListView_by_entries_from_current_dir:
+   102D DD E5              2832 	push	ix
+   102F DD 21 00 00        2833 	ld	ix,#0
+   1033 DD 39              2834 	add	ix,sp
+   1035 3B                 2835 	dec	sp
+                           2836 ;fs_walk.c:135: clear_area(lview.x, lview.y, lview.width, lview.height);
+   1036 21r43s05           2837 	ld	hl,#_lview + 9
+   1039 4E                 2838 	ld	c,(hl)
+   103A 11r42s05           2839 	ld	de,#_lview + 8
+   103D 1A                 2840 	ld	a,(de)
+   103E 47                 2841 	ld	b,a
+   103F 11r41s05           2842 	ld	de,#_lview + 7
+   1042 1A                 2843 	ld	a,(de)
+   1043 DD 77 FF           2844 	ld	-1 (ix),a
+   1046 21r40s05           2845 	ld	hl,#_lview + 6
+   1049 5E                 2846 	ld	e,(hl)
+   104A 79                 2847 	ld	a,c
+   104B F5                 2848 	push	af
+   104C 33                 2849 	inc	sp
+   104D C5                 2850 	push	bc
+   104E 33                 2851 	inc	sp
+   104F DD 7E FF           2852 	ld	a,-1 (ix)
+   1052 57                 2853 	ld	d,a
+   1053 D5                 2854 	push	de
+   1054 CDr6Bs12           2855 	call	_clear_area
+   1057 F1                 2856 	pop	af
+   1058 F1                 2857 	pop	af
+                           2858 ;fs_walk.c:137: clear_area(lview.x, lview.y + lview.height, lview.width, 1);
+   1059 21r42s05           2859 	ld	hl,#_lview + 8
+   105C 4E                 2860 	ld	c,(hl)
+   105D 11r41s05           2861 	ld	de,#_lview + 7
+   1060 1A                 2862 	ld	a,(de)
+   1061 47                 2863 	ld	b,a
+   1062 21r43s05           2864 	ld	hl,#_lview + 9
+   1065 5E                 2865 	ld	e,(hl)
+   1066 78                 2866 	ld	a,b
+   1067 83                 2867 	add	a,e
+   1068 47                 2868 	ld	b,a
+   1069 21r40s05           2869 	ld	hl,#_lview + 6
+   106C 5E                 2870 	ld	e,(hl)
+   106D 3E 01              2871 	ld	a,#0x01
+   106F F5                 2872 	push	af
+   1070 33                 2873 	inc	sp
+   1071 79                 2874 	ld	a,c
+   1072 F5                 2875 	push	af
+   1073 33                 2876 	inc	sp
+   1074 C5                 2877 	push	bc
+   1075 33                 2878 	inc	sp
+   1076 7B                 2879 	ld	a,e
+   1077 F5                 2880 	push	af
+   1078 33                 2881 	inc	sp
+   1079 CDr6Bs12           2882 	call	_clear_area
+   107C F1                 2883 	pop	af
+   107D F1                 2884 	pop	af
+                           2885 ;fs_walk.c:140: tmp1[0] = 0;
+   107E ED 4Br32s00        2886 	ld	bc,(_tmp1)
+   1082 3E 00              2887 	ld	a,#0x00
+   1084 02                 2888 	ld	(bc),a
+                           2889 ;fs_walk.c:142: numStrings = do_dir();
+   1085 CDr44s01           2890 	call	_do_dir
+   1088 44                 2891 	ld	b,h
+   1089 4D                 2892 	ld	c,l
+   108A 21r34s00           2893 	ld	hl,#_numStrings + 0
+   108D 71                 2894 	ld	(hl), c
+   108E 21r35s00           2895 	ld	hl,#_numStrings + 1
+   1091 70                 2896 	ld	(hl), b
+                           2897 ;fs_walk.c:143: mybuf = tmp1;       
+   1092 ED 4Br32s00        2898 	ld	bc,(_tmp1)
+                           2899 ;fs_walk.c:145: lview.strArr = mybuf; 
+   1096 21r3As05           2900 	ld	hl,#_lview
+   1099 71                 2901 	ld	(hl),c
+   109A 23                 2902 	inc	hl
+   109B 70                 2903 	ld	(hl),b
+                           2904 ;fs_walk.c:146: lview.numItems = numStrings;
+   109C 21r3Cs05           2905 	ld	hl, #_lview + 2
+   109F 3Ar34s00           2906 	ld	a,(#_numStrings+0)
+   10A2 77                 2907 	ld	(hl),a
+   10A3 23                 2908 	inc	hl
+   10A4 3Ar35s00           2909 	ld	a,(#_numStrings+1)
+   10A7 77                 2910 	ld	(hl),a
+                           2911 ;fs_walk.c:147: lview.selectedIndex = 0;
+   10A8 21r3Es05           2912 	ld	hl, #_lview + 4
+   10AB 36 00              2913 	ld	(hl),#0x00
+   10AD 23                 2914 	inc	hl
+   10AE 36 00              2915 	ld	(hl),#0x00
+                           2916 ;fs_walk.c:148: ListView_Init(&lview);
+   10B0 21r3As05           2917 	ld	hl,#_lview
+   10B3 E5                 2918 	push	hl
+   10B4 CDrEDs05           2919 	call	_ListView_Init
+   10B7 F1                 2920 	pop	af
+                           2921 ;fs_walk.c:149: ListView_Update(&lview);
+   10B8 21r3As05           2922 	ld	hl,#_lview
+   10BB E5                 2923 	push	hl
+   10BC CDr4Cs03           2924 	call	_ListView_Update
+   10BF F1                 2925 	pop	af
+   10C0 DD F9              2926 	ld	sp,ix
+   10C2 DD E1              2927 	pop	ix
+   10C4 C9                 2928 	ret
+   10C5                    2929 _fill_ListView_by_entries_from_current_dir_end::
+                           2930 ;fs_walk.c:153: void main_loop(void)
+                           2931 ;	---------------------------------
+                           2932 ; Function main_loop
+                           2933 ; ---------------------------------
+   10C5                    2934 _main_loop_start::
+   10C5                    2935 _main_loop:
+   10C5 DD E5              2936 	push	ix
+   10C7 DD 21 00 00        2937 	ld	ix,#0
+   10CB DD 39              2938 	add	ix,sp
+   10CD 21 FB FF           2939 	ld	hl,#-5
+   10D0 39                 2940 	add	hl,sp
+   10D1 F9                 2941 	ld	sp,hl
+                           2942 ;fs_walk.c:159: asciicode = scancode = 0;
+   10D2 DD 36 FE 00        2943 	ld	-2 (ix),#0x00
+   10D6 DD 36 FF 00        2944 	ld	-1 (ix),#0x00
+                           2945 ;fs_walk.c:160: while(scancode != SC_ESC && !request_exit) {
+   10DA                    2946 00130$:
+   10DA DD 7E FE           2947 	ld	a,-2 (ix)
+   10DD D6 76              2948 	sub	a,#0x76
+   10DF CAr66s12           2949 	jp	Z,00133$
+   10E2 AF                 2950 	xor	a,a
+   10E3 21r00s00           2951 	ld	hl,#_request_exit + 0
+   10E6 B6                 2952 	or	a,(hl)
+   10E7 C2r66s12           2953 	jp	NZ,00133$
+                           2954 ;fs_walk.c:161: FLOS_WaitKeyPress(&asciicode, &scancode);
+   10EA 21 03 00           2955 	ld	hl,#0x0003
+   10ED 39                 2956 	add	hl,sp
+   10EE 4D                 2957 	ld	c,l
+   10EF 44                 2958 	ld	b,h
+   10F0 21 04 00           2959 	ld	hl,#0x0004
+   10F3 39                 2960 	add	hl,sp
+   10F4 C5                 2961 	push	bc
+   10F5 E5                 2962 	push	hl
+   10F6 CDr00s00           2963 	call	_FLOS_WaitKeyPress
+   10F9 F1                 2964 	pop	af
+   10FA F1                 2965 	pop	af
+                           2966 ;fs_walk.c:162: if(scancode == SC_DOWN || scancode == SC_PGDOWN) {
+   10FB DD 7E FE           2967 	ld	a,-2 (ix)
+   10FE D6 72              2968 	sub	a,#0x72
+   1100 28 08              2969 	jr	Z,00104$
+   1102 DD 7E FE           2970 	ld	a,-2 (ix)
+   1105 D6 7A              2971 	sub	a,#0x7A
+   1107 C2r6As11           2972 	jp	NZ,00105$
+   110A                    2973 00104$:
+                           2974 ;fs_walk.c:163: step = (scancode == SC_DOWN) ? 1 : 5;
+   110A DD 7E FE           2975 	ld	a,-2 (ix)
+   110D D6 72              2976 	sub	a,#0x72
+   110F 20 04              2977 	jr	NZ,00135$
+   1111 0E 01              2978 	ld	c,#0x01
+   1113 18 02              2979 	jr	00136$
+   1115                    2980 00135$:
+   1115 0E 05              2981 	ld	c,#0x05
+   1117                    2982 00136$:
+   1117 DD 71 FB           2983 	ld	-5 (ix),c
+                           2984 ;fs_walk.c:164: numitems      = ListView_GetNumItems(&lview);
+   111A 21r3As05           2985 	ld	hl,#_lview
+   111D E5                 2986 	push	hl
+   111E CDr9Ds05           2987 	call	_ListView_GetNumItems
+   1121 F1                 2988 	pop	af
+                           2989 ;fs_walk.c:165: selectedIndex = ListView_GetSelectedIndex(&lview);
+   1122 E5                 2990 	push	hl
+   1123 21r3As05           2991 	ld	hl,#_lview
+   1126 E5                 2992 	push	hl
+   1127 CDrB5s05           2993 	call	_ListView_GetSelectedIndex
+   112A F1                 2994 	pop	af
+   112B 44                 2995 	ld	b,h
+   112C 4D                 2996 	ld	c,l
+   112D D1                 2997 	pop	de
+   112E DD 71 FC           2998 	ld	-4 (ix),c
+   1131 DD 70 FD           2999 	ld	-3 (ix),b
+                           3000 ;fs_walk.c:167: if(selectedIndex + step < numitems) {
+   1134 DD 4E FB           3001 	ld	c,-5 (ix)
+   1137 06 00              3002 	ld	b,#0x00
+   1139 DD 7E FC           3003 	ld	a,-4 (ix)
+   113C 81                 3004 	add	a,c
+   113D 4F                 3005 	ld	c,a
+   113E DD 7E FD           3006 	ld	a,-3 (ix)
+   1141 88                 3007 	adc	a,b
+   1142 47                 3008 	ld	b,a
+   1143 79                 3009 	ld	a,c
+   1144 93                 3010 	sub	a,e
+   1145 78                 3011 	ld	a,b
+   1146 9A                 3012 	sbc	a,d
+   1147 30 0C              3013 	jr	NC,00102$
+                           3014 ;fs_walk.c:168: ListView_SetSelectedIndex(&lview, selectedIndex+step);
+   1149 C5                 3015 	push	bc
+   114A 21r3As05           3016 	ld	hl,#_lview
+   114D E5                 3017 	push	hl
+   114E CDrCFs05           3018 	call	_ListView_SetSelectedIndex
+   1151 F1                 3019 	pop	af
+   1152 F1                 3020 	pop	af
+   1153 18 0D              3021 	jr	00103$
+   1155                    3022 00102$:
+                           3023 ;fs_walk.c:170: ListView_SetSelectedIndex(&lview, numitems-1);
+   1155 4B                 3024 	ld	c,e
+   1156 42                 3025 	ld	b,d
+   1157 0B                 3026 	dec	bc
+   1158 C5                 3027 	push	bc
+   1159 21r3As05           3028 	ld	hl,#_lview
+   115C E5                 3029 	push	hl
+   115D CDrCFs05           3030 	call	_ListView_SetSelectedIndex
+   1160 F1                 3031 	pop	af
+   1161 F1                 3032 	pop	af
+   1162                    3033 00103$:
+                           3034 ;fs_walk.c:171: ListView_Update(&lview);
+   1162 21r3As05           3035 	ld	hl,#_lview
+   1165 E5                 3036 	push	hl
+   1166 CDr4Cs03           3037 	call	_ListView_Update
+   1169 F1                 3038 	pop	af
+   116A                    3039 00105$:
+                           3040 ;fs_walk.c:174: if(scancode == SC_UP || scancode == SC_PGUP) {
+   116A DD 7E FE           3041 	ld	a,-2 (ix)
+   116D D6 75              3042 	sub	a,#0x75
+   116F 28 08              3043 	jr	Z,00110$
+   1171 DD 7E FE           3044 	ld	a,-2 (ix)
+   1174 D6 7D              3045 	sub	a,#0x7D
+   1176 C2rDFs11           3046 	jp	NZ,00111$
+   1179                    3047 00110$:
+                           3048 ;fs_walk.c:175: step = (scancode == SC_UP) ? 1 : 5;
+   1179 DD 7E FE           3049 	ld	a,-2 (ix)
+   117C D6 75              3050 	sub	a,#0x75
+   117E 20 04              3051 	jr	NZ,00137$
+   1180 0E 01              3052 	ld	c,#0x01
+   1182 18 02              3053 	jr	00138$
+   1184                    3054 00137$:
+   1184 0E 05              3055 	ld	c,#0x05
+   1186                    3056 00138$:
+   1186 DD 71 FB           3057 	ld	-5 (ix),c
+                           3058 ;fs_walk.c:176: numitems      = ListView_GetNumItems(&lview);
+   1189 21r3As05           3059 	ld	hl,#_lview
+   118C E5                 3060 	push	hl
+   118D CDr9Ds05           3061 	call	_ListView_GetNumItems
+   1190 F1                 3062 	pop	af
+                           3063 ;fs_walk.c:177: selectedIndex = ListView_GetSelectedIndex(&lview);
+   1191 21r3As05           3064 	ld	hl,#_lview
+   1194 E5                 3065 	push	hl
+   1195 CDrB5s05           3066 	call	_ListView_GetSelectedIndex
+   1198 F1                 3067 	pop	af
+   1199 44                 3068 	ld	b,h
+   119A DD 75 FC           3069 	ld	-4 (ix),l
+   119D DD 70 FD           3070 	ld	-3 (ix),b
+                           3071 ;fs_walk.c:179: if(selectedIndex >= step ) {
+   11A0 DD 4E FB           3072 	ld	c,-5 (ix)
+   11A3 06 00              3073 	ld	b,#0x00
+   11A5 DD 7E FC           3074 	ld	a,-4 (ix)
+   11A8 91                 3075 	sub	a,c
+   11A9 DD 7E FD           3076 	ld	a,-3 (ix)
+   11AC 98                 3077 	sbc	a,b
+   11AD 38 1B              3078 	jr	C,00108$
+                           3079 ;fs_walk.c:180: ListView_SetSelectedIndex(&lview, selectedIndex-step);
+   11AF DD 4E FB           3080 	ld	c,-5 (ix)
+   11B2 06 00              3081 	ld	b,#0x00
+   11B4 DD 7E FC           3082 	ld	a,-4 (ix)
+   11B7 91                 3083 	sub	a,c
+   11B8 4F                 3084 	ld	c,a
+   11B9 DD 7E FD           3085 	ld	a,-3 (ix)
+   11BC 98                 3086 	sbc	a,b
+   11BD 47                 3087 	ld	b,a
+   11BE C5                 3088 	push	bc
+   11BF 21r3As05           3089 	ld	hl,#_lview
+   11C2 E5                 3090 	push	hl
+   11C3 CDrCFs05           3091 	call	_ListView_SetSelectedIndex
+   11C6 F1                 3092 	pop	af
+   11C7 F1                 3093 	pop	af
+   11C8 18 0D              3094 	jr	00109$
+   11CA                    3095 00108$:
+                           3096 ;fs_walk.c:182: ListView_SetSelectedIndex(&lview, 0);
+   11CA 21 00 00           3097 	ld	hl,#0x0000
+   11CD E5                 3098 	push	hl
+   11CE 21r3As05           3099 	ld	hl,#_lview
+   11D1 E5                 3100 	push	hl
+   11D2 CDrCFs05           3101 	call	_ListView_SetSelectedIndex
+   11D5 F1                 3102 	pop	af
+   11D6 F1                 3103 	pop	af
+   11D7                    3104 00109$:
+                           3105 ;fs_walk.c:183: ListView_Update(&lview);
+   11D7 21r3As05           3106 	ld	hl,#_lview
+   11DA E5                 3107 	push	hl
+   11DB CDr4Cs03           3108 	call	_ListView_Update
+   11DE F1                 3109 	pop	af
+   11DF                    3110 00111$:
+                           3111 ;fs_walk.c:187: if(scancode == SC_HOME) {
+   11DF DD 7E FE           3112 	ld	a,-2 (ix)
+   11E2 D6 6C              3113 	sub	a,#0x6C
+   11E4 20 15              3114 	jr	NZ,00114$
+                           3115 ;fs_walk.c:188: ListView_SetSelectedIndex(&lview, 0);
+   11E6 21 00 00           3116 	ld	hl,#0x0000
+   11E9 E5                 3117 	push	hl
+   11EA 21r3As05           3118 	ld	hl,#_lview
+   11ED E5                 3119 	push	hl
+   11EE CDrCFs05           3120 	call	_ListView_SetSelectedIndex
+   11F1 F1                 3121 	pop	af
+   11F2 F1                 3122 	pop	af
+                           3123 ;fs_walk.c:189: ListView_Update(&lview);
+   11F3 21r3As05           3124 	ld	hl,#_lview
+   11F6 E5                 3125 	push	hl
+   11F7 CDr4Cs03           3126 	call	_ListView_Update
+   11FA F1                 3127 	pop	af
+   11FB                    3128 00114$:
+                           3129 ;fs_walk.c:192: if(scancode == SC_END) {
+   11FB DD 7E FE           3130 	ld	a,-2 (ix)
+   11FE D6 69              3131 	sub	a,#0x69
+   1200 20 1D              3132 	jr	NZ,00116$
+                           3133 ;fs_walk.c:193: numitems = ListView_GetNumItems(&lview);
+   1202 21r3As05           3134 	ld	hl,#_lview
+   1205 E5                 3135 	push	hl
+   1206 CDr9Ds05           3136 	call	_ListView_GetNumItems
+   1209 F1                 3137 	pop	af
+   120A 44                 3138 	ld	b,h
+   120B 4D                 3139 	ld	c,l
+                           3140 ;fs_walk.c:194: ListView_SetSelectedIndex(&lview, numitems-1);
+   120C 0B                 3141 	dec	bc
+   120D C5                 3142 	push	bc
+   120E 21r3As05           3143 	ld	hl,#_lview
+   1211 E5                 3144 	push	hl
+   1212 CDrCFs05           3145 	call	_ListView_SetSelectedIndex
+   1215 F1                 3146 	pop	af
+   1216 F1                 3147 	pop	af
+                           3148 ;fs_walk.c:195: ListView_Update(&lview);
+   1217 21r3As05           3149 	ld	hl,#_lview
+   121A E5                 3150 	push	hl
+   121B CDr4Cs03           3151 	call	_ListView_Update
+   121E F1                 3152 	pop	af
+   121F                    3153 00116$:
+                           3154 ;fs_walk.c:198: if(scancode == SC_F4) {
+   121F DD 7E FE           3155 	ld	a,-2 (ix)
+   1222 D6 0C              3156 	sub	a,#0x0C
+   1224 20 0F              3157 	jr	NZ,00120$
+                           3158 ;fs_walk.c:199: if(!f4_pressed())
+   1226 CDr06s0D           3159 	call	_f4_pressed
+   1229 AF                 3160 	xor	a,a
+   122A B5                 3161 	or	a,l
+   122B 20 08              3162 	jr	NZ,00120$
+                           3163 ;fs_walk.c:200: MarkFrameTime(0xf00);   // set pal zero color to red, if error
+   122D 21 00 0F           3164 	ld	hl,#0x0F00
+   1230 E5                 3165 	push	hl
+   1231 CDr00s00           3166 	call	_MarkFrameTime
+   1234 F1                 3167 	pop	af
+   1235                    3168 00120$:
+                           3169 ;fs_walk.c:203: if(scancode == SC_F8) {
+   1235 DD 7E FE           3170 	ld	a,-2 (ix)
+   1238 D6 0A              3171 	sub	a,#0x0A
+   123A 20 0F              3172 	jr	NZ,00124$
+                           3173 ;fs_walk.c:204: if(!delete_dir_entry())
+   123C CDr59s0E           3174 	call	_delete_dir_entry
+   123F AF                 3175 	xor	a,a
+   1240 B5                 3176 	or	a,l
+   1241 20 08              3177 	jr	NZ,00124$
+                           3178 ;fs_walk.c:205: MarkFrameTime(0xf00);   // set pal zero color to red, if error
+   1243 21 00 0F           3179 	ld	hl,#0x0F00
+   1246 E5                 3180 	push	hl
+   1247 CDr00s00           3181 	call	_MarkFrameTime
+   124A F1                 3182 	pop	af
+   124B                    3183 00124$:
+                           3184 ;fs_walk.c:211: if(scancode == SC_ENTER) {
+   124B DD 7E FE           3185 	ld	a,-2 (ix)
+   124E D6 5A              3186 	sub	a,#0x5A
+   1250 C2rDAs10           3187 	jp	NZ,00130$
+                           3188 ;fs_walk.c:212: if(!enter_pressed())
+   1253 CDrD5s0A           3189 	call	_enter_pressed
+   1256 AF                 3190 	xor	a,a
+   1257 B5                 3191 	or	a,l
+   1258 C2rDAs10           3192 	jp	NZ,00130$
+                           3193 ;fs_walk.c:213: MarkFrameTime(0xf00);   // set pal zero color to red, if error
+   125B 21 00 0F           3194 	ld	hl,#0x0F00
+   125E E5                 3195 	push	hl
+   125F CDr00s00           3196 	call	_MarkFrameTime
+   1262 F1                 3197 	pop	af
+   1263 C3rDAs10           3198 	jp	00130$
+   1266                    3199 00133$:
+   1266 DD F9              3200 	ld	sp,ix
+   1268 DD E1              3201 	pop	ix
+   126A C9                 3202 	ret
+   126B                    3203 _main_loop_end::
+                           3204 ;fs_walk.c:225: void clear_area(byte x, byte y, byte width, byte height)
+                           3205 ;	---------------------------------
+                           3206 ; Function clear_area
+                           3207 ; ---------------------------------
+   126B                    3208 _clear_area_start::
+   126B                    3209 _clear_area:
+   126B DD E5              3210 	push	ix
+   126D DD 21 00 00        3211 	ld	ix,#0
+   1271 DD 39              3212 	add	ix,sp
+   1273 F5                 3213 	push	af
+                           3214 ;fs_walk.c:229: for(cur_y=y; cur_y<y+height; cur_y++) {
+   1274 DD 4E 05           3215 	ld	c,5 (ix)
+   1277                    3216 00105$:
+   1277 DD 7E 05           3217 	ld	a,5 (ix)
+   127A DD 77 FE           3218 	ld	-2 (ix),a
+   127D DD 36 FF 00        3219 	ld	-1 (ix),#0x00
+   1281 DD 46 07           3220 	ld	b,7 (ix)
+   1284 1E 00              3221 	ld	e,#0x00
+   1286 DD 7E FE           3222 	ld	a,-2 (ix)
+   1289 80                 3223 	add	a,b
+   128A DD 77 FE           3224 	ld	-2 (ix),a
+   128D DD 7E FF           3225 	ld	a,-1 (ix)
+   1290 8B                 3226 	adc	a,e
+   1291 DD 77 FF           3227 	ld	-1 (ix),a
+   1294 51                 3228 	ld	d,c
+   1295 06 00              3229 	ld	b,#0x00
+   1297 7A                 3230 	ld	a,d
+   1298 DD 96 FE           3231 	sub	a,-2 (ix)
+   129B 78                 3232 	ld	a,b
+   129C DD 9E FF           3233 	sbc	a,-1 (ix)
+   129F F2rECs12           3234 	jp	P,00109$
+                           3235 ;fs_walk.c:230: for(cur_x=x; cur_x<x+width; cur_x++) {
+   12A2 DD 46 04           3236 	ld	b,4 (ix)
+   12A5                    3237 00101$:
+   12A5 DD 7E 04           3238 	ld	a,4 (ix)
+   12A8 DD 77 FE           3239 	ld	-2 (ix),a
+   12AB DD 36 FF 00        3240 	ld	-1 (ix),#0x00
+   12AF DD 5E 06           3241 	ld	e,6 (ix)
+   12B2 16 00              3242 	ld	d,#0x00
+   12B4 DD 7E FE           3243 	ld	a,-2 (ix)
+   12B7 83                 3244 	add	a,e
+   12B8 DD 77 FE           3245 	ld	-2 (ix),a
+   12BB DD 7E FF           3246 	ld	a,-1 (ix)
+   12BE 8A                 3247 	adc	a,d
+   12BF DD 77 FF           3248 	ld	-1 (ix),a
+   12C2 58                 3249 	ld	e,b
+   12C3 16 00              3250 	ld	d,#0x00
+   12C5 7B                 3251 	ld	a,e
+   12C6 DD 96 FE           3252 	sub	a,-2 (ix)
+   12C9 7A                 3253 	ld	a,d
+   12CA DD 9E FF           3254 	sbc	a,-1 (ix)
+   12CD F2rE8s12           3255 	jp	P,00107$
+                           3256 ;fs_walk.c:231: FLOS_SetCursorPos(cur_x, cur_y);
+   12D0 C5                 3257 	push	bc
+   12D1 79                 3258 	ld	a,c
+   12D2 F5                 3259 	push	af
+   12D3 33                 3260 	inc	sp
+   12D4 C5                 3261 	push	bc
+   12D5 33                 3262 	inc	sp
+   12D6 CDr00s00           3263 	call	_FLOS_SetCursorPos
+   12D9 F1                 3264 	pop	af
+   12DA C1                 3265 	pop	bc
+                           3266 ;fs_walk.c:232: FLOS_PrintString(" "); 
+   12DB C5                 3267 	push	bc
+   12DC 21rF1s12           3268 	ld	hl,#__str_37
+   12DF E5                 3269 	push	hl
+   12E0 CDr00s00           3270 	call	_FLOS_PrintString
+   12E3 F1                 3271 	pop	af
+   12E4 C1                 3272 	pop	bc
+                           3273 ;fs_walk.c:230: for(cur_x=x; cur_x<x+width; cur_x++) {
+   12E5 04                 3274 	inc	b
+   12E6 18 BD              3275 	jr	00101$
+   12E8                    3276 00107$:
+                           3277 ;fs_walk.c:229: for(cur_y=y; cur_y<y+height; cur_y++) {
+   12E8 0C                 3278 	inc	c
+   12E9 C3r77s12           3279 	jp	00105$
+   12EC                    3280 00109$:
+   12EC DD F9              3281 	ld	sp,ix
+   12EE DD E1              3282 	pop	ix
+   12F0 C9                 3283 	ret
+   12F1                    3284 _clear_area_end::
+   12F1                    3285 __str_37:
+   12F1 20                 3286 	.ascii " "
+   12F2 00                 3287 	.db 0x00
+                           3288 ;fs_walk.c:239: BOOL check_OS_version(void)
+                           3289 ;	---------------------------------
+                           3290 ; Function check_OS_version
+                           3291 ; ---------------------------------
+   12F3                    3292 _check_OS_version_start::
+   12F3                    3293 _check_OS_version:
+   12F3 DD E5              3294 	push	ix
+   12F5 DD 21 00 00        3295 	ld	ix,#0
+   12F9 DD 39              3296 	add	ix,sp
+   12FB F5                 3297 	push	af
+   12FC F5                 3298 	push	af
+                           3299 ;fs_walk.c:243: FLOS_GetVersion(&os_version_word, &hw_version_word);
+   12FD 21 00 00           3300 	ld	hl,#0x0000
+   1300 39                 3301 	add	hl,sp
+   1301 4D                 3302 	ld	c,l
+   1302 44                 3303 	ld	b,h
+   1303 21 02 00           3304 	ld	hl,#0x0002
+   1306 39                 3305 	add	hl,sp
+   1307 C5                 3306 	push	bc
+   1308 E5                 3307 	push	hl
+   1309 CDr00s00           3308 	call	_FLOS_GetVersion
+   130C F1                 3309 	pop	af
+   130D F1                 3310 	pop	af
+                           3311 ;fs_walk.c:248: if(os_version_word < OS_VERSION_REQ)
+   130E DD 7E FE           3312 	ld	a,-2 (ix)
+   1311 D6 60              3313 	sub	a,#0x60
+   1313 DD 7E FF           3314 	ld	a,-1 (ix)
+   1316 DE 05              3315 	sbc	a,#0x05
+   1318 30 04              3316 	jr	NC,00102$
+                           3317 ;fs_walk.c:249: return FALSE;
+   131A 2E 00              3318 	ld	l,#0x00
+   131C 18 02              3319 	jr	00103$
+   131E                    3320 00102$:
+                           3321 ;fs_walk.c:251: return TRUE;
+   131E 2E 01              3322 	ld	l,#0x01
+   1320                    3323 00103$:
+   1320 DD F9              3324 	ld	sp,ix
+   1322 DD E1              3325 	pop	ix
+   1324 C9                 3326 	ret
+   1325                    3327 _check_OS_version_end::
+                           3328 ;fs_walk.c:254: void clear_keyboard_buffer(void) {
+                           3329 ;	---------------------------------
+                           3330 ; Function clear_keyboard_buffer
+                           3331 ; ---------------------------------
+   1325                    3332 _clear_keyboard_buffer_start::
+   1325                    3333 _clear_keyboard_buffer:
+   1325 DD E5              3334 	push	ix
+   1327 DD 21 00 00        3335 	ld	ix,#0
+   132B DD 39              3336 	add	ix,sp
+   132D F5                 3337 	push	af
+                           3338 ;fs_walk.c:257: while( FLOS_GetKeyPress(&ASCII, &Scancode) );
+   132E                    3339 00101$:
+   132E 21 00 00           3340 	ld	hl,#0x0000
+   1331 39                 3341 	add	hl,sp
+   1332 4D                 3342 	ld	c,l
+   1333 44                 3343 	ld	b,h
+   1334 21 01 00           3344 	ld	hl,#0x0001
+   1337 39                 3345 	add	hl,sp
+   1338 C5                 3346 	push	bc
+   1339 E5                 3347 	push	hl
+   133A CDr00s00           3348 	call	_FLOS_GetKeyPress
+   133D F1                 3349 	pop	af
+   133E F1                 3350 	pop	af
+   133F AF                 3351 	xor	a,a
+   1340 B5                 3352 	or	a,l
+   1341 20 EB              3353 	jr	NZ,00101$
+   1343 DD F9              3354 	ld	sp,ix
+   1345 DD E1              3355 	pop	ix
+   1347 C9                 3356 	ret
+   1348                    3357 _clear_keyboard_buffer_end::
+                           3358 	.area _CODE
+                           3359 	.area _CABS

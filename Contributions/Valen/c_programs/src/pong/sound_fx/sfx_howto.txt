@@ -1,0 +1,67 @@
+How to implement the sound fx player in programs
+------------------------------------------------
+
+First some limitations:
+
+1. It currently plays all fx on a single channel (currently set at channel_03)
+
+2. If music is to play simultaneously, the audio_enable bits from the modplayer
+   must be OR'd into the sys_audio_enable port writes of the FX player so as not
+   to upset the music samples (also the forth channel code should be commented
+   out in the music player.)
+   
+The FX player uses two elements: a raw sample data file and a sound structure
+table. The sound structure table contains a "description" of each sound. Each
+description always has the following basic header:
+
+byte offset:
+
+      $00       - Priority level* (0-255)
+      $01       - Time (in frames) that this effect is active (for priority system)
+      $02       - Volume of sample (0-255)
+      $03-$04   - Location of sample (word address from start of 128KB Sample RAM)
+      $05-$06   - Length of sample (in words)
+      $07-$08   - Period of sample (16MHz ticks per sample)
+      $09-$0a   - Loop location of sample (word address in 128KB Sample RAM)
+      $0b-$0c   - Loop length of sample (in words)
+ 
+Following on from that is a script-like sequence of commands and their parameters
+to modulate the sample. The commands available are:
+
+ $00 - Do nothing (except skip this byte)
+ $01 - Start a new sample, Parameters: (byte) Vol, (words) Loc, Len, Per, Loop_loc, Loop_len 
+ $02 - Add to period, Parameter: byte value to add $00-$FF
+ $03 - Sub from period, Parameter: byte value to sub 00-$FF
+ $04 - Add to volume, Parameter: byte value to add $00-$FF
+ $05 - Sub from volume, Parameter: byte value to sub $00-$FF
+ $06 - Set new period, Parameter: New period word $0000-$FFFF
+ $07 - Set new volume, Parameter new volume byte $00-$FF
+ $08 - Loop point, Parameter: byte - Number of loops $00-$FF, $00=infinite loops
+ $09 - Wait n frames, parameter: loops $00-$FF (byte)
+ $0a - Loop back to loop point (no parameters)
+ $0b - Set minimum period for modulation (cmd $02/$03). Parameter: Value $0000-$FFFF (default $200)
+ $0c - Set maximum period for modulation (cmd $02/$03). Parameter Value $0000-$FFFF (default $1000)
+ $0d - Set random period (no args)
+ $0e - Reset random seed (no args)
+ $0f - Set repeat point (no args)
+ $10 - Goto repeat point (no args)
+ $FF - End of fx script (no parameters)
+
+So.. For the most basic sample playing, you'd just put $FF (end of fx script) at structure
+offset $0d. The commands are explained above, but bear in mind you'll ALWAYS want at least
+one "$09 - Wait N frames" command to return from the fx processing routine and stop everything
+happening at once (else you'll lock the CPU in a loop).
+
+
+* A note about the priority system. As all FX are on one channel, you'll want to
+allow certain sounds to interrupt some sounds but not others (eg: an explosion
+can interrupt a laser shot, but a laser shot shouldnt interrupt an explosion).
+Obviously you set the priority byte of each sound accordingly, the higher
+more "interrupty" it is :) The priority time byte is the number of frames
+you want a sound's priority level to actually matter. This exists because
+you cannot simply go by the end of a sample - and some sounds are "synthetic".
+
+To use the player in own code, you just need to call the "play_fx" routine
+every frame and call the "new_fx routine" with the new sound number in A
+at the point it is triggered.
+
