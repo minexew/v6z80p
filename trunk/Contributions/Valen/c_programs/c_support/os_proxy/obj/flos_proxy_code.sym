@@ -1,18 +1,0 @@
-ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 1.
-
-Symbol Table
-
-  6 _flos_proxy_code                                               0000 GR
-
-ASxxxx Assembler V01.75 + SDCC mods  (Zilog Z80 / Hitachi HD64180), page 2.
-
-Area Table
-
-   0 _CODE                                                          size    0   flags 0
-   1 _DATA                                                          size    0   flags 0
-   2 _OVERLAY                                                       size    0   flags 0
-   3 _HOME                                                          size    0   flags 0
-   4 _GSINIT                                                        size    0   flags 0
-   5 _GSFINAL                                                       size    0   flags 0
-   6 _FLOS_PROXY_CODE                                               size  759   flags 0
-   7 _CABS                                                          size    0   flags 0
