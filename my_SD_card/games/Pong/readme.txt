@@ -1,5 +1,5 @@
 PONG v0.03
-----------
+-------------
 
 Menu keys:
 Joy 1 fire or keyb X - one player game
