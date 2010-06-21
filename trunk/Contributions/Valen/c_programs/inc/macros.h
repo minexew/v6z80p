@@ -30,8 +30,10 @@
 #define SPRITE_ENABLE                           1
 #define DOUBLE_BUFFER_SPRITE_REGISTER_MODE      8
 
+// blit_misc bits
+#define BLITTER_MISC_ASCENDING_MODE             0x40
 
-
+#define BLITTER_LINEDRAW_BUSY                   0x10
 
 
 
@@ -68,6 +70,18 @@ static volatile __at VREG_EXT_VIDCTRL  unsigned char mm__vreg_ext_vidctrl;
 //#define VREG_LINECOP_LO	   0x20d
 //#define VREG_LINECOP_HI	   0x20e
 //#define VREG_PALETTE_CTRL	   0x20f
+
+// blitter set-up registers
+static volatile __at BLIT_SRC_LOC  unsigned short mm__blit_src_loc;
+static volatile __at BLIT_DST_LOC  unsigned short mm__blit_dst_loc;
+static volatile __at BLIT_SRC_MOD  unsigned char mm__blit_src_mod;
+static volatile __at BLIT_DST_MOD  unsigned char mm__blit_dst_mod;
+static volatile __at BLIT_HEIGHT  unsigned char mm__blit_height;
+static volatile __at BLIT_WIDTH  unsigned char mm__blit_width;
+static volatile __at BLIT_MISC  unsigned char mm__blit_misc;
+static volatile __at BLIT_SRC_MSB  unsigned char mm__blit_src_msb;
+static volatile __at BLIT_DST_MSB  unsigned char mm__blit_dst_msb;
+
 static volatile __at VREG_READ  unsigned char mm__vreg_read;  // video status read register
 static volatile __at MULT_READ  unsigned short mm__mult_read;
 static volatile __at MULT_TABLE  unsigned short mm__mult_table;
