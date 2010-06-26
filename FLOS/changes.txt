@@ -8,6 +8,10 @@ FLOSxxxF.exe = FLOS with FAT16 filesystem
 Changes to FLOS:
 ----------------
 
+5.69 - 26/06/10 : Ability to truncate .exe files (commands) to n bytes upon load using header
+                : Can abort BOOT_RUN.SCR start up scripts by pressing ESC on startup
+
+
 5.68 - 02/06/10 : Fixed (OLD!) bugs where registers were not reported correctly by "R" command.
                 : Added ability to load programs anywhere in RAM with addition of a special header
 
