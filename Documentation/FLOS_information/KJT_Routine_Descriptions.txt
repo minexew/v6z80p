@@ -953,19 +953,47 @@ Trashes: A
 
 
 
+Routine name: kjt_read_sysram_flat
+----------------------------------
 
-Routine name: kjt_wait_vrt
---------------------------
+Action: Reads system memory in a flat, linear addressing mode
 
-Action: Wait for last scanline of display
+Input Registers  : E:HL = $00000 - $7FFFF (address to read)
 
-Input Registers  : none
+Output Registers : A (byte read from address)
 
-Output Registers : none
+Trashes: B,C,E,H
 
-Trashes: A
+Notes:  
+
+* The routine saves and restores the current bank setting around the read
+  so make sure any interrupt service routine is in unpaged memory (<$8000)
+  or disable interrupts to avoid problems.
+
+* As this routine is not fast, only use if convenience is more important than speed.
 
 
+
+
+
+Routine name: kjt_write_sysram_flat
+------------------------------------
+
+Action: Writes to system memory in a flat, linear addressing mode
+
+Input Registers  : E:HL = $00000 - $7FFFF (address to write)
+
+Output Registers : None (but see below)
+
+Trashes: B,C,E,H
+
+Notes:  
+
+* The routine saves and restores the current bank setting around the write
+  so make sure any interrupt service routine is in unpaged memory (<$8000)
+  or disable interrupts to avoid problems.
+
+* As this routine is not fast, only use if convenience is more important than speed.
 
 
 
@@ -1241,6 +1269,17 @@ Notes: All other registers are preserved.
 
 
 
+
+Routine name: kjt_wait_vrt
+--------------------------
+
+Action: Wait for last scanline of display
+
+Input Registers  : none
+
+Output Registers : none
+
+Trashes: A
 
 
 
