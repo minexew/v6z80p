@@ -1,5 +1,5 @@
 ;-------------------------------
-;Kernal jump table for FLOS v566
+;Kernal jump table for FLOS v570
 ;-------------------------------
 
 os_start equ $1000
@@ -83,3 +83,5 @@ kjt_store_dir_position	equ os_start + $d6	 ; added in FLOS v560
 kjt_restore_dir_position	equ os_start + $d9	 ; added in FLOS v560
 kjt_mount_volumes		equ os_start + $dc	 ; added in FLOS v562
 kjt_get_device_info		equ os_start + $df   ; added in FLOS v565
+kjt_read_sysram_flat	equ os_start + $e2 	 ; (added in v570)
+kjt_write_sysram_flat	equ os_start + $e5 	 ; (added in v570)
