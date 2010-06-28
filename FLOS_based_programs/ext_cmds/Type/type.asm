@@ -1,5 +1,5 @@
 
-; Type [filename] command - shows text files - v0.01 By Phil '09
+; Type [filename] command - shows text files - v1.02 By Phil '09
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------
 
@@ -10,36 +10,73 @@ include "system_equates.asm"
 window_cols	equ 40
 window_rows	equ 25
 
-	org $5000
+;----------------------------------------------------------------------------------------------------
+; As this is an external command, load program high in memory to help avoid overwriting user programs
+;----------------------------------------------------------------------------------------------------
 
-;--------- Test FLOS version ---------------------------------------------------------------------
+my_location	equ $8000
+my_bank		equ $0c
+
+	org my_location	; desired load address
+	
+load_loc	db $ed,$00	; header ID (Invalid, safe Z80 instruction)
+	jr exec_addr	; jump over remaining header data
+	dw load_loc	; location file should load to
+	db my_bank	; upper bank the file should load to
+	db 0		; no truncating required
+
+exec_addr	
+
+;-------------------------------------------------------------------------------------------------
+; Test FLOS version 
+;-------------------------------------------------------------------------------------------------
+
+required_flos equ $568
 
 	push hl
-	call kjt_get_version		; check running under FLOS v541+ 
-	ld de,$544
+	di			; temp disable interrupts so stack cannot be corrupted
+	call kjt_get_version
+true_loc	exx
+	ld ix,0		
+	add ix,sp			; get SP in IX
+	ld l,(ix-2)		; HL = PC of true_loc from stack
+	ld h,(ix-1)
+	ei
+	exx
+	ld de,required_flos
 	xor a
 	sbc hl,de
-	jr nc,flos_ok
-	ld hl,old_flos_txt
-	call kjt_print_string
 	pop hl
+	jr nc,flos_ok
+	exx
+	push hl			;show FLOS version required
+	ld de,old_fth-true_loc
+	add hl,de			;when testing location references must be PC-relative
+	ld de,required_flos		
+	ld a,d
+	call kjt_hex_byte_to_ascii
+	ld a,e
+	call kjt_hex_byte_to_ascii
+	pop hl
+	ld de,old_flos_txt-true_loc
+	add hl,de	
+	call kjt_print_string
 	xor a
 	ret
 
 old_flos_txt
 
-	db "Program requires FLOS v544+",11,11,0
-	
-;-------- Load and Init -----------------------------------------------------------------------
-	
-flos_ok	pop hl
+        db "Error: Requires FLOS version $"
+old_fth db "xxxx+",11,11,0
 
-	ld de,$5000		; if being run from G command, HL which is normally
-	xor a			; the argument string will be $5000
-	sbc hl,de
-	ret z
-	
-	add hl,de
+flos_ok
+
+
+;------------------------------------------------------------------------------------------------
+; Actual program starts here..
+;------------------------------------------------------------------------------------------------
+
+
 fnd_para	ld a,(hl)			; examine argument text, if encounter 0: give up
 	or a			
 	ret z
@@ -178,7 +215,7 @@ nochhi	ld hl,text_buffer			;zero text buffer
 	ld iy,(textfile_offset_lo)		;index from start of file
 	call kjt_set_file_pointer
 	ld hl,text_buffer			;load in part of the file	
-	ld b,0
+	ld b,my_bank
 	call kjt_force_load
 	or a			
 	jr z,ltb_ok			;file system error?

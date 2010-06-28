@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------------------------------
-; "MOUSE.EXE" = Test for mouse and activate OS pointer v1.00
+; "MOUSE.EXE" = Test for mouse and activate OS pointer v1.01
 ;-----------------------------------------------------------------------------------------------
 
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------
@@ -8,29 +8,70 @@ include "kernal_jump_table.asm"
 include "osca_hardware_equates.asm"
 include "system_equates.asm"
 
-	org $5000
+;----------------------------------------------------------------------------------------------------
+; As this is an external command, load program high in memory to help avoid overwriting user programs
+;----------------------------------------------------------------------------------------------------
 
-;--------------------------------------------------------------------------------
-; Check FLOS version
-;-------------------------------------------------------------------------------
+my_location	equ $8000
+my_bank		equ $0c
 
-	call kjt_get_version		
-	ld de,$559
+	org my_location	; desired load address
+	
+load_loc	db $ed,$00	; header ID (Invalid, safe Z80 instruction)
+	jr exec_addr	; jump over remaining header data
+	dw load_loc	; location file should load to
+	db my_bank	; upper bank the file should load to
+	db 0		; no truncating required
+
+exec_addr	
+
+;-------------------------------------------------------------------------------------------------
+; Test FLOS version 
+;-------------------------------------------------------------------------------------------------
+
+required_flos equ $568
+
+	push hl
+	di			; temp disable interrupts so stack cannot be corrupted
+	call kjt_get_version
+true_loc	exx
+	ld ix,0		
+	add ix,sp			; get SP in IX
+	ld l,(ix-2)		; HL = PC of true_loc from stack
+	ld h,(ix-1)
+	ei
+	exx
+	ld de,required_flos
 	xor a
 	sbc hl,de
+	pop hl
 	jr nc,flos_ok
-	
-	ld hl,old_flos_txt
+	exx
+	push hl			;show FLOS version required
+	ld de,old_fth-true_loc
+	add hl,de			;when testing location references must be PC-relative
+	ld de,required_flos		
+	ld a,d
+	call kjt_hex_byte_to_ascii
+	ld a,e
+	call kjt_hex_byte_to_ascii
+	pop hl
+	ld de,old_flos_txt-true_loc
+	add hl,de	
 	call kjt_print_string
 	xor a
 	ret
 
 old_flos_txt
 
-	db "Program requires FLOS v559+",11,11,0
+        db "Error: Requires FLOS version $"
+old_fth db "xxxx+",11,11,0
 
-flos_ok	
+flos_ok
 
+
+;------------------------------------------------------------------------------------------------
+; Actual program starts here..
 ;------------------------------------------------------------------------------------------------
 
 	call init_mouse
@@ -52,7 +93,7 @@ minit_ok	ld a,%10000000			; copy sprite pointer to last definition block
 	xor a
 	out (sys_mem_select),a
 
-	ld hl,pointer_colours		;copy to live palette
+	ld hl,new_pointer_colours		;copy to live palette
 	ld de,palette+(248*2)
 	ld bc,8*2
 	ldir
@@ -69,7 +110,7 @@ minit_ok	ld a,%10000000			; copy sprite pointer to last definition block
 	add hl,hl
 	add hl,hl
 	add hl,hl
-	ld bc,pointer_colours
+	ld bc,new_pointer_colours
 	call kjt_enable_pointer
 
 	ld hl,mouse_enabled_txt
@@ -259,7 +300,7 @@ mbyte_rdy	ld a,%00000010
 	
 ;-----------------------------------------------------------------------------------------------
 
-pointer_colours	incbin "pointer_palette.bin"
+new_pointer_colours	incbin "pointer_palette.bin"
 
 pointer_def	incbin "pointer_sprite.bin"
 
