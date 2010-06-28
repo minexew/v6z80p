@@ -2,11 +2,12 @@
 FLOS: V6Z80P (SD Card interface) Build info:
 --------------------------------------------
 
-FLOSxxxF.exe = FLOS with FAT16 filesystem
-
 
 Changes to FLOS:
 ----------------
+
+5.70 - 28/06/10 : Added kernal routines "kjt_read_sysram_flat" and "kjt_write_sysram_flat"
+
 
 5.69 - 26/06/10 : Ability to truncate .exe files (commands) to n bytes upon load using header
                 : Can abort BOOT_RUN.SCR start up scripts by pressing ESC on startup
