@@ -62,7 +62,7 @@ void FillVideoMem(void)
 
 
 
-#define RGB2WORD(r,g,b)         (   (word) ((r/16<<8)+(g/16<<4)+(b/16))   )
+
 const word myPalette[] = {
                     RGB2WORD(0, 0, 0),
                     RGB2WORD(255, 255, 255),

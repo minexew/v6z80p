@@ -61,7 +61,7 @@
 
 // --
 
-#define GET_WORD_9TH_BIT(v) ( ((word)v>>8) & 1 )
+//#define GET_WORD_9TH_BIT(v) ( ((word)v>>8) & 1 )
 
 void initgraph(void);
 void clear_sprite_regs(void);

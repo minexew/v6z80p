@@ -101,5 +101,9 @@ static volatile __at BITPLANE0A_LOC+3 unsigned char mm__bitplane0a_loc__byte3;
 #define PAGE_IN_VIDEO_RAM()      (io__sys_mem_select |= 0x40)
 #define PAGE_OUT_VIDEO_RAM()     (io__sys_mem_select &= (~0x40))
 
+// misc macros
+#define GET_WORD_9TH_BIT(v)     ( ((word)v>>8) & 1 )
+// RGB to 12bit V6Z80P palette value
+#define RGB2WORD(r,g,b)         (   (word) ((r/16<<8)+(g/16<<4)+(b/16))   )
 
 #endif /* MACROS_H */
