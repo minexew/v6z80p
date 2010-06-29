@@ -1,7 +1,7 @@
 # Project specific vars
 prjname    = fs_walk
 prjobjects = obj/fs_walk.o
-linkopt    = --code-loc 0x5A80  --data-loc 0x8280
+linkopt    = --code-loc 0x5A80  --data-loc 0x8880
 stack      = 0xffff
 
 # Include main makefile

@@ -49,9 +49,13 @@ byte buffer[32+1];      // buffer for numbers to string conversion
 
 byte buf[8];
 
+
 // ---- buffer for FLOS DIR output ----
-#define DIRBUF_LEN     (1024*2)
-byte* tmp1 = (byte*) 0x8800;
+byte bufCatalog[1024*2];        // main buffer
+#define DIRBUF_LEN     (sizeof(bufCatalog))
+byte* tmp1 = bufCatalog;
+
+
 word numStrings;        // 
 
 #define FILENAME_LEN    8+1+3                // FILENAME + dot + EXT  
