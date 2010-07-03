@@ -1,5 +1,5 @@
 typedef struct {
-    byte sprite_number;
+    byte sprite_number;                 // 127 total sprite numbers
     int x;
     int y;
     byte height;                        // height in 16 pixels chunks
@@ -22,10 +22,15 @@ static inline void set_sprite_regs_hw(byte sprite_number, byte x, byte misc, byt
 }
 
 
+byte spritesRegsBuffer[127*4];               // 127 sprites (4 bytes per sprite)
+
+// Set sprite regs to system memory buffer.
+// 
 void set_sprite_regs(sprite_regs_t* r)
 {
     byte reg_misc;
     int x, y;
+    byte* p;
 
 
     // convert X coord to hardware sprite coord
@@ -41,7 +46,25 @@ void set_sprite_regs(sprite_regs_t* r)
                ((r->x_flip&1) << 3)                                    |
                (r->height << 4)
                ;
-    set_sprite_regs_hw(r->sprite_number, (byte)x, reg_misc, (byte)y, (byte)r->sprite_definition_number);
+               
+    //set_sprite_regs_hw(r->sprite_number, (byte)x, reg_misc, (byte)y, (byte)r->sprite_definition_number);
+    p = spritesRegsBuffer + (r->sprite_number*4);
+    *p++ =  (byte)x;
+    *p++ =  reg_misc;
+    *p++ =  (byte)y;
+    *p   =  (byte)r->sprite_definition_number;
 
 }
 
+void SpritesRegsBuffer_CopyToHardwareRegs(void)
+{
+    // this is a time critical operation, disable interrupts
+    DI();
+    memcpy((void*)SPR_REGISTERS, spritesRegsBuffer, sizeof(spritesRegsBuffer));
+    EI();
+}
+
+void SpritesRegsBuffer_Clear(void)
+{    
+    memset(spritesRegsBuffer, 0, sizeof(spritesRegsBuffer));    
+}

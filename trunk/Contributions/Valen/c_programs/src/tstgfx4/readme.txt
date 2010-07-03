@@ -1,2 +1,2 @@
-Cursor keys to move.
+Keyboard cursor keys to move.
 ESC to exit.

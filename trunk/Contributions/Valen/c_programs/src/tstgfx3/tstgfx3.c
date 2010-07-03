@@ -137,9 +137,13 @@ int main(void)
     SetPalette();
     //FillVideoMem();
     PutObjectsToSpriteMemory();
+    
 
     while(!done) {
-        FLOS_WaitVRT();
+        FLOS_WaitVRT();        
+        SpritesRegsBuffer_CopyToHardwareRegs();        // must be called just right after FLOS_WaitVRT()
+
+        SpritesRegsBuffer_Clear();                     // clear sprite regs shadow buffer
         DoMain();
         screenX++;
 

@@ -136,7 +136,7 @@ int main(void)
 {    
     PutObjectsToSpriteMemory();
     SetVideoMode();
-    SetPalette();
+    SetPalette();    
     //FillVideoMem();
 
     Keyboard_Init(keyboard_input_map);        
@@ -146,8 +146,10 @@ int main(void)
 
     while(!myplayer_input.esc) {
         FLOS_WaitVRT();
+        SpritesRegsBuffer_CopyToHardwareRegs();        // must be called just right after FLOS_WaitVRT()
+        
+        SpritesRegsBuffer_Clear();                      // clear sprite regs shadow buffer
         DoMain();
-
     }
     
 
