@@ -8,7 +8,7 @@ stack      = 0xFFFF
 include ../../Makefile_inc
 
 # Project specific rules
-obj/tstgfx3.o : tstgfx3.c
+obj/tstgfx3.o : tstgfx3.c ../lib/sprites.c
 	sdcc -c -o obj/ --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DOWN_SP=$(stack) tstgfx3.c 
 
 
