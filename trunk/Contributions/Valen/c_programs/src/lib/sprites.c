@@ -1,8 +1,15 @@
+/* 
+The x and y struct members are in local coordinate system.
+(not hardware)
+The origin (x=0,y=0) of this local coordinate system is in the top left
+corner of your display window.
+(I think, it's more easy to manipulate sprite coordinates in local coordinate system.)
+*/
 typedef struct {
-    byte sprite_number;                 // 127 total sprite numbers
-    int x;
+    byte sprite_number;                 // 127 total sprite numbers [0-126]
+    int x;                              // x, y in local coordinate system
     int y;
-    byte height;                        // height in 16 pixels chunks
+    byte height;                        // height in 16 pixels chunks (0 - 240 pixels, 1 - 16pix, 2 - 32pix, etc...)
     word sprite_definition_number;
     BOOL x_flip;    
 } sprite_regs_t;
@@ -21,11 +28,14 @@ static inline void set_sprite_regs_hw(byte sprite_number, byte x, byte misc, byt
 
 }
 
-
+// buffer for sprite registers
 byte spritesRegsBuffer[127*4];               // 127 sprites (4 bytes per sprite)
 
 // Set sprite regs to system memory buffer.
 // 
+// The sprite register writes go to buffer in
+// system memory (not directly to hardware sprite registers). 
+// This will prevent any sprite flickering/tearing.
 void set_sprite_regs(sprite_regs_t* r)
 {
     byte reg_misc;
@@ -56,6 +66,8 @@ void set_sprite_regs(sprite_regs_t* r)
 
 }
 
+// Copy buffer to hardware sprite registers.
+// (must be called right in the beginning of the frame, right after WaitVRT() )
 void SpritesRegsBuffer_CopyToHardwareRegs(void)
 {
     // this is a time critical operation, disable interrupts

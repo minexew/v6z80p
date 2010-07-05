@@ -30,6 +30,9 @@ byte Keyboard_GetLastPressedScancode(void)
     return keyboard.prev_pressed_scancode;
 }
 
+// Common interrupt pitfal link lhttp://sdcc.sourceforge.net/doc/sdccman.html/node68.html
+// This ISR changes next variables:
+//  - set BOOL var, is atomic operation
 void Keyboard_IRQ_Handler()
 {
     byte scancode;

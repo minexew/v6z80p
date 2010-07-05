@@ -40,15 +40,15 @@ player_input myplayer_input = {FALSE, FALSE, FALSE, FALSE,
 
 // keyboard input map, provided by application
 keyboard_input_map_t keyboard_input_map[] = {
-                {SC_UP, &myplayer_input.up}, {SC_DOWN, &myplayer_input.down},
+                {SC_UP, &myplayer_input.up},     {SC_DOWN, &myplayer_input.down},
                 {SC_LEFT, &myplayer_input.left}, {SC_RIGHT, &myplayer_input.right},
                 {SC_X, &myplayer_input.fire1},
                 {SC_ESC, &myplayer_input.esc},
-                {0xFF, NULL}           // terminator
+                {0xFF, NULL}           // terminator (end of input map)
 };
 
 word screenX = 0, screenY = 0;
-unsigned char Img1[16 * 16];
+unsigned char Img1[16 * 16];            // test sprite image buffer (will be copied to sprite memory)
 
 void SetVideoMode(void)
 {
@@ -105,6 +105,7 @@ void DoMain(void)
 {    
     sprite_regs_t r;
     
+    // process user input 
     if(myplayer_input.up)   screenY -= 2;
     if(myplayer_input.down) screenY += 2;
     if(myplayer_input.left)  screenX -= 2;
@@ -139,14 +140,14 @@ int main(void)
     SetPalette();    
     //FillVideoMem();
 
-    Keyboard_Init(keyboard_input_map);        
+    Keyboard_Init(keyboard_input_map);        // init keyboard input
     install_irq_handler(0x80 + 0x1);          // enable: master irq, keyboard
     
     
 
     while(!myplayer_input.esc) {
         FLOS_WaitVRT();
-        SpritesRegsBuffer_CopyToHardwareRegs();        // must be called just right after FLOS_WaitVRT()
+        SpritesRegsBuffer_CopyToHardwareRegs();         // must be called right after FLOS_WaitVRT()
         
         SpritesRegsBuffer_Clear();                      // clear sprite regs shadow buffer
         DoMain();
