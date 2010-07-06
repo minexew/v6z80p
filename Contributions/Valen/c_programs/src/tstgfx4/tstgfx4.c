@@ -141,7 +141,7 @@ int main(void)
     //FillVideoMem();
 
     Keyboard_Init(keyboard_input_map);        // init keyboard input
-    install_irq_handler(0x80 + 0x1);          // enable: master irq, keyboard
+    install_irq_handler(IRQ_ENABLE_MASTER | IRQ_ENABLE_KEYBOARD);          // enable irq: master, keyboard
     
     
 

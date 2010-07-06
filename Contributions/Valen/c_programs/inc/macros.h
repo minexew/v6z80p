@@ -35,7 +35,12 @@
 
 #define BLITTER_LINEDRAW_BUSY                   0x10
 
-
+// sys_irq_enable bits
+#define IRQ_ENABLE_MASTER                       0x80
+#define IRQ_ENABLE_AUDIO                        8
+#define IRQ_ENABLE_TIMER                        4
+#define IRQ_ENABLE_MOUSE                        2
+#define IRQ_ENABLE_KEYBOARD                     1
 
 
 #define WRITE_REG(reg, value)  ( *((byte *) (reg)) = (value) )
@@ -91,6 +96,9 @@ static volatile __at BITPLANE0A_LOC+1 unsigned char mm__bitplane0a_loc__byte1;
 static volatile __at BITPLANE0A_LOC+2 unsigned char mm__bitplane0a_loc__byte2;
 static volatile __at BITPLANE0A_LOC+3 unsigned char mm__bitplane0a_loc__byte3;
 
+// Set system memory page at address 0x8000-0xFFFF
+// (logic system memory pages are 0-14)
+#define SET_SYSTEM_PAGE(page)     io__sys_mem_select = (page + 1)          // add 1 to page (convert to hardware page number)
 
 #define SET_SPRITE_PAGE(page)     mm__vreg_vidpage = ((page) | 0x80)       // set bit 7 - Set Sprite Page
 #define PAGE_IN_SPRITE_RAM()      (io__sys_mem_select |= 0x80)
