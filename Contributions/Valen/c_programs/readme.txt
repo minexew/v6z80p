@@ -1,4 +1,4 @@
 SDCC framework for V6Z80P.
 
 Online Docs:
-http://wiki.uelectronics.info/wiki/view/SDCC+framework
+http://wiki.retroleum.co.uk/wiki/view/SDCC+framework
