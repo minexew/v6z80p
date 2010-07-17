@@ -2,7 +2,7 @@
 prjname    = test1
 prjobjects = obj/test1.o
 linkopt    = --code-loc 0x5A80  --data-loc 0x7800
-stack      = 0x8000
+stack      = 0xffff
 
 # Include main makefile
 include ../../Makefile_inc

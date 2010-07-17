@@ -55,7 +55,7 @@ $(myd2)/obj/flos_proxy_code.o : $(myd2)/flos_proxy_code.c
 myd3  = $(basedir)/c_support/os_proxy
 myd3_ = $(subst /,\,$(myd3))
 $(myd3)/flos_proxy_code.c : $(myd3)/flos.asm $(myd3)/i__kernal_jump_table.asm $(myd3)/macro.asm
-	cd $(myd3_) && %v6z80pdir%\pasmo\pasmo.exe -d -I %v6z80pdir%\equates  flos.asm flos.asm.bin > a
+	cd $(myd3_) && %v6z80pdir%\pasmo\pasmo.exe -d -I %v6z80pdir%\equates  flos.asm flos.asm.bin > obj\flos.asm.output
 # Generate C source from binary file	
 	cd $(myd3_) && echo /* Machine generated. Dont edit. */ const > flos_proxy_code.c
 	cd $(myd3_) && "../tools/xd.exe" -dflos_proxy_code flos.asm.bin >> flos_proxy_code.c

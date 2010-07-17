@@ -10,11 +10,11 @@ kjt_hex_byte_to_ascii EQU 1025
 kjt_ascii_to_hex_word EQU 1028
 kjt_dont_store_registers EQU 102B
 kjt_get_input_string EQU 102E
-kjt_check_disk_pqfs EQU 1031
-kjt_change_drive EQU 1034
-kjt_check_disk_available EQU 1037
-kjt_get_drive	EQU 103A
-kjt_format	EQU 103D
+kjt_check_volume_format EQU 1031
+kjt_change_volume EQU 1034
+kjt_unnecessary	EQU 1037
+kjt_get_volume_info EQU 103A
+kjt_format_device EQU 103D
 kjt_make_dir	EQU 1040
 kjt_change_dir	EQU 1043
 kjt_parent_dir	EQU 1046
@@ -55,7 +55,7 @@ kjt_dir_list_next_entry EQU 10A3
 kjt_get_cursor_position EQU 10A6
 kjt_read_sector	EQU 10A9
 kjt_write_sector EQU 10AC
-kjt_set_sector_lba EQU 10AF
+kjt_set_sector_and_dev EQU 10AF
 kjt_plot_char	EQU 10B2
 kjt_set_pen	EQU 10B5
 kjt_background_colours EQU 10B8
@@ -70,6 +70,10 @@ kjt_timer_wait	EQU 10D0
 kjt_get_charmap_addr_xy EQU 10D3
 kjt_store_dir_position EQU 10D6
 kjt_restore_dir_position EQU 10D9
+kjt_mount_volumes EQU 10DC
+kjt_get_device_info EQU 10DF
+kjt_read_sysram_flat EQU 10E2
+kjt_write_sysram_flat EQU 10E5
 		End of INCLUDE
 		INCLUDE OSCA_hardware_equates.asm
 sys_mem_select	EQU 0000
@@ -84,7 +88,9 @@ sys_joy_com_flags EQU 0005
 sys_sdcard_ctrl1 EQU 0005
 sys_sdcard_ctrl2 EQU 0006
 sys_timer	EQU 0007
+sys_vreg_read	EQU 0007
 sys_audio_enable EQU 0008
+sys_audio_flags	EQU 0008
 sys_hw_flags	EQU 0009
 sys_hw_settings	EQU 0009
 sys_spi_port	EQU 000A
@@ -94,6 +100,7 @@ sys_pic_comms	EQU 000D
 sys_eeprom_byte	EQU 000D
 sys_io_pins	EQU 000E
 sys_io_dir	EQU 000F
+sys_low_page	EQU 0020
 audchan0_loc	EQU 0010
 audchan0_len	EQU 0011
 audchan0_per	EQU 0012
@@ -110,15 +117,6 @@ audchan3_loc	EQU 001C
 audchan3_len	EQU 001D
 audchan3_per	EQU 001E
 audchan3_vol	EQU 001F
-ide_register0	EQU 0020
-ide_register1	EQU 0021
-ide_register2	EQU 0022
-ide_register3	EQU 0023
-ide_register4	EQU 0024
-ide_register5	EQU 0025
-ide_register6	EQU 0026
-ide_register7	EQU 0027
-ide_high_byte	EQU 0028
 palette		EQU 0000
 video_registers	EQU 0200
 vreg_xhws	EQU 0200
@@ -177,6 +175,8 @@ bitplane4b_loc	EQU 0270
 bitplane5b_loc	EQU 0274
 bitplane6b_loc	EQU 0278
 bitplane7b_loc	EQU 027C
+bitplane_reset	EQU 0243
+bitplane_modulo	EQU 0247
 sprite_registers EQU 0400
 spr_registers	EQU 0400
 mult_table	EQU 0600
@@ -186,19 +186,24 @@ sprite_base	EQU 1000
 video_base	EQU 2000
 		End of INCLUDE
 		INCLUDE system_equates.asm
-bootcode_location EQU 0800
-bootcode_length	EQU 0800
+new_bootcode_location EQU 0200
+new_bootcode_length EQU 0DC0
+new_rom_stack	EQU 0FFF
+keymaps		EQU 0200
+host_device_hardware_info EQU 0380
+volume_mount_list EQU 0400
+pointer_colours	EQU 0480
 sector_buffer	EQU 0800
 irq_jp_inst	EQU 0A00
 irq_vector	EQU 0A01
 nmi_jp_inst	EQU 0A03
 nmi_vector	EQU 0A04
 ide_status	EQU 0A06
+scratch_pad	EQU 0A08
 stack		EQU 0AFF
 OS_variables	EQU 0B00
 OS_charmap	EQU 0C00
 OS_location	EQU 1000
-font_base	EQU 10C0
 		End of INCLUDE
 music_module	EQU A200
 		ORG 8000

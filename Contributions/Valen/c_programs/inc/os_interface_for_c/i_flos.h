@@ -35,7 +35,7 @@ typedef struct  {
 
 byte FLOS_GetLastError(void); 
 
-BOOL FLOS_CheckDiskAvailable(void);
+
 BOOL FLOS_MakeDir(const char* pDirName);
 BOOL FLOS_ChangeDir(const char* pDirName);
 BOOL FLOS_ParentDir(void);

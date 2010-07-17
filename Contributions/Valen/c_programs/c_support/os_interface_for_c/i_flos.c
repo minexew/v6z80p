@@ -69,23 +69,6 @@ byte FLOS_GetLastError(void)
 ptrVoidFunc pFunc;
 
 
-/* Seems, this func report 'no disk', only if user is removed SD card and do MOUNT.
-   Without MOUNT, this func is reported 'disk present' (even if user removed SD card)
-   (Need some more testing)
-*/
-BOOL FLOS_CheckDiskAvailable(void)
-{
-    byte result = FALSE;
-    CALL_FLOS_CODE(KJT_CHECK_DISK_AVAILABLE);
-
-    result = *PTRTO_I_DATA(I_DATA, byte);
-    if(!result) {
-       g_flos_lasterror = *PTRTO_I_DATA(I_DATA+1, byte);
-    }
-
-    return result;
-}
-
 
 // 
 BOOL FLOS_MakeDir(const char* pDirName)
