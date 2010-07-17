@@ -124,14 +124,6 @@ BOOL test1(void)
 {
     BOOL r;
 
-    r = FLOS_CheckDiskAvailable();
-    if(!r) {
-       DiagMessage("CheckDiskAvailable failed: ", "");
-       return FALSE;
-    }
-
-
-//
 
     r = FLOS_FindFile(&myFile, pFilename);
     if(!r) {

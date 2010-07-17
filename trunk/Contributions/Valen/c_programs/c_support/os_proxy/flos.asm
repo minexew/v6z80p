@@ -1,4 +1,6 @@
 ; Proxy for calling Asm code (FLOS KERNAL) from C.
+; This proxy is portable across C compilers  (proxy don't depend on any specific C compiler)
+; Coded in Pasmo.
 ; -----------------------
 
 
@@ -20,7 +22,7 @@ I_DATA equ $            ; area for exchange data (between C and asm code)
 include "i__kernal_jump_table.asm"
 
 
-       i__os_print_string		;start + $13
+        proxy__print_string    ;start + $13
         PUSH_ALL_REGS
         GET_I_DATA l, h
         call kjt_print_string
@@ -28,56 +30,51 @@ include "i__kernal_jump_table.asm"
         ret
 
 
-       i__os_clear_screen		;start + $16
+        proxy__clear_screen    ;start + $16
         PUSH_ALL_REGS
         call kjt_clear_screen
         POP_ALL_REGS
         ret
 
 
-       i__os_page_in_video		;start + $19
+        proxy__page_in_video    ;start + $19
 
-       i__os_page_out_video	;start + $1c
+        proxy__page_out_video    ;start + $1c
 
-       i__os_wait_vrt		;start + $1f
+        proxy__wait_vrt    ;start + $1f
         PUSH_ALL_REGS
         call kjt_wait_vrt
         POP_ALL_REGS
         ret
 
-       i__keyboard_irq_code	;start + $22
+        proxy__keyboard_irq_code    ;start + $22
 
-       i__hexbyte_to_ascii		;start + $25
+        proxy__hex_byte_to_ascii     ;start + $25
 
-       i__ascii_to_hexword		;start + $28
+        proxy__ascii_to_hex_word     ;start + $28
 
-       i__os_dont_store_registers	;start + $2b
+        proxy__dont_store_registers    ;start + $2b
 
-       i__os_user_input		;start + $2e
+        proxy__get_input_string    ;start + $2e
 
 
-       i__os_check_disk_pqfs	;start + $31
+        proxy__check_volume_format    ;start + $31
 
-       i__os_change_drive		;start + $34
+        proxy__change_volume    ;start + $34
 
-       i__os_check_disk_available	;start + $37
+        proxy__check_disk_available    ;start + $37 ; no longer used
         PUSH_ALL_REGS
-        call kjt_check_disk_available
-        ld c,0                  ; status = failed
-        jr nz,failed9
-        ld c,1                  ; status = ok
-failed9
         ld ix, I_DATA
-                                     ; c = result code, a = file system error code (if call was failed)
-        SET_I_DATA c, a
+                                     
+        xor a                        ; a = result code (always fail this call)     
+        SET_I_DATA a
         POP_ALL_REGS
         ret
 
-       i__fs_get_drive		;start + $3a
 
-       i__os_format		;start + $3d
-
-       i__os_make_dir		;start + $40
+        proxy__get_volume_info      ;start + $3a
+        proxy__format_device               ;start + $3d
+        proxy__make_dir             ;start + $40
         PUSH_ALL_REGS
         GET_I_DATA l, h
         call kjt_make_dir
@@ -94,7 +91,7 @@ failed10
         ret
 
 
-       i__os_change_dir		;start + $43
+        proxy__change_dir    ;start + $43
         PUSH_ALL_REGS
         GET_I_DATA l, h
         call kjt_change_dir
@@ -111,7 +108,7 @@ failed12
         ret
 
 
-       i__os_parent_dir		;start + $46
+        proxy__parent_dir    ;start + $46
         PUSH_ALL_REGS
         call kjt_parent_dir
         ld e,0                  ; status = failed
@@ -127,7 +124,7 @@ failed13
         ret
 
 
-       i__os_root_dir		;start + $49
+        proxy__root_dir    ;start + $49
         PUSH_ALL_REGS
         call kjt_root_dir
         ld e,0                  ; status = failed
@@ -143,7 +140,7 @@ failed14
         ret
 
 
-       i__os_delete_dir		;start + $4c
+        proxy__delete_dir    ;start + $4c
         PUSH_ALL_REGS
         GET_I_DATA l, h
         call kjt_delete_dir
@@ -163,7 +160,7 @@ failed11
 
 
 
-       i__os_find_file		;start + $4f
+        proxy__find_file    ;start + $4f
 
         PUSH_ALL_REGS
         GET_I_DATA l, h
@@ -192,11 +189,11 @@ failed1
         ret
 
 
-       i__os_load_file		;start + $52
+        proxy__load_file    ;start + $52
 
-       i__os_save_file		;start + $55
+        proxy__save_file    ;start + $55
 
-       i__os_erase_file		;start + $58
+        proxy__erase_file    ;start + $58
         PUSH_ALL_REGS
 ; HL = address of zero terminated filename.
         GET_I_DATA l, h
@@ -213,7 +210,7 @@ failed5
         ret
 
 
-       i__fs_get_total_sectors	;start + $5b
+        proxy__get_total_sectors    ;start + $5b
         PUSH_ALL_REGS
         call kjt_get_total_sectors
         xor a
@@ -222,7 +219,7 @@ failed5
         POP_ALL_REGS
         ret
 
-       i__os_wait_key_press	;start + $5e
+        proxy__wait_key_press    ;start + $5e
         PUSH_ALL_REGS
         call kjt_wait_key_press
 
@@ -233,7 +230,7 @@ failed5
         ret
 
 
-       i__os_get_key_press		;start + $61
+        proxy__get_key    ;start + $61
         PUSH_ALL_REGS
         call kjt_get_key
 
@@ -244,11 +241,11 @@ failed5
         ret
 
 
-       i__os_forcebank		;start + $64
+        proxy__forcebank    ;start + $64
 
-       i__os_getbank		;start + $67
+        proxy__getbank    ;start + $67
 
-       i__os_create_file		;start + $6a
+        proxy__create_file    ;start + $6a
         PUSH_ALL_REGS
 ; HL = address of zero terminated filename.
 ; IX = address that file should load to when no overrides are specified (irrelevent on FAT16)
@@ -270,11 +267,11 @@ failed4
 
 
 
-       i__os_incbank		;start + $6d
+        proxy__incbank    ;start + $6d
 
-       i__os_compare_strings	;start + $70
+        proxy__compare_strings    ;start + $70
 
-       i__os_write_bytes_to_file	;start + $73
+        proxy__write_bytes_to_file    ;start + $73
         PUSH_ALL_REGS
 
         ld ix, I_DATA
@@ -297,9 +294,9 @@ failed30
         ret
 
 
-       i__os_bchl_memfill		;start + $76
+        proxy__bchl_memfill    ;start + $76
 
-       i__os_force_load		;start + $79
+        proxy__force_load    ;start + $79
         PUSH_ALL_REGS
         GET_I_DATA l, h, b
         call kjt_force_load
@@ -316,7 +313,7 @@ failed2
         ret
 
 
-       i__os_set_file_pointer	;start + $7c
+        proxy__set_file_pointer    ;start + $7c
         PUSH_ALL_REGS
         GET_I_DATA l, h, e, d
         push hl
@@ -329,7 +326,7 @@ failed2
         ret
 
 
-       i__os_set_load_length	;start + $7f
+        proxy__set_load_length    ;start + $7f
         PUSH_ALL_REGS
         GET_I_DATA l, h, e, d
         push hl
@@ -342,18 +339,18 @@ failed2
         ret
 
 
-       i__os_serial_get_header	;start + $82
+        proxy__serial_receive_header    ;start + $82
 
-       i__os_serial_receive_file	;start + $85
+        proxy__serial_receive_file    ;start + $85
 
-       i__os_serial_send_file	;start + $88
+        proxy__serial_send_file    ;start + $88
 
 
-       i__os_init_mouse		;start + $8b
+        proxy__enable_pointer    ;start + $8b
 
-       i__os_get_mouse_position	;start + $8e
+        proxy__get_mouse_position    ;start + $8e
 
-       i__os_get_version		;start + $91
+        proxy__get_version    ;start + $91
         PUSH_ALL_REGS
         call kjt_get_version
 
@@ -363,7 +360,7 @@ failed2
         POP_ALL_REGS
         ret
 
-       i__os_set_cursor_position	;start + $94
+        proxy__set_cursor_position    ;start + $94
 ;;ret
         PUSH_ALL_REGS
         GET_I_DATA b, c
@@ -380,17 +377,17 @@ failed16
         POP_ALL_REGS
         ret
 
-       i__os_serial_tx		;start + $97
+        proxy__serial_tx_byte    ;start + $97
 
-       i__os_serial_rx		;start + $9a
+        proxy__serial_rx_byte    ;start + $9a
 
-        i__os_dir_list_first_entry        ;start + $9d
+        proxy__dir_list_first_entry         ;start + $9d
         PUSH_ALL_REGS
         call kjt_dir_list_first_entry
         POP_ALL_REGS
         ret
 
-        i__os_dir_list_get_entry          ;start + $a0
+         proxy__dir_list_get_entry            ;start + $a0
         PUSH_ALL_REGS
         call kjt_dir_list_get_entry
         ld e,0                  ; status = failed (hardware error)
@@ -415,7 +412,7 @@ failed15
         POP_ALL_REGS
         ret
 
-        i__os_dir_list_next_entry         ;start + $a3
+        proxy__dir_list_next_entry           ;start + $a3
         PUSH_ALL_REGS
         call kjt_dir_list_next_entry
 
@@ -426,13 +423,13 @@ failed15
         ret
 
 
-       i__os_get_cursor_position	;os_start + $a6
-       i__os_read_sector		;os_start + $a9
-       i__os_write_sector		;os_start + $ac
-       i__os_set_sector_lba		;os_start + $af
+        proxy__get_cursor_position    ;os_start + $a6
+        proxy__read_sector    ;os_start + $a9
+        proxy__write_sector    ;os_start + $ac
+        proxy__not_used_one    ;os_start + $af
 
-       i__os_plot_char		;os_start + $b2
-       i__os_set_pen		;os_start + $b5
+        proxy__plot_char    ;os_start + $b2
+        proxy__set_pen    ;os_start + $b5
         PUSH_ALL_REGS
         GET_I_DATA a
         call kjt_set_pen
@@ -440,18 +437,18 @@ failed15
         ret
 
 
-       i__os_background_colours	;os_start + $b8
-       i__os_draw_cursor	;os_start + $bb
+        proxy__background_colours    ;os_start + $b8
+        proxy__draw_cursor    ;os_start + $bb
 
-       i__os_kjt_get_pen		   ;os_start+0xbe
-       i__os_kjt_scroll_up		   ;os_start+0xc1
-       i__os_kjt_flos_display		   ;os_start+0xc4
+        proxy__get_pen       ;os_start+0xbe
+        proxy__scroll_up       ;os_start+0xc1
+        proxy__flos_display       ;os_start+0xc4
         PUSH_ALL_REGS
         call kjt_flos_display
         POP_ALL_REGS
         ret
 
-       i__os_kjt_get_dir_name		   ;os_start+0xc7
+        proxy__get_dir_name       ;os_start+0xc7
         PUSH_ALL_REGS
         call kjt_get_dir_name
         ld e,0                  ; status = failed
@@ -467,23 +464,29 @@ failed20
         POP_ALL_REGS
         ret
 
-        i__os_kjt_get_key_mod_flags	;equ os_start + $ca
+        proxy__get_key_mod_flags    ;equ os_start + $ca
 
-        i__os_kjt_get_display_size	;equ os_start + $cd   ; added in FLOS v559
-        i__os_kjt_timer_wait		;equ os_start + $d0	 ; added in FLOS v559
-        i__os_kjt_get_charmap_addr_xy	;equ os_start + $d3	 ; added in FLOS v559
+        proxy__get_display_size    ;equ os_start + $cd   ; added in FLOS v559
+        proxy__timer_wait    ;equ os_start + $d0	 ; added in FLOS v559
+        proxy__get_charmap_addr_xy ;equ os_start + $d3     ; added in FLOS v559
 
-        i__os_kjt_store_dir_position	;equ os_start + $d6	; added in FLOS v560
+        proxy__store_dir_position  ;equ os_start + $d6    ; added in FLOS v560
         PUSH_ALL_REGS
         call kjt_store_dir_position
         POP_ALL_REGS
         ret
 
-        i__os_kjt_restore_dir_position	;equ os_start + $d9	; added in FLOS v560
+         proxy__restore_dir_position        ;equ os_start + $d9    ; added in FLOS v560
         PUSH_ALL_REGS
         call kjt_restore_dir_position
         POP_ALL_REGS
         ret
+
+        proxy__mount_volumes           ;   start + $dc (added in v562)
+        proxy__get_device_info             ;   start + $df (added in v565)
+        proxy__read_sysram_flat    ;   start + $e2 (added in v570)
+        proxy__write_sysram_flat   ;   start + $e5 (added in v570)
+
 
 
 
