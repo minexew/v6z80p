@@ -25,16 +25,3 @@ serial download tool to send the files.
 8. At main menu again, repeat option the steps 2 - 7 but this time
    at step 3, choose block 1 (address f000 at step 4 as before)
 
-
-Notes:
-
-This new bootcode does now overwrite the old bootcode, therefore old versions
-of OSCA will still work.
-
-The new bootcode allows the OS to load as a normal file from the root dir of
-SD the card. The OS must have the special header attached (and end in .OSF)
-
-The old command "INSTALL.EXE" is no longer required - you just replace
-the .OSF file to update FLOS. The OS can still be installed on the EEPROM,
-the latest version of EPROM.EXE has an option specifically to do that).
-
