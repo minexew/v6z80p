@@ -14,17 +14,17 @@ Contents:
 
 [SLOT 0]
 
-$00800-$047FF - FLOS 563 (FAT16 version)
-$0F000-$0FFFF - Bootcode 6.11 (primary)
-$1F000-$1FFFF - Bootcode 6.11 (backup)
+$00800-$047FF - FLOS 570F
+$0F000-$0FFFF - Bootcode 6.12 (primary)
+$1F000-$1FFFF - Bootcode 6.12 (backup)
 
 [SLOT 1]
 
-$20000-$3FFFF - OSCA 660 (PAL)
+$20000-$3FFFF - OSCA 661 (PAL)
 
 [SLOT 2]
 
-$40000-$5FFFF - OSCA 660 (NTSC)
+$40000-$5FFFF - OSCA 661 (NTSC)
 
 
 
