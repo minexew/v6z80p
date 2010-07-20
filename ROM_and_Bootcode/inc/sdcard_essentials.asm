@@ -18,14 +18,14 @@ mmc_init_card
 	call mmc_power_off			; Switch off power to the card
 	
 	ld b,128				; wait approx 0.5 seconds
-mmc_powod	rst $18
+mmc_powod	call pause_4ms
 	djnz mmc_powod			
 		
 	call mmc_power_on			; Switch card power back on
 
 	call mmc_spi_port_slow
 
-	rst $18				; Short delay
+	call pause_4ms			; Short delay
 
 	call mmc_deselect_card		
 	
