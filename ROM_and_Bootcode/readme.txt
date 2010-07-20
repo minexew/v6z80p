@@ -2,8 +2,8 @@
 Bootcode - IMPORTANT: 
 ---------------------
 
-When changing the bootcode, remember to insert the correct CRC word to the
-end of the file before writing it to the EEPROM. Use the PC-based util
+After assembling the bootcode, remember to insert the correct CRC word
+to the end of the file before writing it to the EEPROM. Use the PC-based util
 "New_Bootcode_CRC.exe" in the apps subdirectory for this. (An incorrect
 CRC word results in the display flashing magenta on power up).
 
@@ -16,8 +16,25 @@ as a back up).
 * Revisions *
 *************
 
-bootcode
+Bootcode
 --------
+
+6.12 (20-07-2010) 
+
+This update became necessary due to changes in ROM 6.14 (as used in OSCA
+v661 onwards)
+
+Bootcode is no longer dependant on routines in ROM (no longer uses RST
+instructions)
+
+Initializes system registers and ports, sets up and clears screen
+(previously done by ROM)
+
+Can now press F1-F7 to select configs (only F1-F3 previously)
+
+Removed PQFS support code
+
+
 
 V6.11 (27-08-2009)
 
@@ -46,6 +63,28 @@ BAUD on boot with Function keys F11 (slow) and F12 (fast)
 
 ROM code
 --------
+
+v6.14 (20-07-2010):
+
+This version became necessary mainly due to the V6Z80P+ having the
+option of a soldered-on SMT EEPROM. As it would be difficult to program
+the EEPROM prior to soldering, a means of writing the bootcode in situ
+(without it already being available) was required. I decided the best
+way was for the ROM code to allow serial download of the bootcode if
+the EEPROM bootcode CRC checks failed. This way FLOS can boot allowing
+access to the usual EEPROM.EXE tool for installing bootcode to the EEPROM.
+This version of ROM code is used in OSCA 661 onwards.
+
+ROM code no longer initializes all ports and registers, only blanks screen
+and clears ports necessary for start up.
+
+If the EEPROM bootcode is not available, the screen turns grey meaning
+bootcode can then be sent via the serial link (115200 baud only). This
+serial download can be forced (skipping the EEPROM bootcode checks) by
+pressing Fire and holding UP+RIGHT on a joystick in port A on system
+start up.
+
+
 
 v6.12:
 
