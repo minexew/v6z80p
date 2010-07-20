@@ -1,3 +1,13 @@
+Updates to OSCA
+---------------
+
+
+661 - ROM version updated to v6.14 (requires bootcode 6.12)
+
+    - Port $B ("sys_alt_write_page") is now readable
+
+    - When VGA mode is not selected H_Sync is now high (V6Z80P+ compatibility)
+
 
 
 660 - Change: The PAL and NTSC versions of OSCA now only contain the relevant sync generator.

@@ -1,15 +1,17 @@
 
 Notes:
+------
 
 If you are upgrading from a version of OSCA prior to v652 you must install
-bootcode v6.11 in the EEPROM or the system will not start. See the folder
-bootcode_611 for info.
+bootcode v6.12 in the EEPROM or the system will not start. See the "bootcode"
+folder for info.
 
 If the version of EEPROM.EXE you have is not compatible with your current
-FLOS or OSCA set up, the original version is supplied in the bootcode_611
+FLOS or OSCA set up, the original version is supplied in the bootcode/old
 folder. When using it, it's probably best to tap ESC on boot, send the
 original version of FLOS serially, and load EEPROM.EXE serially also.
-Failing that, use FIRMWARE.EXE to rewrite SLOTS 0-2 from an image file.
+Failing that, use FIRMWARE.EXE to directly rewrite SLOTS 0-2 from an
+image file.
 
 
 Updating OSCA
