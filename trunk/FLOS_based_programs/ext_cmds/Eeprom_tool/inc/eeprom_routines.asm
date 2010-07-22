@@ -1,4 +1,15 @@
-
+; V6Z80P EEPROM ROUTINES V1.01
+; ----------------------------
+;
+; Note: Uses some sofware timing loops so it's probably best to disable/re-enable
+; interrupts around calls.
+;  
+; Changes:
+;
+; V1.01 - "Wait busy" now times out after 5 seconds (not 1 second)
+; 
+;
+;
 ;-------- EEPROM CONSTANTS -------------------------------------------------------------
 
 pic_data_input	equ 0	; from FPGA to PIC (bit 0 of sys_pic_comms)
@@ -261,14 +272,16 @@ pdswlp	djnz pdswlp		; allows time for PIC to act on received byte
 wait_pic_busy
 
 	push de
-	ld d,0
+	ld de,0
 	
 wait_pic	in a,(sys_irq_ps2_flags)	; check for timer overflow..
 	and 4
 	jr z,test_pic	
 	out (sys_clear_irq_flags),a	; clear timer overflow flag
-	inc d			; inc count of overflows
-	jr nz,test_pic			
+	inc de			; inc count of overflows
+	ld a,d
+	cp 5
+	jr nz,test_pic		; every 256 DE increments = 1 second		
 	pop de
 	scf			; timed out error - carry flag set
 	ret
