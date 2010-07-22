@@ -825,7 +825,7 @@ req_de_pe	ld a,(w_active_window)		;is this the hardware error requester?
 	jr nz,req_de_exit
 	call w_get_element_selection		;was OK pressed?
 	cp 1
-	call z,kjt_mount_drives		;if so remount drives
+	call z,kjt_mount_volumes		;if so remount drives
 	
 req_de_exit
 	
