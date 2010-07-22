@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.14 - P.Ruston '08 - '10    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.15 - P.Ruston '08 - '10    *
 ; ****************************************************************************
 ;
 ;
@@ -536,16 +536,29 @@ option_4	call show_banner
 fsokop4	call erase_block	
 	
 	call write_block
-	jr nz,endop4
+	ld hl,write_error_txt
+	jr nz,op4retry
 	
 	call verify_block
-	jr nz,endop4
+	ld hl,verify_error_txt
+	jr nz,op4retry		
 	
 	ld hl,ok_text		; show "completed" text
 endop4	call kjt_print_string
 	call kjt_wait_key_press
 	jp begin
 
+op4retry	call kjt_print_string	; state error and ask if want to retry the write
+	ld hl,retry_txt
+	call kjt_print_string
+op4gtri	call kjt_get_input_string
+	or a
+	jr z,op4gtri
+	ld a,(hl)
+	cp "N"
+	jp z,begin
+	jr fsokop4
+	
 
 ;------------------------------------------------------------------------------------
 ;-------- OPTION 5: Uninstall OS ----------------------------------------------------
@@ -578,19 +591,33 @@ ufp0	ld (hl),$ff
 	inc hl
 	djnz ufp0			
 
-	call erase_block
+fsokop5	call erase_block
 
 	call write_block
-	jr nz,endop5
+	ld hl,write_error_txt
+	jr nz,op5retry
 	
 	call verify_block
-	jr nz,endop5
+	ld hl,verify_error_txt
+	jr nz,op5retry
 	
 	ld hl,ok_text		; show "completed" text
 endop5	call kjt_print_string
 	call kjt_wait_key_press
 	jp begin
 
+
+op5retry	call kjt_print_string	; state error and ask if want to retry the write
+	ld hl,retry_txt
+	call kjt_print_string
+op5gtri	call kjt_get_input_string
+	or a
+	jr z,op5gtri
+	ld a,(hl)
+	cp "N"
+	jp z,begin
+	jr fsokop5
+	
 ;------------------------------------------------------------------------------------
 ;-------- OPTION 6: Update bootcode -------------------------------------------------
 ;------------------------------------------------------------------------------------
@@ -625,10 +652,12 @@ option_6	call show_banner
 fsokop6	call erase_block	
 	
 	call write_block
-	jr nz,endop6
+	ld hl,write_error_txt
+	jr nz,op6retry
 	
 	call verify_block
-	jr nz,endop6
+	ld hl,verify_error_txt
+	jr nz,op6retry
 	
 	ld hl,ok_text		; show "completed" text
 endop6	call kjt_print_string
@@ -636,6 +665,18 @@ endop6	call kjt_print_string
 	jp begin
 	
 	
+op6retry	call kjt_print_string	; state error and ask if want to retry the write
+	ld hl,retry_txt
+	call kjt_print_string
+op6gtri	call kjt_get_input_string
+	or a
+	jr z,op6gtri
+	ld a,(hl)
+	cp "N"
+	jp z,begin
+	jr fsokop6
+	
+		
 ;------------------------------------------------------------------------------------
 ;-------- OPTION 7: Insert arbitary data into EEPROM block --------------------------
 ;------------------------------------------------------------------------------------
@@ -764,9 +805,11 @@ fsokop7	ld a,(block_number)			;warn about OS..
 osissafe	call erase_block
 
 	call write_block
+	ld hl,write_error_txt
 	jr nz,op7end
 	
 	call verify_block
+	ld hl,verify_error_txt
 	jr nz,op7end
 
 	ld hl,ok_text			; show "completed" text
@@ -780,6 +823,18 @@ aborted	ld hl,abort_error_txt
 
 stopwas	ld hl,warn_active_slot_txt
 	jr op7end
+
+
+op7retry	call kjt_print_string		; state error and ask if want to retry the write
+	ld hl,retry_txt
+	call kjt_print_string
+op7gtri	call kjt_get_input_string
+	or a
+	jr z,op7gtri
+	ld a,(hl)
+	cp "N"
+	jp z,begin
+	jr osissafe
 			
 ;------------------------------------------------------------------------------------------
 
@@ -1359,7 +1414,7 @@ include "file_requesters_with_rs232.asm"
 
 
 start_text1	db 11," ************************************ ",11
-		db    " * V6Z80P ONBOARD EEPROM TOOL V1.14 * ",11
+		db    " * V6Z80P ONBOARD EEPROM TOOL V1.15 * ",11
 		db    " ************************************ ",11,0
 		
 start_text2	db 11
@@ -1477,9 +1532,9 @@ abort_error_txt	db 11,11,"Aborted - Press any key",11,0
 
 time_out_error_txt	db "   ",11,"Time out error - Press any key",11,0
 
-write_error_txt	db "   ",11,"Write error - Press any key",11,0
+write_error_txt	db "   ",11,"Write error!",11,0
 
-verify_error_txt	db "   ",11,"Verify error - Press any key",11,0
+verify_error_txt	db "   ",11,"Verify error!",11,0
 
 serial_error_txt	db 11,"Serial error - Press any key",11,0
 
@@ -1559,6 +1614,8 @@ pic_fw_text	db 11,"Config PIC firmware: ",0
 pic_fw_figures	db "6xx",11,0
 pic_fw_unknown_text	db "Unknown",11,0
 pic_fw_byte	db 0
+
+retry_txt		db 11,"Do you want to re-write the data (y/n)? ",0
 
 ;---------------------------------------------------------------------------------------
 
