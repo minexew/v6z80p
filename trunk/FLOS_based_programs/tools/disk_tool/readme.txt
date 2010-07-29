@@ -2,7 +2,7 @@
 Disktool.exe for FLOS by Phil Ruston 2010
 ------------------------------------------
 
-v0.01
+v0.03
 
 
 Info
