@@ -19,6 +19,13 @@ as a back up).
 Bootcode
 --------
 
+6.13 (31-07-2010)
+
+Bug fix: Restored missing "jr nz" after find file which was causing loader
+to try loading from card even when no .osf was present.
+
+
+
 6.12 (20-07-2010) 
 
 This update became necessary due to changes in ROM 6.14 (as used in OSCA
