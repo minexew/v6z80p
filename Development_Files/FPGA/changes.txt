@@ -1,0 +1,147 @@
+Updates to OSCA
+---------------
+
+
+661 - ROM version updated to v6.14 (requires bootcode 6.12)
+
+    - Port $B ("sys_alt_write_page") is now readable
+
+    - When VGA mode is not selected H_Sync is now high (V6Z80P+ compatibility)
+
+
+
+660 - Change: The PAL and NTSC versions of OSCA now only contain the relevant sync generator.
+      So to switch to the other TV system, it is necessary to put the alternative config in
+      another slot and reconfigure the FPGA.
+     
+      New: Port bit option to force VGA output to 50Hz (312 lines)
+      
+      New: 8x8 Tilemode added
+ 
+      Change: Extended mode tilemaps are now positioned at $70000 
+     
+--------------------------------------------------------------------------------------
+
+From this version backwards, the only difference between the PAL and NTSC versions of
+the OSCA config/project was that the NTSC mode flip/flop (bit 2 in Z80 Port 9) is
+set by default in the NTSC version - it can be switched in software.
+
+---------------------------------------------------------------------------------------
+
+659 - Made port $20 readable.
+      
+    - Reset button now clears "sys_alt_write_page", meaning the ROM is paged in
+      upon reset so the system can always start.
+
+    - Reset logic simplified (optimization)
+
+    - ROM updated (v612) - Port $20 is cleared on startup.
+ 
+
+658 - Added ability to select the 32KB bank of system RAM that resides at CPU
+      address $0-$7fff (port $20).
+
+    - Added a control bit to allow the first 32KB of system RAM to appear
+      at CPU address $8000-$7fff.
+
+    - Schematics for Port decode / registers tidied up in Xilinx project.
+
+
+657 - Added hi-res TV mode "filter" (vreg_ext_vidctrl bit 3)
+
+
+656 - ROM/Palette can now be paged out (0-$1ff = system RAM when bit 6 of
+      port sys_alt_write_page is set)
+
+    - When Video registers are paged out (with bit 7 of port sys_alt_write_page)
+      $200-$7ff becomes system RAM (previously $700-$7ff was exluded)
+
+    - Because of the above, the video status register "vreg_read" at $700
+      is now also available in port 7 (sys_vreg_read)
+
+
+654 - Recompiled with Keep Hierachy option set - this seems to have stopped
+      a display glitch that occured in 652.
+
+
+652 - ROM updated to load new bootcode (6.11)
+
+    - Port "sys_alt_write_page" bit 7 now pages out the hardware registers
+      in the range $200-$6ff when set. The locations always READ as the system
+      memory, and can be written to (without affecting the video registers)
+      when the new option bit is set.
+
+
+651 - Fixed the Video IRQ flag (vreg_read bit 3) which at some point I'd
+      accidentally connected to the video IRQ enable line, instead of the
+      video IRQ status flag signal.
+
+    - Tidied up video register schematics. Removed some async logic and negetive
+      clock logic. Fixed an unconnected input that had gone unnoticed.
+
+    - Compiled with "keep hierachy: soft" - seems to work fine.
+
+
+650 - Writes to Live Palette Select bit now take effect at the start of
+      the next scanline.
+
+    - Modulo register special case: When $ff is written, the data-fetch offset
+      counter is cleared at the start of each scan line (so the same
+      background line is re-used repeatedly)
+
+    - When sprite height is set to zero, sprite is 240 pixels tall (doesn't
+	apply if matte mode is enabled)
+
+    - New sprite priority mode bit: Allows sprites that are forced to the
+      foreground by setting their height MSB to 1 (via priority mode) to
+      maintain colours in the palette range 1-127, instead of changing to
+      129-255.
+
+645 - Added bitmap display modulo register (4th byte of odd bitplane
+      loc registers) Vidctrl bit 5 (bitplane register bank select 0/1)
+      sync'd to start of scanlines, Reset vram offset counter (writes
+      to 4th byte of even bitplane loc registers) sync'd to start of scanlines
+
+642 - Some refinements to the audio system: audio_enable bits can now
+      be read and audio IRQs generated.
+
+641 - Added interlace modes for TV displays
+      ROM now loads $800 bytes (was $2000 previously for some reason...)
+
+638 - New: Double buffered palette
+    - Fixed glitch that crept in a few updates back concerning CPU
+      writes to VRAM being corrupted if blitter running at same time
+      (blitter pause / DMA timing redesigned)
+      
+635 - New: Sprite x mirror, "force colours hi" + "matte" modes.
+
+634 - New: "LineCop" scanline sync'd video register writes (like Amiga's Copper)
+      New: Flood mode in chunky pixel bitmaps - automatic area filling.
+
+630 - Redesigned the tilemap architecture and extended its capabilities:
+      * Single 2032 block tileset, 11 bit index, 2 bits for x/y tile flip.
+      * Playfield priority swap bit
+  
+624 - Despite the sole change being the addition of an inverter gate on
+      the display mode jumper, v623 appeared to have a bug which froze
+      the system, particularly when scrolling the screen in FLOS.
+      This version is an attempt to fix that. It also contains a
+      small ROM update (if bootcode CRC is bad, screen flashes magenta
+      if bootcode databurst times out, screen flashes yellow)
+
+623 - Polarity of VGA mode jumper reversed. So jumper is now installed
+      for VGA mode, removed for TV mode. This release turned out to be
+      unstable for some reason.
+
+622 - New serial port architecture. Comm Port set to 115200 in config.
+      New ROM 6.02 (checks for bootcode in backup EEPROM location
+      $10000 if normal location load fails)
+
+618 - ROM 6.01: clear blit_src_msb and blit_dst_msb on boot to help
+      backwards compatibility with v5z80p programs (if a v6z80p program
+      changed these from default zeroes, and then a v5z80p program
+      ran afterwards, the blitter would use incorrect locations, ie:
+      above 128KB in VRAM)
+
+
+
