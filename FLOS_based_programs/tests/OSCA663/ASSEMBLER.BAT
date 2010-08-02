@@ -1,5 +1,5 @@
 
-%v6z80pdir%\pasmo\pasmo.exe -d -I %v6z80pdir%\equates -I %v6z80pdir%\FLOS_based_programs\tests\OSCA662\data %1 %1.bin
+%v6z80pdir%\pasmo\pasmo.exe -d -I %v6z80pdir%\equates -I %v6z80pdir%\FLOS_based_programs\tests\OSCA663\data %1 %1.bin
 
 pause
 
