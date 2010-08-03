@@ -1,0 +1,14 @@
+
+** Update the bootcode to version 6.12 before installing OSCA version 663 !! **
+
+Reason:
+
+Previous versions of the bootcode contain calls to locations within the
+ROM which are no longer valid, so the system will not start up correctly
+if old bootcode is present.
+
+The new ROM does provide an "escape route": Connect a joystick to port A
+and hold fire, up and right on power up. The screen will go grey allowing
+the latest bootcode to be sent via serial link. Once the system starts
+you can use EEPROM.EXE to install the latest bootcode to the EEPROM.
+
