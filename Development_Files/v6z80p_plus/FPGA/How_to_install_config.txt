@@ -1,0 +1,43 @@
+
+Installing an FPGA config onto the EEPROM
+-----------------------------------------
+
+
+1. Optional: Copy the relevant FPGA config *.bin file to the SD card.
+
+2. Boot into FLOS.
+
+3. Load the EEPROM tool (eeprom.exe)
+
+    If EEPROM.EXE is not on your SD card:
+    Enter RX * 5000
+    Send EEPROM.EXE from the utils folder with the PC serial link app
+    Enter G 5000
+
+4. Choose Option 1 "Write config to slot".
+
+5. Choose an inactive slot.
+
+6. Send the FPGA configuration .BIN file with the Serial Link app
+   (or enter filename to load from disk if it has been saved there)
+
+7. Wait for file to download, write to EEPROM and complete verification.
+
+8. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
+
+9. When prompted, choose to reconfigure from whichever slot you
+   used in step 5
+
+10. The FPGA restarts with the new FPGA firmware. This selection
+    persists until power off (or changed again with this util)
+
+   If everything is OK, you can reload the EEPROM tool and choose option 3
+   to make the new slot active.
+
+
+   If you want, you can just rewrite the active slot in the first place, but
+   the method above allows you to test the new config before making it default.
+   IE: If you overwrite the current Active Slot with a bad config, the FPGA will
+   not start at power on and you'll be forced to use one of the emergency options
+   to sort it out.
+
