@@ -1,4 +1,5 @@
 // ------------
+void Keyboard_Clear_IRQ_Flag(void);
 
 typedef struct {
     byte  scancode;
@@ -44,6 +45,8 @@ void Keyboard_IRQ_Handler()
     if(scancode == 0xF0) {
         keyboard.is_looking_for_second_byte_of_scancode = TRUE;
         // next interrupt, will bring the second byte of scancode
+
+        Keyboard_Clear_IRQ_Flag();
         return;
     }
 
@@ -60,6 +63,7 @@ void Keyboard_IRQ_Handler()
         if(scancode == keyboard.prev_pressed_scancode)
             keyboard.last_typed_scancode = scancode;
 
+        Keyboard_Clear_IRQ_Flag();
         return;
     }
 
@@ -74,6 +78,22 @@ void Keyboard_IRQ_Handler()
         keyboard.prev_pressed_scancode = scancode;   // remember last pressed scancode
     }
 
+    Keyboard_Clear_IRQ_Flag();
 }
+
+
+// clear keyboard interrupt flag
+void Keyboard_Clear_IRQ_Flag(void)
+{
+    BEGINASM()
+    push af
+
+    ld a,#0x01
+    out (SYS_CLEAR_IRQ_FLAGS),a ; clear keyboard interrupt flag
+
+    pop af
+    ENDASM()
+}
+
 
 //
