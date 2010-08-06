@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------------------------------
-; "MOUSE.EXE" = Test for mouse and activate OS pointer v1.01
+; "MOUSE.EXE" = Test for mouse and activate OS pointer v1.02
 ;-----------------------------------------------------------------------------------------------
 
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------
@@ -82,7 +82,8 @@ flos_ok
 	xor a
 	ret
 	
-minit_ok	ld a,%10000000			; copy sprite pointer to last definition block
+minit_ok	in a,(sys_mem_select)
+	or %10000000			; copy sprite pointer to last definition block
 	out (sys_mem_select),a		; of sprite ram
 	ld a,%10011111
 	ld (vreg_vidpage),a		
@@ -90,7 +91,8 @@ minit_ok	ld a,%10000000			; copy sprite pointer to last definition block
 	ld de,$1f00
 	ld bc,$100
 	ldir
-	xor a
+	in a,(sys_mem_select)
+	and %01111111
 	out (sys_mem_select),a
 
 	ld hl,new_pointer_colours		;copy to live palette
