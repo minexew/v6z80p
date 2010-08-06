@@ -183,7 +183,7 @@ sys_spi_port	EQU 0000AH
 sys_timer	EQU 00007H
 sys_vreg_read	EQU 00007H
 temphex		EQU 00B3AH
-use_mouse_pointer EQU 00BF6H
+use_mouse	EQU 00BF6H
 video_base	EQU 02000H
 video_registers	EQU 00200H
 volume_mount_list EQU 00400H

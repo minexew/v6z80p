@@ -525,6 +525,11 @@ filesize_cache_msw	dw 0		; ""
 
 dir_pos_cache	dw 0		; for KJT routines store/restore dir position
 
+mouse_disp_x	dw 0		; mouse displacement (not absolute position)
+mouse_disp_y	dw 0
+old_mouse_disp_x	dw 0
+old_mouse_disp_y	dw 0
+
 ;--------------------------------------------------------------------------------------
 
 	

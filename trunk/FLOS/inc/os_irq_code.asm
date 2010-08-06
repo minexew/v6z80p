@@ -86,7 +86,7 @@ sccdiz	ld a,%00000001
 
 
 ;-----------------------------------------------------------------------------------------
-; Mouse IRQ code v5.00
+; Mouse IRQ code v5.01
 ;-----------------------------------------------------------------------------------------
 
 mouse_irq_code
@@ -119,6 +119,9 @@ mouse_irq_code
 	dec d
 mxsignpos	ld a,(mouse_packet+1)
 	ld e,a
+	ld hl,(mouse_disp_x)
+	add hl,de
+	ld (mouse_disp_x),hl
 	ld hl,(mouse_pos_x)
 	add hl,de			; add mouse displacement to absolute pointer pos
 	ld (mouse_pos_x),hl
@@ -139,6 +142,10 @@ mrightok	ld d,0			; update pointer y position
 	dec d
 mysignpos	ld a,(mouse_packet+2)
 	ld e,a
+	ld hl,(mouse_disp_y)	; mouse uses positive displacement = upwards	
+	xor a			; motion so subtract value instead of adding
+	sbc hl,de
+	ld (mouse_disp_y),hl
 	ld hl,(mouse_pos_y)
 	xor a
 	sbc hl,de			; mouse uses positive displacement = upwards
