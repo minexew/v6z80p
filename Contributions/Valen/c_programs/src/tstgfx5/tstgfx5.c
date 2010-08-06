@@ -1,5 +1,5 @@
 /*
-   Basic keyboard and sprites example.
+   Basic keyboard and mouse example.
            
 */
 #include "../../inc/kernal_jump_table.h"
@@ -25,12 +25,14 @@
 #define Y_WINDOW_START                0x5
 #define Y_WINDOW_STOP                 0xA
 
-
+// we use our own irq code for keyb and mouse 
 #define APP_USE_OWN_KEYBOARD_IRQ
+#define APP_USE_OWN_MOUSE_IRQ
 
 
 #include "../../src/lib/sprites.c"
 #include "../../src/lib/keyboard.c"
+#include "../../src/lib/mouse.c"
 #include "../../src/lib/irq.c"
 
 //  application flags for pressed keyboard keys
@@ -110,10 +112,15 @@ void DoMain(void)
     sprite_regs_t r;
     
     // process user input 
+    // keyboard
     if(myplayer_input.up)   screenY -= 2;
     if(myplayer_input.down) screenY += 2;
     if(myplayer_input.left)  screenX -= 2;
     if(myplayer_input.right) screenX += 2;
+
+    // mouse
+    screenX = Mouse_GetX();
+
     
     r.sprite_number            = 0;
     r.x                        = screenX;
@@ -145,7 +152,7 @@ int main(void)
     //FillVideoMem();
 
     Keyboard_Init(keyboard_input_map);        // init keyboard input
-    install_irq_handler(IRQ_ENABLE_MASTER | IRQ_ENABLE_KEYBOARD);          // enable irq: master, keyboard
+    install_irq_handler(IRQ_ENABLE_MASTER | IRQ_ENABLE_KEYBOARD | IRQ_ENABLE_MOUSE);          // enable irq: master, keyboard, mouse
     
     
 

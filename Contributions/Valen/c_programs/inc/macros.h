@@ -53,6 +53,8 @@ sfr at SYS_PS2_JOY_CONTROL      io__sys_ps2_joy_control;
 sfr at SYS_JOY_COM_FLAGS        io__sys_joy_com_flags;
 sfr at SYS_IRQ_ENABLE           io__sys_irq_enable;
 sfr at SYS_CLEAR_IRQ_FLAGS      io__sys_clear_irq_flags;
+sfr at SYS_MOUSE_DATA           io__sys_mouse_data;
+
 
 /* define memory mapped I/O devices. This is SDCC specific feature.*/
 //------ Graphics registers -------------------------------------------------
