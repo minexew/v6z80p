@@ -37,7 +37,10 @@ Installing an FPGA config onto the EEPROM
 
    If you want, you can just rewrite the active slot in the first place, but
    the method above allows you to test the new config before making it default.
-   IE: If you overwrite the current Active Slot with a bad config, the FPGA will
+   IE: If you overwrite the current Active Slot with a bad config, the system will
    not start at power on and you'll be forced to use one of the emergency options
-   to sort it out.
+   to correct it.
+
+   It is recommended that a known working OSCA config file is always left in one
+   of the first seven slots and never over written.
 
