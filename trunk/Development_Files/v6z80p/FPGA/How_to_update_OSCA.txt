@@ -1,17 +1,9 @@
 
-Notes:
-------
+IMPORTANT:
+----------
 
-If you are upgrading from a version of OSCA prior to v652 you must install
-bootcode v6.12 in the EEPROM or the system will not start. See the "bootcode"
-folder for info.
-
-If the version of EEPROM.EXE you have is not compatible with your current
-FLOS or OSCA set up, the original version is supplied in the bootcode/old
-folder. When using it, it's probably best to tap ESC on boot, send the
-original version of FLOS serially, and load EEPROM.EXE serially also.
-Failing that, use FIRMWARE.EXE to directly rewrite SLOTS 0-2 from an
-image file.
+Please make sure you have the latest version of the bootcode installed before
+updating OSCA.
 
 
 Updating OSCA
@@ -46,17 +38,18 @@ Updating OSCA
 10. The FPGA restarts with the new FPGA firmware. This selection
     persists until power off (or changed again with this util)
 
-   If everything is OK, you can reload the EEPROM tool and choose option 3
-   to make the new slot active.
+11. If everything is OK, you can reload the EEPROM tool and choose option 3
+    to make the new slot active.
 
 
    If you want, you can just rewrite the active slot in the first place, but
    the method above allows you to test the new config before making it default.
    IE: If you overwrite the current Active Slot with a bad config, the FPGA will
    not start at power on and you'll be forced to use one of the emergency options
-   to sort it out.
+   to correct it (see below).
 
-
+   It is recommended that a known-working OSCA config is always present in one
+   of the first three slots.
 
 
 Emergency recovery options:
@@ -99,3 +92,14 @@ There are 3 different ways to overcome a bad configuration selection
     program.
 
 -------------------------------------------------------------------------------
+
+Notes:
+
+If the version of EEPROM.EXE you have is not compatible with your current
+FLOS or OSCA set up, the original version is supplied in the bootcode/old
+folder. When using it, it's probably best to tap ESC on boot, send the
+original version of FLOS serially, and load EEPROM.EXE serially also.
+Failing that, use FIRMWARE.EXE to directly rewrite SLOTS 0-2 from an
+image file.
+
+---------------------------------------------------------------------------------
