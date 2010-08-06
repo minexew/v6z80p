@@ -51,7 +51,7 @@ kjt_set_load_length		equ os_start + $7f
 kjt_serial_receive_header	equ os_start + $82
 kjt_serial_receive_file	equ os_start + $85
 kjt_serial_send_file	equ os_start + $88
-kjt_enable_pointer		equ os_start + $8b	; changed from "kjt_init_mouse" in FLOS v559
+kjt_enable_mouse		equ os_start + $8b	; changed from "kjt_enable_pointer" in FLOS v571
 kjt_get_mouse_position	equ os_start + $8e
 kjt_get_version		equ os_start + $91
 kjt_set_cursor_position	equ os_start + $94
@@ -85,3 +85,5 @@ kjt_mount_volumes		equ os_start + $dc	 ; added in FLOS v562
 kjt_get_device_info		equ os_start + $df   ; added in FLOS v565
 kjt_read_sysram_flat	equ os_start + $e2 	 ; (added in v570)
 kjt_write_sysram_flat	equ os_start + $e5 	 ; (added in v570)
+
+kjt_get_mouse_motion	equ os_start + $e8	 ; (added in v571)
