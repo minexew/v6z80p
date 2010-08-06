@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------------------------------
-; "MOUSE.EXE" = Test for mouse and activate OS pointer v1.02
+; "MOUSE.EXE" = Test for mouse and activat driver v1.03
 ;-----------------------------------------------------------------------------------------------
 
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------
@@ -82,25 +82,7 @@ flos_ok
 	xor a
 	ret
 	
-minit_ok	in a,(sys_mem_select)
-	or %10000000			; copy sprite pointer to last definition block
-	out (sys_mem_select),a		; of sprite ram
-	ld a,%10011111
-	ld (vreg_vidpage),a		
-	ld hl,pointer_def
-	ld de,$1f00
-	ld bc,$100
-	ldir
-	in a,(sys_mem_select)
-	and %01111111
-	out (sys_mem_select),a
-
-	ld hl,new_pointer_colours		;copy to live palette
-	ld de,palette+(248*2)
-	ld bc,8*2
-	ldir
-
-	call kjt_get_display_size		;get pointer boundaries
+minit_ok	call kjt_get_display_size		;get pointer boundaries
 	ld l,c
 	ld h,0
 	add hl,hl
@@ -112,9 +94,8 @@ minit_ok	in a,(sys_mem_select)
 	add hl,hl
 	add hl,hl
 	add hl,hl
-	ld bc,new_pointer_colours
-	call kjt_enable_pointer
-
+	call kjt_enable_mouse
+	
 	ld hl,mouse_enabled_txt
 	call kjt_print_string
 	xor a
@@ -299,11 +280,5 @@ mbyte_rdy	ld a,%00000010
 	ret
 
 
-	
 ;-----------------------------------------------------------------------------------------------
 
-new_pointer_colours	incbin "pointer_palette.bin"
-
-pointer_def	incbin "pointer_sprite.bin"
-
-;------------------------------------------------------------------------------------------------
