@@ -1,10 +1,19 @@
 
-FLOS: V6Z80P (SD Card interface) Build info:
---------------------------------------------
+FLOS: for V6Z80P version info:
+------------------------------
 
 
 Changes to FLOS:
 ----------------
+
+5.71 - 06/08/10 : Overhauled mouse driver system. The sprite pointer has been removed from
+                  FLOS. The driver just returns motion info, it is up to external programs to
+                  display whatever pointer / cursor they require.
+                : "kjt_enable_pointer" renamed to "kjt_enable_mouse"
+                ; "kjt_get_mouse_position" returns with Zero Flag not set if no driver installed.
+                : New KJT entry: "kjt_get_mouse_motion" - this returns the relative motion of the mouse
+                  since the last time the routine was called.
+
 
 5.70 - 28/06/10 : Added kernal routines "kjt_read_sysram_flat" and "kjt_write_sysram_flat"
 
