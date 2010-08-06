@@ -115,7 +115,7 @@ insert_mode		db 0
 mouse_packet		db 0,0,0
 mouse_packet_index		db 0
 
-use_mouse_pointer		db 0
+use_mouse			db 0
 
 mouse_pos_x		dw 0
 mouse_pos_y		dw 0
