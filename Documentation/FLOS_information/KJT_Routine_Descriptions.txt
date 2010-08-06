@@ -1,5 +1,5 @@
 
-  			Kernal Routines - Full Descriptions 31/05/2010
+  			Kernal Routines - Full Descriptions 06/08/2010
 			-----------------------------------------------
 
 
@@ -798,15 +798,15 @@ Output Registers : A bit 0 - left shift
 
 
 
-Routine name: kjt_enable_pointer (FLOS v559+)
-----------------------------------------------
+Routine name: kjt_enable_mouse (FLOS v571)
+------------------------------------------
 
 
-Action: Activates mouse pointer (called by MOUSE.EXE)
+Action: Activates mouse pointer (called by MOUSE.EXE) and sets x/y boundaries
 
 Input Registers  :  HL = Window size X
                     DE = Window size Y
-			  BC = address of 8 colours pointer palette
+		
 
 Output Registers : None
 
@@ -825,12 +825,38 @@ Input Registers  : none
 Output Registers : HL = x coordinate
                    DE = y coordinate
                     A = buttons status
+                   
+                   Zero Flag: if not set, the mouse driver was not enabled
+
+The x and y coordinates cannot overflow from the boundaries set with 
+"kjt_enable_mouse"
 
 (Note: the mouse driver is currently somewhat primative - it may become
 out of sync with the three-byte packets that the mouse sends if say,
 interrupts are disabled)
                    
 
+
+
+
+
+Routine name: kjt_get_mouse_motion (FLOS v571+)
+-----------------------------------------------
+
+Action: Returns relative mouse motion and button data. 
+
+Input Registers  : none 
+
+Output Registers : HL = x motion since last called
+                   DE = y motion since last called
+                    A = buttons status
+
+                  Zero Flag: if not set, the mouse driver was not enabled
+
+(Note: the mouse driver is currently somewhat primative - it may become
+out of sync with the three-byte packets that the mouse sends if say,
+interrupts are disabled)
+                   
 
 
 
