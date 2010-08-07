@@ -10,5 +10,4 @@ PCB (made post August 2010, PCB marked "V6Z80P+ Rev1.0", with
 a 15pin standard VGA socket)
 
 Please make sure you use files from the correct folder as the
-info, FPGA config and PIC data files are not compatible between
-PCBs.
+FPGA config files are not compatible between PCBs.
