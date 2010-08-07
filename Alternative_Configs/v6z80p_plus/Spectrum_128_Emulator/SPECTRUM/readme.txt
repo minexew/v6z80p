@@ -22,9 +22,10 @@ Installing the FPGA config
 
 6. Choose "L" to load config file from disk.
 
-7. Enter filename of the FPGA .bin file (the version ending in "p"
-   is for PAL TVs and the version ending in "n" is for NTSC TVs.
-   both versions support VGA 60Hz with 50Hz option)
+7. Enter filename of the FPGA .bin file contained in this folder
+   (the version ending in "p.bin" is for PAL TVs and the version
+   ending in "n.bin" is for NTSC TVs. both versions support VGA
+   60Hz with 50Hz option)
 
 8. Wait for file to write to EEPROM and complete verification.
 
