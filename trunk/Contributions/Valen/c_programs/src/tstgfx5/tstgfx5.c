@@ -1,5 +1,7 @@
 /*
    Basic keyboard and mouse example.
+
+   Draw, using mouse. Left button - draw. Right button - change color.
            
 */
 #include "../../inc/kernal_jump_table.h"
@@ -18,12 +20,12 @@
 #include <string.h>
 
 // Display Window sizes:
-// Width  320 pixels
-#define X_WINDOW_START                0x8
-#define X_WINDOW_STOP                 0xC
-// Height 200 lines
-#define Y_WINDOW_START                0x5
-#define Y_WINDOW_STOP                 0xA
+// Width  368 pixels
+#define X_WINDOW_START                0x7
+#define X_WINDOW_STOP                 0xE
+// Height 240 lines
+#define Y_WINDOW_START                0x3
+#define Y_WINDOW_STOP                 0xD
 
 // we use our own irq code for keyb and mouse 
 #define APP_USE_OWN_KEYBOARD_IRQ
@@ -34,6 +36,8 @@
 #include "../../src/lib/keyboard.c"
 #include "../../src/lib/mouse.c"
 #include "../../src/lib/irq.c"
+
+#include "../../src/lib/video_mode.c"
 
 //  application flags for pressed keyboard keys
 typedef struct {
@@ -53,32 +57,30 @@ keyboard_input_map_t keyboard_input_map[] = {
                 {0xFF, NULL}           // terminator (end of input map)
 };
 
-word screenX = 0, screenY = 0;
+short screenX = 0, screenY = 0;
 unsigned char Img1[16 * 16];            // test sprite image buffer (will be copied to sprite memory)
+
+byte colorIndex = 0xFF;        // color being draw under cursor
 
 void SetVideoMode(void)
 {
     // select bitmap mode + chunky pixel mode (1 byte = 1 pixel)
     mm__vreg_vidctrl = BITMAP_MODE|CHUNKY_PIXEL_MODE;
 
-    // Setup display window size:
-    // use y window pos reg
-    mm__vreg_rasthi = 0;
-    mm__vreg_window = (Y_WINDOW_START<<4)|Y_WINDOW_STOP;
-    // Switch to x window pos reg.
-    mm__vreg_rasthi = SWITCH_TO_X_WINDOW_REGISTER;
-    mm__vreg_window = (X_WINDOW_START<<4)|X_WINDOW_STOP;
+    VideoMode_SetupDisplayWindowSize(X_WINDOW_START, X_WINDOW_STOP, Y_WINDOW_START, Y_WINDOW_STOP);
 
     // initialize datafetch start address HW pointer
     mm__bitplane0a_loc__byte0 = 0;      // [7:0] bits
     mm__bitplane0a_loc__byte1 = 0;      // [15:8] 
     mm__bitplane0a_loc__byte2 = 0;      // [18:16] 
 
+//    mm__bitplane0a_loc__byte3 = 0;      // modulo
+
     // Enable sprites
     mm__vreg_sprctrl = SPRITE_ENABLE;
 }
 
-/*void FillVideoMem(void)
+void FillVideoMem(void)
 {
     byte i, totalVideoPages;
     byte colorIndex = 0;
@@ -91,7 +93,7 @@ void SetVideoMode(void)
         memset((byte*)(VIDEO_BASE), colorIndex, 0x2000);        // fill 8KB video page
         PAGE_OUT_VIDEO_RAM();
     }
-}*/
+}
 
 void PutObjectsToSpriteMemory(void)
 {
@@ -107,20 +109,47 @@ void PutObjectsToSpriteMemory(void)
 }
 
 
+// unoptimized
+void PutPixel(word x, word y, byte color)
+{
+    dword videoAddr = y * 368UL + x;
+    byte bank;
+    byte *p;
+
+    bank = videoAddr >> 13; // div by 8KB
+
+    PAGE_IN_VIDEO_RAM();
+    SET_VIDEO_PAGE(bank);
+    p = (byte*)(VIDEO_BASE + ((word)videoAddr & 0x1FFF));
+    *p = color;
+    PAGE_OUT_VIDEO_RAM();
+
+}
+
 void DoMain(void)
 {    
     sprite_regs_t r;
     
     // process user input 
-    // keyboard
+    // keyboard:
     if(myplayer_input.up)   screenY -= 2;
     if(myplayer_input.down) screenY += 2;
     if(myplayer_input.left)  screenX -= 2;
     if(myplayer_input.right) screenX += 2;
 
-    // mouse
-    screenX = Mouse_GetX();
+    // mouse:
+    screenX += Mouse_GetOffsetX();
+    // mouse uses positive displacement = upwards
+    // motion so subtract value instead of adding
+    screenY -= Mouse_GetOffsetY();
+    Mouse_ClearOffsets();
 
+    if(mouse.buttons & MOUSE_RIGHT_BUTTON_PRESSED) colorIndex++;
+
+
+    // check bounds
+    if(screenX < 0) screenX = 0; if(screenX > 368-1) screenX = 368-1;
+    if(screenY < 0) screenY = 0; if(screenY > 240-1) screenY = 240-1;
     
     r.sprite_number            = 0;
     r.x                        = screenX;
@@ -129,6 +158,10 @@ void DoMain(void)
     r.sprite_definition_number = 0;
     r.x_flip                   = FALSE;      
     set_sprite_regs(&r);
+
+    if(mouse.buttons & MOUSE_LEFT_BUTTON_PRESSED)
+        PutPixel(screenX, screenY, colorIndex);
+
 
 }
 
@@ -149,7 +182,7 @@ int main(void)
     PutObjectsToSpriteMemory();
     SetVideoMode();
     SetPalette();    
-    //FillVideoMem();
+    FillVideoMem();
 
     Keyboard_Init(keyboard_input_map);        // init keyboard input
     install_irq_handler(IRQ_ENABLE_MASTER | IRQ_ENABLE_KEYBOARD | IRQ_ENABLE_MOUSE);          // enable irq: master, keyboard, mouse
