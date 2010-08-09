@@ -33,6 +33,11 @@ typedef struct  {
 } FLOS_DIR_ENTRY;
 
 
+typedef struct {
+    byte buttons;
+    word PosX, PosY; 
+} MouseStatus;
+
 byte FLOS_GetLastError(void); 
 
 
@@ -67,6 +72,8 @@ void FLOS_WaitKeyPress(byte* pASCII, byte* pScancode);
 BOOL FLOS_GetKeyPress(byte* pASCII, byte* pScancode);
 
 // ---------------
+//GetMousePosition
+// ---------------
 void FLOS_DirListFirstEntry(void);
 BOOL FLOS_DirListGetEntry(FLOS_DIR_ENTRY* pEntry);
 byte FLOS_DirListNextEntry(void);
@@ -74,6 +81,9 @@ const char* FLOS_GetDirName(void);
 
 // Misc --------------------------------------
 void FLOS_GetVersion(word* os_version_word, word* hw_version_word);
+
+// Mouse --------------------------------------
+BOOL FLOS_GetMousePosition(MouseStatus* ms);
 
 // helpers --------------------------------------
 void FLOS_PrintStringLFCR(const char* string);

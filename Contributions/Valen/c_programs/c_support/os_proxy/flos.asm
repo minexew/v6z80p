@@ -349,6 +349,21 @@ failed2
         proxy__enable_pointer    ;start + $8b
 
         proxy__get_mouse_position    ;start + $8e
+        PUSH_ALL_REGS
+        call kjt_get_mouse_position
+                                ; Zero Flag: if not set, the mouse driver was not enabled
+        ld c,0                  ; status = failed
+        jr nz,failed26
+        ld c,1                  ; status = ok
+failed26
+
+
+        ld ix, I_DATA
+                                     ; HL = x,  DE = y, A = buttons
+        SET_I_DATA c, l, h, e, d, a
+        POP_ALL_REGS
+        ret
+
 
         proxy__get_version    ;start + $91
         PUSH_ALL_REGS

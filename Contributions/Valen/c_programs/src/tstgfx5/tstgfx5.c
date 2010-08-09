@@ -2,6 +2,8 @@
    Basic keyboard and mouse example.
 
    Draw, using mouse. Left button - draw. Right button - change color.
+   Keyboard cursor keys also move pen.
+   ESC - exit.
            
 */
 #include "../../inc/kernal_jump_table.h"
@@ -27,6 +29,8 @@
 #define Y_WINDOW_START                0x3
 #define Y_WINDOW_STOP                 0xD
 
+#define OS_VERSION_REQ  0x571           // OS version req. to run this program
+
 // we use our own irq code for keyb and mouse 
 #define APP_USE_OWN_KEYBOARD_IRQ
 #define APP_USE_OWN_MOUSE_IRQ
@@ -38,6 +42,7 @@
 #include "../../src/lib/irq.c"
 
 #include "../../src/lib/video_mode.c"
+#include "../../src/lib/utils.c"
 
 //  application flags for pressed keyboard keys
 typedef struct {
@@ -61,6 +66,8 @@ short screenX = 0, screenY = 0;
 unsigned char Img1[16 * 16];            // test sprite image buffer (will be copied to sprite memory)
 
 byte colorIndex = 0xFF;        // color being draw under cursor
+
+char buffer[32];
 
 void SetVideoMode(void)
 {
@@ -177,8 +184,42 @@ void SetPalette(void)
     
 }
 
+
+BOOL Check_FLOS_Version(void) 
+{
+    if(!Utils_Check_FLOS_Version(OS_VERSION_REQ)) {
+        FLOS_PrintString("FLOS v");
+        _uitoa(OS_VERSION_REQ, buffer, 16);
+        FLOS_PrintString(buffer);
+        FLOS_PrintStringLFCR("+ req. to run this program.");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL IsMouseInitialized(void)
+{
+    MouseStatus ms;
+    if(!FLOS_GetMousePosition(&ms)) {   // req FLOS v571+
+        FLOS_PrintStringLFCR("ERROR:");
+        FLOS_PrintStringLFCR("The mouse driver was not enabled.");
+        FLOS_PrintStringLFCR("Attach the mouse and run MOUSE.EXE,");
+        FLOS_PrintStringLFCR("before running this program.");
+        return FALSE;
+    }
+    return TRUE;
+}
+
 int main(void)
 {    
+
+    if(!Check_FLOS_Version()) 
+        return NO_REBOOT;
+
+    if(!IsMouseInitialized())
+        return NO_REBOOT;
+    
+
     PutObjectsToSpriteMemory();
     SetVideoMode();
     SetPalette();    
@@ -188,7 +229,7 @@ int main(void)
     install_irq_handler(IRQ_ENABLE_MASTER | IRQ_ENABLE_KEYBOARD | IRQ_ENABLE_MOUSE);          // enable irq: master, keyboard, mouse
     
     
-
+    SpritesRegsBuffer_Clear();          // clear, to not see garbage on first frame
     while(!myplayer_input.esc) {
         FLOS_WaitVRT();
         SpritesRegsBuffer_CopyToHardwareRegs();         // must be called right after FLOS_WaitVRT()
