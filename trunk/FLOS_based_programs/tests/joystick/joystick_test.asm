@@ -1,7 +1,7 @@
 
-; Tests: Joystick ports
+; Tests Joystick ports (simplified 10-08-2010)
 
-;---Standard header for OSCA and FLOS ----------------------------------------
+;---Standard header for OSCA and FLOS -----------------------------------------------------------------------
 
 include "kernal_jump_table.asm"
 include "OSCA_hardware_equates.asm"
@@ -9,118 +9,78 @@ include "system_equates.asm"
 
 	org $5000	
 
-;-----------------------------------------------------------------------------------------
+;---------Set up video --------------------------------------------------------------------------------------
 
-; Initialize video hardware
 
-	ld a,0
-	ld (vreg_rasthi),a		; select y window reg
-	ld a,$5a
-	ld (vreg_window),a		; set y window size/position (200 lines)
-	ld a,%00000100
-	ld (vreg_rasthi),a		; select x window reg
-	ld a,$8c
-	ld (vreg_window),a		; set x window size/position (320 pixels)
-	
-	ld a,%01000000
-	out (sys_mem_select),a	; page in video ram
-	
-	ld e,0
-	ld a,e
-clrabp	ld (vreg_vidpage),a
+	ld a,%00000000			; select y window pos register
+	ld (vreg_rasthi),a		 
+	ld a,$2e				; set 256 line display
+	ld (vreg_window),a
+	ld a,%00000100			; switch to x window pos register
+	ld (vreg_rasthi),a		
+	ld a,$bb
+	ld (vreg_window),a			; set 256 pixels wide window
 
-	ld hl,video_base		; clear all bitplanes
-	ld bc,$2000
-flp	ld (hl),0
-	inc hl
-	dec bc
-	ld a,b
-	or c
-	jr nz,flp
-
-	inc e
-	ld a,e
-	cp 16
-	jr nz,clrabp
-	
-	ld a,0
-	ld (vreg_vidctrl),a		;bitmap mode + normal border + video enabled
-	ld a,0
-	ld (vreg_xhws),a		;x scroll position = 0
-
-	ld a,7
-	ld (vreg_yhws_bplcount),a
-
-	ld ix,bitplane0a_loc	;initialize bitplane pointers.
-	ld hl,$0			;first bitplane address (15:0)
-	ld c,$0			;first bitplane address msb
-	ld de,$2000		;size of bitplane
-	ld b,16			;number of registers to do
-ibpl_lp	ld (ix),l
-	ld (ix+1),h
-	ld (ix+2),c
-	inc ix
-	inc ix
-	inc ix
-	inc ix
-	add hl,de
-	jr nc,nobplcr
-	set 0,c
-nobplcr	djnz ibpl_lp
-
+	ld ix,bitplane0a_loc	 
+	ld hl,0				; Set video window start address		
+	ld a,0 
+set_vaddr	ld (ix),l				;\ 
+	ld (ix+1),h			;- Video fetch start address for this frame
+	ld (ix+2),a			;/
 		
-;---------------------------------------------------------------------------------------
+	ld a,%10000000
+	ld (vreg_vidctrl),a			; Set bitmap mode (bit 0 = 0) + chunky pixel mode (bit 7 = 1)	
 
-; Draw 128x128x8 pic
+	
+;--------- Copy 128x128 pic to display ----------------------------------------------------------------------
+ 
+	ld a,0
+	ld (vreg_vidpage),a			; select first 64kb of video ram
+	
+	di				; temp disable interrupts
+	ld a,%00100000			; Z80 address space = 64KB page of video RAM for writes
+	out (sys_mem_select),a
 
-	ld a,0		
-	ld (vid_buffer),a		;software blit writes to bm buffer 0
-
-	ld de,video_base+12+(32*40)	;de = destination address
-	ld hl,test_gfx		;source address of graphic
-	ld bc,$8010		;b = height / c = width in bytes
-	ld a,40-16		;a = destination modulo
-	call sw_blit
-
-
-;-----------------------------------------------------------------------------------------
-
-	ld hl,test_pal		;write palette
-	ld de,palette
+	ld hl,0
 	ld b,0
-pwloop	ld c,(hl)
+clrlp1	ld (hl),b				; clear 64kb of vram
 	inc hl
-	ld a,(hl)
-	inc hl
-	ld (de),a
-	inc de
-	ld a,c
-	ld (de),a
-	inc de
-	djnz pwloop
+	ld a,h
+	or l
+	jr nz,clrlp1
+	
+	ld hl,source_pic			; copy the joystick pic to vram (in centre of window)
+	ld de,64+(64*256)
+	ld a,128
+lp1	ld bc,128
+	ldir
+	ex de,hl
+	ld bc,128
+	add hl,bc
+	ex de,hl
+	dec a
+	jr nz,lp1
 		
-	ld a,%00000000
-	out (sys_mem_select),a	;page out video ram
+	xor a
+	out (sys_mem_select),a
+	ei				;reenable interrupts
+	
+	ld hl,colours			;write palette
+	ld de,palette
+	ld bc,512
+	ldir
 	
 ;--------------------------------------------------------------------------------------------
 
-wvrtstart	ld a,(vreg_read)		;wait for Vertical Retrace
-	and 1
-	jr z,wvrtstart
-wvrtend	ld a,(vreg_read)
-	and 1
-	jr nz,wvrtend
-	
-	ld hl,counter
-	inc (hl)
+wvrtstart	call kjt_wait_vrt
 	
 	call do_stuff
 
 	in a,(sys_keyboard_data)
 	cp $76
-	jr nz,wvrtstart		; loop if SPACE key not pressed
+	jr nz,wvrtstart			; loop if ESC key not pressed
 	
-	ld a,$ff			; quit
+	ld a,$ff				; quit
 	or a
 	ret
 
@@ -128,10 +88,7 @@ wvrtend	ld a,(vreg_read)
 ;-----------------------------------------------------------------------------------------
 		
 		
-do_stuff
-
-
-	ld hl,palette+(240*2)
+do_stuff	ld hl,palette+(240*2)		;show joystick directions by changing colour palette
 	ld b,16
 pgrey	ld (hl),$88
 	inc hl
@@ -139,13 +96,10 @@ pgrey	ld (hl),$88
 	inc hl
 	djnz pgrey
 	
-	ld hl,palette+(240*2)
 	xor a
-	out (sys_ps2_joy_control),a	;select port a
-
-	ld b,0			;short delay necessart for V4Z80P
-lp1	djnz lp1			;as wire-OR selection diodes hold charge for a while
+	out (sys_ps2_joy_control),a		;select port a
 	
+	ld hl,palette+(240*2)
 	in a,(sys_joy_com_flags)
 	
 	bit 0,a
@@ -186,9 +140,6 @@ not_a5
 	ld a,%00000001
 	out (sys_ps2_joy_control),a	;select port b
 	
-	ld b,0			;short delay necessart for V4Z80P
-lp2	djnz lp2			;as wire-OR diodes hold charge for a while
-	
 	ld hl,palette+(248*2)
 	in a,(sys_joy_com_flags)
 	bit 0,a
@@ -227,59 +178,11 @@ not_b4	inc hl
 	
 not_b5	ret
 
-	
-
 
 ;-----------------------------------------------------------------------------------------
 
-
-		
-sw_blit	ld ix,blit_vars
-	ld (ix),a			;modulo
-	ld (ix+1),b		;height
-	ld (ix+4),b		;height backup
-	ld (ix+2),c		;width
-	ld (ix+3),0		;bitplane number
-blit_lp2	push de
-	ld a,(vid_buffer)
-	sla a
-	sla a
-	sla a
-	or (ix+3)
-	ld (vreg_vidpage),a
-blit_lp1	ld b,0
-	ldir
-	ld a,(ix)
-	add a,e			;add line modulo
-	jr nc,nocrmod
-	inc d
-nocrmod	ld e,a
-	ld c,(ix+2)
-	dec (ix+1)
-	jr nz,blit_lp1
-	pop de
-	ld a,(ix+4)		;restore height counter
-	ld (ix+1),a
-	inc (ix+3)		;next bitplane
-	ld a,(ix+3)
-	cp 8
-	jr nz,blit_lp2
-	ret
-		
-;-------------------------------------------------------------------------------------------
-
-blit_vars		db 0,0,0,0,0,0
-
-vid_buffer	db 0
-
-counter 		db 0
-
-showbuffer 	db 0
-
-;-------------------------------------------------------------------------------------------
-
-test_gfx incbin "joystick_bitplanes.bin"
-test_pal incbin "joystick_12bit_palette.bin"
+source_pic incbin "joystick_chunky.bin"
+colours    incbin "joystick_12bit_palette.bin"
 
 ;-------------------------------------------------------------------------------------
 
