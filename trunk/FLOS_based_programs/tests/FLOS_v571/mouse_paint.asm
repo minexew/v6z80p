@@ -1,4 +1,5 @@
-; Simple "paint with mouse" program.
+; Ultra simple "paint object to display with mouse buttons" test program.
+
 
 ;---Standard source header for OSCA and FLOS ------------------------------------------
 
