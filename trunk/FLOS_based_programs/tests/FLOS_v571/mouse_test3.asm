@@ -1,4 +1,4 @@
-; Moves pointer sprite using mouse displacements
+; Moves pointer sprite using mouse displacements (as opposed to absolute mouse coords)
 
 ;---Standard source header for OSCA and FLOS ------------------------------------------
 
