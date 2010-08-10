@@ -1,4 +1,4 @@
-; Refines mouse window size
+; Redefines mouse window size
 ; Displays mouse coordinates and mouse displacements
 
 
