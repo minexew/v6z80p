@@ -1,5 +1,5 @@
 
-; Tests: Joystick ports
+; Tests: keyboard, acting as joystick
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
