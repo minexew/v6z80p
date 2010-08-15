@@ -1,5 +1,5 @@
 ;-------------------------------
-;Kernal jump table for FLOS v570
+;Kernal jump table for FLOS v573
 ;-------------------------------
 
 os_start equ $1000
