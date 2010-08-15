@@ -1,5 +1,5 @@
 
-  			Kernal Routines - Full Descriptions 06/08/2010
+  			Kernal Routines - Full Descriptions 14/08/2010
 			-----------------------------------------------
 
 
@@ -29,14 +29,13 @@ Most of the file system routines return the standard error codes.
 	$08 - File too big (IE: Memory address out of range)
 	$09 - Filename already exists
 	$0a - Already at root directory
-	$0b - Directory not found
 	$0e - Invalid filename
 	$13 - Unknown/incorrect disk format
 	$1b - Requested bytes beyond EOF
 	$1e - Bad range (sector out of range)
 	$21 - Invalid disk 
 	$22 - Device not present		
-	$23 - Directory not found		     
+	$23 - Directory not found
 	$24 - End of directory list
 	$25 - Device does not use MBR
 	$26 - Cant find volume label
@@ -311,9 +310,8 @@ Output Registers : Standard error codes
 
 Notes:
 
-Use “kjt_create_file” or “kjt_save_file” before calling this routine.
-Returns "file not found" error if the file has not been created previously.
-
+Returns "file not found" error if the file has not been previously created 
+with “kjt_create_file” or “kjt_save_file”
 
 
 
@@ -472,6 +470,43 @@ Output Registers : HL = address of device info table
 		   DE = address of driver table
 		   B =  number of devices initialized 
                    A = current active driver number
+
+
+
+Routine name: kjt_get_dir_cluster (new in FLOS 572)
+---------------------------------------------------
+
+Action: Returns the location of the directory cluster
+
+Input Registers  : None
+
+Output Registers : DE = cluster pointed at by current directory
+		   
+                   
+
+
+Routine name: kjt_set_dir_cluster (new in FLOS 572)
+---------------------------------------------------
+
+Action: Sets the directory cluster (for use with above command)
+
+Input Registers  : DE = desired cluster number to be used as current dir
+
+Output Registers : None
+		   
+
+
+
+Routine name: kjt_rename_file (new in FLOS 572)
+---------------------------------------------------
+
+Action: Rename files / folders.
+
+Input Registers  : HL = Pointer to filename to change (null terminated ASCII)
+                 : DE = Pointer to replacement filename (null terminated ASCII)
+
+Output Registers : Standard error codes	
+
 
 
 
