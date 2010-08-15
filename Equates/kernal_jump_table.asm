@@ -87,3 +87,7 @@ kjt_read_sysram_flat	equ os_start + $e2 	 ; (added in v570)
 kjt_write_sysram_flat	equ os_start + $e5 	 ; (added in v570)
 
 kjt_get_mouse_motion	equ os_start + $e8	 ; (added in v571)
+
+kjt_get_dir_cluster		equ os_start + $eb 	 ; (added in v572)
+kjt_set_dir_cluster		equ os_start + $ee   ; (added in v572)
+kjt_rename_file		equ os_start + $f1   ; (added in v572)
