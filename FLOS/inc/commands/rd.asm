@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"RD" - Remove directory command. V6.01
+;"RD" - Remove directory command. V6.02
 ;-----------------------------------------------------------------------
 
 os_cmd_rd
@@ -17,10 +17,7 @@ os_cmd_rd
 	jp z,os_no_args_error
 	call fs_delete_dir_command
 	ret c
-	cp $0b			;dir not found?
-	jr nz,notdnf
-	ld a,$23			;swap FS error code $0b to message index $23	
-notdnf	or a		
+	or a		
 	ret
 
 ;-----------------------------------------------------------------------

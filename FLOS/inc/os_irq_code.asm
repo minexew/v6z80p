@@ -32,57 +32,118 @@ timer_irq_code
 	ld a,%00000100
 	out (sys_clear_irq_flags),a	;clears timer IRQ
 	ret
-
+	
 ;----------------------------------------------------------------------------------------
-; Keyboard IRQ routine v5.00
+; Keyboard IRQ routine v5.02
 ;----------------------------------------------------------------------------------------
 
 keyboard_irq_code
 
-	push af			; buffers the scan code bytes
+	push af			; buffer the keypresses, keep track of qualifiers
 	push hl			
-			
-	ld a,(sub_keycode_idx)	; multi-byte keycode sub index 
-	ld hl,key_buf_wr_idx	
-	add a,(hl)		; add buffer index
-	ld hl,scancode_buffer	
-	and 31
-	add a,l
-	jr nc,kbblnc
-	inc h
-kbblnc	ld l,a						
-	in a,(sys_keyboard_data)	; get the keycode
-	cp $e0			; ignore/discard any E0 scan code bytes
-	jr z,sccdiz
-	cp $e1			; ignore/discard any E1 scan code bytes
-	jr z,sccdiz
-	ld (hl),a			; put scancode into keyboard buffer
 	
-	ld l,1			; 1 = default number of bytes expected in a keycode
-	cp $f0			; was scancode = $F0 (release key)?
-	jr nz,kcnot_f0
-	ld l,2			; if so set the "bytes expected" counter to 2
-kcnot_f0	ld a,l
-	ld (sub_keycode_countdown),a	
+	ld a,(key_release_mode)
+	or a
+	jr z,key_pressed
+
+	in a,(sys_keyboard_data)
+	cp $e0
+	jr z,kirq_done	
+	cp $e1
+	jr z,kirq_done	
 	
-	ld hl,sub_keycode_idx
-	inc (hl)			; increment sub-scancode index
-	ld a,(hl)			
-	ld hl,sub_keycode_countdown	
-	dec (hl)			; decrement "bytes in scancode" count
-	jr nz,sccdiz
-	ld hl,key_buf_wr_idx	; if zero the full keycode sequence is in
-	add a,(hl)		; so the actual scancode buffer position can
-	and 31			; be updated
-	ld (hl),a
+	call qualifiers
+	ld a,l
+	cpl
+	ld l,a
+	ld a,(key_mod_flags)
+	and l			;update qualifier key releases
+	ld (key_mod_flags),a
 	xor a
-	ld (sub_keycode_idx),a	; sub-scancode counter is reset to zero
+	ld (key_release_mode),a
+
+	jr kirq_done
 	
-sccdiz	ld a,%00000001
+key_pressed
+
+	in a,(sys_keyboard_data)
+	cp $e0
+	jr z,kirq_done	
+	cp $e1
+	jr z,kirq_done	
+
+	cp $f0			;is scancode a key released token?
+	jr nz,not_krel
+	ld a,1			;if so, so nothing except set the next irq to
+	ld (key_release_mode),a	;treat scan code as a release code
+	jr kirq_done
+	
+	
+not_krel	push af
+	call qualifiers
+	ld a,(key_mod_flags)	;update qualifier presses
+	or l
+	ld (key_mod_flags),a
+	
+	ld hl,scancode_buffer
+	ld a,(key_buf_wr_idx)		 
+	add a,l
+	ld l,a
+	jr nc,kbhok
+	inc h
+kbhok	pop af
+	ld (hl),a			; put key press scancode in buffer 	
+	ld a,l
+	add a,16
+	ld l,a
+	jr nc,kbhok2
+	inc h
+kbhok2	ld a,(key_mod_flags)	; also record qualifier status in buffer
+	ld (hl),a	
+	ld a,(key_buf_wr_idx)
+	inc a
+	and 15
+	ld (key_buf_wr_idx),a	; advance the buffer location
+	
+kirq_done	ld a,%00000001
 	out (sys_clear_irq_flags),a	; clear keyboard interrupt flag
 	pop hl
 	pop af
 	ret
+
+
+qualifiers
+
+	ld l,$40
+	cp $2f
+	ret z
+
+	ld l,$20
+	cp $27
+	ret z
+
+	ld l,$10
+	cp $59
+	ret z
+
+	ld l,$08
+	cp $11
+	ret z
+
+	ld l,$04
+	cp $1f
+
+	ld l,$02
+	cp $14
+	ret z
+
+	ld l,$01
+	cp $12
+	ret z
+	
+	ld l,0
+	ret
+	
 
 
 ;-----------------------------------------------------------------------------------------

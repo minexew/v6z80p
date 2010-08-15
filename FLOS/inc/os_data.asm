@@ -224,6 +224,7 @@ ser_rec2_msg	db $95,$6f,$98,$97,0		;"Receiving Data..",11,0
 ser_send_msg	db $96,$6f,$98,$97,0		;"Sending Data..",11,0
 hw_err_msg	db $a7,$7c,$90,$97,0		;"Driver Error:$xx",11,0
 disk_err_msg	db $60,$7c,0			;"Disk Error",0
+script_aborted_msg	db $a1,$77,$97,$97,0		;"Script Aborted",11.0
 
 
 packed_help1	db $97,$0
@@ -355,7 +356,7 @@ ok_msg		db $89,0			;$20 ok (OS error code 16)
 		db $87,$60,0		;$21 Invalid Volume
 		db $1a,$62,$78,0		;$22 Device not present
 
-		db $1d,$62,$63,0		;$23 Dir not found (FS error code 0b)
+		db $1d,$62,$63,0		;$23 Dir not found
 		db $77,0			;$24 aborted (OS error code 17)
 
 		db $21,$99,$6d,0		;$25 File name mismatch (FS error code 0c)
@@ -363,7 +364,7 @@ ok_msg		db $89,0			;$20 ok (OS error code 16)
 		db $6f,$71,$70,$6e,0	;$27 Data after EOF request (FS error code 0d)
 no_vols_msg	db $76,$36,$0		;$28 No Volumes
 none_found_msg	db $97,$a6,$63,$0		;$29 None Found
-		
+				
 		db $ff			;END MARKER
 		
 

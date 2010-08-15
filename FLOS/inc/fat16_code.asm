@@ -1,8 +1,9 @@
 ;----------------------------------------------------------------------------------------------
-; Z80 FAT16 File System code for FLOS v1.10 by Phil @ Retroleum
+; Z80 FAT16 File System code for FLOS v1.11 by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.10 - changes for Volume based file access (IE: multiple partitions)
+; Changes:1.11 - "Dir not found" error now always $23 ($0b no longer used)
+;	1.10 - changes for Volume based file access (IE: multiple partitions)
 ;              - added "fs_get_volume_label"
 ;              - added "fs_calc_free_space"
 ;              - fixed "find_free_cluster" - now uses "sectors per fat" comparison to find end of fat 
@@ -782,7 +783,7 @@ fs_delete_dir_command
 	call fs_find_filename		;does filename exist in current dir?
 	ret c
 	jr z,ddc_gotd
-	ld a,$0b				;change file not found to dir not found
+	ld a,$23				;change file not found to dir not found
 	or a
 	ret
 	

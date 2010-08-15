@@ -1,10 +1,19 @@
 
-FLOS: for V6Z80P version info:
-------------------------------
+FLOS for V6Z80P version info:
+-----------------------------
 
-
-Changes to FLOS:
-----------------
+5.73 - 15/08/10 : To skip boot_run (or any scripts started with EXEC) at any point in the list
+                  you now hold down CTRL + C (not ESC)
+                : Keyboard handling code simplified (both Kernal routines and IRQ)
+                : As part of the above, "kjt_get_key_mod_flags" will now return the current
+                : status of the qualifier keys at any point, you dont need to have
+                : called "kjt_get_key" or "kjt_wait_key_press" previously.
+              
+              
+5.72 - 10/08/10 : Added "kjt_get_dir_cluster" and "kjt_set_dir_cluster"
+                : Standardized filesystem error code: $0B ("dir not found") to $23
+                : Added "kjt_rename_file"
+                
 
 5.71 - 06/08/10 : Overhauled mouse driver system. The sprite pointer has been removed from
                   FLOS. The driver just returns motion info, it is up to external programs to
