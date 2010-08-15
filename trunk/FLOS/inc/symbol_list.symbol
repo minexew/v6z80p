@@ -79,6 +79,7 @@ irq_vector	EQU 00A01H
 key_buf_rd_idx	EQU 00BEDH
 key_buf_wr_idx	EQU 00BECH
 key_mod_flags	EQU 00BF0H
+key_release_mode EQU 00BEEH
 keymaps		EQU 00200H
 last_os_var	EQU 00C00H
 linedraw_colour	EQU 0020BH
@@ -117,6 +118,7 @@ new_bootcode_location EQU 00200H
 new_rom_stack	EQU 00FFFH
 nmi_jp_inst	EQU 00A03H
 nmi_vector	EQU 00A04H
+not_currently_used EQU 00BEFH
 os_args_pos_cache EQU 00B93H
 os_args_start_hi EQU 00B92H
 os_args_start_lo EQU 00B91H
@@ -155,8 +157,6 @@ storeix		EQU 00B12H
 storeiy		EQU 00B14H
 storepc		EQU 00B18H
 storesp		EQU 00B16H
-sub_keycode_countdown EQU 00BEEH
-sub_keycode_idx	EQU 00BEFH
 sys_alt_write_page EQU 0000BH
 sys_audio_enable EQU 00008H
 sys_audio_flags	EQU 00008H

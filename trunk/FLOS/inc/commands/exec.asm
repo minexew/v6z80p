@@ -1,5 +1,7 @@
 ;-----------------------------------------------------------------------
-;"exec" - execute script V6.00
+;"exec" - execute script V6.01
+;
+; Changes in 6.01 - abort with CRTL + C
 ;
 ; Notes: Changing drives within a script not supported yet.
 ;        Scripts cannot launch scripts
@@ -29,7 +31,32 @@ oktlscr	set 0,(hl)
 	ld hl,0
 	ld (script_file_offset),hl
 	
-scrp_loop	ld hl,script_buffer			;clear bootscript buffer and command string		
+
+scrp_loop	ld a,(key_mod_flags)		; skip boot script if L-CTRL is pressed
+	and 2
+	jr z,noskip_script	
+	ld d,0
+chk_c	call os_get_key_press
+	cp $21
+	jr nz,no_cpr
+wkend	ld d,25				; wait for key repeats to stop for a while
+wkend2	call kjt_wait_vrt			; before continuing	
+	call os_get_key_press		
+	or a
+	jr nz,wkend
+	dec d
+	jr nz,wkend2
+	ld hl,script_aborted_msg
+	call os_show_packed_text
+	xor a				; script aborted error message
+	ret
+no_cpr	dec d
+	jr nz,chk_c
+
+
+noskip_script
+
+	ld hl,script_buffer			;clear bootscript buffer and command string		
 	ld de,commandstring
 	ld b,OS_window_cols+1
 	ld a,$20				;fill 'em with spaces

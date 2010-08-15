@@ -103,8 +103,8 @@ scancode_buffer		ds 32,0
 
 key_buf_wr_idx		db 0
 key_buf_rd_idx		db 0
-sub_keycode_countdown	db 0		;handles multi-byte keycodes
-sub_keycode_idx		db 0		;""    ""    ""     ""    ""
+key_release_mode		db 0		
+not_currently_used		db 0
 key_mod_flags		db 0
 insert_mode		db 0
 
