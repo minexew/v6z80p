@@ -1080,7 +1080,9 @@ Notes: Char $0a = line feed
        Char $0d = carriage return
        Char $0b = Line Feed and Carriage return
 
-       All registers are preserved by this routine!
+       HL returns pointing to the zero byte at end of the string
+
+       All other registers are preserved by this routine.
 
 
 
