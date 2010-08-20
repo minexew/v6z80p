@@ -28,7 +28,7 @@ load_loc	db $ed,$00	; header ID (Invalid Z80 instruction)
 	jr exec_addr	; jump over remaining header data
 	dw load_loc	; location file should load to
 	db my_bank	; upper bank the file should load to
-	db 0		; just padding to 8 bytes
+	db 0		; dont truncate the program load
 
 exec_addr	
 
