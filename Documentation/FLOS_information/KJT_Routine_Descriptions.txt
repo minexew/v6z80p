@@ -601,6 +601,31 @@ Output registers: Standard error codes (relevant errrors: $1e, $22)
 
 
 
+Routine name: kjt_file_sector_list (new in FLOS 575)
+----------------------------------------------------
+
+Action: Retrieves the location of the (next) disk sector that a file occupies.
+
+Input registers:	A  = Sector offset (within current cluster)
+			DE = Cluster number
+
+Output registers:       A  = Next sector offset
+                        DE = Updated cluster
+                        HL = Memory address of LSB of 4 byte sector location
+
+How to use:
+------------
+
+To obtain the list of sectors that a file uses, first call "kjt_find_file" with
+the filename in HL as normal. On exit, DE will be equal the first cluster that
+the file occupies. Clear the accumulator (as we're starting at the first sector
+of this cluster), and call "kjt_file_sector_list". On return A and DE are updated
+to the values required for the next time the routine is called and HL points to
+the lowest significant byte of the sector address (LBA0). Next, copy the 4 bytes
+from HL to HL+3 to your sector list buffer and loop around, calling "kjt_file_sector_list"
+for as many sectors as are used by the file (simply subtract 512 from a
+variable holding the file size every call until variable is = < 0)
+
 
 
 ******************************************************************************
@@ -1483,4 +1508,52 @@ Note: Preserves all other registers.
 
 
 
-------------------------------------------------------------------------------------------------
+*********************************************************************************
+*                      ENVIRONMENT VARIABLE RELATED CALLS                       *
+*********************************************************************************
+
+
+
+Routine name: kjt_set_envar (FLOS 575+)
+---------------------------------------
+
+Action: Sets an environment variable (or updates a variable if it already exists)
+
+Input Registers: HL = name of variable (4 chars max, zero-termination required if less than 4 chars)
+		 DE = address of data for variable (4 bytes)
+
+Output Registers: Zero Flag = set if all OK, not set if no space for new variable
+
+
+
+
+
+
+Routine name: kjt_get_envar (FLOS 575+)
+---------------------------------------
+
+Action: gets (address of) value of an environment variable
+
+Input Registers : HL = name of variable (4 chars max, zero-termination required if less than 4 chars)
+		
+Output Registers: If zero Flag = Set : all OK,  HL = address of data for variable (4 bytes)
+                  If Zero Flag = Not set: variable was not found, HL = address of envar list, A = max entries
+                  
+
+
+
+
+
+Routine name: kjt_delete_envar (FLOS 575+)
+------------------------------------------
+
+Action: deletes an environment variable
+
+Input Registers : HL = name of variable (4 chars max, zero-termination required if less than 4 chars)
+
+Output Registers: Zero flag = set if all OK, not set if named variable not found
+
+
+
+
+
