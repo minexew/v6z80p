@@ -65,6 +65,7 @@ cursorflashtimer EQU 00B9AH
 cursorstatus	EQU 00B9BH
 de_store1	EQU 00B07H
 de_store2	EQU 00B0EH
+env_var_list	EQU 00480H
 fillbyte	EQU 00B3CH
 find_hexstringascii EQU 00B38H
 first_os_var	EQU 00B1EH
@@ -100,6 +101,7 @@ linedraw_reg5	EQU 0022AH
 linedraw_reg6	EQU 0022CH
 linedraw_reg7	EQU 0022EH
 max_bank	EQU 00B35H
+max_envars	EQU 00010H
 memmonaddrh	EQU 00B23H
 memmonaddrl	EQU 00B22H
 mouse_buttons	EQU 00BFBH
@@ -127,7 +129,6 @@ os_extcmd_jmp_addr EQU 00B95H
 os_linecount	EQU 00B3BH
 output_line	EQU 00B67H
 palette		EQU 00000H
-pointer_colours	EQU 00480H
 scancode_buffer	EQU 00BCCH
 scratch_pad	EQU 00A08H
 script_buffer	EQU 00B9CH
