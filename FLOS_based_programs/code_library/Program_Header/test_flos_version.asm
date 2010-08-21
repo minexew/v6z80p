@@ -1,7 +1,12 @@
 
+; A header for programs to test that required FLOS version (or above) is running.
+
+
 ;--------- Test FLOS version -----------------------------------------------------------
 
+
 required_flos equ $575
+
 
 	push hl
 	call kjt_get_version	
@@ -32,4 +37,6 @@ hex_txt	db "----+",11,11,0
 
 flos_ok	
 
+;--------------------------------------------------------------------------------------
+; User's program goes here..
 ;--------------------------------------------------------------------------------------
