@@ -1,8 +1,9 @@
 ;----------------------------------------------------------------------------------------------
-; Z80 FAT16 File System code for FLOS v1.11 by Phil @ Retroleum
+; Z80 FAT16 File System code for FLOS v1.12 by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.11 - "Dir not found" error now always $23 ($0b no longer used)
+; Changes:1.12 - "hl_to_filename" - If filename has forward slash at 9th (dot) character, it now counts as end of filename
+;	1.11 - "Dir not found" error now always $23 ($0b no longer used)
 ;	1.10 - changes for Volume based file access (IE: multiple partitions)
 ;              - added "fs_get_volume_label"
 ;              - added "fs_calc_free_space"
@@ -1668,7 +1669,9 @@ csfnlp2	ld a,(hl)				; now copy filename, upto 8 characters
 find_ext	ld a,(hl)
 	cp "."				; ninth char should be a dot
 	jr z,dofn_ext	
-	cp " "				; if space or zero, no extension
+	cp " "				; if space, zero or forward slash, no extension
+	ret z
+	cp $2f
 	ret z
 	or a
 	ret z
