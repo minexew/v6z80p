@@ -2,6 +2,17 @@
 FLOS for V6Z80P version info:
 -----------------------------
 
+5.75  -20/08/10 : Added environment variable routines: kjt_get_envar, kjt_set_envar, kjt_delete_envar
+                  Environment variables currently live under the video registers at $480-$4FF (see
+                  entry in system_equates.asm)
+                : Added "kjt_list_file_sectors" to get a list of disk sectors that a file occupies
+
+
+5.74  -18/08/10 : Bugfix: Previously, if "CD" was given a multi-dir path and one of the dirs was 8 chars long
+                  the dir stepping would stop at that point.
+                : FLOS filename now "FLOSvXYZ.OSF" - no need to FAT16 distinction as non-FAT16
+                  versions no longer produced.
+
 5.73 - 15/08/10 : To skip boot_run (or any scripts started with EXEC) at any point in the list
                   you now hold down CTRL + C (not ESC)
                 : Keyboard handling code simplified (both Kernal routines and IRQ)
