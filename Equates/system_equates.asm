@@ -1,7 +1,7 @@
 
 ;-- ROM / Bootcode related values ----------------------------------------------------
 
-new_bootcode_location	equ $200	; bootcode 6.10+
+new_bootcode_location	equ $200		; bootcode 6.10+
 new_bootcode_length		equ $DC0
 new_rom_stack		equ $FFF
 
@@ -13,7 +13,8 @@ host_device_hardware_info	equ $380		; "under" the video registers (to $3ff)
 
 volume_mount_list		equ $400		; "under" the video registers (to $47f)
 
-pointer_colours		equ $480		; "under" the video registers (to $48f)
+max_envars 		equ 16	
+env_var_list		equ $480		; "under" the video registers (to $4ff)
 
 sector_buffer		equ $800
 
@@ -33,3 +34,8 @@ OS_charmap		equ $c00		; 25 x 40 chars
 OS_location		equ $1000
 
 ;-------------------------------------------------------------------------------------
+
+; NOTES
+; -----
+; "env_vars" must be aligned to 8 byte boundary, each variable takes 8 bytes.
+; The variable list must not spill over into a new page
