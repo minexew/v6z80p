@@ -1,5 +1,5 @@
 ;---------------------------------------------------------------------------------
-; Reads a source palette and brigtens or darkens the RGB nybbles before
+; Reads a source palette and brightens or darkens the RGB nybbles before
 ; writing the values to the a destination (normally the hardware palette registers)
 ;----------------------------------------------------------------------------------
 ;
