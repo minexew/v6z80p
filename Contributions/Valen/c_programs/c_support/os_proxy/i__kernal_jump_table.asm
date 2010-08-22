@@ -1,4 +1,4 @@
-; Machine generated. Dont edit. Source file: /home/valen/_1/v6z80p_SVN/FLOS/FLOS570FAT16.asm
+; Machine generated. Dont edit. Source file: /home/valen/_1/v6z80p_SVN/FLOS/FLOSv575.asm
 ; FLOS proxy jump table (must be identical to Kernel jump table)
     jp proxy__print_string		  ;   start + $13
     jp proxy__clear_screen		  ;   start + $16
@@ -40,7 +40,7 @@
     jp proxy__serial_receive_header	  ;   start + $82
     jp proxy__serial_receive_file	  ;   start + $85
     jp proxy__serial_send_file	  ;   start + $88
-    jp proxy__enable_pointer		  ;   start + $8b
+    jp proxy__enable_mouse		  ;   start + $8b
     jp proxy__get_mouse_position	  ;   start + $8e
     jp proxy__get_version		  ;   start + $91
     jp proxy__set_cursor_position	  ;   start + $94
@@ -71,3 +71,11 @@
     jp proxy__get_device_info		  ;   start + $df (added in v565)
     jp proxy__read_sysram_flat	  ;   start + $e2 (added in v570)
     jp proxy__write_sysram_flat	  ;   start + $e5 (added in v570)
+    jp proxy__get_mouse_disp		  ;   start + $e8 (added in v571)
+    jp proxy__get_dir_cluster		  ;   start + $eb (added in v572)
+    jp proxy__set_dir_cluster		  ;   start + $ee (added in v572)
+    jp proxy__rename_file		  ;   start + $f1 (added in v572)
+    jp proxy__set_envar		  ;   start + $f4 (added in v575)
+    jp proxy__get_envar		  ;   start + $f7 (added in v572)
+    jp proxy__delete_envar		  ;   start + $fa (added in v572)
+    jp proxy__file_sector_list	  ;   start + $fd (added in v575)

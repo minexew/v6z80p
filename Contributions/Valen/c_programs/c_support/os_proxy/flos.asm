@@ -165,6 +165,7 @@ failed11
         PUSH_ALL_REGS
         GET_I_DATA l, h
         call kjt_find_file
+        push de
         ld e,0                  ; status = failed
         jr nz,failed1
         ld e,1                  ; status = ok
@@ -183,6 +184,9 @@ failed1
         pop hl
         pop bc                  ; bc:hl
         SET_I_DATA l, h, c, b
+; DE = first cluster that the file uses
+        pop de
+        SET_I_DATA e, d
 
 
         POP_ALL_REGS
@@ -346,7 +350,7 @@ failed2
         proxy__serial_send_file    ;start + $88
 
 
-        proxy__enable_pointer    ;start + $8b
+        proxy__enable_mouse    ;start + $8b
 
         proxy__get_mouse_position    ;start + $8e
         PUSH_ALL_REGS
@@ -501,6 +505,37 @@ failed20
         proxy__get_device_info             ;   start + $df (added in v565)
         proxy__read_sysram_flat    ;   start + $e2 (added in v570)
         proxy__write_sysram_flat   ;   start + $e5 (added in v570)
+        proxy__get_mouse_disp		  ;   start + $e8 (added in v571)
+        proxy__get_dir_cluster		  ;   start + $eb (added in v572)
+        proxy__set_dir_cluster		  ;   start + $ee (added in v572)
+        proxy__rename_file		  ;   start + $f1 (added in v572)
+        proxy__set_envar		  ;   start + $f4 (added in v575)
+        proxy__get_envar		  ;   start + $f7 (added in v572)
+        proxy__delete_envar		  ;   start + $fa (added in v572)
+
+        proxy__file_sector_list	  ;   start + $fd (added in v575)
+        PUSH_ALL_REGS
+        GET_I_DATA a, e, d
+        call kjt_file_sector_list
+        push de
+        ld e,0                  ; status = failed
+        jr nz,failed27
+        ld e,1                  ; status = ok
+failed27
+
+        ld ix, I_DATA
+                                     ; e = result code
+        SET_I_DATA e, a              ; a  = Sector offset (within current cluster)
+; HL = Memory address of LSB of 4 byte sector location
+        SET_I_DATA l, h
+
+        pop de
+; DE = Updated cluster
+        SET_I_DATA e, d
+
+        POP_ALL_REGS
+        ret
+
 
 
 
