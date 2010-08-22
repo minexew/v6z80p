@@ -13,7 +13,11 @@ TEST v0.01
 
 #include <stdlib.h>
 
-#define OS_VERSION_REQ  0x555           // OS version req. to run this program
+// for use sprintf (this will add about 3KB of code)
+#include <stdio.h>             
+
+
+#define OS_VERSION_REQ  0x575           // OS version req. to run this program
 
 
 // prototypes
@@ -32,11 +36,14 @@ void WaitKeyPress(byte scancode);
 BOOL PrintCurDirName(void);
 word GetSP(void)  NAKED;
 
-char *pFilename;        // = "VID1.BIN";
+char *pFilename;
 FLOS_FILE myFile;
 char buffer[32+1];
 
 byte buf[8];
+
+byte mystring[60];
+
 
 # define CALL_TEST(n)        if ( !test##n() ) {                \
                                  MarkFrameTime(0xf00);          \
@@ -124,6 +131,11 @@ BOOL test1(void)
 {
     BOOL r;
 
+    FLOS_FILE_SECTOR_LIST pF;
+    byte sectorOffset;
+    word clusterNumber;
+    dword sectorNumber;
+
 
     r = FLOS_FindFile(&myFile, pFilename);
     if(!r) {
@@ -148,6 +160,16 @@ BOOL test1(void)
     FLOS_PrintString(" Bank: $");
     FLOS_PrintString(buffer);
     FLOS_PrintString(PS_LFCR);
+
+    sprintf(mystring, "Cluster: %i", myFile.firstCluster);
+    FLOS_PrintStringLFCR(mystring);
+
+    sectorOffset = 0; clusterNumber = myFile.firstCluster;
+    FLOS_FileSectorList(&pF, sectorOffset, clusterNumber);
+
+    sectorNumber =  *pF.ptrToSectorNumber;
+    sprintf(mystring, "Cluster: %l", sectorNumber);
+    FLOS_PrintStringLFCR(mystring);
 
     return TRUE;
 }

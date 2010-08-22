@@ -182,6 +182,8 @@ BOOL FLOS_FindFile(FLOS_FILE* const pFile, const char* pFileName)
 //       pFile->first_block = *PTRTO_I_DATA(I_DATA+2, word);
        pFile->z80_bank    = *PTRTO_I_DATA(I_DATA+2, byte);
        pFile->size        = *PTRTO_I_DATA(I_DATA+5, dword);
+       pFile->firstCluster= *PTRTO_I_DATA(I_DATA+9, word);
+
 //    
     } else {
        g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
@@ -190,6 +192,30 @@ BOOL FLOS_FindFile(FLOS_FILE* const pFile, const char* pFileName)
 
     return result; 
 }
+
+
+BOOL FLOS_FileSectorList(FLOS_FILE_SECTOR_LIST* const pF, byte sectorOffset, word clusterNumber)
+{
+    byte result = FALSE;
+    *PTRTO_I_DATA(I_DATA,   byte) = (byte) sectorOffset;
+    *PTRTO_I_DATA(I_DATA+1, word) = (word) clusterNumber;
+
+    CALL_FLOS_CODE(KJT_FILE_SECTOR_LIST);
+
+    result = *PTRTO_I_DATA(I_DATA, byte);
+    if(result) {
+       pF->sectorOffset      =          *PTRTO_I_DATA(I_DATA+1, byte);
+       pF->ptrToSectorNumber = (dword*) *PTRTO_I_DATA(I_DATA+2, word);
+       pF->clusterNumber     =          *PTRTO_I_DATA(I_DATA+4, word);
+
+    } else {
+//       g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
+//       g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
+    }
+
+    return result; 
+}
+
 
 void FLOS_SetLoadLength(const dword len)
 {
