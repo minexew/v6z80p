@@ -516,20 +516,14 @@ failed20
         proxy__file_sector_list	  ;   start + $fd (added in v575)
         PUSH_ALL_REGS
         GET_I_DATA a, e, d
-        call kjt_file_sector_list
-        push de
-        ld e,0                  ; status = failed
-        jr nz,failed27
-        ld e,1                  ; status = ok
-failed27
+        call kjt_file_sector_list    ; function don't return result code 
 
         ld ix, I_DATA
-                                     ; e = result code
-        SET_I_DATA e, a              ; a  = Sector offset (within current cluster)
+
+        SET_I_DATA a              ; a  = Sector offset (within current cluster)
 ; HL = Memory address of LSB of 4 byte sector location
         SET_I_DATA l, h
 
-        pop de
 ; DE = Updated cluster
         SET_I_DATA e, d
 

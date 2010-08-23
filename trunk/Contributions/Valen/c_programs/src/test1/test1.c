@@ -134,7 +134,8 @@ BOOL test1(void)
     FLOS_FILE_SECTOR_LIST pF;
     byte sectorOffset;
     word clusterNumber;
-    dword sectorNumber;
+    dword sectorLBA;
+    byte i;
 
 
     r = FLOS_FindFile(&myFile, pFilename);
@@ -161,15 +162,19 @@ BOOL test1(void)
     FLOS_PrintString(buffer);
     FLOS_PrintString(PS_LFCR);
 
-    sprintf(mystring, "Cluster: %i", myFile.firstCluster);
+    sprintf(mystring, "First cluster: $%x", myFile.firstCluster);
     FLOS_PrintStringLFCR(mystring);
 
     sectorOffset = 0; clusterNumber = myFile.firstCluster;
-    FLOS_FileSectorList(&pF, sectorOffset, clusterNumber);
+    for(i=0; i<3; i++) {
+        FLOS_FileSectorList(&pF, sectorOffset, clusterNumber);
 
-    sectorNumber =  *pF.ptrToSectorNumber;
-    sprintf(mystring, "Cluster: %l", sectorNumber);
-    FLOS_PrintStringLFCR(mystring);
+        sectorLBA =  *pF.ptrToSectorNumber;
+        sprintf(mystring, "Sector num $%x, LBA $%lx", i, sectorLBA);
+        FLOS_PrintStringLFCR(mystring);
+
+        sectorOffset = pF.sectorOffset; clusterNumber = pF.clusterNumber;
+    }
 
     return TRUE;
 }

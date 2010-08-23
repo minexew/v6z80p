@@ -65,7 +65,7 @@ BOOL FLOS_CreateFile(const byte* pFilename);
 BOOL FLOS_EraseFile(const byte* pFilename);
 BOOL FLOS_WriteBytesToFile(const byte* pFilename, byte* address, const byte bank, const dword len);
 
-BOOL FLOS_FileSectorList(FLOS_FILE_SECTOR_LIST* const pF, byte sectorOffset, word clusterNumber);
+void FLOS_FileSectorList(FLOS_FILE_SECTOR_LIST* const pF, byte sectorOffset, word clusterNumber);
 // ---------------
 
 void FLOS_PrintString(const char* string);
