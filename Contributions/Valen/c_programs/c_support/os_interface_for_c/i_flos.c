@@ -194,26 +194,21 @@ BOOL FLOS_FindFile(FLOS_FILE* const pFile, const char* pFileName)
 }
 
 
-BOOL FLOS_FileSectorList(FLOS_FILE_SECTOR_LIST* const pF, byte sectorOffset, word clusterNumber)
+void FLOS_FileSectorList(FLOS_FILE_SECTOR_LIST* const pF, byte sectorOffset, word clusterNumber)
 {
-    byte result = FALSE;
+    word w;
     *PTRTO_I_DATA(I_DATA,   byte) = (byte) sectorOffset;
     *PTRTO_I_DATA(I_DATA+1, word) = (word) clusterNumber;
 
     CALL_FLOS_CODE(KJT_FILE_SECTOR_LIST);
 
-    result = *PTRTO_I_DATA(I_DATA, byte);
-    if(result) {
-       pF->sectorOffset      =          *PTRTO_I_DATA(I_DATA+1, byte);
-       pF->ptrToSectorNumber = (dword*) *PTRTO_I_DATA(I_DATA+2, word);
-       pF->clusterNumber     =          *PTRTO_I_DATA(I_DATA+4, word);
+    pF->sectorOffset      = *PTRTO_I_DATA(I_DATA+0, byte);
 
-    } else {
-//       g_flos_lasterror    = *PTRTO_I_DATA(I_DATA+1, byte);
-//       g_flos_hw_lasterror = *PTRTO_I_DATA(I_DATA+2, byte);
-    }
+    w                     = *PTRTO_I_DATA(I_DATA+1, word);
+    pF->ptrToSectorNumber = (dword*) w; 
 
-    return result; 
+    pF->clusterNumber     = *PTRTO_I_DATA(I_DATA+3, word);
+
 }
 
 
