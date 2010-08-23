@@ -1,6 +1,10 @@
 
-; App: Set - set environment variable - v1.00 By Phil @ retroleum
+; App: Set - set environment variable - v1.01 By Phil @ retroleum
 ; Usage: set "var_name" "var_value" (if no parameters supplied, en_vars are listed)
+;
+; Changes
+;
+; 1.01 - Env vars with % prefix are displayed as paths (and not allowed to be set)
 
 ;======================================================================================
 ; Standard header for OSCA and FLOS
@@ -135,6 +139,9 @@ evnclp	ld a,(hl)
 	inc de
 	djnz evnclp
 evncdone	pop hl
+	ld a,(var_name)
+	cp "%"
+	jp z,bad_name
 
 fnd_spc	inc hl
 	ld a,(hl)			; locate next space
@@ -193,7 +200,7 @@ got_evd	ld hl,var_name		;set the environment variable
 	call kjt_set_envar
 	ret z
 	ld hl,no_room_txt
-	jr err_quit
+	jp err_quit
 
 ;------------------------------------------------------------------------------------------------------------
 
@@ -227,6 +234,11 @@ lp2	push bc
 	ld de,var_data
 	ld bc,4
 	ldir
+
+	ld a,(var_name)		;is it an assign type envar? IE:"%xxx"
+	cp "%"
+	jr z,show_assign
+
 	ld de,var_data+3		;show env_var databytes
 	ld hl,hex_output_txt+4
 	ld b,4
@@ -241,7 +253,9 @@ lp1	ld a,(de)
 	call kjt_set_cursor_position
 	ld hl,hex_output_txt	
 	call kjt_print_string
-	
+
+show_next_envar	
+
 	pop hl
 	ld de,8
 	add hl,de
@@ -249,6 +263,31 @@ skp_ev	pop bc
 	djnz lp2
 	xor a
 	ret
+	
+
+show_assign
+
+	ld hl,equals_txt
+	call kjt_print_string
+	
+	call kjt_get_dir_cluster	;show the en_var as a path
+	ld (orig_cluster),de
+	call kjt_get_volume_info
+	ld (orig_volume),a
+
+	ld a,(var_data+2)
+	call kjt_change_volume
+	ld de,(var_data)
+	call kjt_set_dir_cluster
+	call show_path
+	ld a,(orig_volume)	
+	call kjt_change_volume
+	ld de,(orig_cluster)
+	call kjt_set_dir_cluster
+
+	ld hl,new_line_txt
+	call kjt_print_string
+	jr show_next_envar
 	
 	
 ;------------------------------------------------------------------------------------------------------------
@@ -260,6 +299,100 @@ err_quit	call kjt_print_string
 	xor a
 	ret
 
+
+bad_name	ld hl,badname_txt
+	jr err_quit
+	
+;-------------------------------------------------------------------------------------------
+
+show_path
+
+	max_chars equ 32			;max allowable window width for path (min 28)
+		
+	ld c,max_chars-9			;Paths always have "VOL0:" and may also have "/../"
+	ld b,0				;untruncated dir count
+	ld de,text_buffer
+	ld a,$2f
+	ld (de),a
+	inc de
+	
+gdnlp	push bc
+	push de
+	call kjt_get_dir_name		;are we at ROOT?
+	pop de
+	pop bc
+	push hl
+	pop ix
+	ld a,(ix+4)
+	cp ":"
+	jr z,ds_end
+		
+cpy_dn	ld a,c				;is the text buffer full?
+	or a
+	jr z,trunc
+
+	ld a,(hl)				;copy dir name char
+	cp 33				
+	jr c,eodn				;unless its 0 or space
+	ld (de),a
+	inc hl
+	inc de
+	dec c				;is text buffer full?
+	jr cpy_dn
+eodn	ld a,$2f				;add a "/"
+	ld (de),a
+	ld (last_full),de			;note the position of the end of this untruncated entry
+	inc de
+	inc b				;increase count of untruncated dir names
+	dec c				;dec char buffer count
+				
+ndirup	push bc
+	push de
+	call kjt_parent_dir
+	ret nz				;error return
+	pop de
+	pop bc
+	jr gdnlp				 
+
+trunc	ld de,0
+
+ds_end	push de
+	call kjt_root_dir
+	call kjt_get_dir_name
+	call kjt_print_string		;show the volume name
+	pop de
+	
+	xor a
+	or b				;if no dir names in buffer, all done
+	ret z
+	
+	ld hl,trunc_txt			;if the dir list was truncated show "/../"
+	ld a,e
+	or d
+	call z,kjt_print_string	
+
+notrutxt	ld hl,(last_full)			;position of trailing "/"
+	inc hl
+nxtdlev	ld (hl),0				;replace with zero (stop print)
+	dec hl
+dnbacklp	dec hl
+	ld a,(hl)
+	cp $2f				;find preceeding "/"
+	jr nz,dnbacklp
+	inc hl
+	push hl
+	call kjt_print_string		;show dir name
+	pop hl
+	djnz nxtdlev			;any more dirs?
+	xor a
+	ret
+			
+
+last_full dw 0
+
+trunc_txt	db "/../",0
+
+text_buffer ds max_chars+8,0
 
 ;-------------------------------------------------------------------------------------------
 
@@ -274,6 +407,16 @@ hex_output_txt	db " = $xxxxxxxx",11,0
 fake_var_txt	db "@@@@",0
 defined_vars_txt	db 11,"Environment variables:",11
 		db "----------------------",11,11,0
+
+badname_txt	db "Illegal variable name.",11,11,0
+
+orig_cluster	dw 0
+
+orig_volume  	db 0
+
+new_line_txt	db 11,0
+
+equals_txt	db " = ",0
 		
 ;-------------------------------------------------------------------------------------------
 
