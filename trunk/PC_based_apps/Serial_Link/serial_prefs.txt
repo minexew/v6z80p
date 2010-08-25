@@ -1,2 +1,2 @@
 baud_rate = 115200
-com_port = COM3
+com_port = COM4

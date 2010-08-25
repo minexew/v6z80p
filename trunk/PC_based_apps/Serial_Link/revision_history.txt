@@ -1,3 +1,9 @@
+V2.8
+----
+
+Responds to "WW" from receiver
+
+
 V2.7
 ----
 
