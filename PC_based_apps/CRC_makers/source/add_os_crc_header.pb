@@ -15,7 +15,7 @@
        *SourceBuffer = AllocateMemory(sourcesize_bc+16)       ; allocate the needed memory
       ReadData(0,*SourceBuffer+16, sourcesize_bc)             ; read all data into the memory block
       CloseFile(0)
-    EndIf
+    
 
 ;-----------------------------------------------------------------------------------------
 
@@ -77,11 +77,12 @@ PokeW (*sourcebuffer+14,0)                                ; nothing at $E
  ;------------------------------------------------------------------------------------------
 
 MessageRequester("Phils utils","Done." + Chr(13) , 0)
- 
+
+EndIf
+
 End
 
 ; IDE Options = PureBasic 4.30 (Windows - x86)
-; CursorPosition = 66
-; FirstLine = 18
+; CursorPosition = 80
 ; Folding = -
 ; Executable = ..\Add_os_crc_header.exe
