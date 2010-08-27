@@ -1,5 +1,5 @@
 ;****************************************************
-; FLOS File Manager by Phil @ Retroleum.co.uk - V0.01
+; FLOS File Manager by Phil @ Retroleum.co.uk - V0.03
 ;****************************************************
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------------
@@ -18,14 +18,19 @@ highlight_unselected_colour	equ $70	;yellow / blue
 unhighlight_selected_colour	equ $d8	;lt blue / white
 highlight_selected_colour 	equ $8d	;white / lt blue
 
+box_select_colour		equ $80	; white / blue
+
 file_buffer_length	 	equ $8000
 file_buffer_bank 		equ 0
-	
+
+window_cols	equ 40
+window_rows	equ 25
+
 ;--------- Test FLOS version ---------------------------------------------------------------------
 
 	
 	call kjt_get_version		; check running under required FLOS version 
-	ld de,$573
+	ld de,$577
 	xor a
 	sbc hl,de
 	jr nc,flos_ok
@@ -36,7 +41,7 @@ file_buffer_bank 		equ 0
 
 old_flos_txt
 
-	db "Program requires FLOS v573+",11,11,0
+	db "Program requires FLOS v577+",11,11,0
 	
 flos_ok	
 
@@ -68,6 +73,7 @@ redraw_all
 	xor a
 	ld (src_dir_sel_pos),a
 	ld (dst_dir_sel_pos),a
+	ld (ops_activated),a
 	
 ;----------------------------------------------------------------------------------------------
 ; Main loop - Handle GUI control
@@ -75,7 +81,33 @@ redraw_all
 
 gui_main_loop
 
-	call common_window_code
+	ld a,(src_dst_target)
+	add a,2
+	call w_set_element_selection
+	call highlight_selected_element
+	
+	ld a,(ops_activated)
+	or a
+	jr z,no_ops
+	ld a,(op_box)
+	add a,4
+	call w_set_element_selection
+	call highlight_box
+	
+no_ops	call wait_border
+
+	call unhighlight_selected_element
+	ld a,(src_dst_target)
+	add a,2
+	call w_set_element_selection
+	call unhighlight_selected_element
+		
+	
+	call kjt_get_key
+	ld (req_current_scancode),a
+	ld a,b
+	ld (req_current_ascii_char),a	
+
 
 	ld a,(req_current_scancode)			;action for keys in main window
 	cp $0d
@@ -84,8 +116,6 @@ gui_main_loop
 	jp z,req0_down_pressed
 	cp $75
 	jp z,req0_up_pressed
-	cp $66
-	jp z,req0_backspace_pressed
 	cp $5a
 	jp z,req0_enter_pressed
 	cp $29
@@ -96,7 +126,9 @@ gui_main_loop
 	jp z,req0_left_pressed
 	cp $76
 	jp z,req0_esc_pressed
-
+	cp $14
+	jp z,req0_ctrl_pressed
+	
 	jp gui_main_loop
 
 
@@ -115,6 +147,40 @@ error_window_loop
 	ret z
 	jp error_window_loop
 
+;----------------------------------------------------------------------------------------------
+; Yes/No Window - Wait for selection and quit  
+;-----------------------------------------------------------------------------------------------
+
+yesno_window_loop
+
+	call common_window_code
+		
+	ld a,(req_current_scancode)			
+	cp $0d
+	jr nz,yn_ntab
+	call w_get_element_selection			;if tab pressed swap selection between yes and no buttons
+	inc a
+	cp 4
+	jr nz,yn_nmel
+	ld a,2
+yn_nmel	call w_set_element_selection
+	jr yesno_window_loop
+	
+	
+yn_ntab	ld a,(req_current_scancode)			;escape from this subroutine is ESC or Enter pressed
+	cp $5a
+	jr nz,yn_noent
+	call w_get_element_selection
+	sub 2					;exits with A = 0/1 = no/yes
+	xor 1
+	ret	
+		
+yn_noent	cp $76					;ESC exits with A = FF = aborted
+	jr nz,yesno_window_loop
+	ld a,$ff
+	or a
+	ret
+	
 
 ;-----------------------------------------------------------------------------------------------
 ; ASCII input subroutine
@@ -165,6 +231,12 @@ no_cursor_draw
 	jp z,ascii_enter_pressed
 	cp $66
 	jp z,ascii_bs_pressed
+	cp $71
+	jp z,ascii_del_pressed
+	cp $74
+	jp z,ascii_right_pressed
+	cp $6b
+	jp z,ascii_left_pressed
 
 	ld a,(req_current_ascii_char)		;an ascii key pressed?
 	or a
@@ -173,8 +245,10 @@ no_cursor_draw
 	call w_get_selected_element_data_location
 	ld a,(req_ti_cursor)		
 	cp (ix+1)				;cant enter more text if at end of line
-	jr z,req_nai
-	call req_ascii_cursor_pos
+	jr nz,req_nae
+	dec a
+	ld (req_ti_cursor),a
+req_nae	call req_ascii_cursor_pos
 	ld a,(req_current_ascii_char)
 	cp $60				;Entered text converted to capitals
 	jr c,req_loca
@@ -201,13 +275,34 @@ ascii_bs_pressed
 	jp z,text_input_loop
 	ld hl,req_ti_cursor			;move back and put a space at current location
 	dec (hl)
+
+ascii_del_pressed
+	
 	call req_ascii_cursor_pos
-	ld a,32
+	call kjt_set_cursor_position
+	call kjt_get_charmap_addr_xy
+	inc hl
+	ld a,(req_ti_cursor)
+	ld e,a
+	ld a,(max_cursor)
+	cp e
+	jp z,text_input_loop
+	inc e
+	inc e
+delchars	ld a,(max_cursor)
+	cp e
+	jr c,chmdone
+	ld a,(hl) 
+	call kjt_plot_char
+	inc hl
+	inc b
+	inc e
+	jr delchars
+chmdone	ld a,32
 	call kjt_plot_char
 	jp text_input_loop
-
-
-
+	
+	
 ascii_enter_pressed
 
 
@@ -244,12 +339,39 @@ ascii_esc_pressed
 	ret				; end of ascii loop, a = 1, Aborted (pressed escape)
 	
 	
+ascii_left_pressed
+
+	ld a,(max_cursor)
+	ld e,a
+	ld a,(req_ti_cursor)		;cant move back if cursor at 0
+	cp e
+	jr nz,asinar
+	dec a
+asinar	or a
+	jp z,text_input_loop
+	dec a
+	ld (req_ti_cursor),a
+	jp text_input_loop
+	
+	
+	
+ascii_right_pressed
+	
+	ld a,(max_cursor)
+	ld e,a
+	ld a,(req_ti_cursor)
+	cp e
+	jp z,text_input_loop
+	inc a
+	ld (req_ti_cursor),a
+	jp text_input_loop
+		
 	
 ;----------------------------------------------------------------------------------------------
 
 common_window_code
 
-	call highlight_selected_element
+	call highlight_box
 	call wait_border
 	call unhighlight_selected_element
 	
@@ -294,7 +416,7 @@ de_ok	push bc
 	call get_dir_step_for_level
 	call is_step_selected
 	pop bc
-	jr z,nxt_ent			;ZF set means entry is not selected
+	jp z,nxt_ent			;ZF set means entry is not selected
 	
 	ld a,(hl)				;if entry starts with "." it is ignored
 	cp "."
@@ -346,8 +468,15 @@ cf_sdfd	call disk_op_create_dest_dir		;ok to create folder at destination (and m
 	jp topofdir			;start at top of new dir
 	
 fc_nadir	call disk_op_copy_file		;do a file copy
+	or a
+	jr z,dofc_ok
+	cp 6
 	jp nz,disk_error
-	call go_src_folder
+	ld hl,filename_used_txt		;if error 6, filename is used by a directory - abort
+	call show_error_window
+	jp redraw_all
+		
+dofc_ok	call go_src_folder
 	
 nxt_ent	call get_dir_step_for_level		;move to next entry in directory
 	inc bc
@@ -645,8 +774,13 @@ mf_sdfd	call disk_op_create_dest_dir		;ok to create dir at destination (and move
 	jp mf_topofdir			;start a new scan at top of new dir
 	
 mf_nadir	call disk_op_copy_file		;if not a dir, just copy the file...
+	jr z,mffc_ok
+	cp 6
 	jp nz,disk_error
-	call go_src_folder
+	ld hl,filename_used_txt		;if error 6, filename is used by a directory - abort
+	call show_error_window
+	jp redraw_all
+mffc_ok	call go_src_folder
 	call disk_op_delete_file		;..then delete it at source
 	jp nz,disk_error
 	call adjust_selections		;remove the selection just deleted (if at top of tree)
@@ -666,6 +800,9 @@ mf_endofdir
 	dec a				;otherwise go up a level on directory tree
 	ld (directory_level),a
 	
+	call kjt_get_dir_cluster
+	ld (deleted_dir_cluster),de
+
 	call kjt_parent_dir			;go to parent (source) dir
 	jp nz,disk_error
 	call get_dir_step_for_level		;find name of this parent dir
@@ -677,7 +814,19 @@ mf_endofdir
 	call disk_op_remove_dir		;and remove the dir
 	jp nz,disk_error
 	
-	call note_src_cluster
+	ld hl,(original_cluster)		;have we deleted the dir where FLOS was originally at?
+	ld de,(deleted_dir_cluster)
+	xor a
+	sbc hl,de
+	jr nz,mf_ndoc
+	ld a,(original_volume)
+	ld hl,current_vol
+	cp (hl)
+	jr nz,mf_ndoc
+	ld de,(root_cluster)		;if so, reset original FLOS dir to root
+	ld (original_cluster),de
+
+mf_ndoc	call note_src_cluster
 	call go_dst_folder			;go to parent dir at dest too
 	call kjt_parent_dir
 	jp nz,disk_error
@@ -826,7 +975,344 @@ new_dir_end
 
 		
 ;--------------------------------------------------------------------------------------------------------
+rs232_receive
+;--------------------------------------------------------------------------------------------------------
 
+	call go_src_folder			;choose appropriate target "window"
+	ld a,(src_dst_target)
+	or a
+	call nz,go_dst_folder
+
+	in a,(sys_serial_port)		; flush serial buffer at start
+
+	call show_main_rx_window
+	call req_rs232_say_waiting
+	call highlight_box	
+	call wait_no_enter
+
+	
+req_rs232_header_wait
+
+	ld hl,wildcard_txt			; filename address of * wildcard
+	ld a,$c5				; time out = 5 seconds or with ESC/ENTER key
+	call kjt_serial_receive_header
+	jr z,rx_go			; file header loaded ok?
+	cp $14				; only a time-out error?
+	jr z,req_rs232_header_wait		; otherwise say "serial error" and quit the serial download
+	cp $2a
+	jp z,rs232exit
+ser_err	call req_rs232_say_error		; when the cancel button is pressed
+	call error_window_loop
+rs232exit	call wait_no_enter			; quit rs232 receive mode
+	jp redraw_all	
+
+
+rx_go	push ix				; copy filename and convert to uppercase
+	ld hl,serial_filename
+	ld bc,14
+	xor a
+	call kjt_bchl_memfill
+	pop hl
+	ld de,serial_filename	
+	ld b,8
+s_tuclp	ld a,(hl)					
+gdot	cp $21
+	jr c,gotsfn	
+	call uppercasify
+	ld (de),a
+	inc hl
+	inc de
+	cp "."
+	jr z,pdot
+	djnz s_tuclp
+	ld b,h
+	ld c,l
+fdotlp	ld a,(hl)
+	inc hl
+	cp "."
+	jr z,gotdot
+	cp $21
+	jr nc,fdotlp
+	ld h,b
+	ld l,c
+gotdot	ld a,"."
+	ld (de),a
+	inc de
+pdot	ld b,3
+pdotch	ld a,(hl)
+	cp $21
+	jr c,gotsfn	
+	call uppercasify
+	ld (de),a
+	inc hl
+	inc de
+	djnz pdotch
+
+gotsfn	
+	ld e,(ix+$10)			; get file length
+	ld d,(ix+$11)
+	ld l,(ix+$12)
+	ld h,(ix+$13)
+	ld (ser_length_lo),de
+	ld (ser_length_hi),hl
+	
+	ld hl,serial_filename		; does this file already exist?
+	call kjt_find_file
+	jr nz,sr_fnex
+	
+	call s_waitack			; a file exists with this name - send "WW" ack wait to sender
+	call find_fn_len
+	ld a,11
+	srl c
+	sub c
+	ld (fn_xpos),a
+	call backup_display
+	call show_replace_window		; ask user if want to replace the file
+	cp $ff
+	jp z,rs232exit
+	push af
+	call restore_display		; remove requester
+	pop af
+	cp 1
+	jr z,oktorep				
+	call s_badack			; dont want to replace it, so send back ack "XX" and
+	jp rs232_receive			; go back to waiting
+	
+sr_fnex	cp 2				; if file not found error, just go ahead
+	jr z,sr_okmf
+	cp 6				; if the filename is in use by a dir, cannot proceed
+	jp nz,disk_error
+	call s_badack
+	call backup_display
+	ld hl,filename_used_txt
+	call show_error_window
+	call restore_display
+	jp rs232_receive
+
+oktorep	call show_main_rx_window		; replace the main rx window (to make it active again)
+	ld hl,serial_filename		; remove old file with this name
+	call kjt_erase_file
+	jp nz,disk_error
+
+sr_okmf	ld hl,serial_filename		; create a new file with this name
+	call kjt_create_file
+	jp nz,disk_error			
+
+	call req_rs232_say_receiving		; say receiving "filename.xxx"
+		
+rxbuff_lp	ld de,(ser_length_lo)		; length of file low
+	ld hl,(ser_length_hi)		; length of file high
+	ld iy,file_buffer			; $7e00 byte buffer
+	ld c,file_buffer_length/256
+rx_filelp	call s_goodack			; prompt sender for a file block
+	call receive_block			; get block of file data
+	jp c,ser_err			; if carry set = there was an error (code in A)
+	ld ix,rx_sector_buffer		; copy sector buffer to load buffer
+	ld b,0
+scopylp	ld a,(ix)
+	ld (iy),a
+	inc ix
+	inc iy
+	dec de				; countdown file length
+	ld a,e
+	and d
+	inc a
+	jr nz,s_rfmb
+	dec hl
+s_rfmb	ld a,e				
+	or d
+	or l
+	or h
+	jr z,all_bytes_rec			; if zero, last byte
+	djnz scopylp			
+	dec c				
+	jr nz,rx_filelp			; loop to next block of load buffer
+
+	ld (ser_length_lo),de		; reduce length of file
+	ld (ser_length_hi),hl
+	ld de,file_buffer_length
+	ld c,0				; C,DE = File lenth
+	ld b,file_buffer_bank		; B = bank
+	ld ix,file_buffer			; IX = source address
+	ld hl,serial_filename		; HL = filename
+	call kjt_write_bytes_to_file		; write buffered bytes to file
+	jr z,rxbuff_lp			; loop around for next chunk			
+	jp disk_error
+	
+
+all_bytes_rec
+
+
+	push iy
+	pop hl
+	ld de,file_buffer
+	xor a
+	sbc hl,de
+	ex de,hl
+	ld c,0				; C,DE = File length
+	ld b,file_buffer_bank		; B = bank
+	ld ix,file_buffer			; IX = source address
+	ld hl,serial_filename		; HL = filename
+	call kjt_write_bytes_to_file		; write (remaining) bytes to file
+	jp nz,disk_error			
+	call s_goodack
+	jp rs232_receive			; Done - ready for next file
+
+		
+receive_block
+
+	push hl
+	push de
+	push bc
+	ld hl,rx_sector_buffer		; load a block of 256 bytes
+	ld b,0
+	exx
+	ld hl,$ffff			; CRC checksum
+	exx
+s_lgb	ld a,1
+	call kjt_serial_rx_byte
+	jr c,s_gbtoerr			; timed out if carry = 1	
+	ld (hl),a
+	exx
+	xor h				; do CRC calculation		
+	ld h,a			
+	ld b,8
+rxcrcbyte	add hl,hl
+	jr nc,rxcrcnext
+	ld a,h
+	xor 10h
+	ld h,a
+	ld a,l
+	xor 21h
+	ld l,a
+rxcrcnext	djnz rxcrcbyte
+	exx
+	inc hl
+	djnz s_lgb
+	exx				; hl = calculated CRC
+
+	call kjt_serial_rx_byte		; get 2 more bytes - block checksum in bc
+	jr c,s_gbtoerr
+	ld c,a
+	call kjt_serial_rx_byte	
+	jr c,s_gbtoerr		
+	ld b,a
+	
+	xor a				; compare checksum
+	sbc hl,bc
+	jr z,s_gbcsok
+	ld a,$0f				;A=$0f : bad checksum
+	scf
+s_gberr	pop bc
+	pop de
+	pop hl
+	ret
+
+s_gbtoerr ld a,$14				;A=$14 : time out
+	scf
+	jr s_gberr
+	
+s_gbcsok	xor a				;A=$00 : all ok
+	jr s_gberr
+
+
+
+s_goodack	ld a,"O"				; send "OK" ack to start file TX
+	call kjt_serial_tx_byte
+	ld a,"K"
+	call kjt_serial_tx_byte
+	ret
+
+
+		
+s_badack	ld a,"X"				; send "bad ack" to stop file TX
+	call kjt_serial_tx_byte
+	ld a,"X"
+	call kjt_serial_tx_byte	
+	ret
+
+
+
+s_waitack	ld a,"W"				; send "please wait" ack to sender
+	call kjt_serial_tx_byte
+	ld a,"W"
+	call kjt_serial_tx_byte	
+	ret
+	
+
+show_main_rx_window
+
+	ld b,10
+	ld a,7				; set 'receive file rs232' window active
+	ld c,7
+	ld e,2				; set element selection = 2 (cancel button)
+	call req_draw_window
+	ret
+	
+		
+req_rs232_say_waiting
+
+	ld a,1
+	ld hl,req_waiting_txt
+	call req_put_text_at_element
+	ret	
+
+
+
+req_rs232_say_receiving
+
+	ld a,1
+	ld hl,req_receiving_txt
+	call req_put_text_at_element
+	ret				
+				
+
+
+req_rs232_say_error
+
+	ld a,1
+	ld hl,req_serial_err_txt
+	call req_put_text_at_element
+	ret
+	
+
+find_fn_len
+	
+	ld hl,serial_filename
+	ld b,12
+	ld c,0
+ffnlen	ld a,(hl)
+	or a
+	ret z
+	cp " "
+	ret z
+	inc hl
+	inc c
+	djnz ffnlen
+	ret
+		
+
+
+uppercasify
+
+	cp $61
+	jr c,s_notuc
+	sub $20
+s_notuc	ret
+
+	
+;--------------------------------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+				
+wait_no_enter
+
+	call kjt_get_key
+	cp $5a
+	jr z,wait_no_enter
+	ret			
+				
+	
+				
 
 test_selections
 
@@ -897,7 +1383,18 @@ key_wait	push hl
 	pop de
 	pop hl	
 	ret
-	
+
+
+show_replace_window
+
+	ld a,8				;show error message window
+	ld b,7
+	ld c,7
+	ld e,2
+	call req_draw_window
+	call yesno_window_loop
+	ret
+
 ;--------------------------------------------------------------------------------------------------
 
 is_step_selected
@@ -1026,11 +1523,10 @@ cf_mkf	ld hl,filename			;create new file on dest dir
 	call kjt_erase_file
 	jr z,cf_mkf
 	cp 6				;Is filename used by a directory?
-	ret nz
-	ld a,1				;cannot proceed - filename used by a directory	
+	jr nz,fc_loop
 	or a
-	ret				
-		
+	ret
+			
 fc_loop	call go_src_folder
 	
 	ld hl,filename			;set up pointers (in)to source file	
@@ -1244,34 +1740,40 @@ req0_esc_pressed
 
 req0_tab_pressed
 
-	call w_next_selectable_element
-	call w_get_element_selection		;skip right dest panel when tabbing
-
-	cp 2
-	jr nz,notel2
-	xor a				;set source window as target for mkdir etc
+	ld a,(ops_activated)		;dont switch panels if operation boxes selected
+	or a
+	jp nz,req0_right_pressed		;cycle the op boxes instead
+	
+swap_box	ld a,(src_dst_target)
+	xor 1
 	ld (src_dst_target),a
 	jp gui_main_loop
-		
-notel2	cp 3
-	jr nz,notel3
-	call w_next_selectable_element
-			
-notel3	jp gui_main_loop
 
+;-----------------------------------------------------------------------------------------------
+
+req0_ctrl_pressed
+
+	ld a,(ops_activated)
+	xor 1
+	ld (ops_activated),a
+	jp z,gui_main_loop
+	xor a
+	ld (op_box),a
+	jp gui_main_loop
 	
 ;----------------------------------------------------------------------------------------------
 
 
 req0_down_pressed
 
-	call w_get_element_selection
-	cp 2				;cant move highlight if not in a dir window
-	jr z,src_win_down
-	cp 3
-	jr z,dst_win_down
- 	jp gui_main_loop
- 	
+	ld a,(ops_activated)
+	or a
+	jp nz,gui_main_loop
+
+	ld a,(src_dst_target)
+	or a
+	jr nz,dst_win_down
+
 src_win_down
 
 	call w_get_selected_element_data_location
@@ -1324,16 +1826,14 @@ req_ddpok	jp gui_main_loop
 
 
 req0_up_pressed
+	
+	ld a,(ops_activated)
+	or a
+	jp nz,gui_main_loop
 
-	call w_get_element_selection
-	cp 2				;cant move highlight if not in a dir window
-	jr z,src_win_up
-	cp 3
-	jr z,dst_win_up
-  	jp gui_main_loop
-
-
-src_win_up
+	ld a,(src_dst_target)
+	or a
+	jr nz,dst_win_up
 
 	ld hl,src_dir_sel_pos		;can only scroll up if selection line
 	ld a,(hl)				;is at the top
@@ -1380,57 +1880,53 @@ req_dpdok	jp gui_main_loop
 ;----------------------------------------------------------------------------------------------
 
 req0_left_pressed
-
-	call w_get_element_selection
-	cp 3
-	jr nz,lp_notel3
-	ld a,2
-	call w_set_element_selection
-	xor a
-	ld (src_dst_target),a
-lp_notel3	jp gui_main_loop	
+	
+	ld a,(op_box)
+	dec a
+	cp $ff
+	jr nz,decob_ok
+	ld a,5
+decob_ok	ld (op_box),a
+	jp gui_main_loop
 
 ;----------------------------------------------------------------------------------------------
 	
 req0_right_pressed
 
-	call w_get_element_selection
-	cp 2
-	jr nz,rp_notel2
-	ld a,3
-	call w_set_element_selection
-	ld a,1
-	ld (src_dst_target),a
-rp_notel2	jp gui_main_loop
+	ld a,(op_box)
+	inc a
+	cp 6
+	jr nz,incob_ok
+	xor a
+incob_ok	ld (op_box),a
+	jp gui_main_loop
 	
 ;----------------------------------------------------------------------------------------------
 	
 req0_enter_pressed
 
-	ld a,(w_active_window)		;which window was active when Enter pressed?
+	ld a,(ops_activated)		;pressed Enter 	
 	or a
-	jr z,req0_main_win_enter		;0 = main window?
+	jr nz,do_func
 	
-	jp gui_main_loop
-
-
-req0_main_win_enter
-
-	call w_get_element_selection
-	cp 2				;pressed Enter on which element
-	jr z,req_ch_src_dir			;in the main window?
-	cp 3
-	jp z,req_ch_dst_dir
-	cp 4
+	ld a,(src_dst_target)		;if the operation boxes are not active
+	or a				;enter directories
+	jp z,req_ch_src_dir			
+	jp req_ch_dst_dir
+	
+do_func	ld a,(op_box)			;select an operation based on selected box
+	cp 0
 	jp z,copy_files
-	cp 5
+	cp 1
 	jp z,move_files
-	cp 6
+	cp 2
 	jp z,delete_files
-	cp 7
+	cp 3
 	jp z,make_a_dir
-	cp 8
+	cp 4
 	jp z,rename_files
+	cp 5
+	jp z,rs232_receive
 	jp gui_main_loop
 
 
@@ -1551,8 +2047,12 @@ clear_selection_list
 
 req0_space_pressed
 
-	call w_get_element_selection
-	cp 2				;only select/deselect when in source window
+	ld a,(ops_activated)		;pressed Space 	
+	or a			
+	jp nz,gui_main_loop			;only select/deselect when panels window
+
+	ld a,(src_dst_target)		;and only when in the source window
+	or a
 	jp nz,gui_main_loop
 	
 	call w_get_selected_element_coords	
@@ -1817,12 +2317,12 @@ itnosel	ld a,b
 unhighlight_selected_element
 
 	ld a,plain_colour			;normal colour for unselected, unhighlighted text
-	jr setpen
+	jr hl_penset
 	
 highlight_selected_element
 
 	ld a,highlight_unselected_colour	;colour for unselected, but highlighted text
-setpen	ld (use_pen),a
+hl_penset	ld (use_pen),a
 	call kjt_set_pen
 
 	call w_get_selected_element_data_location
@@ -1908,7 +2408,16 @@ draw_file_manager_window
 	ld a,1
 	call show_dir_page
 	ret
-	
+
+;--------------------------------------------------------------------------------------------
+
+req_put_text_at_element
+
+	call w_get_element_a_coords
+	call kjt_set_cursor_position
+	call kjt_print_string		
+	ret
+			
 ;--------------------------------------------------------------------------------------------
 
 
@@ -1923,7 +2432,60 @@ wait_ras2	bit 2,(hl)
 	pop hl
 	ret
 
+
+;--------------------------------------------------------------------------------------------
+
+backup_display
+
+	ld hl,OS_charmap
+	ld de,charmap_buffer
+	ld bc,window_rows*window_cols
+	ldir
+	ld a,$0e			
+	ld (vreg_vidpage),a
+	call kjt_page_in_video
+	ld hl,video_base
+	ld de,attribute_buffer
+	ld bc,window_rows*window_cols
+	ldir
+	call kjt_page_out_video	
+	ret
+		
 	
+	
+restore_display
+
+	call kjt_get_pen
+	push af
+	ld de,attribute_buffer
+	ld hl,charmap_buffer
+	ld c,0
+rdylp	ld b,0
+rdxlp	ld a,(de)
+	call kjt_set_pen
+	ld a,(hl)
+	call kjt_plot_char
+	inc hl
+	inc de
+	inc b
+	ld a,b
+	cp window_cols
+	jr nz,rdxlp
+	inc c
+	ld a,c
+	cp window_rows
+	jr nz,rdylp
+	pop af
+	call kjt_set_pen
+	ret
+		
+;--------------------------------------------------------------------------------------------
+
+highlight_box
+
+	ld a,box_select_colour
+	jp hl_penset
+			
 ;--------------------------------------------------------------------------------------------
 
 	
@@ -1942,87 +2504,99 @@ foo	dw 0
 
 show_path
 	call kjt_store_dir_position
-	
-	call kjt_get_dir_name
-	ld c,26				;max number of chars allowed
-	ld de,path_txt+2			;start at +2 so first two bytes act as end of list
-
-pathcpylp	ld a,c
-	or a
-	jr z,skp_cpath			 ;is the text buffer full?
-	call copy_ascii_until_zero
-skp_cpath	push de
-	push bc
-	call kjt_parent_dir
-	jr nz,pcatroot
-	call kjt_get_dir_name
-	pop bc
-	pop de
-	jr pathcpylp
-
-pcatroot	pop bc
-	ld a,c				;if we got to root and the text buffer isnt
-	or a				;full then proceed as normal 
-	jr nz,untrpath
-	
-	call kjt_get_dir_name		;text buffer is full, show a truncated path
-	call kjt_print_string		;show volx:
-	ld hl,path_etc_txt			;show "/../"
-	call kjt_print_string		;then move to an "unbroken" entry
-	pop hl
-	dec hl
-	call find_previous_zero
-	push hl	
-
-untrpath	pop hl
-	dec hl
-showplp	call find_previous_zero		
-	push hl
-	inc hl
-	call kjt_print_string		;show the dir name
-	pop hl
-	dec hl				;if two zeroes together this is the end of the list
-	ld a,(hl)
-	or a
-	jr nz,showplp
+	call display_path
 	call kjt_restore_dir_position
 	ret
-
-find_previous_zero
-
-	dec hl
-	ld a,(hl)
-	or a
-	ret z
-	jr find_previous_zero
 	
 	
-copy_ascii_until_zero
+display_path
 
-	ld b,16				;max length to prevent spoon-ups.
-ctzlp	ld a,(hl)
+	max_chars equ 31			;max allowable window width for path (min 28)
+		
+	ld c,max_chars-9			;Paths always have "VOL0:" and may also have "/../"
+	ld b,0				;untruncated dir count
+	ld de,text_buffer
+	ld a,$2f
 	ld (de),a
+	inc de
+	
+gdnlp	push bc
+	push de
+	call kjt_get_dir_name		;are we at ROOT?
+	pop de
+	pop bc
+	push hl
+	pop ix
+	ld a,(ix+4)
+	cp ":"
+	jr z,ds_end
+		
+cpy_dn	ld a,c				;is the text buffer full?
 	or a
-	jr nz,ctz_nz
-	ld a,"/"				;append a "/"
+	jr z,trunc
+
+	ld a,(hl)				;copy dir name char
+	cp 33				
+	jr c,eodn				;unless its 0 or space
 	ld (de),a
+	inc hl
 	inc de
-	dec c
-	ret z
-	xor a
-	ld (de),a				;null terminate
-	dec c
+	dec c				;is text buffer full?
+	jr cpy_dn
+eodn	ld a,$2f				;add a "/"
+	ld (de),a
+	ld (last_full),de			;note the position of the end of this untruncated entry
 	inc de
-	ret
-ctz_nz	inc hl
-	inc de
-	dec c
-	ret z	
-	djnz ctzlp
-	ret
+	inc b				;increase count of untruncated dir names
+	dec c				;dec char buffer count
 				
-path_txt		ds 32,0
-path_etc_txt	db "/../",0
+ndirup	push bc
+	push de
+	call kjt_parent_dir
+	ret nz				;error return
+	pop de
+	pop bc
+	jr gdnlp				 
+
+trunc	ld de,0
+
+ds_end	push de
+	call kjt_root_dir
+	call kjt_get_dir_name
+	call kjt_print_string		;show the volume name
+	pop de
+	
+	xor a
+	or b				;if no dir names in buffer, all done
+	ret z
+	
+	ld hl,trunc_txt			;if the dir list was truncated show "/../"
+	ld a,e
+	or d
+	call z,kjt_print_string	
+
+notrutxt	ld hl,(last_full)			;position of trailing "/"
+	inc hl
+nxtdlev	ld (hl),0				;replace with zero (stop print)
+	dec hl
+dnbacklp	dec hl
+	ld a,(hl)
+	cp $2f				;find preceeding "/"
+	jr nz,dnbacklp
+	inc hl
+	push hl
+	call kjt_print_string		;show dir name
+	pop hl
+	djnz nxtdlev			;any more dirs?
+	xor a
+	ret
+			
+
+last_full dw 0
+
+trunc_txt	db "/../",0
+
+text_buffer ds max_chars+8,0
 	
 ;---------------------------------------------------------------------------------------------
 
@@ -2038,8 +2612,9 @@ window_list	dw main_fm_window		;0
 		dw error_msg_window		;4
 		dw new_dir_window		;5
 		dw rename_window		;6
+		dw rx_window		;7
+		dw replace_window		;8
 		
-
 main_fm_window	db 0,0
 		db 38,23
 		db 0
@@ -2064,6 +2639,8 @@ main_fm_window	db 0,0
 		dw mkdir_button
 		db 25,21			;8
 		dw rename_button
+		db 33,21			;9
+		dw rx_button		
 		db 255
 
 
@@ -2138,6 +2715,39 @@ rename_window	db 0,0
 		db 2,3			
 		dw current_file_element	;1
 		db 255
+
+
+rx_window		db 0,0
+		db 18,7
+		db 0
+		db 0
+
+		db 3,1				;0
+		dw win_element_rs232rectxt
+		db 1,3				;1
+		dw win_element_rs232_status
+		db 6,5				;2
+		dw win_element_cancel
+		db 255
+
+
+replace_window	db 0,0
+		db 23,7
+		db 0
+		db 0
+		
+fn_xpos		db 5,1				;1
+		dw show_filename_elem
+		db 1,3				;0
+		dw win_element_replace
+		db 7,5				;2
+		dw yes_button
+		db 14,5				;3
+		dw no_button			
+		db 255
+
+
+
 								
 ;---- Window elements for Main Window ----------------------------------------------------
 
@@ -2203,6 +2813,13 @@ rename_button	db 0
 		db 1
 		db 0
 		dw rename_txt
+
+rx_button		db 0
+		db 2
+		db 1
+		db 1
+		db 0
+		dw rx_txt
 
 
 ;-- Elements for pop ups ---------------------------------------------------------------------------------
@@ -2276,6 +2893,60 @@ rename_element	db 2
 		db 0
 		dw req_rename_txt
 				
+win_element_cancel	db 0
+		db 6,1
+		db 1
+		db 0
+		dw req_cancel_txt				
+				
+win_element_rs232rectxt
+
+		db 2
+		db 13,1
+		db 0
+		db 0
+		dw req_rs232rec_txt			
+				
+win_element_rs232_status
+
+		db 1
+		db 16,1
+		db 0
+		db 0
+		dw req_waiting_txt				
+
+win_element_replace
+
+		db 2
+		db 21,1
+		db 0
+		db 0
+		dw file_exists_txt
+
+
+yes_button	db 0
+		db 3
+		db 1
+		db 1
+		db 0
+		dw yes_txt
+		
+		
+no_button		db 0
+		db 2
+		db 1
+		db 1
+		db 0
+		dw no_txt	
+		
+show_filename_elem	db 2
+		db 12,1
+		db 0
+		db 0
+		dw serial_filename	
+					
+;---------------------------------------------------------------------------------------------
+				
 
 blank_line	ds 31,32
 		db 0
@@ -2291,6 +2962,16 @@ error_txt		db "ERROR!",0
 filename_exists_txt	db "Filename Already Exists",0
 req_rename_txt	db "RENAME:",0
 src_dst_box_txt	db "Src:Dst:",0
+req_cancel_txt	db "CANCEL",0
+req_rs232rec_txt	db "RS232 RECEIVE",0
+req_waiting_txt	db "    Waiting..",0
+req_receiving_txt	db "Rec:"
+serial_filename	db "                ",0
+req_serial_err_txt	db "Header Error!",0
+file_exists_txt	db "File Exists. Replace?",0
+yes_txt		db "YES",0
+no_txt		db "NO",0
+filename_used_txt	db "Filename In Use By A Dir",0
 
 ;---------------------------------------------------------------------------------------------
 			
@@ -2301,6 +2982,7 @@ move_txt		db "MOVE",0
 del_txt		db "DEL",0
 mkdir_txt		db "MKDIR",0
 rename_txt	db "RENAME",0
+rx_txt		db "RX",0
 
 ;---------------------------------------------------------------------------------------------
 
@@ -2337,8 +3019,11 @@ req_dir_name	ds 12,0
 
 dir_step		dw 0
 blank_txt		db "            ",0
+wildcard_txt	db "*",0
 
 src_dst_target	db 0
+op_box		db 0
+ops_activated	db 0
 
 recommence_addr	dw 0
 
@@ -2373,6 +3058,16 @@ text_input_coord_base	dw 0
 max_cursor		db 0
 
 ;---------------------------------------------------------------------------------------------
+
+ser_length_lo	dw 0
+ser_length_hi  	dw 0
+
+rx_sector_buffer	ds 256,0
+
+;---------------------------------------------------------------------------------------------
+
+charmap_buffer	ds window_rows*window_cols,0
+attribute_buffer	ds window_rows*window_cols,0
 
 file_buffer	db 0		;start of file buffer - do not place any variables beyond this point
 
