@@ -1,5 +1,5 @@
 
-; ECHO.EXE - Shows a line of text v1.01
+; ECHO.EXE - Shows a line of text v1.02
 ; Usage: echo.exe Text_to_display
 
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------
@@ -13,8 +13,8 @@ include "system_equates.asm"
 ; As this is an external command, load program high in memory to help avoid overwriting user programs
 ;----------------------------------------------------------------------------------------------------
 
-my_location	equ $8000
-my_bank		equ $0c
+my_location	equ $f000
+my_bank		equ $0e
 
 	org my_location	; desired load address
 	
@@ -75,29 +75,24 @@ flos_ok
 ; Actual program starts here..
 ;------------------------------------------------------------------------------------------------
 
-	push hl				;home cursor
+					;home cursor
 	call kjt_get_cursor_position
 	ld b,0
-	call kjt_set_cursor_position
-	pop hl
-	
-	push hl				;look for end of line
-feol	ld a,(hl)
-	inc hl
-	or a
-	jr nz,feol
-flc	dec hl				;look for last char 
+shchlp	call kjt_set_cursor_position
+	jr nz,ldone
 	ld a,(hl)
-	cp $20
-	jr nz,flc
+	or a
+	jr z,ldone
+	call kjt_plot_char
 	inc hl
-	ld (hl),11			;<CR> at end of line
-	inc hl
-	ld (hl),0
-	
-	pop hl
+	inc b
+	jr shchlp
+
+ldone	ld hl,cr_txt
 	call kjt_print_string
 	xor a
 	ret
+
+cr_txt	db 11,0
 
 ;---------------------------------------------------------------------------------------------
