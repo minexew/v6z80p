@@ -1,5 +1,5 @@
 
-  			Kernal Routines - Full Descriptions 14/08/2010
+  			Kernal Routines - Full Descriptions 27/08/2010
 			-----------------------------------------------
 
 
@@ -285,8 +285,7 @@ Routine name: kjt_create_file
 Action: Makes a file stub for a new file on current disk, current directory.
 
 Input Registers : HL = address of zero terminated filename.
-		      IX = address file should load back to (not used on FAT16)
-		      B  = bank part of reload address (not used on FAT 16)
+		      
 
 Output Registers : Standard error codes
 
@@ -636,16 +635,6 @@ variable holding the file size every call until variable is = < 0)
 As with the disk routines, Whenever a serial file transfer command reaches address
 $FFFF, it wraps around to $8000 and continues onto the next bank.
 
-If a routine is successful the zero flag will be set. If it is not, A will contain
-the error code:
-
-A = $07 : Save length is zero
-A = $08 : File too big (IE: Memory address out of range)
-A = $0f : Checksum bad
-A = $11 : Comms error
-A = $14 : Time out error
-A = $25 : Filename mismatch
-
 
 
 Routine name: kjt_serial_receive_header
@@ -661,7 +650,14 @@ Output Registers : Zero Flag: If set, all OK
                     
                    If Zero Flag is NOT set, A = serial error code.
 
-                       
+			A = $07 : Save length is zero
+			A = $08 : File too big (IE: Memory address out of range)
+			A = $0f : Checksum bad
+			A = $11 : Comms error
+			A = $14 : Time out error
+			A = $25 : Filename mismatch        
+			A = $2A : Aborted with ESC key
+            
 Note: Filename can be "*" if any file is to be accepted.
 
 
@@ -682,6 +678,15 @@ Output Registers : Zero Flag: If set, all OK
                    IX = location of of serial file header
                     
                    If Zero Flag is NOT set, A = serial error code.
+
+			A = $07 : Save length is zero
+			A = $08 : File too big (IE: Memory address out of range)
+			A = $0f : Checksum bad
+			A = $11 : Comms error
+			A = $14 : Time out error
+			A = $25 : Filename mismatch
+
+
 
 Note: "kjt_serial_receive_header" MUST be called before this routine!
 
@@ -706,6 +711,13 @@ Output Registers : Zero flag, set if all OK.
 
                    If zero flag not set, A = serial error code.
 
+			A = $07 : Save length is zero
+			A = $08 : File too big (IE: Memory address out of range)
+			A = $0f : Checksum bad
+			A = $11 : Comms error
+			A = $14 : Time out error
+			A = $25 : Filename mismatch
+
 
 
 
@@ -716,15 +728,18 @@ Routine name: kjt_serial_rx_byte
 
 Action: Wait for a byte from serial port
 
-Input Registers  : A = max time to wait in seconds
+Input Registers  : A - Bits 0:5 = max time to wait in seconds
+                              6 = If set, the wait can be aborted with the ENTER key
+			      7 = If set, the wait can be aborted with ESCAPE key
 
 Output Registers : If Carry flag is clear all OK, A = byte received.
-                   If Carry flag is set, operation timed out
+  
+                   If Carry flag is set, error code in A as follows:
+
+				A = $14 - Timed out
+				A = $2A - Aborted with key.
 
 Notes: All registers except A preserved
-
-
-
 
 
 
