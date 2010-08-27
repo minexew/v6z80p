@@ -1,9 +1,10 @@
 
-; App: Set - set environment variable - v1.01 By Phil @ retroleum
+; App: Set - set environment variable - v1.02 By Phil @ retroleum
 ; Usage: set "var_name" "var_value" (if no parameters supplied, en_vars are listed)
 ;
 ; Changes
 ;
+; 1.02 - Fixed bug - when listing EnvVars - first zero encountered stopped list 
 ; 1.01 - Env vars with % prefix are displayed as paths (and not allowed to be set)
 
 ;======================================================================================
@@ -257,9 +258,9 @@ lp1	ld a,(de)
 show_next_envar	
 
 	pop hl
-	ld de,8
+skp_ev	ld de,8
 	add hl,de
-skp_ev	pop bc
+	pop bc
 	djnz lp2
 	xor a
 	ret

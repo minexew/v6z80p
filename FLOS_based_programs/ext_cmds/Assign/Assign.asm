@@ -177,13 +177,13 @@ para2_ok	push hl
 	push ix
 	call kjt_compare_strings
 	pop ix
-	jr nc,bad_path
+	jp nc,bad_path
 	ld a,(ix+3)		; get volume digit char
 	sub $30
 	push ix
 	call kjt_change_volume
 	pop ix
-	jr nz,bad_path		; error if new volume is invalid
+	jp nz,bad_path		; error if new volume is invalid
 
 	ld de,5
 	add ix,de			; move past "VOLx:"
@@ -201,10 +201,8 @@ nxt_path	ld de,filename_txt		;step through args changing dirs as apt
 cpypslp	ld a,(ix)
 	cp $2f
 	jr z,path_break
-	cp " "
-	jr z,path_break
-	or a
-	jr z,bad_path
+	cp 33
+	jr c,path_break
 	ld (de),a
 	inc ix
 	inc de
@@ -218,14 +216,14 @@ path_break
 	push ix
 	call kjt_change_dir		
 	pop ix
-	or a
 	jr nz,bad_path
-	inc ix			;next char in path string
-	jr nxt_path
-	 
-bad_path	ld hl,bad_path_txt
-	jr err_quit
-
+	
+	ld a,(ix)
+	cp 33
+	jr c,path_done
+	inc ix
+	jr nxt_path		;next char in path string
+				
 
 skip_spaces
 
@@ -250,10 +248,11 @@ set_var
 	ld hl,var_name		;set the environment variable
 	ld de,var_data
 	call kjt_set_envar
-	jr z,all_ok
+	jr z,all_done
 	ld hl,no_room_txt
 	jr err_quit
-all_ok	ld a,(orig_volume)		;restore original current drive and dir
+
+all_done	ld a,(orig_volume)		;restore original current drive and dir
 	call kjt_change_volume
 	ld de,(orig_cluster)
 	call kjt_set_dir_cluster
@@ -262,12 +261,14 @@ all_ok	ld a,(orig_volume)		;restore original current drive and dir
 
 no_args	ld hl,missing_args_txt
 err_quit	call kjt_print_string
-	xor a
-	ret
+	jr all_done
 
 inv_proxy	ld hl,bad_proxy_txt
 	jr err_quit
-	
+
+bad_path	ld hl,bad_path_txt
+	jr err_quit
+		
 ;-------------------------------------------------------------------------------------------
 
 vol_txt	   db "VOL",0
