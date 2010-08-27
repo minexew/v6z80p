@@ -2,16 +2,36 @@
 FLOS for V6Z80P version info:
 -----------------------------
 
+5.78 - 26/08/10 : Many optimizations. Internal commands optimized and now return
+		  error codes in the standard format (ZF = All OK, else A = error code.
+		  If A = 0, B = hardware error bits)
+		: When directories are deleted, any corresponding assignment names are removed
+		  from the Environment Variable list.
+                : EXEC - when the command string is copied, the <CR> from the end of a script
+		  line is replaced with a zero.
+
+
+5.77 - 25/08/10 : Allowed exit from serial wait with keys if the "wait in seconds" value supplied in A
+                  has bits 6:7 set (affects "kjt_serial_rx_byte", "kjt_serial_receive_header")
+                : "RX" command now waits 15 seconds before timing out / can be aborted with ESC key.
+                : Some optimizations (get start/end address code for "C", "H","F" commands..)
+
+
+5.76  -23/08/10 : Updated CD command to accept assigned paths (%xxx), also now shows current
+                  path when no arguments are supplied (up to 16 dir levels).
+
+
 5.75  -20/08/10 : Added environment variable routines: kjt_get_envar, kjt_set_envar, kjt_delete_envar
                   Environment variables currently live under the video registers at $480-$4FF (see
                   entry in system_equates.asm)
                 : Added "kjt_list_file_sectors" to get a list of disk sectors that a file occupies
 
 
-5.74  -18/08/10 : Bugfix: Previously, if "CD" was given a multi-dir path and one of the dirs was 8 chars long
-                  the dir stepping would stop at that point.
-                : FLOS filename now "FLOSvXYZ.OSF" - no need to FAT16 distinction as non-FAT16
-                  versions no longer produced.
+5.74  -18/08/10 : Bugfix: Previously, if "CD" was given a multi-dir path and one of the dirs was
+		  8 chars long the dir stepping would stop at that point.
+                : FLOS filename now "FLOSvXYZ.OSF" - no need for FAT16 distinction as non-FAT16
+                  version discontinued.
+
 
 5.73 - 15/08/10 : To skip boot_run (or any scripts started with EXEC) at any point in the list
                   you now hold down CTRL + C (not ESC)
@@ -26,7 +46,7 @@ FLOS for V6Z80P version info:
                 : Added "kjt_rename_file"
                 
 
-5.71 - 06/08/10 : Overhauled mouse driver system. The sprite pointer has been removed from
+5.71 - 06/08/10 : Overhauled mouse driver system. The  pointer sprite has been removed from
                   FLOS. The driver just returns motion info, it is up to external programs to
                   display whatever pointer / cursor they require.
                 : "kjt_enable_pointer" renamed to "kjt_enable_mouse"
@@ -38,7 +58,7 @@ FLOS for V6Z80P version info:
 5.70 - 28/06/10 : Added kernal routines "kjt_read_sysram_flat" and "kjt_write_sysram_flat"
 
 
-5.69 - 26/06/10 : Ability to truncate .exe files (commands) to n bytes upon load using header
+5.69 - 26/06/10 : Added ability to truncate .exe files (commands) to n bytes upon load using header
                 : Can abort BOOT_RUN.SCR start up scripts by pressing ESC on startup
 
 
@@ -57,13 +77,14 @@ FLOS for V6Z80P version info:
                  : (Internally, regarding FS_* calls, FLOS still uses the CARRY SET = Driver Error system).
   
 
-5.66 - 31/05/10	: Removed "kjt_set_sector_lba" call, this function is now included in actual read/write sector calls
+5.66 - 31/05/10	: Removed "kjt_set_sector_lba" call, this function is now included in actual
+		  read/write sector calls
 		: Fixed kjt_format_device (was untested in v565)
-                : Standardized error code returns: External apps no longer use the CARRY flag, they now must clear
-                  the ZERO FLAG if they complete sucessfully. If the zero flag is not set but A = 0, this is a
-                  hardware error and the relevent error data bits should be placed in B (Kernal based routines
-                  that return error codes do this). As before, $FF = system restart. $FE = spawn new program (but
-                  make sure the zero flag is set).
+                : Standardized error code returns: External apps no longer use the CARRY flag,
+		  they now must clear the ZERO FLAG if they complete sucessfully. If the zero flag is
+		  not set but A = 0, this is a hardware error and the relevent error data bits should
+		  be placed in B (Kernal based routines that return error codes do this). As before,
+                  $FF = system restart. $FE = spawn new program (but make sure the zero flag is set).
 		: KJT_mount_volumes has option to do so quietly. 
 		: Some tidying up and other small fixes.
 
@@ -92,7 +113,8 @@ FLOS for V6Z80P version info:
 		: kjt_change_drive to kjt_change_volume
 		: Created internal scratchpad label just below stack, the decimal routines now use this. 
 		: Replaced Disassemble routine with highly optimized version
-		: Added "<" command to "edit disassembly" (now using John Kerr's DiSZ80 routine for D command)
+		: Added "<" command to "edit disassembly" (now using John Kerr's DiSZ80
+		  routine for D command)
 		: All internal reads of vreg_read use the port, not the video register (in case paged out)
                 : Changed KJT routines for external low level sector access (see docs)
                 : Added internal command "VOLx:" to set volume but not change dir
