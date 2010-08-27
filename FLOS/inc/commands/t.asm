@@ -1,14 +1,11 @@
 ;-----------------------------------------------------------------------
-;"T" - Show memory as ascii text command. V6.02
+;"T" - Show memory as ascii text command. V6.03
 ;-----------------------------------------------------------------------
 
 os_cmd_t:	
 	
-	call ascii_to_hexword	;DE = address
-	cp $c
-	ret z
-	cp $1f
-	jp nz,unaddr
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
+	jr nz,unaddr
 	ld de,(memmonaddrl)
 
 unaddr:	ld b,16

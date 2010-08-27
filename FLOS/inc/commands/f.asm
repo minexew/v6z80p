@@ -1,21 +1,12 @@
 ;-----------------------------------------------------------------------
-;"f" fill memory command. V6.01
+;"f" fill memory command. V6.03
 ;-----------------------------------------------------------------------
 
-os_cmd_f:				
+os_cmd_f			
 
-	call get_start_and_end
-	cp $c			;bad hex?
-	ret z
-	cp $1f		
-	jp z,os_no_start_addr	;no start address
-	cp $20
-	jp z,os_no_e_addr_error	;no end address
+	call get_start_and_end	;this routine only returns here if start/end data is valid
 
-	call ascii_to_hexword	;get fill byte
-	cp $c
-	ret z
-	cp $1f
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jp z,os_no_args_error
 	ld a,e
 	ld (fillbyte),a
@@ -33,7 +24,8 @@ os_cmd_f:
 	ld a,(fillbyte)
 	call os_bchl_memfill
 
-	xor a
 	ld a,$20			;OK completion message
+	or a
 	ret
 
+;-----------------------------------------------------------------------

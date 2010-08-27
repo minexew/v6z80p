@@ -1,16 +1,10 @@
 ;-----------------------------------------------------------------------
-;"H" - Hunt in memory command V6.04
+;"H" - Hunt in memory command V6.06
 ;-----------------------------------------------------------------------
 
 os_cmd_h
 
-	call get_start_and_end
-	cp $c			;bad hex?
-	ret z
-	cp $1f		
-	jp z,os_no_start_addr	;no start address
-	cp $20
-	jp z,os_no_e_addr_error	;no end address
+	call get_start_and_end	;this routine only returns here if start/end data is valid
 	
 	push hl
 	ld hl,(cmdop_start_address)
@@ -20,11 +14,8 @@ os_cmd_h
 	jp nc,os_range_error	;abort if end addr <= start addr
 	
 	ld (find_hexstringascii),hl	;address in command string where search bytes start
-	ld b,0
-cntfbyts	call ascii_to_hexword	;count bytes in string to find
-	cp $c
-	ret z
-	cp $1f
+	ld b,0			;count bytes in string to find
+cntfbyts	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jr z,gthexstr
 	inc b
 	inc hl
@@ -66,8 +57,8 @@ nofmatch	inc ix
 	cp d
 	jr nz,fndloop1
 	
-	xor a
 	ld a,$20			;completion message
+	or a
 	ret
 
 ;-----------------------------------------------------------------------

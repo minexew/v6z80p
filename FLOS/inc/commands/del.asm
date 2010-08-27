@@ -1,24 +1,26 @@
 ;-----------------------------------------------------------------------
-;"del" delete file command. V6.00
+;"del" delete file command. V6.02
 ;-----------------------------------------------------------------------
 
 
 os_cmd_del
 	
-	call fs_check_disk_format
-	ret c
-	or a
+	call kjt_check_volume_format	
 	ret nz
+
+	call filename_or_bust
 	
-	call os_args_to_filename
-	or a
-	jp z,os_no_fn_error	
-	call fs_erase_file_command
-	ret c
-	or a
-	ret nz
-	ld a,$20				;ok msg
-	ret
+	jp kjt_erase_file			;no point it being a call, nothing follows
+	
 	
 ;-----------------------------------------------------------------------
-	
+
+filename_or_bust
+
+	ld a,(hl)				;is the char here zero, return in not
+	or a
+	ret nz
+	pop hl				;otherwise pop the parent return address of the stack
+	jp os_no_fn_error			;so eventual return is made to grandparent
+
+;-----------------------------------------------------------------------

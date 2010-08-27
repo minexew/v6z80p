@@ -1,13 +1,10 @@
 ;-----------------------------------------------------------------------
-;">" for write ascii bytes to memory command. V6.00
+;">" for write ascii bytes to memory command. V6.01
 ;-----------------------------------------------------------------------
 
-os_cmd_gtr:
+os_cmd_gtr
 
-	call ascii_to_hexword	
-	cp $c
-	ret z
-	cp $1f
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jp z,os_no_start_addr
 fndquot1	inc hl
 	ld a,(hl)
@@ -38,8 +35,8 @@ os_gtrdn	xor a
 	ret	
 
 noquot2	pop hl			;no second quote - bad args
-	xor a
 	ld a,$12
+	or a
 	ret
 
 ;-----------------------------------------------------------------------

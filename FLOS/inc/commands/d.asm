@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------------------------
-; OS "D" Command: Z80 Disassembler v6.01
+; OS "D" Command: Z80 Disassembler v6.03
 ; Now using John Kerr's Z80 (1987!) disassembly routine for compactness. Nice one, John! :)
 ;------------------------------------------------------------------------------------------
 
@@ -8,18 +8,13 @@ os_cmd_d:
 	ld de,$ffff
 	ld (disend),de		; default end address
 		
-	call ascii_to_hexword	; convert command line args to address in DE
-	cp $c			; if A is $1f on return, use last address (no address supplied)
-	ret z			; if A is $c hex address given is bad	
-	cp $1f
-	jr z,startdis
+	call hexword_or_bust	; the call only returns here if the hex in DE is valid
+	jr z,startdis		; in no args, use last address (no address supplied)
 
 dvalidhex	ld (DISADD),de
-	call ascii_to_hexword	; get end address if supplied
-	cp $c
-	ret z
-	cp $1f
-	jr z,startdis
+
+	call hexword_or_bust	; the call only returns here if the hex in DE is valid
+	jr z,startdis		; get end address if supplied
 	ld (disend),de		; use specifed end location
 	
 startdis	xor a			; start disassembly listing
@@ -27,16 +22,22 @@ startdis	xor a			; start disassembly listing
 
 disloop	ld hl,mdis_txt
 	call os_print_string	; show "> "
+	
 	ld de,(DISADD)
 	call z80dis_jk
 	ld (DISADD),de		; new location
+
+	call os_new_line
+	
 	ld hl,(disend)
 	xor a
 	sbc hl,de
-	jr c,dcmddone
-	
+	jr nc,d_cline
 	call os_new_line
-	call os_count_lines
+	xor a
+	ret
+	
+d_cline	call os_count_lines
 	ld a,"y"
 	cp b
 	jr z,disloop
@@ -699,6 +700,7 @@ CHROP  	PUSH HL
 ;-----------------------------------------------------------------------------------------
 
 DISADD	dw $5000
-disend	dw $ffff
+
+disend	equ scratch_pad
 
 ;-----------------------------------------------------------------------------------------

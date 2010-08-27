@@ -1,8 +1,9 @@
 ;-----------------------------------------------------------------------
-;"RX" - Receive binary file via serial port command. V6.02
+;"RX" - Receive binary file via serial port command. V6.04
 ;-----------------------------------------------------------------------
 ;
-; Changes in 6.02 - Adapted to new regime where "receive file" sets the load address
+;  6.03 - Longer time out but can quit with ESC key
+;  6.02 - Adapted to new regime where "receive file" sets the load address
 ;
 ;-------------------------------------------------------------------------------
 
@@ -26,11 +27,8 @@ os_cmd_rx:
 	ld (serial_fn_length),a
 	call os_scan_for_space
 	
-	call ascii_to_hexword	;gets load location in DE
-	cp $c
-	ret z
-	cp $1f
-	jp z,os_no_start_addr
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
+	jp z,os_no_start_addr	;gets load location in DE
 	ld (serial_address),de
 	
 	push hl
@@ -39,16 +37,13 @@ os_cmd_rx:
 	sbc hl,de
 	jr c,os_prok
 	pop hl
-	xor a
 	ld a,$26			;ERROR $26 - A load here would overwrite OS code/data
+	or a
 	ret
 os_prok	pop hl
 	
-	call ascii_to_hexword	;get bank if specified, else use current bank
-	cp $c			
-	ret z			;bad hex?
-	cp $1f
-	jr nz,serl_dfb
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
+	jr nz,serl_dfb		;get bank if specified, else use current bank
 	call os_getbank
 	ld e,a
 serl_dfb	ld b,e
@@ -63,7 +58,7 @@ serl_dfb	ld b,e
 	in a,(sys_serial_port)	;flush serial buffer at outset
 
 	ld hl,serial_filename	;filename location in HL
-	ld a,10			;time out = 10 seconds
+	ld a,$8F			;time out = 15 seconds / escape key active
 	call serial_get_header
 	or a
 	ret nz			;if a = 0 on return, header was OK
@@ -84,8 +79,8 @@ serl_dfb	ld b,e
 	ld b,7
 	call os_print_output_line_skip_zeroes
 		
-	xor a			
 	ld a,$10			;show " bytes loaded" return message
+	or a
 	ret
 
 

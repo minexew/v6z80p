@@ -18,14 +18,12 @@ oktlscr	set 0,(hl)
 
 	ld hl,(os_args_start_lo)		;copy the script filename (scripts cannot launch
 	ld de,script_fn			;scripts as this would require nested script filenames)
-	ld b,16
+	ld b,13
 	call os_copy_ascii_run
 	call fs_get_dir_block		;store location of dir that holds the script
 	ld (script_dir),de
 	
-	call fs_check_disk_format
-	ret c
-	or a
+	call kjt_check_volume_format	
 	ret nz
 	
 	ld hl,0
@@ -106,7 +104,9 @@ scrp_cmd	ld a,(hl)
 	inc iy
 	djnz scrp_cmd
 	
-scrp_eol	ld (script_file_offset),iy
+scrp_eol	xor a
+	ld (de),a				;null terminate command string 
+	ld (script_file_offset),iy
 	ld (script_buffer_offset),hl
 
 	call os_parse_cmd_chk_ps		;attempt to launch commands (check for spawn progs)

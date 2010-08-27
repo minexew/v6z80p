@@ -1,11 +1,12 @@
 ;-----------------------------------------------------------------------------------------------
-; "Vers" = Show OS / Hardware version / FS version v6.04
+; "Vers" = Show OS / Hardware version v6.04
 ;-----------------------------------------------------------------------------------------------
 
 os_cmd_vers
 
 	ld hl,os_version_txt
 	call os_print_string
+
 	call os_get_version
 	push de
 	ex de,hl

@@ -4,9 +4,7 @@
 
 os_cmd_dir
 
-	call fs_check_disk_format
-	ret c
-	or a
+	call kjt_check_volume_format	
 	ret nz
 	
 	call div_line

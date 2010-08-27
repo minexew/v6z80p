@@ -22,11 +22,8 @@ os_cmd_tx:
 	ld (serial_fn_length),a
 	call os_scan_for_space
 				
-	call ascii_to_hexword	;get save address in DE
-	cp $c
-	ret z
-	cp $1f
-	jp z,os_no_start_addr
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
+	jp z,os_no_start_addr	;get save address in DE
 	ld (fs_z80_address),de
 
 	ld de,0			;find file length
@@ -52,21 +49,18 @@ sers_cgfl	pop hl
 
 	call ascii_to_hex_digit	;convert first digit
 	cp 16
-	jp nc,os_hex_error
-	ld (fs_file_length+2),a
+	jr c,tx_hok
+	ld a,$c
+	or a
+	ret	
+tx_hok	ld (fs_file_length+2),a
 	inc hl	
-sers_fln	call ascii_to_hexword	;do (rest of) length
-	cp $c
-	ret z
-	cp $1f
+sers_fln	call hexword_or_bust	;do (rest of) length
 	jp z,os_no_filesize
 	ld (fs_file_length),de
 	
-	call ascii_to_hexword	;get bank if specified, else use current bank
-	cp $c			
-	ret z			;bad hex?
-	cp $1f
-	jr nz,sers_dfb
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
+	jr nz,sers_dfb		;get bank if specified, else use current bank
 	call os_getbank
 	ld e,a
 sers_dfb	ld b,e
@@ -86,9 +80,10 @@ sers_dfb	ld b,e
 	ld ix,(fs_z80_address)
 	call serial_send_file
 	or a			;if a = 0 on return, load was OK
-	ret nz			;"or" clears carry flag
-	xor a	
+	ret nz			
+
 	ld a,$20			;ok message on return
+	or a
 	ret
 
 sers_fsb	pop hl
