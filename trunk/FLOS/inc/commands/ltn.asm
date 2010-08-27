@@ -1,16 +1,13 @@
 ;-----------------------------------------------------------------------------------------
-; OS "<" Command: Update mem hex bytes and re-disassemble v6.00
+; OS "<" Command: Update mem hex bytes and re-disassemble v6.02
 ;------------------------------------------------------------------------------------------
 
 os_cmd_ltn:
 
 	ld a,(cursor_y)
 	ld (scratch_pad),a
-	call ascii_to_hexword	;returns DE = address to write bytes to
-	cp $c			
-	ret z			;if returns $c = bad hex
-	cp $1f
-	ret z			;if returns $1f = no address followed the "<"
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
+	jp z,os_no_args_error	;if no address followed the "<" quit
 	push de
 	pop ix			;ix is now dest for bytes
 	ld (DISADD),de	
@@ -29,7 +26,7 @@ nsplp	inc b
 	jr nc,redisa
 	call ascii_to_hex_no_scan	;copy hex bytes from line to RAM
 	cp $c
-	ret z
+	jp z,os_no_args_error
 	ld (ix),e
 	inc ix
 	jr hexbtmlp

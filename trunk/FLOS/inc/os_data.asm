@@ -7,7 +7,7 @@
 ;-------------------------------------------------------------------------------------------
 
 welcome_message	db "FLOS by Phil Ruston 2010",0
-storage_txt	db "Storage:",11,0
+storage_txt	db "Drives:",11,0
 os_dos_cmds_txt	db "COMMANDS",0
 boot_script_fn	db "BOOT_RUN.SCR",0
 os_hex_prefix_txt	db "$",0
@@ -364,6 +364,8 @@ ok_msg		db $89,0			;$20 ok (OS error code 16)
 		db $6f,$71,$70,$6e,0	;$27 Data after EOF request (FS error code 0d)
 no_vols_msg	db $76,$36,$0		;$28 No Volumes
 none_found_msg	db $97,$a6,$63,$0		;$29 None Found
+		
+		db $2c,$77,0		;$2a "Receive Aborted" - Serial receive abort
 				
 		db $ff			;END MARKER
 		
@@ -517,7 +519,7 @@ os_quiet_mode	db 0
 temp_string	ds OS_window_cols+2,0		
 
 bank_pre_cmd	db 0
-script_fn		ds 17,0
+script_fn		ds 13,0
 
 fs_drive_sel_cache	db 0		; used in format command
 

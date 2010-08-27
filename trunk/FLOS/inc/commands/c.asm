@@ -1,34 +1,24 @@
 ;-----------------------------------------------------------------------
-;"c" - Copy memory command. V6.02
+;"c" - Copy memory command. V6.04
 ;-----------------------------------------------------------------------
 
 os_cmd_c
 
-	call get_start_and_end
-	cp $c			;bad hex?
-	ret z
-	cp $1f		
-	jp z,os_no_start_addr	;no start address
-	cp $20
-	jp z,os_no_e_addr_error	;no end address
+	call get_start_and_end	;this routine only returns here if start/end data is valid
 	
-	call ascii_to_hexword	;get destination address in DE
-	cp $c
-	ret z
-	cp $1f
+	call hexword_or_bust	;only returns here if the hex in DE (destination address) is valid
 	jp z,os_no_d_addr_error
 	ld (copy_dest_address),de
+
 	inc hl
-	call ascii_to_hexword	;get dest bank number if supplied 
-	cp $c
-	ret z
-	cp $1f
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jp z,copytsb		;1f = no args so copy to same bank
 	ld a,e
 	call test_bank
 	jp nc,os_invalid_bank
 	
 	ld (copy_dest_bank),a
+
 	call set_copy_regs		;bank flipping copy
 	jp c,os_range_error		;abort if end addr < start addr
 	call os_cachebank
@@ -53,30 +43,10 @@ copytsb	call set_copy_regs		;straightforward copy - no bank flipping
 	jp c,os_range_error		;abort if end addr <= start addr
 	ldir
 
-copydone	xor a			;completion message
-	ld a,$20
-	ret
-
-;-----------------------------------------------------------------------
-
-
-get_start_and_end
-
-	call ascii_to_hexword	;get start address
-	inc hl
-	ld (cmdop_start_address),de
+copydone	ld a,$20			;completion message
 	or a
-	ret nz
-	
-	call ascii_to_hexword	;get end address
-	inc hl
-	ld (cmdop_end_address),de
-	cp $c
-	ret z
-	cp $1f
-	ret nz
-	inc a
 	ret
+
 
 ;-----------------------------------------------------------------------
 
@@ -101,3 +71,31 @@ set_copy_regs
 	ret
 	
 ;------------------------------------------------------------------------
+
+get_start_and_end
+
+	call ascii_to_hexword	;get start address
+	ld (cmdop_start_address),de
+	inc hl
+	or a
+	jr z,st_addrok
+	pop hl			;this pop is remove originating call addr from the stack
+	cp $c			;bad hex error code
+	jr z,c_badhex
+	ld a,$16			;no start address error code
+c_badhex	or a
+	ret
+	
+st_addrok	call ascii_to_hexword	;get end address
+	ld (cmdop_end_address),de
+	inc hl
+	or a
+	ret z
+	pop hl			;this pop is remove originating call addr from the stack
+	cp $c			;bad hex error code
+	jr z,c_badhex
+	ld a,$1c			;no end address error code
+	ret
+	
+;------------------------------------------------------------------------
+

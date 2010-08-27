@@ -11,8 +11,8 @@ os_cmd_format
 	ld a,(hl)			;check args exist
 	or a
 	jr nz,fgotargs		;no args
-	xor a
 	ld a,$1f
+	or a
 	ret
 
 fgotargs	
@@ -44,8 +44,8 @@ fdev_lp	ld a,(ix)			;a = driver number for this dev
 	inc c
 	djnz fdev_lp
 
-fno_dev	xor a
-	ld a,$22			;device not present
+fno_dev	ld a,$22			;device not present
+	or a
 	ret
 	
 
@@ -105,8 +105,8 @@ form_err
 	
 	
 ab_form	call os_new_line
-	xor a			;Format aborted
-	ld a,$24		
+	ld a,$24			;ERROR $24 - Format aborted	
+	or a
 	ret
 	
 confirm_yes

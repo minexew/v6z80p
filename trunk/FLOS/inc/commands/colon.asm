@@ -1,24 +1,17 @@
 ;-----------------------------------------------------------------------
-;":" for write hex bytes command. V6.01
+;":" for write hex bytes command. V6.03
 ;-----------------------------------------------------------------------
 
-os_cmd_colon:			
+os_cmd_colon
 	
-	call ascii_to_hexword	;returns DE = address to write to
-	cp $c
-	ret z
-	cp $1f
-	jp z,os_no_start_addr
-	
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
+	jp z,os_no_start_addr	;DE = address to write to
 	push de
 	pop ix			;ix is now dest
 
-wmblp	call ascii_to_hexword	;copy hex bytes from line to RAM
-	cp $c
-	ret z
-	cp $1f
+wmblp	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jr z,os_ccmdn
-	ld (ix),e
+	ld (ix),e			;copy hex bytes from line to RAM
 	inc ix
 	jr wmblp
 os_ccmdn	xor a

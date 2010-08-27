@@ -1,13 +1,10 @@
 ;-----------------------------------------------------------------------
-;"m" - Show memory as hex bytes command. V6.01
+;"m" - Show memory as hex bytes command. V6.02
 ;-----------------------------------------------------------------------
 
 os_cmd_m	
 
-	call ascii_to_hexword	; convert following ascii to address in DE
-	cp $c			; if A is $1f on return, use last address (no address)
-	ret z			; if A is $c hex address given is bad	
-	cp $1f
+	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jr nz,validhex
 	ld de,(memmonaddrl)
 

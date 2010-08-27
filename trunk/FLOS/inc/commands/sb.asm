@@ -1,81 +1,69 @@
 ;-----------------------------------------------------------------------
-;"SB" - Save binary file command. V6.01
+;"SB" - Save binary file command. V6.03
 ;-----------------------------------------------------------------------
 
 os_cmd_sb
 	
-	call fs_check_disk_format
-	ret c
-	or a
+	call kjt_check_volume_format		;disk ok?
 	ret nz
 	
-	call os_args_to_filename
-	or a
-	jp z,os_no_fn_error			;filename supplied?
+	call os_getbank			
+	ld (sb_save_bank),a			;use current bank for save by default
 
-	call fs_open_file_command		;check for anything with this filename 
-	ret c
-	cp 6
-	ret z				;quit if its a directory
+	call filename_or_bust		;filename supplied?
+	ld (sb_save_name_addr),hl
 	
 	ld hl,(os_args_start_lo)
-	call ascii_to_hexword		;save location
-	cp $c
-	ret z
-	cp $1f
-	jp z,os_no_start_addr
-	ld (fs_z80_address),de
+	call os_next_arg
+	call hexword_or_bust		;the call only returns here if the hex in DE is valid
+	jp z,os_no_start_addr		;get the save location from command string
+	ld (sb_save_addr),de
 	
-	ld bc,0				;set up file length
-	ld (fs_file_length),bc		
-	ld (fs_file_length+2),bc		;first, clear it
-	call os_scan_for_non_space
-	or a
+	call os_next_arg			;find save length
 	jp z,os_no_filesize
-		
-	push hl
-	ld b,5				;check for 5 digit save length
-	ld c,0
-os_scflc:	ld a,(hl)
-	or a
-	jr z,os_sfba
+	exx
+	ld hl,0				;hl = LSW	
+	ld e,0				; e = MSN
+	exx
+sb_fsllp	ld a,(hl)
 	cp " "
-	jr z,os_scgfl
-	inc c
-os_scinc:	inc hl
-	djnz os_scflc
-os_scgfl:	pop hl
-	ld a,c
-	cp 5
-	jr nz,os_sfln
-	call ascii_to_hex_digit		;convert first digit
+	jr z,sb_gsl
+	call ascii_to_hex_digit		;convert up to 5 digits
+	inc hl
 	cp 16
-	jp nc,os_hex_error
-	ld (fs_file_length+2),a
-	inc hl	
-os_sfln:	call ascii_to_hexword		;do (rest of) length
-	cp $c
-	ret z
-	cp $1f
-	jp z,os_no_filesize
-	ld (fs_file_length),de
-	
-	call os_getbank			;bank override?
-	ld (fs_z80_bank),a			;use current bank by default
-	call ascii_to_hexword		
-	cp $1f				;code $1f = no hex
-	jr z,os_sfgds
-	cp $c				;code $c=bad hex
-	ret z
+	jr c,sb_hok
+	ld a,$c
+	or a
+	ret	
+sb_hok	exx
+	add hl,hl
+	rl e
+	add hl,hl
+	rl e
+	add hl,hl
+	rl e
+	add hl,hl
+	rl e
+	or l
+	ld l,a
+	ld (sb_save_len_lo),hl
+	ld a,e
+	ld (sb_save_len_hi),a
+	exx
+	jr sb_fsllp
+
+sb_gsl	call hexword_or_bust		;the call only returns here if the hex in DE is valid			
+	jr z,os_sfgds			;no hex = no bank override
 	ld a,e
 	call test_bank			;bank must be in correct range
 	jp nc,os_invalid_bank
-	ld (fs_z80_bank),a
+	ld (sb_save_bank),a
 	
-os_sfgds:	call fs_create_file_command
-	ret c
-	cp 9				;if error 9, file exists already
-	jr nz,os_sffde			
+os_sfgds	ld hl,(sb_save_name_addr)		;try to make file
+	call kjt_create_file
+	jr z,os_sfapp
+	cp 9				;if error 9, file exists already. Else quit.
+	ret nz			
 	ld hl,save_append_msg		;ask if want to append data to exisiting file
 	call os_show_packed_text
 	call os_wait_key_press
@@ -84,22 +72,28 @@ os_sfgds:	call fs_create_file_command
 	jr z,os_sfapp
 	xor a
 	ret
-	
-os_sffde	or a	
-	ret nz
 
-os_sfapp	call fs_write_bytes_to_file_command
-	ret c
-	or a
-	ret nz
+os_sfapp	ld hl,(sb_save_name_addr)
+	ld ix,(sb_save_addr)
+	ld de,(sb_save_len_lo)
+	ld a,(sb_save_len_hi)
+	ld c,a
+	ld a,(sb_save_bank)
+	ld b,a
+	call kjt_write_bytes_to_file
+	ret nz	
 	ld a,$20				;ok msg
+	or a
 	ret
 
-os_sfba:	pop hl
-	xor a
-	ld a,$12				;bad arguments
-	ret
-	
 	
 ;-------------------------------------------------------------------------------------------------
-	
+
+sb_save_addr	equ scratch_pad
+sb_save_len_lo	equ scratch_pad+2
+sb_save_len_hi	equ scratch_pad+4
+sb_save_bank	equ scratch_pad+6
+sb_save_name_addr	equ scratch_pad+8
+
+
+;--------------------------------------------------------------------------------------------------

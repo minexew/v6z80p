@@ -1,9 +1,14 @@
-;---------- RS232 File Transfer Routines V6.01 ------------------------------------------------
+;---------- RS232 File Transfer Routines V6.02 ------------------------------------------------
 ;
-; Changes in v6.01 - The load bank and address is now set by "serial_receive_file"
-;                    it made no sense for the get header routine to do this.
-;                    This has necessitated changing the RX command code and any
-;                    external apps that use the KJT routines.
+;  v6.02 - If bit 7 is set in A, when calling serial_get_header is called
+;          the wait will be aborted if ESC is pressed. If bit 6 is set, Enter
+;          key will escape (also).
+;        - Some optimizations.
+;
+;  v6.01 - The load bank and address is now set by "serial_receive_file"
+;          it made no sense for the get header routine to do this.
+;          This has necessitated changing the RX command code and any
+;          external apps that use the KJT routines.
 ;
 ;---------------------------------------------------------------------------------------------
 ; .---------------------.
@@ -189,7 +194,7 @@ s_getblock
 	ld hl,$ffff			; CRC checksum
 	exx
 s_lgb	call receive_serial_byte
-	jr c,s_gbtoerr			; timed out if carry = 1	
+	jr c,s_gberr			; timed out if carry = 1	
 	ld (hl),a
 	exx
 	xor h				; do CRC calculation		
@@ -210,30 +215,23 @@ rxcrcnext	djnz rxcrcbyte
 	exx				; hl = calculated CRC
 
 	call receive_serial_byte		; get 2 more bytes - block checksum in bc
-	jr c,s_gbtoerr
+	jr c,s_gberr
 	ld c,a
 	call receive_serial_byte
-	jr c,s_gbtoerr		
+	jr c,s_gberr		
 	ld b,a
 	
 	xor a				; compare checksum
 	sbc hl,bc
-	jr z,s_gbcsok
+	jr z,s_gberr
+
 	ld a,$0f				;A=$0f : bad checksum
 	scf
 s_gberr	pop bc
 	pop de
 	pop hl
 	ret
-
-s_gbtoerr ld a,$14				;A=$14 : time out
-	scf
-	jr s_gberr
 	
-s_gbcsok	xor a				;A=$00 : all ok
-	jr s_gberr
-
-
 ;----------------------------------------------------------------------------------
 
 s_goodack	push bc
@@ -393,7 +391,6 @@ s_sendblock
 	ld e,0
 s_sblklp	ld a,(hl)
 	call send_serial_byte
-	jr c,s_sbto
 	inc hl
 	dec e
 	jr nz,s_sblklp
@@ -402,45 +399,35 @@ s_sblklp	ld a,(hl)
 	call crc_checksum
 	ld a,l
 	call send_serial_byte
-	jr c,s_sbto
 	ld a,h
 	call send_serial_byte
-	jr c,s_sbto
 	xor a
-	jr s_bsok
-s_sbto	ld a,$14				;A=$14 : time out
-	scf
-s_bsok	pop bc
+s_popall	pop bc
 	pop de
 	pop hl
 	ret
 	
 
 s_waitack
-	push bc
 	push hl
 	push de
+	push bc
 	call receive_serial_byte		; wait to receive "OK" acknowledge
-	jr c,s_wato
+	jr c,s_popall
 	ld b,a
 	call receive_serial_byte
-	jr c,s_wato
+	jr c,s_popall
 	ld c,a
 	ld h,"O"
 	ld l,"K"
 	xor a
 	sbc hl,bc				; zero flag set on return if OK received
-	jr nz,s_wabada
-	xor a
-	jr s_waend
-s_wabada	ld a,$11				; bad ack received  ($11:"comms error")
-	jr s_waerr	
-s_wato	ld a,$14
-s_waerr	scf
-s_waend	pop de
-	pop hl
-	pop bc
-	ret
+	jr z,s_popall
+
+	ld a,$11				; bad ack received  ($11:"comms error")
+	scf
+	jr s_popall
+
 	
 		
 ;---------------------------------------------------------------------------------------	
@@ -453,7 +440,10 @@ receive_serial_byte
 	push bc
 	ld a,(serial_timeout)	; max time to wait for a byte to arrive
 	ld c,a
-wait_sto	ld b,0
+	sla c
+	sla c
+	
+wait_sto	ld b,64
 wait_sb	in a,(sys_joy_com_flags)	; if bit 6 of status flags = 1, byte is in buffer 
 	bit 6,a
 	jr nz,sbyte_in
@@ -463,13 +453,32 @@ wait_sb	in a,(sys_joy_com_flags)	; if bit 6 of status flags = 1, byte is in buff
 	ld a,%00000100
 	out (sys_clear_irq_flags),a	; clear timer overflow flag
 	djnz wait_sb		
-	dec c
-	jr nz,wait_sto
-	xor a			; gives up with carry flag set after [x] seconds
+	
+	ld a,(serial_timeout)	; allow quit with ESC / ENTER?
+	ld b,a
+	push bc
+	call os_get_key_press
+	pop bc
+	bit 7,b
+	jr z,s_escnq
+	cp $76
+	jr z,s_kquit
+s_escnq	bit 6,b
+	jr z,sb_dchesc
+	cp $5a
+	jr nz,sb_dchesc
+s_kquit	ld a,$2a			; ERROR CODE $2A - "RECEIVE WAIT ABORTED WITH KEYBOARD"
+quit_ser	scf
+	pop bc
+	ret
+	
+sb_dchesc	dec c			; decrement 'time out' seconds
+	jr nz,wait_sto		; gives up with carry flag set after [x] seconds
+ser_tout	ld a,$14			; ERROR CODE $14 - "SERIAL TIME OUT"	
 	jr quit_ser
+
 sbyte_in	in a,(sys_serial_port)	; get serial byte in A - this also clears bit 6 of status flags
-	scf			
-quit_ser	ccf			
+	or a			; clear carry flag
 	pop bc
 	ret
 	
