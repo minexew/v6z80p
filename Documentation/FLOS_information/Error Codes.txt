@@ -42,4 +42,4 @@ $26 - OS RAM protected
 $27 - Data after EOF request
 $28 - No Volumes
 $29 - None Found
-		
+$2a - Receive aborted	
