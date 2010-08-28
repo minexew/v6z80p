@@ -1,3 +1,8 @@
+
+A Z80/FPGA-based computer system by Phil Ruston - www.retroleum.co.uk
+---------------------------------------------------------------------
+
+
 Disclaimers:
 ------------
 
@@ -14,11 +19,10 @@ to be connected to the user's equipment entirely at their own risk.
 Any future developments should be backwards compatible with
 the existing hardware design, but this is not guaranteed.
 
-The software and schematics supplied remain the copyright of
-Phil Ruston 2008-2010, but can be freely modified if desired.
-
 The V6Z80P PCB design, OSCA FPGA architecture, FLOS operating system
-can be used freely for non-profit, non-commercial applications.
+and software supplied remain the copyright of Phil Ruston 2008-2010,
+but can be modified if desired and used freely for non-profit,
+non-commercial applications.
 
 
 Credits:
