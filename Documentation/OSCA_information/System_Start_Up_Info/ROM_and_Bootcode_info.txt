@@ -1,4 +1,4 @@
-Updated for OSCA v652
+Updated for OSCA v661
 
 ------------------------- OSCA ROM Operations -----------------------------
 
@@ -7,18 +7,21 @@ This ROM code tells the PIC microcontroller to clock out 3520 bytes from the
 SPI EEPROM (EEPROM location $F000 onwards) - this is the bootcode. The Z80 reads
 this serial data into $200-$FFF, checks the CRC checksum (last two bytes) and
 executes it (JP $200) if all is OK. If the CRC doesn't match, the databurst is
-requested again, this time from EEPROM location $1F000. If this fails EEPROM
-location $F000 is tried again.
+requested again, this time from EEPROM location $1F000. If this fails, the
+screen goes grey indicating that a bootcode file should be serially downloaded.
+(This grey screen condition can be forced by holding up, right and fire on a
+joystick in port 2 at power up).
 
 ------------------------ Bootcode operations ------------------------------
 
 The bootcode resets the keyboard and looks for an Operating System. 
-First it reads the root directory of an inserted SD card, next it looks at
-$800-$4800 in the onboard EEPROM, finally it requests a serial download.
+First it checks the root directory of an inserted SD card, next it looks at
+$00800-$047FF in the onboard EEPROM, finally it requests a serial download.
 The OS code is loaded to $1000, and executes from $1010.
 
-To skip the SD card and EEPROM check and immediately go to serial
-download, press the ESC key on boot.
+To skip the SD card and EEPROM check and immediately go to serial download,
+press the ESC key on boot. If F1-F7 are pressed, the FPGA will configure
+from the relevant slot.
 
 To reboot whilst the waiting for a serial download, press Left CTRL
 (the serial download also times out and reboots after 1 minute of
@@ -39,14 +42,9 @@ and the output (.bin) file reprogrammed into a config slot in the EEPROM
 
 To change the bootcode:
 
-This is easier (as long as you are able to get into FLOS). Use the supplied
-PC-based "Bootcode_CRC.exe" util (in the apps dir), Select your Z80
-bootcode file and it will output a file with the correct CRC inserted
-in the last two bytes. The EEPROM.EXE tool can then be used to write
-this to the EEPROM.
+This is achieved using the FLOS util; EEPROM.EXE. (The PC-based util
+"Bootcode_CRC.exe" (in the apps dir) can be used to add the CRC word
+required by the ROM to your Z80 binary.)
 
-If FLOS is unavailable the EEPROM will need to be removed and reprogrammed
-with an external EEPROM burner (capable of programming "25x" series 8-PIN
-DIP 3.3v serial EEPROMS)
 
 --------------------------------------------------------------------------
