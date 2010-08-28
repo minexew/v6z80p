@@ -1,7 +1,8 @@
 
-; Basic blit example
+; Basic blit example - copies a rectangular image to the display (moved along
+; one pixel every frame)
 
-;---Standard header for OSCA and FLOS ----------------------------------------
+;---Standard header for OSCA and FLOS --------------------------------------------------------
 
 include "kernal_jump_table.asm"
 include "OSCA_hardware_equates.asm"
