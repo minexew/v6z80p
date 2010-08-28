@@ -17,17 +17,17 @@ EG:
 $A00 JP My_IRQ_routine ; C3 XX YY
 $A03 JP My_NMI_routine ; C3 XX YY
 
-Note also that the ROM disables normal interrupts (with the DI instruction)
-and NMI interrupts (using the "Disable NMI switch input" port bit) and it
-is up to the user program to enable the IRQs if interrupts are required.
+Note also that at startup the ROM disables normal interrupts (with the DI instruction)
+and NMI interrupts (using the "Disable NMI switch input" port bit) and it is up to the
+user program to enable the IRQs if interrupts are required.
 
 
-(Interrupt mode 0 is not currently supported)
-
-
-Update:
+Notes:
 ------
 
 From OSCA v656 onwards, it is possible to access the system RAM "underneath"
 the ROM at $000-$1ff by paging out the Video palette. Therefore the IRQ
 vectors can be directly set if required.
+
+
+Interrupt mode 0 is not currently supported.
