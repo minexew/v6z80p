@@ -1,6 +1,6 @@
 ;-----------------------------------------------------------------------------------------
 ; System Memory Test - fills high bank 0 with 01, bank 1 with 02 etc and checks, then
-; fills (mt_start to $ffff) with random bytes, then banks @ 8000-fffff..Runs indefinately.
+; fills (mt_start to $ffff) with random bytes, then banks @ 8000-fffff..Runs indefinately (no esc)
 ;-----------------------------------------------------------------------------------------
 
 include "OSCA_hardware_equates.asm"
@@ -48,6 +48,11 @@ clrloop2	ld (hl),a
 	ld (vreg_rasthi),a			; select x window register
 	ld (hl),$8c			; set x window size/position (320 pixels)
 		
+	ld hl,0
+	ld (palette),hl
+	ld hl,$fff
+	ld (palette+2),hl
+	
 	ld a,%00000111
 	out (sys_clear_irq_flags),a		; clear all irqs at start
 
@@ -107,9 +112,6 @@ loop3	push bc
 	ld hl,dot_txt
 	call print_string
 	pop bc
-	in a,(sys_irq_ps2_flags)	; reset on keyboard irq.
-	bit 0,a				
-	jp nz,$0	
 	inc c
 	djnz loop3
 	
