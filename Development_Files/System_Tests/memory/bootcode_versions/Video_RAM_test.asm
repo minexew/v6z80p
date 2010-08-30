@@ -45,7 +45,12 @@ clrloop2	ld (hl),a
 	ld a,%00000100
 	ld (vreg_rasthi),a			; select x window register
 	ld (hl),$8c			; set x window size/position (320 pixels)
-		
+	
+	ld hl,0
+	ld (palette),hl
+	ld hl,$fff
+	ld (palette+2),hl
+	
 	ld a,%00000111
 	out (sys_clear_irq_flags),a		; clear all irqs at start
 	
@@ -129,10 +134,6 @@ vrloop1	push de
 	ld a,d
 	cp $40
 	jr nz,vrloop1
-
-	in a,(sys_irq_ps2_flags)	; reset on keyboard irq.
-	bit 0,a				
-	jp nz,$0	
 
 	ld hl,(seedtemp)
 	inc hl
