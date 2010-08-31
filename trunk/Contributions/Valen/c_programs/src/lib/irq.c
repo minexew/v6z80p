@@ -20,8 +20,13 @@ void irq_handler() NAKED
     call nz,_Mouse_IRQ_Handler		; mouse IRQ?
 #endif
 
-;    bit 2,a
-;    call nz,timer_irq_code	; timer IRQ?
+#ifdef APP_USE_OWN_TIMER_IRQ
+    in a,(SYS_IRQ_PS2_FLAGS)            ; Read irq status flags
+    bit 2,a
+    call nz,_Timer_IRQ_Handler          ; timer IRQ?
+#endif
+
+    // TODO: add video irq related code
 ;    bit 3,a
 ;    call nz,video_irq_code	; video IRQ?
 
