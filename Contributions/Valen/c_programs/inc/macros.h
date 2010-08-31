@@ -56,6 +56,8 @@ sfr at SYS_IRQ_ENABLE           io__sys_irq_enable;
 sfr at SYS_CLEAR_IRQ_FLAGS      io__sys_clear_irq_flags;
 sfr at SYS_MOUSE_DATA           io__sys_mouse_data;
 
+sfr at SYS_TIMER                io__sys_timer;
+
 
 /* define memory mapped I/O devices. This is SDCC specific feature.*/
 //------ Graphics registers -------------------------------------------------
