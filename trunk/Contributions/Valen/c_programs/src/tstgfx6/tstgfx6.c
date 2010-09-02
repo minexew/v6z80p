@@ -1,9 +1,13 @@
 /*
-   Basic timer example.
+    Basic timer example.
    
-   V6Z80P have 8-bit timer.
-   The timer has a resolution of 0.000016 seconds (IE: it runs at 62.5 KHz).
-   (See docs for more info)
+    V6Z80P have 8-bit timer.
+    The timer has a resolution of 0.000016 seconds (IE: it runs at 62.5 KHz).
+    Timer can generate intervals from 0,016 millisec to 4 millisec.
+    (See docs for more info)
+   
+    If you want to time long intervals, you have to count shorter
+    periods in your IRQ routine.
 
            
 */
@@ -28,7 +32,7 @@ void Application_Timer_IRQ_Handler(void);
 #define OS_VERSION_REQ  0x571           // OS version req. to run this program
 
 // let's set timer to 4 milliseconds
-#define TIMER_MILLISEC_PERIOD   4                                       // possible values are about [0,5...4] 
+#define TIMER_MILLISEC_PERIOD   4                                       // possible values are [0,016...4] 
 #define TIMER_HARDWARE_PERIOD   256-(TIMER_MILLISEC_PERIOD/0.016)       // calculate timer hardware period (8-bit value)
 //#if TIMER_HARDWARE_PERIOD > 255
 //#endif
@@ -67,7 +71,7 @@ word GetSeconds()
 {
     word tmp;
     
-    // non-atomic operation (disable interrupts)
+    // non-atomic operation (do with disabled interrupts)
     DI();
     tmp = seconds;
     EI();
