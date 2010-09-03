@@ -43,8 +43,8 @@ power on, the yellow LED will flash slowly (around 1 flash per second). There ar
 various ways to fix this..
 
 
-Recovery Instructions For the original V6Z80P Board
-----------------------------------------------------
+Recovery Instructions *** For the original V6Z80P Board ***
+-----------------------------------------------------------
 
 OPTION 1: With Config PIC firmware v616+ the Active Slot can be changed manually. Assuming
 there is a working config in Slot 1, 2 or 3 and the problem is just that the Active Slot
