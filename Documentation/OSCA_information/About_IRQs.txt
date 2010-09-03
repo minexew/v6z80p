@@ -1,33 +1,27 @@
 A note about the ROM interrupt vectors:
 ---------------------------------------
 
-Locations $38 (IRQ) and $66 (NMI) in the default ROM hold the instructions:
+The OSCA ROM* has the instruction "JP $0A00" at $38 (IRQ) and "JP $0A03" at $66 (NMI).
+OSCA is designed to use Interrupt Mode 1. 
 
-$38: JP irq_jp_inst
+FLOS places the following code at these locations:
 
-$66: JP nmi_jp_inst
+$0A00: JP aabb (where aabb is FLOS's default IRQ handler)
+$0A03: JP ccdd (where ccdd is FLOS's default NMI handler)
 
-(where irq_jp_inst is $A00 and nmi_irq_inst is $A03, as set up in the equates file)
+See the FLOS manual for more information on how the OS handles interrupts.
 
-It is up to the user program to place appropriate code at $A00 and $A03, ordinarily
-this will be additional jumps to the actual location of the interrupt handler.
-
-EG:
-
-$A00 JP My_IRQ_routine ; C3 XX YY
-$A03 JP My_NMI_routine ; C3 XX YY
-
-Note also that at startup the ROM disables normal interrupts (with the DI instruction)
-and NMI interrupts (using the "Disable NMI switch input" port bit) and it is up to the
-user program to enable the IRQs if interrupts are required.
+The ROM disables normal interrupts (with the Z80 DI instruction) and NMI interrupts 
+(via hardware using the "Disable NMI switch input" port bit) and it is up to the user
+program to enable the IRQs if interrupts are required.
 
 
 Notes:
 ------
 
-From OSCA v656 onwards, it is possible to access the system RAM "underneath"
-the ROM at $000-$1ff by paging out the Video palette. Therefore the IRQ
-vectors can be directly set if required.
+From OSCA v656 onwards, it is possible to have read/write access the system RAM
+"underneath" the ROM at $000-$1ff (see the port "sys_alt_write_page"). However,
+paging in this memory pages out the colour palette so care must be taken if
+CPU access to the palette is required thereafter.
 
 
-Interrupt mode 0 is not currently supported.
