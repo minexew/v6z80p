@@ -12,13 +12,17 @@ objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.o                   \
           $(basedir)/c_support/os_interface_for_c/obj/i_flos.o         \
           $(basedir)/c_support/os_proxy/obj/flos_proxy_code.o          \
           $(basedir)/src/$(prjname)/obj/myheap.o
+
+# output redirection to stdout (instead of stderr), for Windows shell
+# use_stdout = "--use-stdout"
+
      
 v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)
 	@echo ----------------- Linking -------------------
 	del obj\*.ihx
 	del obj\*.bin
 	del obj\*.exe
-	sdcc  -o obj/ -mz80   --use-stdout  --no-std-crt0   $(linkopt)  -Wl-b_FLOS_PROXY_CODE=0x5080  $(objects) $(prjobjects)
+	sdcc  -o obj/ -mz80   $(use_stdout)  --no-std-crt0   $(linkopt)  -Wl-b_FLOS_PROXY_CODE=0x5080  $(objects) $(prjobjects)
 	ren obj\crt0_v6z80p.ihx $(prjname).ihx
 	@echo ------------- IHX to BIN convertion ---------
 #	..\..\c_support\tools\BINEX.EXE /X /%%+0 /!-  obj\$(prjname).ihx
@@ -40,14 +44,14 @@ v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)
 myd1   = $(basedir)/c_support/os_interface_for_c
 myd1_  = $(subst /,\,$(myd1))
 $(myd1)/obj/i_flos.o : $(myd1)/i_flos.c 
-	cd $(myd1_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed --use-stdout     i_flos.c
+	cd $(myd1_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)     i_flos.c
 
 
 # Asm proxy (object file)
 myd2  = $(basedir)/c_support/os_proxy
 myd2_ = $(subst /,\,$(myd2))
 $(myd2)/obj/flos_proxy_code.o : $(myd2)/flos_proxy_code.c 
-	cd $(myd2_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed --use-stdout  --no-std-crt0   --constseg FLOS_PROXY_CODE flos_proxy_code.c
+	cd $(myd2_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)  --no-std-crt0   --constseg FLOS_PROXY_CODE flos_proxy_code.c
 
 
 # Asm proxy 
