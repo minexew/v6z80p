@@ -1,38 +1,22 @@
 ;----------------------------------------------------------------------------------------
-; IRQ / NMI Routines v5.00
+; IRQ / NMI Routines v5.01
 ;----------------------------------------------------------------------------------------
 
 os_irq_handler
 
 	push af			; Maskable IRQ jumps here
 	in a,(sys_irq_ps2_flags)	; Read irq status flags
+	
 	bit 0,a			; keyboard irq set?
 	call nz,keyboard_irq_code	; call keyboard irq routine if so
+
 	bit 1,a
 	call nz,mouse_irq_code	; mouse IRQ?
-	bit 2,a
-	call nz,timer_irq_code	; timer IRQ?
-	bit 3,a
-	call nz,video_irq_code	; video IRQ?
+
 	pop af			
 	ei			; re-enable interrupts
 	reti			; return to main code
 
-;---------------------------------------------------------------------------------------
-
-video_irq_code
-
-	ld a,%10000000
-	ld (vreg_rasthi),a		; clears video IRQ
-	ret
-
-
-timer_irq_code
-
-	ld a,%00000100
-	out (sys_clear_irq_flags),a	;clears timer IRQ
-	ret
-	
 ;----------------------------------------------------------------------------------------
 ; Keyboard IRQ routine v5.02
 ;----------------------------------------------------------------------------------------
@@ -147,7 +131,7 @@ qualifiers
 
 
 ;-----------------------------------------------------------------------------------------
-; Mouse IRQ code v5.01
+; Mouse IRQ code v5.02
 ;-----------------------------------------------------------------------------------------
 
 mouse_irq_code
@@ -156,6 +140,10 @@ mouse_irq_code
 	push bc			; on the 3 byte, absolute mouse location and
 	push de			; button registers are updated 
 	push hl
+	
+	ld a,(use_mouse)		; mouse allowed to call IRQ code?
+	or a
+	jp z,no_mouse
 	
 	ld d,0		
 	ld a,(mouse_packet_index)	; packet byte 0-2  
@@ -227,6 +215,7 @@ msubpkt	ld (mouse_packet_index),a
 	ld a,%00000010
 	out (sys_clear_irq_flags),a	; clear mouse interrupt flag
 
+no_mouse
 	pop hl
 	pop de
 	pop bc
