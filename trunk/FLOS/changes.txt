@@ -2,6 +2,10 @@
 FLOS for V6Z80P version info:
 -----------------------------
 
+5.79 - 01/09/10 : Added "kjt_mouse_irq_code" allowing external programs to use the kernal's
+                  mouse IRQ routine even if it has its own interrupt handler. Main IRQ
+                  handler changed a little.
+
 5.78 - 26/08/10 : Many optimizations. Internal commands optimized and now return
 		  error codes in the standard format (ZF = All OK, else A = error code.
 		  If A = 0, B = hardware error bits)
