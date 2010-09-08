@@ -878,7 +878,8 @@ Action: Keyboard IRQ handler.
 
 When a custom interrupt handler is set up but kernal-based keyboard handling
 is required, this routine can be called when the keyboard IRQ flag is set.
-The above kernal keyboard routines will then still work.
+The above kernal keyboard routines will then still work. (The call clears
+the relevant IRQ flag).
 
 
 
@@ -955,7 +956,8 @@ Action: Mouse IRQ handler
 
 When a custom interrupt handler is set up but kernal-based mouse handling
 is required, this routine can be called when the mouse IRQ flag is set.
-The above kernal mouse routines will then still work.
+The above kernal mouse routines will then still work. (The call clears
+the relevant IRQ flag).
 
 
 
