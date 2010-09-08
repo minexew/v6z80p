@@ -871,6 +871,18 @@ Output Registers : A bit 0 - left shift
 
 
 
+Routine name: kjt_keyboard_irq_code
+-----------------------------------
+
+Action: Keyboard IRQ handler.
+
+When a custom interrupt handler is set up but kernal-based keyboard handling
+is required, this routine can be called when the keyboard IRQ flag is set.
+The above kernal keyboard routines will then still work.
+
+
+
+
 
 
 Routine name: kjt_enable_mouse (FLOS v571)
@@ -931,8 +943,19 @@ Output Registers : HL = x motion since last called
 (Note: the mouse driver is currently somewhat primative - it may become
 out of sync with the three-byte packets that the mouse sends if say,
 interrupts are disabled)
-                   
+          
+         
 
+
+
+Routine name: kjt_mouse_irq_code (FLOS v579+)
+---------------------------------------------
+
+Action: Mouse IRQ handler
+
+When a custom interrupt handler is set up but kernal-based mouse handling
+is required, this routine can be called when the mouse IRQ flag is set.
+The above kernal mouse routines will then still work.
 
 
 
