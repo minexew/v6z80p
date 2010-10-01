@@ -2,16 +2,22 @@
 # This file must be "included" in user project makefile
 
 SHELL=cmd.exe
+# (assembler name was as-z80.exe for old SDCC 2.9.0)
+AS=sdasz80
 
 basedir = $(v6z80pdir)/Contributions/Valen/c_programs
 
 
+# object file extension ("rel" for SDCC 2.9.7 and "o" for old SDCC 2.9.0)
+O=rel
 
+objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.$(O)                   \
+          $(basedir)/c_support/os_interface_for_c/obj/i_flos.$(O)         \
+          $(basedir)/c_support/os_interface_for_c/obj/i_flos_lib.lib      \
+          $(basedir)/c_support/os_proxy/obj/flos_proxy_code.$(O)          \
+          $(basedir)/src/$(prjname)/obj/myheap.$(O)
 
-objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.o                   \
-          $(basedir)/c_support/os_interface_for_c/obj/i_flos.o         \
-          $(basedir)/c_support/os_proxy/obj/flos_proxy_code.o          \
-          $(basedir)/src/$(prjname)/obj/myheap.o
+INC=-I$(basedir)/inc
 
 # output redirection to stdout (instead of stderr), for Windows shell
 # use_stdout = "--use-stdout"
@@ -43,14 +49,32 @@ v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)
 # OS interface for C  (object file)
 myd1   = $(basedir)/c_support/os_interface_for_c
 myd1_  = $(subst /,\,$(myd1))
-$(myd1)/obj/i_flos.o : $(myd1)/i_flos.c 
-	cd $(myd1_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)     i_flos.c
+$(myd1)/obj/i_flos.$(O) : $(myd1)/i_flos.c 
+	cd $(myd1_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)     i_flos.c
+
+
+
+# Library content. OS interface for C.
+# .rel <-- .c
+myd7   = $(basedir)/c_support/os_interface_for_c
+myd7_  = $(subst /,\,$(myd7))
+#$(myd7)/obj/FLOS%.rel : $(myd7)/FLOS%.c
+#	cd $(myd7_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) $<
+# Include Library makefile
+include $(myd7)/Makefile_lib
+
+# Library. OS interface for C.
+#$(myd7)/obj/i_flos_lib.lib : $(myd7)/obj/FLOS*.rel
+#	@echo -------------- Adding REL files to LIB ------------
+#	cd $(myd7_) && rem $?
+#set SDCCLIB_CC=sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) && sdcclib -l obj/i_flos_lib.lib myliblist.txt
+
 
 
 # Asm proxy (object file)
 myd2  = $(basedir)/c_support/os_proxy
 myd2_ = $(subst /,\,$(myd2))
-$(myd2)/obj/flos_proxy_code.o : $(myd2)/flos_proxy_code.c 
+$(myd2)/obj/flos_proxy_code.$(O) : $(myd2)/flos_proxy_code.c 
 	cd $(myd2_) && sdcc -c -o obj/ --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)  --no-std-crt0   --constseg FLOS_PROXY_CODE flos_proxy_code.c
 
 
@@ -69,8 +93,8 @@ $(myd3)/flos_proxy_code.c : $(myd3)/flos.asm $(myd3)/i__kernal_jump_table.asm $(
 # .o file <-- .s file
 myd4  = $(basedir)/c_support/crt
 myd4_ = $(subst /,\,$(myd4))
-$(myd4)/obj/crt0_v6z80p.o : $(myd4)/crt0_v6z80p.s
-	cd $(myd4_) && as-z80.exe -o obj/crt0_v6z80p.o crt0_v6z80p.s
+$(myd4)/obj/crt0_v6z80p.$(O) : $(myd4)/crt0_v6z80p.s
+	cd $(myd4_) && $(AS) -o obj/crt0_v6z80p.$(O) crt0_v6z80p.s
 
 
 
@@ -78,11 +102,11 @@ $(myd4)/obj/crt0_v6z80p.o : $(myd4)/crt0_v6z80p.s
 # .o file <-- heapsize file
 myd5  = $(basedir)/src/$(prjname)
 myd5_ = $(subst /,\,$(myd5))
-$(myd5)/obj/myheap.o : $(myd5)/heapsize
+$(myd5)/obj/myheap.$(O) : $(myd5)/heapsize
 	@echo ----------------- Heap allocation -------------------
 	cd $(myd5_) && cd obj && type ..\..\..\c_support\myheap.s > myheap.s
 	cd $(myd5_) && type heapsize             >> obj/myheap.s
-	cd $(myd5_) && cd obj && as-z80.exe -o myheap.o myheap.s
+	cd $(myd5_) && cd obj && $(AS) -o myheap.$(O) myheap.s
 
 
 # Default heapsize file (if no heapsize file exist, provide default file with heap size 0)

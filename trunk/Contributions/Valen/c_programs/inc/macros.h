@@ -48,15 +48,15 @@
 #define READ_REG(reg, var)     ( var = *(( byte*) (reg)) )
 
 /* define a vars (ports) in I/O space. This is SDCC specific feature.*/
-sfr at SYS_MEM_SELECT           io__sys_mem_select;
-sfr at SYS_KEYBOARD_DATA        io__sys_keyboard_data;
-sfr at SYS_PS2_JOY_CONTROL      io__sys_ps2_joy_control;
-sfr at SYS_JOY_COM_FLAGS        io__sys_joy_com_flags;
-sfr at SYS_IRQ_ENABLE           io__sys_irq_enable;
-sfr at SYS_CLEAR_IRQ_FLAGS      io__sys_clear_irq_flags;
-sfr at SYS_MOUSE_DATA           io__sys_mouse_data;
+__sfr __at SYS_MEM_SELECT           io__sys_mem_select;
+__sfr __at SYS_KEYBOARD_DATA        io__sys_keyboard_data;
+__sfr __at SYS_PS2_JOY_CONTROL      io__sys_ps2_joy_control;
+__sfr __at SYS_JOY_COM_FLAGS        io__sys_joy_com_flags;
+__sfr __at SYS_IRQ_ENABLE           io__sys_irq_enable;
+__sfr __at SYS_CLEAR_IRQ_FLAGS      io__sys_clear_irq_flags;
+__sfr __at SYS_MOUSE_DATA           io__sys_mouse_data;
 
-sfr at SYS_TIMER                io__sys_timer;
+__sfr __at SYS_TIMER                io__sys_timer;
 
 
 /* define memory mapped I/O devices. This is SDCC specific feature.*/
