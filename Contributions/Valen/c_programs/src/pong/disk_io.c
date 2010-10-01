@@ -1,6 +1,6 @@
 
 
-BOOL load_file_to_buffer(char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
+BOOL load_file_to_buffer(const char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
 {
     FLOS_FILE myFile;
     BOOL r;
@@ -58,7 +58,7 @@ BOOL diag__FLOS_ForceLoad(const byte* address, const byte bank)
 // ------------ chunk loader --------------------
 // loads file from disk by 4KB chunks
 typedef struct {
-    char* pFilename;
+    const char* pFilename;
     FLOS_FILE file;
 
     byte* buf;           // 4KB buffer, where to load chunks
@@ -70,7 +70,7 @@ typedef struct {
 chunk_loader cl;        // global instance
 
 
-void ChunkLoader_Init(char* pFilename, /*FLOS_FILE* file,*/ byte* buf, byte bank)
+void ChunkLoader_Init(const char* pFilename, /*FLOS_FILE* file,*/ byte* buf, byte bank)
 {
     cl.pFilename = pFilename;
 

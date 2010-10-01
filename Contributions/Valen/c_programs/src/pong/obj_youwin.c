@@ -15,8 +15,8 @@ void GameObjYouWin_Init(GameObjYouWin* this, int x, int y)
     //
     //GameObj_InitCollideBox((GameObj*)this);
 
-    this->gobj.pMoveFunc = &GameObjYouWin_Move;
-    this->gobj.pDrawFunc = &GameObjYouWin_Draw;
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjYouWin_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjYouWin_Draw);
 
     GameObjYouWin_AllocateAnimObjects(this);
 

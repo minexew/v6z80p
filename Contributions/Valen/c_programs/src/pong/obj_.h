@@ -8,7 +8,9 @@ typedef enum {
     BLINKING
 } ObjState;
 
-typedef struct {
+//typedef struct GameObj_tag *GAME_OBJ_PTR;
+
+typedef struct GameObj_tag {
     BOOL in_use;        // is this object used or no? (allocated from objects pool or not?)
 
     int x, y;
@@ -21,10 +23,15 @@ typedef struct {
     word extra_field1;  // this var can be used by other objects to store some context info
                         //
     // virtual funcs, must be implemented in child objects
-    void (*pMoveFunc)(void* this);
-    void (*pDrawFunc)(void* this);
+    void (*pMoveFunc)(struct GameObj_tag* this);
+    void (*pDrawFunc)(struct GameObj_tag* this);
 
 } GameObj;
+
+//typedef struct GameObj_tag GameObj;
+
+
+#define CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(func1)      (void ()(struct GameObj_tag*))   func1
 
 void GameObj_SetPos(GameObj* this, int x, int y);
 void GameObj_SetInUse(GameObj* this, BOOL inUse);

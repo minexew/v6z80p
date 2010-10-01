@@ -1,8 +1,8 @@
 //
 
-void DiagMessage(char* pMsg, char* pFilename);
+void DiagMessage(char* pMsg, const char* pFilename);
 
-void DiagMessage(char* pMsg, char* pFilename)
+void DiagMessage(char* pMsg, const char* pFilename)
 {
     byte err;
 

@@ -66,7 +66,7 @@
 void initgraph(void);
 void clear_sprite_regs(void);
 void DrawBat(int x1,int y1,int x2,int y2);
-void DrawBall(int x_center,int y_center,int r1,int r2);
+void DrawBall(int x_center,int y_center);
 
 void set_sprite_regs(byte sprite_number, int x, int y, byte height, word sprite_definition_number, BOOL x_flip);
 void set_sprite_regs_hw(byte sprite_number, byte x, byte misc, byte y, byte sprite_definition_number);

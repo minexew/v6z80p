@@ -50,7 +50,7 @@ void TileMap_FillTileDefinition(word tileNumber, byte fillValue)
 
     PAGE_IN_VIDEO_RAM();
     SET_VIDEO_PAGE(video_page);
-    memset((byte*)(VIDEO_BASE) + video_offset, fillValue, 0x100); //fill tile def
+    memset((byte*)(VIDEO_BASE + video_offset), fillValue, 0x100); //fill tile def
     PAGE_OUT_VIDEO_RAM();
 }
 
@@ -104,3 +104,4 @@ void Background_InitTilemap(word firstTileDef)
 
     PAGE_OUT_VIDEO_RAM();
 }
+

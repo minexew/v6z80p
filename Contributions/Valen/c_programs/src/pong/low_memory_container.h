@@ -20,6 +20,7 @@
 };*/
 
 EXTERN void Sound_NewFx(byte fx_number);
+EXTERN void asmproxy__Sound_NewFx(void);
 EXTERN void Sound_PlayFx(void);
 EXTERN void Sound_AddFxDesc(byte fx_number,  SOUND_FX* p);
 
