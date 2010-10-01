@@ -1,15 +1,15 @@
 /*
-TEST v0.01
+TEST v0.02
 -------------
 */
 
-#include "../../inc/kernal_jump_table.h"
-#include "../../inc/v6z80p_types.h"
-#include "../../inc/OSCA_hardware_equates.h"
-#include "../../inc/macros_specific.h"
-#include "../../inc/set_stack.h"
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+#include <OSCA_hardware_equates.h>
+#include <macros_specific.h>
+#include <set_stack.h>
 
-#include "../../inc/os_interface_for_c/i_flos.h"
+#include <os_interface_for_c/i_flos.h>
 
 #include <stdlib.h>
 
@@ -30,13 +30,13 @@ BOOL test5(void);
 BOOL test6(void);
 
 void proccess_cmd_line(void);
-void DiagMessage(char* pMsg, char* pFilename);
+void DiagMessage(char* pMsg, const char* pFilename);
 void PrintNum(dword n);
 void WaitKeyPress(byte scancode);
 BOOL PrintCurDirName(void);
 word GetSP(void)  NAKED;
 
-char *pFilename;
+const char *pFilename;
 FLOS_FILE myFile;
 char buffer[32+1];
 
@@ -234,7 +234,7 @@ BOOL test3(void)
 {
     BOOL r;
     dword blocks;
-    byte* pFilename;
+    const byte* pFilename;
 
     blocks = FLOS_GetTotalSectors();
 
@@ -348,6 +348,8 @@ BOOL test5(void)
     // test FLOS_WaitKeyPress
     FLOS_PrintStringLFCR("FLOS_WaitKeyPress... press any key");
     FLOS_WaitKeyPress(&asciicode, &scancode);
+
+    FLOS_ClearScreen();
     FLOS_PrintString("scancode: $");
     _ultoa(scancode, buffer, 16);
     FLOS_PrintString(buffer);
@@ -358,6 +360,7 @@ BOOL test5(void)
 
 
     // test FLOS_SetCursorPos
+
     r = FLOS_SetCursorPos(10, 18);
     if(!r)
        return FALSE;
@@ -406,7 +409,7 @@ BOOL test6(void)
     return TRUE;
 }
 
-void DiagMessage(char* pMsg, char* pFilename)
+void DiagMessage(char* pMsg, const char* pFilename)
 {
     byte err;
 

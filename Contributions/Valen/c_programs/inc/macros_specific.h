@@ -6,7 +6,7 @@
 #ifdef SDCC
 #define ASM_PREFIX		#
 #define NAKED   		__naked
-#define	BEGINASM()              __asm;
+#define	BEGINASM()              __asm
 #define	ENDASM()                __endasm;
 #else
 #define ASM_PREFIX
@@ -55,11 +55,11 @@
 #ifdef SDCC
 #define DI()     __asm          \
                  di             \
-                 __endasm
+                 __endasm;
 
 #define EI()     __asm          \
                  ei             \
-                 __endasm
+                 __endasm;
 #endif
 
 
