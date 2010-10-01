@@ -13,7 +13,7 @@ BOOL LoadingIcon_LoadSprites(void)
     // put to the end of sprite memory
     PAGE_IN_SPRITE_RAM();
     SET_SPRITE_PAGE(31);
-    memcpy((byte*)SPRITE_BASE+4096-size, (byte*)BUF_FOR_LOADING_SPRITES_4KB, size);
+    memcpy((byte*)(SPRITE_BASE+4096-size), (byte*)BUF_FOR_LOADING_SPRITES_4KB, size);
     PAGE_OUT_SPRITE_RAM();
 
     loadingIcon.isLoaded = TRUE;

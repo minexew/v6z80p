@@ -44,19 +44,23 @@ void Sound_NewFx(byte fx_number)
     if(!game.isSoundfxEnabled) return;
     btmp1 = fx_number;
 
-    BEGINASM();
-    PUSH_ALL_REGS();
-    ld a,(#_btmp1)
-    di
-    SET_MUSIC_BANK_ASM;
-
-    call SOUND_FX__NEWFX
-    SET_PONG_MAIN_BANK_ASM;
-    ei
-    POP_ALL_REGS();
-    ENDASM();
+    asmproxy__Sound_NewFx();
 }
 
+void asmproxy__Sound_NewFx(void)
+{
+    BEGINASM()
+    PUSH_ALL_REGS()
+    ld a,(#_btmp1)
+    di
+    SET_MUSIC_BANK_ASM
+
+    call SOUND_FX__NEWFX
+    SET_PONG_MAIN_BANK_ASM
+    ei
+    POP_ALL_REGS()
+    ENDASM()
+}
 
 void Sound_PlayFx(void)
 {

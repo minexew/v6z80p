@@ -4,23 +4,26 @@ PONG v0.03
 Valen 2009-2010
 -------------
 
+SDCC 2.9.7
+
+
 TODO: fix for 60Hz video mode
 */
 
 
-#include "../../inc/kernal_jump_table.h"
-#include "../../inc/v6z80p_types.h"
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
 
-#include "../../inc/OSCA_hardware_equates.h"
-#include "../../inc/scan_codes.h "
-#include "../../inc/macros.h "
-#include "../../inc/macros_specific.h "
-#include "../../inc/set_stack.h"
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+#include <set_stack.h>
 
-#include "../../inc/os_interface_for_c/i_flos.h"
+#include <os_interface_for_c/i_flos.h>
 
 
-
+#include "v6assert.h"
 #include "util.h"
 #include "sprites.h"
 #include "disk_io.h"
@@ -70,7 +73,7 @@ void delay(int a) {a;}
 
 
 
-
+#include "v6assert.c"
 #include "math.c"
 #include "util.c"
 #include "disk_io.c"
@@ -89,10 +92,12 @@ void delay(int a) {a;}
 #include "obj_anim.c"
 #include "obj_score.c"
 #include "obj_rocket.c"
+
 #include "obj_bat.c"
 #include "obj_ball.c"
 #include "obj_youwin.c"
 #include "obj_gamemenu.c"
+
 
 
 #include "ai.c"
@@ -335,28 +340,34 @@ void Game_Play(void)
             //request_exit = TRUE;
         }*/
 
+
         if(!Debug_CheckCurrentBank()) {
             Game_MarkFrameTime(0x00F);
-            BEGINASM();
-            di
-            halt
-            ENDASM();
+//            BEGINASM()
+//        di
+//        halt
+//            ENDASM()
             //return NO_REBOOT;
         }
 
 
+
     }//while
+
+
+
+
 }
 
 
 void Game_InitLevelBegining(void)
 {
-    scoreA.score = 0;  // Intialize score
-    scoreB.score = 0;
+    // Intialize score
+    scoreA.score = scoreB.score = 5;
     scoreA.num_rockets = scoreB.num_rockets = 3;
 
+//    GameObjScore_SetScore(&scoreA, 0);
 }
-
 
 
 int main (void)
@@ -368,7 +379,7 @@ int main (void)
     debug.isShowFrameTime = FALSE;
     //strcpy(debug.guard_str, "GUARD");
 
-
+//memset(&scoreA, 0, sizeof(scoreA));
 
 
     if(!Debug_CheckCurrentBank())

@@ -47,7 +47,7 @@ void clear_shadow_sprite_regs(void)
 {
     byte* p;
 
-    p = (byte*)SPR_REGISTERS + (game.shadow_sprite_register_bank*64*4);
+    p = (byte*)(SPR_REGISTERS + game.shadow_sprite_register_bank*64*4);
     memset(p, 0, 0x100);
 
 }
@@ -90,11 +90,10 @@ void DrawBat(int x1,int y1,int x2,int y2)
 
 }
 
-void DrawBall(int x_center,int y_center,int r1,int r2)
+void DrawBall(int x_center,int y_center)
 {
     byte spr_height = 1;
     word spr_def = 0;   /* sprite_definition_number*/
-    r2;
 
     if(ball1.state == DYING)
         spr_def = SPRITE_DEF_NUM_DYING_BALL + (ball1.dying_time/8);
@@ -122,7 +121,7 @@ void DrawBall(int x_center,int y_center,int r1,int r2)
     if (game.shadow_sprite_register_bank == 0)
         p = (byte *) SPR_REGISTERS;
     else
-        p = (byte *) SPR_REGISTERS + 0x100;     // add offset of shadow sprite register bank
+        p = (byte *) (SPR_REGISTERS + 0x100);     // add offset of shadow sprite register bank
 
     p += ((sprite_number*4));
     *p =  x;                            p++;
@@ -215,7 +214,7 @@ void set_sprite_regs_optimized(void)
 BOOL load_sprites(void)
 {
 
-    char *pFilename = SPRITES_FILENAME;
+    const char *pFilename = SPRITES_FILENAME;
 //    FLOS_FILE myFile;
     byte sprite_page = 0;
 

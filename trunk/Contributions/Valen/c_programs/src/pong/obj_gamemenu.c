@@ -8,8 +8,8 @@ void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y)
     this->gobj.width  = 0;
     this->gobj.height = 0;
 
-    this->gobj.pMoveFunc = &GameObjGameMenu_Move;
-    this->gobj.pDrawFunc = &GameObjGameMenu_Draw;
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Draw);
 
 }
 

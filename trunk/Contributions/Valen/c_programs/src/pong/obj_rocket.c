@@ -24,8 +24,8 @@ void GameObjRocket_Init(GameObjRocket* this, int x, int y)
     //
     GameObj_InitCollideBox((GameObj*)this);
 
-    this->gobj.pMoveFunc = &GameObjRocket_Move;
-    this->gobj.pDrawFunc = &GameObjRocket_Draw;
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjRocket_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjRocket_Draw);
 
 
     if(x < SCREEN_WIDTH/2) {

@@ -31,8 +31,8 @@ void GameObjBall_Init(GameObjBall* this)
     this->gobj.x = 320/2;
     this->gobj.y = 250/2;
 
-    this->gobj.pMoveFunc = &GameObjBall_Move;
-    this->gobj.pDrawFunc = &GameObjBall_Draw;
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjBall_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjBall_Draw);
 
     // we dont use collision box vars for this game obj (because we doing collision detection based on radius)
     // so, just zero them
@@ -140,5 +140,5 @@ void GameObjBall_CheckCollision(GameObjBall* this)
 
 void GameObjBall_Draw(GameObjBall* this)
 {
-    DrawBall (this->gobj.x, this->gobj.y, this->radius, this->radius);
+    DrawBall (this->gobj.x, this->gobj.y);
 }

@@ -12,8 +12,8 @@ void GameObjAnim_Init(GameObjAnim* this, int x, int y/*, byte offset*/)
     this->isLoopAnim = TRUE;
     //this->isDisplayOneFrame = FALSE;
 
-    this->gobj.pMoveFunc = &GameObjAnim_Move;
-    this->gobj.pDrawFunc = &GameObjAnim_Draw;
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjAnim_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjAnim_Draw);
 
 }
 
@@ -21,6 +21,7 @@ void GameObjAnim_Init(GameObjAnim* this, int x, int y/*, byte offset*/)
 void GameObjAnim_Move(GameObjAnim* this)
 {
 //    this->gobj.x++; // do something
+      this;
 }
 
 void GameObjAnim_Draw(GameObjAnim* this)
@@ -111,26 +112,3 @@ void GameObjAnim_Free(GameObjAnim* this)
     PoolGameObj_FreeGameObj( (GameObj*)this );
 }
 
-/*
-//---
-// Game object: ScoreAnim - do score animation
-// Blink few times a score of a winner.
-// On last blink, we will show new score (incrased by 1)
-typedef struct {
-    GameObj gobj;   // <-- this must be a FIRST member of struct !! (to allow pointer cast to parent type)
-
-
-
-} GameObjScoreAnim;
-
-
-void GameObjScoreAnim_Init(GameObjScoreAnim* this, int x, int y)
-{
-    this->gobj.x = x;
-    this->gobj.y = y;
-
-    this->gobj.pMoveFunc = &GameObjAnim_Move;
-    this->gobj.pDrawFunc = &GameObjAnim_Draw;
-
-}
-*/

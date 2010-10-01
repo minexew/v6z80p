@@ -4,10 +4,13 @@ void GameObjScore_Init(GameObjScore* this, int x, int y)
     this->gobj.x = x;
     this->gobj.y = y;
 
-    this->gobj.pMoveFunc = &GameObjScore_Move;
-    this->gobj.pDrawFunc = &GameObjScore_Draw;
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjScore_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjScore_Draw);
 
     this->state = NORMAL;
+
+//    this->score = 0;
+//    this->num_rockets = 3;
 
     this->is_show = TRUE;
     this->off_time_counter = this->off_num_switches = 0;
@@ -55,12 +58,16 @@ void GameObjScore_Draw(GameObjScore* this)
 // ASSERT: strlen(score_str) <= 2   (2 chars + zero byte)
 void GameObjScore_draw_score(GameObjScore* this)
 {
+//word *pw;
+
     byte spr_height;
     byte spr1_def, spr2_def;
     char* p = this->score_str;
     int x = this->gobj.x; int y =  this->gobj.y;
+    V6ASSERT(this->score <= MAX_SCORE_FOR_LEVEL);
 
-
+//pw  = (word*)0xF000;
+//*pw++ = 0x1234; *pw++ = this->score; *pw++ = (word)this->score_str; while(1);
 
     spr1_def = SPRITE_DEF_NUM_DIGIT + (p[0] - 0x30);
     if(p[1] != 0)
@@ -72,9 +79,15 @@ void GameObjScore_draw_score(GameObjScore* this)
 //    set sprite data
     spr_height = 1;
     set_sprite_regs(this->sprite_num  , x,      y, spr_height, spr1_def, FALSE);
+/*
     if(spr2_def == 0xff)
         y = 256;        // put sprite off-screen
     set_sprite_regs(this->sprite_num+1, x+16,   y, spr_height, spr2_def, FALSE);
+*/
+
+    if(spr2_def != 0xff)
+        set_sprite_regs(this->sprite_num+1, x+16,   y, spr_height, spr2_def, FALSE);
+
 
 }
 
@@ -84,7 +97,9 @@ void GameObjScore_draw_score(GameObjScore* this)
 void GameObjScore_UpdateScore(GameObjScore* this)
 {
     // word to ASCII
-    _uitoa(this->score, this->score_str, 10);
+
+    // uitoa worked fine in SDCC 2.9.0 but failed in 2.9.7 TODO: why?
+    _ultoa(this->score, this->score_str, 10);
 
 }
 

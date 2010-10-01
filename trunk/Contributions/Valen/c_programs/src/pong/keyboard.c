@@ -1,3 +1,4 @@
+
 typedef enum {
     KEYBOARD = 0,
     JOY
@@ -53,6 +54,7 @@ byte Keyboard_GetLastPressedScancode(void)
 {
     return keyboard.prev_pressed_scancode;
 }
+
 
 void Keyboard_IRQ_Handler()
 {
@@ -116,7 +118,10 @@ void Keyboard_IRQ_Handler()
 
 }
 
+
+
 //
+
 void irq_handler() NAKED
 {
     BEGINASM()
@@ -138,8 +143,12 @@ void irq_handler() NAKED
 
 void install_irq_handler(void)
 {
+    word *p;
+
     DI();
-    *((word*)IRQ_VECTOR) = (word)&irq_handler;
+    p  = (word*)IRQ_VECTOR;
+    *p = (word)&irq_handler;
     io__sys_irq_enable = 0x81;      // enable: master irq, keyb
     EI();
 }
+

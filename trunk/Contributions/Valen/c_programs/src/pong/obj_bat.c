@@ -3,8 +3,8 @@ void GameObjBat_Init(GameObjBat* this, int x, int y)
     // init parent obj
     GameObj_Init((GameObj*)this);
 
-    this->gobj.pMoveFunc = &GameObjBat_Move;
-    this->gobj.pDrawFunc = &GameObjBat_Draw;
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjBat_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjBat_Draw);
 
     this->gobj.x = x;
     this->gobj.y = y;

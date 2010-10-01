@@ -4,7 +4,7 @@ typedef struct {
 
     ObjState state;
 
-    int score;
+    word score;
     char score_str[3];  // string representation of score       (3 chars)
     byte sprite_num;
 
