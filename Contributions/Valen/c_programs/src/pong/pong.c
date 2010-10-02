@@ -363,7 +363,7 @@ void Game_Play(void)
 void Game_InitLevelBegining(void)
 {
     // Intialize score
-    scoreA.score = scoreB.score = 5;
+    scoreA.score = scoreB.score = 0;
     scoreA.num_rockets = scoreB.num_rockets = 3;
 
 //    GameObjScore_SetScore(&scoreA, 0);
