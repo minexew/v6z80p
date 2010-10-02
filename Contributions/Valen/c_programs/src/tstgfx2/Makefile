@@ -1,16 +1,15 @@
 # Project specific vars
 prjname    = tstgfx2
-prjobjects = obj/tstgfx2.o 
-#obj/object_32x28.o
-linkopt    = --code-loc 0x5A80  --data-loc 0xA000
+prjobjects = obj/tstgfx2.rel 
+linkopt    = --code-loc 0x5A80  --data-loc 0
 stack      = 0xFFFF
 
 # Include main makefile
 include ../../Makefile_inc
 
 # Project specific rules
-obj/tstgfx2.o : tstgfx2.c object_32x28.c
-	sdcc -c -o obj/ --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DOWN_SP=$(stack) tstgfx2.c 
+obj/tstgfx2.rel : tstgfx2.c object_32x28.c
+	sdcc -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DOWN_SP=$(stack) tstgfx2.c 
 
 
 object_32x28.c : data/object_32x28.bin data/object_palette.bin
