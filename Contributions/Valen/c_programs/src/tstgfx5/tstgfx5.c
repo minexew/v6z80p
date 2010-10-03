@@ -164,7 +164,7 @@ void DoMain(void)
     r.height                   = 1;                       // 16 pixels tall       (height in 16pixels chunks)
     r.sprite_definition_number = 0;
     r.x_flip                   = FALSE;      
-    set_sprite_regs(&r);
+    SpritesRegsBuffer_SetSpriteRegs(&r);
 
     if(mouse.buttons & MOUSE_LEFT_BUTTON_PRESSED)
         PutPixel(screenX, screenY, colorIndex);

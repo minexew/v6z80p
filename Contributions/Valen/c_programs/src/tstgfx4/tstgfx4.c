@@ -1,5 +1,8 @@
 /*
    Basic keyboard and sprites example.
+
+   Keyboard cursor keys to move.
+   ESC to exit.
            
 */
 #include <kernal_jump_table.h>
@@ -121,7 +124,7 @@ void DoMain(void)
     r.height                   = 1;                       // 16 pixels tall       (height in 16pixels chunks)
     r.sprite_definition_number = 0;
     r.x_flip                   = FALSE;      
-    set_sprite_regs(&r);
+    SpritesRegsBuffer_SetSpriteRegs(&r);
 
 }
 

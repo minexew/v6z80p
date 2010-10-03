@@ -1,14 +1,14 @@
 # Project specific vars
 prjname    = tstgfx3
-prjobjects = obj/tstgfx3.o 
-linkopt    = --code-loc 0x5A80  --data-loc 0xA000
+prjobjects = obj/tstgfx3.rel 
+linkopt    = --code-loc 0x5A80  --data-loc 0
 stack      = 0xFFFF
 
 # Include main makefile
 include ../../Makefile_inc
 
 # Project specific rules
-obj/tstgfx3.o : tstgfx3.c ../lib/sprites.c
-	sdcc -c -o obj/ --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DOWN_SP=$(stack) tstgfx3.c 
+obj/tstgfx3.rel : tstgfx3.c ../lib/sprites.c
+	sdcc -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DOWN_SP=$(stack) tstgfx3.c 
 
 

@@ -33,7 +33,7 @@ byte Keyboard_GetLastPressedScancode(void)
 
 // Common interrupt pitfal link lhttp://sdcc.sourceforge.net/doc/sdccman.html/node68.html
 // This ISR changes next variables:
-//  - set BOOL var, is atomic operation
+//  - set BOOL var, is atomic operation for z80
 void Keyboard_IRQ_Handler()
 {
     byte scancode;
