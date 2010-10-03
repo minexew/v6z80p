@@ -103,7 +103,7 @@ void DoMain(void)
     r.height                   = 1;                       // 16 pixels tall       (height in 16pixels chunks)
     r.sprite_definition_number = 0;
     r.x_flip                   = FALSE;      
-    set_sprite_regs(&r);
+    SpritesRegsBuffer_SetSpriteRegs(&r);
 
     r.sprite_number            = 1;
     r.x                        = screenX;
@@ -111,7 +111,7 @@ void DoMain(void)
     r.height                   = 1;                       // 16 pixels tall       (height in 16pixels chunks)
     r.sprite_definition_number = 16;
     r.x_flip                   = FALSE;      
-    set_sprite_regs(&r);
+    SpritesRegsBuffer_SetSpriteRegs(&r);
 
 }
 

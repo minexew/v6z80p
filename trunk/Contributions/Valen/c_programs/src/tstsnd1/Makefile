@@ -1,6 +1,6 @@
 # Project specific vars
 prjname    = tstsnd1
-prjobjects = obj/tstsnd1.o fx_player/obj/fx_player_code.o
+prjobjects = obj/tstsnd1.rel fx_player/obj/fx_player_code.rel
 # where fx_player code will be located
 sound_fx_code = 0xA800
 
@@ -10,13 +10,13 @@ stack      = 0x8000
 # Include main makefile
 include ../../Makefile_inc
 
+CFLAGS=-c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed --use-stdout
 # Project specific rules
-obj/tstsnd1.o : tstsnd1.c  fx_player/sound_fx.h fx_player/sound_fx.c
-	sdcc -c -o obj/ --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DSOUND_FX_CODE=$(sound_fx_code) \
-        -DOWN_SP=$(stack)  tstsnd1.c
+obj/tstsnd1.rel : tstsnd1.c  fx_player/sound_fx.h fx_player/sound_fx.c
+	sdcc $(CFLAGS)  -DSOUND_FX_CODE=$(sound_fx_code) -DOWN_SP=$(stack)  tstsnd1.c
 
 # compile fx_player code to separate segment FX_PLAYER_CODE
-fx_player/obj/fx_player_code.o : fx_player/obj/fx_player_code.c
+fx_player/obj/fx_player_code.rel : fx_player/obj/fx_player_code.c
 	sdcc -c -o fx_player/obj/ --std-sdcc99   -mz80   --opt-code-speed --use-stdout  \
         --constseg FX_PLAYER_CODE fx_player/obj/fx_player_code.c
 

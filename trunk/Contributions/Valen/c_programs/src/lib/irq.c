@@ -40,8 +40,10 @@ void irq_handler() NAKED
 
 void install_irq_handler(byte irq_enable_mask)
 {
+    word *pW;
     DI();
-    *((word*)IRQ_VECTOR) = (word)&irq_handler;
+    pW  = (word*)IRQ_VECTOR;
+    *pW = (word)&irq_handler;
     io__sys_irq_enable = irq_enable_mask;
     EI();
 }

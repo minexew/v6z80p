@@ -36,7 +36,7 @@ byte spritesRegsBuffer[127*4];               // 127 sprites (4 bytes per sprite)
 // The sprite register writes go to buffer in
 // system memory (not directly to hardware sprite registers). 
 // This will prevent any sprite flickering/tearing.
-void set_sprite_regs(sprite_regs_t* r)
+void SpritesRegsBuffer_SetSpriteRegs(sprite_regs_t* r)
 {
     byte reg_misc;
     int x, y;

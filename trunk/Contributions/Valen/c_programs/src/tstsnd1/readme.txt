@@ -1,4 +1,5 @@
-Example: How to use fx_player (coded in asm by Phil) from C code.
+Example: How to use fx_player code from C program.
+(fx_player was coded in asm by Phil)
 =================================================================
 
 
