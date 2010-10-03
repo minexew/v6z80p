@@ -19,7 +19,8 @@ var
 
 function isesc:boolean;
 begin
-  if keypressed then isesc:=readkey=#27 else isesc:=false;
+  isesc:=keypressed;
+//  if keypressed then isesc:=readkey=#27 else isesc:=false;
 end;
 
 function calccrc:word;
@@ -98,7 +99,7 @@ begin
       while not quit do
       begin
         clreol;write('sending to '+devstring+':',fbufpos,'/',flen);gotoxy(1,wherey);
-        if fbufpos>flen then quit:=true else
+        if fbufpos>=flen then quit:=true else
         begin
           move(fbuffer[fbufpos],buffer[0],256);
           inc(fbufpos,256);
