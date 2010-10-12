@@ -1,5 +1,6 @@
 ;-----------------------------------------------------------------------------------------
-; Video Memory Test - fills video memory pages with random bytes then verifies
+; Video Memory Test - fills video memory pages with random bytes then verifies 
+; Runs indefinately (no esc)
 ;-----------------------------------------------------------------------------------------
 
 include "OSCA_hardware_equates.asm"
@@ -91,10 +92,6 @@ rloop1	push de
 	cp $40
 	jr nz,rloop1
 	
-	in a,(sys_irq_ps2_flags)	; reset on keyboard irq.
-	bit 0,a				
-	jp nz,$0
-		
 	ld hl,(seedtemp)
 	inc hl
 	ld (seedtemp),hl
@@ -376,7 +373,7 @@ cursor_y		db 0
 
 memtest_txt	db "Testing Video Memory",11,11
 		db "Garbage will appear on screen",11
-		db "between each pass. Any key to quit",11,11,11
+		db "between each pass..",11,11,11
 		db "PASS: $"
 pass_no_txt	db "0000",0
 		
