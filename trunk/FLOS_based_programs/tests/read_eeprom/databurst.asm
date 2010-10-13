@@ -10,8 +10,13 @@ include "system_equates.asm"
 
 	org $5000
 
-source	equ $800				;address in EEPROM from which to get bytes
-length	equ $3ff1				;number of bytes required from EEPROM
+source	equ $0000				;address in EEPROM from which to get bytes
+src_block equ $06
+
+length	equ $0000
+len_msb	equ $02				;number of bytes required from EEPROM (minimum = $000001)
+
+dst_bank	equ 2
 dest	equ $8000				;where to dump the bytes in RAM
 
 ;-----------------------------------------------------------------------------
@@ -19,13 +24,16 @@ dest	equ $8000				;where to dump the bytes in RAM
 	call set_timer			; timer @ 256 * 256 cycles between overflows + restart
 dl_bcode	in a,(sys_eeprom_byte)		; clear shift reg count with a read
 
-
-
+	ld a,src_block
 	ld hl,source			; fill in values for databurst command sequence 
 	ld (s_addr),hl
+	ld (s_addr+2),a
+	
+	ld a,len_msb
 	ld hl,length			
 	ld (s_length),hl
-
+	ld (s_length+2),a
+	
 	ld hl,databurst_sequence		; send PIC the commands to send data from EEPROM
 	ld b,12
 init_dblp	ld a,(hl)
@@ -33,11 +41,18 @@ init_dblp	ld a,(hl)
 	inc hl
 	djnz init_dblp
 
+	ld a,dst_bank
+	call kjt_force_bank
+	ld hl,dest			; download loop counts.. 
+	ld bc,length			                
+	ld e,len_msb
+	
+nxt_byte	ld a,b
+	or c
+	or e
+	jr z,all_ok
 
-
-	ld hl,dest			; download loop.. 
-	ld bc,length			;                 
-nxt_byte	ld d,0				; D counts timer overflows
+	ld d,0				; D counts timer overflows
 	ld a,1<<pic_clock_input		; prompt PIC to send a byte by raising PIC clock line
 	out (sys_pic_comms),a
 wbc_byte	in a,(sys_hw_flags)			; have 8 bits been received?		
@@ -55,10 +70,18 @@ gbcbyte	xor a
 	in a,(sys_eeprom_byte)		; read byte received, clear bit count
 	ld (hl),a				; copy to dest, loop back to wait for next byte
 	inc hl
-	dec bc
+	ld a,h
+	or l
+	jr nz,same_bnk
+	call kjt_inc_bank
+	ld h,$80
+same_bnk	dec bc
 	ld a,b
-	or c
+	and c
+	inc a
 	jr nz,nxt_byte
+	dec e
+	jr nxt_byte
 
 all_ok	ld hl,ok_txt
 endit	call kjt_print_string
@@ -138,8 +161,10 @@ databurst_sequence
 
 	db $88,$d4		; $88,$d4 = set address
 s_addr	db $00,$00,$00		; (low,mid,high)
+
 	db $88,$e2		; $88,$e2 = set length
 s_length	db $00,$00,$00		; (low,mid,high)
+
 	db $88,$c9		; $88,$c9 = begin transfer!
 	
 ;------------------------------------------------------------------------------------------
