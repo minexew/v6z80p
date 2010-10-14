@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.15 - P.Ruston '08 - '10    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.16 - P.Ruston '08 - '10    *
 ; ****************************************************************************
 ;
 ;
@@ -99,6 +99,8 @@ waitkey	call kjt_wait_key_press
 	jp z,option_6	
 	cp "7"
 	jp z,option_7	
+	cp "8"
+	jp z,option_8
 	
 	jr waitkey
 
@@ -255,6 +257,8 @@ cfgloaded	call charmap_restore
 	
 	ld hl,writing_text		; show "writing" text
 	call kjt_print_string
+	ld hl,0
+	ld (page_count),hl
 	ld a,0
 	call kjt_forcebank
 	ld hl,data_buffer
@@ -270,15 +274,18 @@ wrpagelp	call program_eeprom_page
 	jr nz,samebank
 	ld h,$80
 	call kjt_incbank
-samebank	call animate_working_chars
+samebank	call show_progress
 	inc de			; next eeprom page
 	dec bc
 	ld a,b
 	or c
 	jr nz,wrpagelp
+	call show_progress
 	
 	ld hl,verifying_text	; show "verifying" text
 	call kjt_print_string
+	ld hl,0
+	ld (page_count),hl
 	ld a,0
 	call kjt_forcebank
 	ld hl,data_buffer
@@ -301,12 +308,13 @@ verlp	ld a,(ix)
 	jr nz,samebankv
 	ld h,$80
 	call kjt_incbank
-samebankv	call animate_working_chars
+samebankv	call show_progress
 	inc de
 	dec bc
 	ld a,b
 	or c
 	jr nz,vrpagelp
+	call show_progress
 
 	ld hl,ok_text		; show "completed" text
 	call kjt_print_string
@@ -569,6 +577,13 @@ option_5	call show_banner
 
 	ld hl,uninstall_os_txt
 	call kjt_print_string
+	
+	call kjt_get_input_string	; and ask for confirmation
+	or a
+	jp z,begin
+	ld a,(hl)
+	cp "Y"
+	jp nz,begin
 			
 	xor a
 	ld (block_number),a
@@ -836,13 +851,106 @@ op7gtri	call kjt_get_input_string
 	jp z,begin
 	jr osissafe
 			
-;------------------------------------------------------------------------------------------
+;------------------------------------------------------------------------------------
+;-------- OPTION 8: Erase Slot (and verify blank) -----------------------------------
+;------------------------------------------------------------------------------------
+
+option_8	call show_banner
+	call show_slot_ids
+
+	ld hl,erase_prompt_text	; which slot?
+	call kjt_print_string
+	call kjt_get_input_string
+	or a
+	jp z,begin
+	call kjt_ascii_to_hex_word	; returns de = slot number
+	or a
+	jp nz,invalid_input
+	ld a,e
+	ld (slot_number),a
+	ld hl,number_of_slots
+	cp (hl)
+	jp nc,invalid_input
+	
+	ld hl,active_slot
+	cp (hl)			; if erasing current active slot show warning
+	jr nz,ok_to_er
+	ld hl,er_warning_1_text
+	call kjt_print_string
+	call kjt_get_input_string	; and ask for confirmation
+	or a
+	jp z,begin
+	ld a,(hl)
+	cp "Y"
+	jp nz,begin
+
+ok_to_er	ld (slot_number),a
+	or a
+	jr nz,ne_slot0		; confirm slot 0 erase 
+	ld hl,er_warning_2_text
+	call kjt_print_string
+	call kjt_get_input_string	; and ask for confirmation
+	or a
+	jp z,begin
+	ld a,(hl)
+	cp "Y"
+	jp nz,begin
+
+ne_slot0	ld a,(slot_number)		
+	ld hl,erase_chars
+	call kjt_hex_byte_to_ascii
+	ld hl,erasing_text		; show "erasing slot xx" text
+	call kjt_print_string
+	ld a,(slot_number)		; erase the required 2 x 64KB eeprom sectors 
+	sla a
+	call erase_eeprom_sector
+	inc a
+	call erase_eeprom_sector
+	
+	ld hl,verifying_erase	; show "verifying" text
+	call kjt_print_string
+	ld hl,0
+	ld (page_count),hl
+	
+	ld bc,512
+	ld a,(slot_number)
+	sla a
+	ld d,a
+	ld e,0
+evrpagelp	call read_eeprom_page
+	or a
+	jp nz,time_out_error
+	ld ix,page_buffer
+	ld l,0
+everlp	ld a,(ix)
+	cp $ff
+	jp nz,verify_error
+	inc ix
+	inc l
+	jr nz,everlp
+	call show_progress
+	inc de
+	dec bc
+	ld a,b
+	or c
+	jr nz,evrpagelp
+	call show_progress
+	
+	ld hl,ok_text		; show "completed" text
+	call kjt_print_string
+	call kjt_wait_key_press
+	jp begin
+
+
+;------------------------------------------------------------------------------------------------------
+
 
 read_in_block
 	
 	ld hl,block_read_text		; say "reading existing data"
 	call kjt_print_string
-
+	ld hl,0
+	ld (page_count),hl
 	xor a
 	call kjt_forcebank
 	ld a,(block_number)
@@ -868,9 +976,10 @@ riedplp	push bc
 sameb4	exx	
 	inc de				;next eeprom page
 	pop bc				
-	call animate_working_chars
+	call show_progress
 	djnz riedplp
-	ld hl,no_anim_chars
+	call show_progress
+	ld hl,new_line
 	call kjt_print_string
 	xor a
 	ret
@@ -887,8 +996,9 @@ eprd_err	pop bc
 erase_block
 
 	ld a,(block_number)		
-	add a,$30
-	ld (erase_blk_char),a
+	ld hl,erase_blk_chars
+	call kjt_hex_byte_to_ascii
+	
 	ld hl,erasing_blk_text		; show "erasing" text
 	call kjt_print_string
 
@@ -902,6 +1012,8 @@ write_block
 
 	ld hl,writing_text			; show "writing" text
 	call kjt_print_string
+	ld hl,0
+	ld (page_count),hl
 	xor a
 	call kjt_forcebank
 	ld hl,data_buffer
@@ -916,10 +1028,11 @@ dwrpagelp	call program_eeprom_page
 	jr nz,samebdb
 	ld h,$80
 	call kjt_incbank
-samebdb	call animate_working_chars
+samebdb	call show_progress
 	inc de
 	djnz dwrpagelp
-	ld hl,no_anim_chars
+	call show_progress
+	ld hl,new_line
 	call kjt_print_string
 	xor a
 	ret
@@ -937,6 +1050,8 @@ verify_block
 	
 	ld hl,verifying_data_txt		; show "verifying" text
 	call kjt_print_string
+	ld hl,0
+	ld (page_count),hl
 	ld a,0
 	call kjt_forcebank
 	ld hl,data_buffer
@@ -958,10 +1073,11 @@ dverlp	ld a,(ix)
 	jr nz,dsamebnkv
 	ld h,$80
 	call kjt_incbank
-dsamebnkv	call animate_working_chars
+dsamebnkv	call show_progress
 	inc de
 	djnz dvrpagelp
-	ld hl,no_anim_chars
+	call show_progress
+	ld hl,new_line
 	call kjt_print_string
 	xor a
 	ret
@@ -1100,28 +1216,52 @@ lowbank	ld (dload_bank),a
 	ret
 
 ;------------------------------------------------------------------------------------------
-	
 
-animate_working_chars
+show_progress
 
 	push hl
-	push de
-	push bc
-	ld hl,anim_chars
-	ld a,(anim_charpos)
-	ld e,a
-	add a,5
-	cp 15
-	jr nz,achpok
-	xor a
-achpok	ld (anim_charpos),a
-	ld d,0
-	add hl,de
-	call kjt_print_string
-	pop bc
-	pop de
-	pop hl
+	ld hl,(page_count)
+	srl h
+	rr l
+	srl h
+	rr l
+	ld a,l
+	ld hl,prog_figures+1
+	ld (hl),$30
+	dec hl
+	ld (hl),$30	
+hundlp	sub 100
+	jr c,tens
+	inc (hl)
+	jr hundlp
+
+tens	add a,100
+	inc hl
+tens_lp	sub 10
+	jr c,units
+	inc (hl)
+	jr tens_lp
+
+units	add a,10
+	inc hl
+	add a,$30
+	ld (hl),a
+
+	ld hl,(page_count)
+	inc hl
+	ld (page_count),hl	
+
+	ld hl,prog_figures
+iglsp	ld a,(hl)
+	cp "0"
+	jr nz,showpr
+	inc hl
+	jr iglsp
+	
+showpr	call kjt_print_string
+	pop hl	
 	ret
+
 
 ;----------------------------------------------------------------------------------------
 
@@ -1414,7 +1554,7 @@ include "file_requesters_with_rs232.asm"
 
 
 start_text1	db 11," ************************************ ",11
-		db    " * V6Z80P ONBOARD EEPROM TOOL V1.15 * ",11
+		db    " * V6Z80P ONBOARD EEPROM TOOL V1.16 * ",11
 		db    " ************************************ ",11,0
 		
 start_text2	db 11
@@ -1426,10 +1566,10 @@ start_text2	db 11
 		db 11
 		db    "4 - Install OS to EEPROM",11
 		db    "5 - Remove OS from EEPROM",11
-		db 11
 		db    "6 - Update bootcode",11
 		db 11
 		db    "7 - Insert data into EEPROM block",11
+		db    "8 - Erase slot",11
 		db 11
 		db    "ESC - Quit",11,0
 		
@@ -1437,13 +1577,21 @@ slot_prompt_text	db 11,11,"Write new config to which slot? ",0
 
 warning_1_text	db 11,11,"Are you sure you want to write",11
 		db "to the currently active slot (y/n) ",0
-		
+
+er_warning_1_text	db 11,11,"Are you sure you want to erase",11
+		db "the currently active slot (y/n) ",0
+
+er_warning_2_text	db 11,11,"Sure you want to erase slot 0?",11
+		db "Bootcode, OS etc will be lost! (y/n) ",0
+				
 erasing_text	db 11,"Erasing slot:"
-erase_chars	db "xx",0
+erase_chars	db "xx",11,0
 
-writing_text	db 11,11,"Writing data - please wait",11,0
+writing_text	db 11,"Writing data - please wait",11,0
 
-verifying_text	db 13,"    ",11,"Verifying data",11,0
+verifying_text	db 11,"Verifying data",11,0
+
+verifying_erase	db 11,"Verifying erasure",11,0
 
 serial_error_text	db 11,"Download error. Press any key.",0
 
@@ -1459,12 +1607,8 @@ addr_prompt_text	db 11,"Hex address within block? (0-FFFF) ",0
 addr_error_text	db 11,"ERROR! File cannot overlap 64KB block",11,11
 		db "Press any key",0
 
-
 erasing_blk_text	db 11,"Erasing block:"
-erase_blk_char	db "x",0
-
-
-block_erase_text	db 11,"Erasing current block",0
+erase_blk_chars	db "xx..",11,0
 
 set_slot_text	db 11,11,"Which slot should the FPGA",11
 		db "configure from upon power up? ",0
@@ -1487,7 +1631,7 @@ check_digit	db "xx - Sure? (y/n) ",0
 reconfig_now_text	db 11,11,"Reconfigure FPGA now (non permanent)"
 		db 11,11,"Which slot? ",0
 
-ok_text		db 13,"    ",11,11,"Completed OK - Press any key",11,0
+ok_text		db 13,11,11,"SUCCESS! - Press any key..",11,0
 
 cr_txt		db 11,0
 
@@ -1503,13 +1647,6 @@ input_error_text	db 11,11,"Invalid input - Press any key",0
 
 wildcard_filename	db "*",0
 
-anim_chars	db ".  ",13,0
-		db ".. ",13,0
-		db "...",13,0
-no_anim_chars	db "   ",0
-
-anim_charpos	db 0
-
 cfg_id		db $ff,$ff,$ff,$ff,$aa,$99,$55,$66
 
 cfg_file_error_text	db 11,11,"Not a valid Xilinx config file!",11,11
@@ -1523,18 +1660,19 @@ loading_txt	db 11,"Loading...",11,0
 
 install_os_txt	db 11,"Install OS..",0
 
-uninstall_os_txt	db 11,"Uninstall OS...",0
+uninstall_os_txt	db 11,"Remove OS from EEPROM...",11,11
+		db "Sure you want to continue? (y/n) ",0
 
 os_size_error_txt	db "File to big for EEPROM page!",11
 		db "OS must be $E800 bytes or less",11,0
 
 abort_error_txt	db 11,11,"Aborted - Press any key",11,0
 
-time_out_error_txt	db "   ",11,"Time out error - Press any key",11,0
+time_out_error_txt	db 11,"Time out error - Press any key",11,0
 
-write_error_txt	db "   ",11,"Write error!",11,0
+write_error_txt	db 11,"Write error!",11,0
 
-verify_error_txt	db "   ",11,"Verify error!",11,0
+verify_error_txt	db 11,"Verify error!",11,0
 
 serial_error_txt	db 11,"Serial error - Press any key",11,0
 
@@ -1616,6 +1754,14 @@ pic_fw_unknown_text	db "Unknown",11,0
 pic_fw_byte	db 0
 
 retry_txt		db 11,"Do you want to re-write the data (y/n)? ",0
+
+erase_prompt_text	db 11,11,"Erase which slot? ",0
+
+prog_figures	db "--- KB complete..",13,0
+
+new_line		db 11,0
+
+page_count	dw 0
 
 ;---------------------------------------------------------------------------------------
 
