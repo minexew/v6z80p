@@ -5,6 +5,7 @@
 #include <kernal_jump_table.h>
 #include <v6z80p_types.h>
 #include <OSCA_hardware_equates.h>
+#include <macros_specific.h>
 
 #include <stddef.h>
 
@@ -132,5 +133,7 @@ V6Z80P_EXTERN void FLOS_PrintStringLFCR(const char* string);
 
 V6Z80P_EXTERN char* FLOS_GetCmdLine(void);
 V6Z80P_EXTERN BOOL FLOS_SetSpawnCmdLine(const char* line);
+
+V6Z80P_EXTERN void FLOS_ExitToFLOS(void);
 
 #endif /* I_FLOS_H */

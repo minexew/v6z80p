@@ -176,6 +176,9 @@ BOOL test1(void)
         sectorOffset = pF.sectorOffset; clusterNumber = pF.clusterNumber;
     }
 
+    
+    //FLOS_ExitToFLOS();
+
     return TRUE;
 }
 

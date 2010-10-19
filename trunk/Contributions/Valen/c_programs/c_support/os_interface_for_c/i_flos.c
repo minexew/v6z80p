@@ -32,6 +32,15 @@ byte FLOS_GetLastError(void)
 }
 
 
+// Stop execution of program and exit to FLOS immediately 
+void FLOS_ExitToFLOS(void) 
+{
+    BEGINASM()
+    xor  a        ; program exit code is 0 (no reboot)
+    ld   l,a      
+    jp   _exit
+    ENDASM()
+}
 
 
 
