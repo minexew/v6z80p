@@ -59,7 +59,7 @@ cmdline_exist:
 	.area	_DATA
         .area   _BSS
         .area   _HEAP
-        .area   _HEAP_END       ; workaround for heap (7 jun 2010)
+        .area   _HEAP_END       ; workaround for heap (valen 7 jun 2010)
 
         .area   _CODE
 __clock::
