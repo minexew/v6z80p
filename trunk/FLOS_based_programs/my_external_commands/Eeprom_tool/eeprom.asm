@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.16 - P.Ruston '08 - '10    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.17 - P.Ruston '08 - '10    *
 ; ****************************************************************************
 ;
 ;
@@ -497,7 +497,7 @@ is_zero	ld a,$88			; send "set config base" command
 	jr c,toer1
 	call exit_programming_mode
 
-	ld hl,ok_text+5		; show "completed" text
+	ld hl,ok_text		; show "completed" text
 endop3	call kjt_print_string
 	call kjt_wait_key_press
 	jp begin
@@ -1554,7 +1554,7 @@ include "file_requesters_with_rs232.asm"
 
 
 start_text1	db 11," ************************************ ",11
-		db    " * V6Z80P ONBOARD EEPROM TOOL V1.16 * ",11
+		db    " * V6Z80P ONBOARD EEPROM TOOL V1.17 * ",11
 		db    " ************************************ ",11,0
 		
 start_text2	db 11
