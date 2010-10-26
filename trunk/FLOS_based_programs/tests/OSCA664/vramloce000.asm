@@ -54,7 +54,7 @@ start	ld a,0
 ;-----------------------------------------------------------------------------------
 
 	ld a,vram/$2000
-	out (sys_vram_location),a		; Locate 8KB VRAM page at Z80 $6000-$7FFF
+	out (sys_vram_location),a	; Locate 8KB VRAM page at Z80 $6000-$7FFF
 
 	ld a,%01000000
 	out (sys_mem_select),a	; page in VRAM
@@ -66,7 +66,7 @@ loopit	call do_stuff
 	jr nz,loopit		; loop if ESC key not pressed
 
 	ld a,1
-	out (sys_vram_location),a		; Locate 8KB VRAM page at Z80 $2000-$3FFF (default)
+	out (sys_vram_location),a	; Locate 8KB VRAM page at Z80 $2000-$3FFF (default)
 
 	ld a,%00000000
 	out (sys_mem_select),a	; page out VRAM
