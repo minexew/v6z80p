@@ -1,8 +1,16 @@
 Updates to OSCA
 ---------------
 
+664 - Video RAM window can be moved from default location $2000 to any 8KB boundary
+      of Z80 address space (added the setting sys_vram_location @ port $21)
+
+    - Includes ROM 6.15 (resets sys_vram_location on reset)
+
+
+
 663 - Added ability to expand pixels horizontally in chunky pixel mode.
       bit 3 of "vreg_vidctrl" enables and bits 0:2 "vreg_yhws_bplcount" sets the width
+
 
 
 661 - ROM version updated to v6.14 (requires bootcode 6.12)
