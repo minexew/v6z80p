@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.17 - P.Ruston '08 - '10    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.18 - P.Ruston '08 - '10    *
 ; ****************************************************************************
 ;
 ;
@@ -884,7 +884,7 @@ option_8	call show_banner
 	cp "Y"
 	jp nz,begin
 
-ok_to_er	ld (slot_number),a
+ok_to_er	ld a,(slot_number)
 	or a
 	jr nz,ne_slot0		; confirm slot 0 erase 
 	ld hl,er_warning_2_text
@@ -1554,7 +1554,7 @@ include "file_requesters_with_rs232.asm"
 
 
 start_text1	db 11," ************************************ ",11
-		db    " * V6Z80P ONBOARD EEPROM TOOL V1.17 * ",11
+		db    " * V6Z80P ONBOARD EEPROM TOOL V1.18 * ",11
 		db    " ************************************ ",11,0
 		
 start_text2	db 11

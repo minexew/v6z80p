@@ -1,5 +1,5 @@
 
-V6Z80P EEPROM TOOL V1.17 - Phil Ruston www.retroleum.co.uk 2008-10
+V6Z80P EEPROM TOOL V1.18 - Phil Ruston www.retroleum.co.uk 2008-10
 ------------------------------------------------------------------
 
 *******************************************************************
@@ -233,7 +233,8 @@ UP+RIGHT+FIRE on a joystick in port A. (Note: The transfer must be at 115200 BAU
 Update History:
 ---------------
 
-v1.17 - Fixed Success text after using "change slot" option.
+v1.18 - Fixed Success text after using "change slot" option.
+      - Fixed bug where wrong slot was erased when active slot chosen
 
 v1.16 - Added "Erase Slot" option
         Added progress indication (replaced animated dots)
