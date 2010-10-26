@@ -71,6 +71,11 @@ BAUD on boot with Function keys F11 (slow) and F12 (fast)
 ROM code
 --------
 
+v6.15 (25/10/2010):
+
+Clears new port "sys_vram_location", ensuring VRAM is placed at $2000 on reset.
+
+
 v6.14 (20-07-2010):
 
 This version became necessary mainly due to the V6Z80P+ having the
