@@ -1,10 +1,16 @@
+{$mode delphi}
  
 uses
   Classes, SysUtils, Synaser, Crt;
     
 const
   hdr:array[0..11] of char='Z80P.FHEADER';
+{$IFDEF LINUX}
   ttydev:string='USB0';
+{$ELSE}
+  ttydev:string='COM1';
+{$ENDIF}
+
 var
   ser: TBlockSerial;
   quit:boolean=false;
@@ -81,19 +87,30 @@ begin
   if ((paramcount<1) or (paramcount>2))   then 
   begin
     writeln('Usage: SENDV6 <device> file');
+{$IFDEF LINUX}
     writeln('use "SENDV6 file.asm" to send file.asm to /dev/ttyUSB0');
     writeln('use "SENDV6 USB1 file.asm" to send file.asm to /dev/ttyUSB1');
+{$ELSE}
+    writeln('use "SENDV6 file.asm" to send file.asm to COM1');
+    writeln('use "SENDV6 COM3 file.asm" to send file.asm to COM3');
+{$ENDIF}
     halt;
   end;
   if paramcount=1 then fname:=paramstr(1) else begin fname:=paramstr(2); ttydev:=paramstr(1);end;
   if not fileexists(fname) then begin writeln('?File not Found ERROR');halt; end;
   filemode:=0; assign(f,fname); reset(f,1); flen:=filesize(f); blockread(f,fbuffer,flen); close(f); fbufpos:=0;
   ser:=TBlockSerial.Create;
+{$IFDEF LINUX}
   devstring:='/dev/tty'+ttydev;
+{$ELSE}
+  devstring:=ttydev;
+{$ENDIF}
   try
+    clreol;write('opening '+devstring);gotoxy(1,wherey);
     ser.Connect(devstring);
     ser.config(115200, 8, 'N', SB1, False, False);
     makehdr;
+    clreol;write('connecting to V6Z80P');gotoxy(1,wherey);
     if sendbuf then
     begin
       while not quit do
