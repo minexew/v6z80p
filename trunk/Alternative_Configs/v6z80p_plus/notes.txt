@@ -1,0 +1,4 @@
+
+When developing alternative V6Z80P+ configs, take note of the pin connections
+of the peripherals/components on the PCB (see pin list in docs) and avoid conflicting outputs. (In general, set your project's configuration options to
+pull all I/O pins not used in your project high.)
