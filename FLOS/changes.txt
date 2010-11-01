@@ -1,0 +1,358 @@
+
+FLOS for V6Z80P version info:
+-----------------------------
+
+5.79 - 01/09/10 : Added "kjt_mouse_irq_code" allowing external programs to use the kernal's
+                  mouse IRQ routine even if it has its own interrupt handler. Main IRQ
+                  handler changed a little.
+
+5.78 - 26/08/10 : Many optimizations. Internal commands optimized and now return
+		  error codes in the standard format (ZF = All OK, else A = error code.
+		  If A = 0, B = hardware error bits)
+		: When directories are deleted, any corresponding assignment names are removed
+		  from the Environment Variable list.
+                : EXEC - when the command string is copied, the <CR> from the end of a script
+		  line is replaced with a zero.
+
+
+5.77 - 25/08/10 : Allowed exit from serial wait with keys if the "wait in seconds" value supplied in A
+                  has bits 6:7 set (affects "kjt_serial_rx_byte", "kjt_serial_receive_header")
+                : "RX" command now waits 15 seconds before timing out / can be aborted with ESC key.
+                : Some optimizations (get start/end address code for "C", "H","F" commands..)
+
+
+5.76  -23/08/10 : Updated CD command to accept assigned paths (%xxx), also now shows current
+                  path when no arguments are supplied (up to 16 dir levels).
+
+
+5.75  -20/08/10 : Added environment variable routines: kjt_get_envar, kjt_set_envar, kjt_delete_envar
+                  Environment variables currently live under the video registers at $480-$4FF (see
+                  entry in system_equates.asm)
+                : Added "kjt_list_file_sectors" to get a list of disk sectors that a file occupies
+
+
+5.74  -18/08/10 : Bugfix: Previously, if "CD" was given a multi-dir path and one of the dirs was
+		  8 chars long the dir stepping would stop at that point.
+                : FLOS filename now "FLOSvXYZ.OSF" - no need for FAT16 distinction as non-FAT16
+                  version discontinued.
+
+
+5.73 - 15/08/10 : To skip boot_run (or any scripts started with EXEC) at any point in the list
+                  you now hold down CTRL + C (not ESC)
+                : Keyboard handling code simplified (both Kernal routines and IRQ)
+                : As part of the above, "kjt_get_key_mod_flags" will now return the current
+                : status of the qualifier keys at any point, you dont need to have
+                : called "kjt_get_key" or "kjt_wait_key_press" previously.
+              
+              
+5.72 - 10/08/10 : Added "kjt_get_dir_cluster" and "kjt_set_dir_cluster"
+                : Standardized filesystem error code: $0B ("dir not found") to $23
+                : Added "kjt_rename_file"
+                
+
+5.71 - 06/08/10 : Overhauled mouse driver system. The  pointer sprite has been removed from
+                  FLOS. The driver just returns motion info, it is up to external programs to
+                  display whatever pointer / cursor they require.
+                : "kjt_enable_pointer" renamed to "kjt_enable_mouse"
+                ; "kjt_get_mouse_position" returns with Zero Flag not set if no driver installed.
+                : New KJT entry: "kjt_get_mouse_motion" - this returns the relative motion of the mouse
+                  since the last time the routine was called.
+
+
+5.70 - 28/06/10 : Added kernal routines "kjt_read_sysram_flat" and "kjt_write_sysram_flat"
+
+
+5.69 - 26/06/10 : Added ability to truncate .exe files (commands) to n bytes upon load using header
+                : Can abort BOOT_RUN.SCR start up scripts by pressing ESC on startup
+
+
+5.68 - 02/06/10 : Fixed (OLD!) bugs where registers were not reported correctly by "R" command.
+                : Added ability to load programs anywhere in RAM with addition of a special header
+
+ 
+5.67 - 01/06/10 : Simplified the error reporting system: If an external program returns with the zero
+                  flag set, there was no error to report (if A=$FF, the OS will restart, if A=$FE a new
+                  program will be launched HL holds the command string). If an external program returns
+                  with the zero flag not set, there was an error. If A=0, the error was from a device
+                  driver and the relevant code will be in B. If A = FE/FF, same deal as above. otherwise
+                  report the relevent system (error) message. This all means external programs can
+                  quit (RET NZ) from error reporting Kernal calls and have the appropriate error displayed.
+                 : As part of the above, the G command has been made a special case.
+                 : (Internally, regarding FS_* calls, FLOS still uses the CARRY SET = Driver Error system).
+  
+
+5.66 - 31/05/10	: Removed "kjt_set_sector_lba" call, this function is now included in actual
+		  read/write sector calls
+		: Fixed kjt_format_device (was untested in v565)
+                : Standardized error code returns: External apps no longer use the CARRY flag,
+		  they now must clear the ZERO FLAG if they complete sucessfully. If the zero flag is
+		  not set but A = 0, this is a hardware error and the relevent error data bits should
+		  be placed in B (Kernal based routines that return error codes do this). As before,
+                  $FF = system restart. $FE = spawn new program (but make sure the zero flag is set).
+		: KJT_mount_volumes has option to do so quietly. 
+		: Some tidying up and other small fixes.
+
+
+5.65 - 28/05/10 : Removed all references to PQFS and IDE drivers
+                : Adapted Filesystem to allow multiple partitions on cards
+                : Changed references to Drives to Volumes. EG: DRV0: is now VOL0:
+                : Removed pointless "FI" command
+                : Corrected free space calculation when using cards with MBR
+                : Mount reports Volume labels and driver name (not get_id info)
+	       	: OS_print_string pushes/pops BC
+	       	: Four storage drivers and 8 volumes are allowed
+	       	: Added "kjt_get_device_info" to allow external drive(rs) to be mounted
+	       	: Moved device tables under hw registers
+	       	: OS_plot_char (and by extension kjt_print_string) page in the video registers
+	       	: Pointer colours put under video registers.
+	       	: Put keyboard routines below $2000 avoiding any issues when video is paged in.
+	       	: Fixed multiple path on CD command EG: CD dir1/dir2/dir3
+	       	: kjt_get_current_dir_name now null terminates ascii at first space
+		  (instead of padding to 11 chars) and also returns VOLx: when at root
+	       	: DIR now shows volume label
+	       	: kjt_get_volume changed to kjt_get_volume_info, returns more data (see kjt docs)
+	       	: FORMAT now optionally labels the volume (FORMAT driver_name [label])
+	       	: KJT_format requires label addr in HL and DEVICE number in A
+	       	: kjt_check_disk_available to kjt_check_volume_available
+		: kjt_change_drive to kjt_change_volume
+		: Created internal scratchpad label just below stack, the decimal routines now use this. 
+		: Replaced Disassemble routine with highly optimized version
+		: Added "<" command to "edit disassembly" (now using John Kerr's DiSZ80
+		  routine for D command)
+		: All internal reads of vreg_read use the port, not the video register (in case paged out)
+                : Changed KJT routines for external low level sector access (see docs)
+                : Added internal command "VOLx:" to set volume but not change dir
+                : Lots of other small updates and optimizations  
+	       
+5.63 - 10/03/10  : Opimized the plot_char routine a little (for speed)
+
+5.62 - 08/03/10  : Added "kjt_mount_drives"
+                 : Updated "kjt_get_current_dir_name" and the kjt directory listing calls
+                   to return the standard error codes. IE: Carry flag is not tested by
+                   external program, only zero flag, A (and if A=0, B for HW error flags)
+
+5.61 - 04/03/10  : Changed the serial routines: The load address is now set by the
+                   "receive_serial_file" call. Unfortunately, this will have broken
+                   any external apps that use the relevant KJT routines (eeprom.exe
+                   etc being recoded).
+
+5.60 - 02/03/10  : Added KJT_STORE_DIR_POSITION and KJT_RESTORE_DIR position
+
+5.59 - 02/03/10  : Relegated "MOUSE" to external command to make room for new features.
+                   (The new external mouse.exe command contains the image, palette and code
+                    to initialize the mouse. Driver is still internal to FLOS. The
+                    kjt_init_mouse call has been replaced with kjt_init_pointer - see docs)
+                 : The qualifier keys: CTRL, ALT, GUI are now reported by KJT_key_mod_flags
+                 : Relegated "KM" to external command (Keymap.exe) as there was no point
+                   it being internal since it has to load external keymap files. 
+                 : keymap files can now contain two or three banks of the scancode->ascii
+                   translation table: unshifted, shifted and optionally alt-modified keys
+                   (each table is $62 bytes long). To accommodate the larger file, the
+                   internal UK keymap is now copied to the RAM below the video registers
+                   and read from there.
+                 : Added colour attribute map at VRAM $1c000, meaning characters maintain
+                   their assigned colours within the OS window etc.
+                 : KJT_PLOT_CHAR now tests for out-of-range coordinates (set to 0 if so)
+                 : KJT_SET_CURSOR_POSITION now does likewise
+                 : Added KJT_GET_CHARMAP_ADDR_XY   - see kernal docs
+                 : Added KJT_GET_DISPLAY_SIZE      - see kernal docs
+                 : Added KJT_TIMER_WAIT            - see kernal docs
+
+
+5.58 - 01/03/10  : Changed the FAT16 dir listing routines. (There was an anomaly where the
+                   same entry would be returned twice from the root dir if "get_entry" was
+                   not called after "first_entry" - due to the disk label entry). 
+
+
+5.57 - 21/02/10  : Changed the font system to allow 32 user defined characters to be inserted
+                   into the FLOS font (characters 128-160). The non-standard ASCII characters
+                   occupying "{" and "}" in the default FLOS font have been replaced with
+                   the bracket and pipe characters. The keymaps have also been updated.
+                   These changes mean any programs using the arrow characters needs to
+                   install user-defined versions into the FLOS font, therefore
+                   TEXTEDIT.EXE has been updated. CHFNT.EXE has also been updated to
+                   reflect the changes.
+
+
+5.56 - 21/02/10  : BUGFIX: To avoid the get dir command returning fragments of long file names
+                   created by Windows, the FAT16 cluster dir search code now checks the
+                   first character of each entry's filename (IE: not $05, $E5 etc)
+
+
+5.55 - 15/02/10  : Added "KJT_GET_DIR_NAME" and "KJT_GET_KEY_MOD_FLAGS"
+                   FAT16 DIR command now shows dir name 
+                   Removed "BAUD" internal command to save space (made BAUD.EXE external cmd)
+                   Simplified mouse sprite image to save space.                     
+
+
+5.54 - 14/02/10  : Small bug fix: Cursor plot routine now clears "Mult_index" so if an
+                   external program uses OTHER parts of the h/w mult table, the cursor
+                   plotting still works correctly.
+
+
+5.53 - 13/02/10  : Fixed bug in "kjt_write_bytes_to_file" (bank was not being selected)
+
+
+5.52 - 29/01/10  : H command ("Hunt for bytes in memory") fixed. Had been messed up by
+                   optimization in a previous release.
+
+
+5.51 - 15/09/09  : When a program restarts the OS, the pen colour now remains unchanged
+                   instead of being reset to yellow.
+
+
+5.49 - 27/09/09  : When control is returned to OS, sys_alt_write_page is cleared ensuring
+                   the video registers are paged in.
+
+
+5.48 - 22/08/09  : Updated filesystem load routine to allow faster sequential file loads.
+                   (No longer seeks from start of file each load of same file unless filepointer
+                    has been changed).
+                 : Optimized various commands (C,H etc) and keyboard routines to make space
+                   for FS improvement.
+
+
+5.47 - 17/08/09  : Added "KJT_flos_display" - this allows programs that have changed the display mode
+                 : to exit back to the OS without restarting it. This currently only resets the video
+                 : registers so if a program has overwritten VRAM $10000-$1ffff it is still
+                 : necessary to restart the OS to restore the font / characters etc.
+                 : (The C - copy memory - command was optimized a little to fit this in)
+
+
+5.46 - 06/08/09  : Added KM command to change keymap (scancode to ascii table)
+                 : Changed wait VRT to wait y border to remove glitch on VGA when scrolling
+                 : SD/MMC routines optimized to make space (v1.04)
+
+
+5.45 - 23/06/09  : New OS command: "EXEC fn" (to run scripts). Note: scripts
+                   cannot run other scripts. 
+                 : Lots of optimization!
+
+
+5.44 - 21/06/09  : KJT_get_pen addded
+                 : KJT_scroll_up added
+                 : OS resets the new bitplane modulo on restart
+                 : Slight change to UI scroll routine: the fresh line at the
+                   bottom of the screen is cleared instead of being redrawn
+                   with space characters - this prevents the pen colour
+                   filling the entire new line which looked bad. Similarly,
+                   the Clear Screen routine now erases the display
+                   directly instead of plotting spaces.
+                 : A couple of small optimizations to fit in the new code.
+                 
+
+5.43 - 15/06/09  : Commands in BOOT_RUN.SCR can now spawn programs on exit.
+                 : Added FAT16 FORMAT command.
+                 : DIR free space corrected - tally now agrees with Windows
+                 : Optimized FLOS text (packed: dictionary/index system)
+                 : Moved RLE unpack routine to low memory to avoid VRAM page
+                 : RD command now correctly reports "dir not found" 
+                 : Fixed "ESC key showing random chars" bug (created by previous
+                   optimization of SCANCODE to ASCII table)
+                 : PQFS format now wipes LBA sector 0 so that remains of any
+                   previous FAT format are not seen by FLOS 
+
+
+5.42 - 10/06/09  : Allowed programs to issue a new FLOS command upon exit.
+                   To do so: clear the carry flag, set A to $FE and HL to the
+                   address of the new command string.
+
+                 : Zeroed all sprite registers on OS start.
+
+
+5.41 - 10/06/09  : Pretty major restructuring of the UI font handling:
+                   Blitter now draws characters, scrolls etc. OS UI now
+                   has 6 bitplanes so font can now be in colour (15 colours
+                   foreground and background*). UI display border and
+                   "paper" colours can be changed. Note: The OS font is
+                   now packed so cannot be read directly from "font_base"
+                   any more. (It it unpacked to VRAM at $1E400.)
+ 
+                   (* Note: There is no actual attribute map, so changing
+                    the pen colours in the UI editor will sometimes alter
+                    wider areas - this is normal.)
+
+                 : New OS command: COLOUR pen [paper, border, cursor]
+                   (pen is a byte, $nm where n is background, m is
+                    background from 15 colour preset colour palette)
+                    others values are 12 bit: $RGB
+
+                 : New KJT commands (see docs for info)
+		
+                    kjt_set_pen
+                    kjt_background_colours
+                    kjt_draw_cursor
+                                     
+                    
+5.39  -09/06/09  :  Added "KJT_plot_char" routine
+                 :  FLOS now uses only the first entry of the hardware multiply table.
+
+
+5.38  -08/06/09  :  Added KJT following routines (see docs for infO)
+                     kjt_get_cursor_position
+                     kjt_read_sector
+                     kjt_write_sector
+                     kjt_set_sector_lba
+
+                 :  "Vers" now reports Filesystem version (also on start screen)
+                 :  "Format" gives proper error report if attempting FAT16 format.
+                 :   PQFS directory listing also restructured for new KJT routines. 
+ 
+                
+5.37  -07/06/09 :  Restructured the directory listing code, adding KJT entries so that
+                   external programs can access the directory list (FAT16). New routines:
+                    kjt_dir_list_first_entry	
+                    kjt_dir_list_get_entry
+                    kjt_dir_list_next_entry
+
+
+5.36 - 27/05/09 :  FAT16 routines updated (FLOS.asm unchanged) FAT16 now checks for MBR on
+                   disk at LBA 0 and offsets to the actual partition if found.
+
+
+5.35 - 17/05/09 :  When using FAT16, non-kernal commands now automatically
+                   have .exe file entensions added when the command name
+                   is entered at the command line. EG: You can launch the
+                   program "eeprom.exe" by typing "eeprom" or "eeprom.exe" 
+                   This means executable files MUST have .exe extensions if
+                   they are to run as commands.                 
+
+
+5.34 - 27/4/09  : FAT16 check disk format routine now also checks the drive is
+                  actually available according to the mount list (as required)
+                  
+                : no_ide lable flipped, now "use_ide_driver"
+		: "max_drives" can now be 1,2,3 or 4
+                 
+
+5.33 - 26/4/09  : FAT16 check format now checks for FAT16 signature.
+                : Checked IDE code options on V5Z80P
+
+
+5.32 - 13/4/09  : "fs_z80_bank" now cleared when opening a file (FAT16 bug)
+                   No cluster chain to follow when deleting a file with 0 length (FAT16)
+                   Scancode $0E when shifted (also) codes for the tilde character. 
+
+
+5.30 - 12/4/09 : FAT16 filesystem compatible version of FLOS can be generated by
+                 changing the "Use_PQFS" equate to 0 in the source.
+                    
+                 External commands now need to be placed in root dir called "COMMANDS"
+                 
+                 Boot Script now needs to be called "BOOT_RUN.SCR"
+                 
+                 KJT_Get_Total_Blocks has been replaced with "KJT_Get_Total_Sectors"
+                 
+                 Font changed: "Down arrow" character is 3 chars prior to where it was
+                 previously - this was done to make a tilde character is available.
+                 (Needed for truncated long filenames on FAT disks).
+
+                 Keymap updated: Tilde character available: Shift+hash.
+                
+                 Many other transparent changes and optimizations.
+
+	  
+                 Known issues with FAT16 FS version:
+                 -----------------------------------
+                 CD command without args does not show file path on FAT16 disks.
+ 
