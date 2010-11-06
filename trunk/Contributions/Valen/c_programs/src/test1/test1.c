@@ -16,6 +16,7 @@ TEST v0.02
 // for use sprintf (this will add about 3KB of code)
 #include <stdio.h>             
 
+//#include <stdio_v6z80p.h>        // provide fopen, fread, ...
 
 #define OS_VERSION_REQ  0x575           // OS version req. to run this program
 
