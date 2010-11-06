@@ -10,6 +10,7 @@ basedir = $(v6z80pdir)/Contributions/Valen/c_programs
 
 # object file extension ("rel" for SDCC 2.9.7 and "o" for old SDCC 2.9.0)
 O=rel
+RM=del
 
 objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.$(O)                   \
           $(basedir)/c_support/os_interface_for_c/obj/i_flos.$(O)         \
@@ -25,9 +26,9 @@ INC=-I$(basedir)/inc
      
 v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)
 	@echo ----------------- Linking -------------------
-	del obj\*.ihx
-	del obj\*.bin
-	del obj\*.exe
+	$(RM) obj\*.ihx
+	$(RM) obj\*.bin
+	$(RM) obj\*.exe
 	sdcc  -o obj/ -mz80   $(use_stdout)  --no-std-crt0   $(linkopt)  -Wl-b_FLOS_PROXY_CODE=0x5080  $(objects) $(prjobjects)
 	ren obj\crt0_v6z80p.ihx $(prjname).ihx
 	@echo ------------- IHX to BIN convertion ---------
