@@ -298,7 +298,7 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
   return 0;
 }
 
-/*
+
 static int close_file(FILE *stream)
 {
   int rc = EOF;
@@ -309,14 +309,16 @@ static int close_file(FILE *stream)
     return EOF;
   }
 
-  rc = fflush(stream);
-  freebuf(stream);
+//  rc = fflush(stream);
+//  freebuf(stream);
 
-  if (close(fileno(stream)) < 0) rc = EOF;
+//  if (close(fileno(stream)) < 0) rc = EOF;
 
   return rc;
 }
 
+
+/*
 FILE *fdopen(int fd, const char *mode)
 {
   FILE *stream; 
@@ -381,16 +383,42 @@ FILE *freopen(const char *filename, const char *mode, FILE *stream)
 }
 */
 
+#define MAX_OPEN_FILES_IN_FLOS 4
+
 struct {
-    FILE arrFILE[4];
+    FILE arrFILE[MAX_OPEN_FILES_IN_FLOS];
 } stdio_v6z80p;
+
+
+static void freeMemoryForFILE(FILE* const p)
+{
+    p->isAllocated = FALSE;
+}
+
+static FILE* allocateMemoryForFILE(void)
+{
+    byte i;
+    FILE *p;
+
+    for(i=0; i<MAX_OPEN_FILES_IN_FLOS; i++) {
+        p = &stdio_v6z80p.arrFILE[i]; 
+        if(!p->isAllocated) {
+            p->isAllocated = TRUE;
+            return p;
+        }
+
+    }
+
+    return NULL;
+}
+
 
 FILE *fopen(const char *filename, const char *mode)
 {
   FILE *stream;
 
   // allocate memory for stream
-  stream = &stdio_v6z80p.arrFILE[0];
+  stream = allocateMemoryForFILE();         //&stdio_v6z80p.arrFILE[0];
 
   if (!stream)
   {
@@ -400,12 +428,13 @@ FILE *fopen(const char *filename, const char *mode)
 
   if (open_file(stream, filename, mode) < 0)
   {
-    //free(stream);
+    freeMemoryForFILE(stream);
     return NULL;
   }
 
   return stream;
 }
+
 
 /*
 FILE *popen(const char *command, const char *mode)
@@ -488,15 +517,19 @@ void clearerr(FILE *stream)
   stream->flag &= ~(_IOERR | _IOEOF);
 }
 
+*/
+
+
 int fclose(FILE *stream)
 {
   int rc;
 
   rc = close_file(stream);
-  free(stream);
+  freeMemoryForFILE(stream);
   return rc;
 }
 
+/*
 int fflush(FILE *stream)
 {
   int rc = 0;
@@ -656,6 +689,38 @@ int puts(const char *string)
   return 0;
 }
 
+*/
+
+// A simple implementation of fread.
+// No any buffering (to save memory).
+size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
+{
+    DWORD nbytes;                // How much to read now
+    DWORD nread;                 // How much we did read
+
+    nbytes = size * num;
+    if(nbytes == 0) return 0;
+
+    nread = read(/*fileno(stream)*/0, buffer, nbytes);
+    if (nread == 0)
+    {
+      // End of file -- out of here
+      stream->flag |= _IOEOF;
+      return 0;
+    }
+    else if ((long) nread < 0)
+    {
+      // Error -- out of here
+      stream->flag |= _IOERR;
+      return 0;
+    }
+
+    // We finished successfully, so just return
+    return num;
+}
+
+
+/*
 size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
 {
   char *data;                     // Point to where should be read next
@@ -742,6 +807,8 @@ size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
   // We finished successfully, so just return num
   return num;
 }
+
+
 
 size_t fwrite(const void *buffer, size_t size, size_t num, FILE *stream)
 {

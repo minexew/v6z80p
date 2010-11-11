@@ -42,6 +42,8 @@ struct _iobuf
   int charbuf;
   int bufsiz;
   int phndl;
+
+  BOOL isAllocated;
 };
 
 typedef struct _iobuf FILE;
