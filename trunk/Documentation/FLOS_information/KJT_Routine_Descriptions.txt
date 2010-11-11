@@ -1,19 +1,19 @@
 
-  			Kernal Routines - Full Descriptions 27/08/2010
+  			Kernal Routines - Full Descriptions 11/11/2010
 			-----------------------------------------------
 
 
    ===   ASSUME ALL ROUTINES TRASH ALL REGISTERS UNLESS OTHERWISE STATED!  =====
   
-== NOT ALL ROUTINES RETURN ERROR FLAGS. ONLY CHECK ZERO FLAG AFTER ROUTINES WHICH DO! ==
+== NOT ALL ROUTINES RETURN ERROR CODES / FLAGS. ONLY CHECK ZERO FLAG AFTER ROUTINES WHICH DO! ==
 
 
 **********************************************************************************
-*                              File system routines                              *
+*                              File System Routines                              *
 **********************************************************************************
 
 
-Most of the file system routines return the standard error codes.
+Most of the file system kernal calls return one of these standard error codes:
 
   If the zero flag is set, the operation was a success.
   If the zero flag is not set, there was an error. A = error code:
@@ -39,9 +39,6 @@ Most of the file system routines return the standard error codes.
 	$24 - End of directory list
 	$25 - Device does not use MBR
 	$26 - Cant find volume label
-
-
-(See separate text file for a full list of error codes.)
 
 
 Notes:
