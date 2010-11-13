@@ -10,6 +10,35 @@
 #include <stddef.h>
 
 
+
+// This is a list of error codes returned by the Kernal's disk routines:
+
+
+/*$00 	Drive(r) error, value in B
+$01 	Volume Full
+$02 	File Not Found
+$03 	Dir Full
+$04 	Not A Dir
+$05 	Dir Is Not Empty
+$06 	Not A File
+$07 	File Length Is Zero
+$08 	Address out of range
+$09 	File Name Already Exists
+$0a 	Already at root
+$0d 	No file name
+$0e 	Invalid Volume
+$13 	not FAT16
+$15 	file name too long
+*/
+#define FLOS_FILESYSTEM_ERR__BEYOND_EOF       0x1b    // requested bytes beyond end of file
+/*
+$21 	Invalid Volume
+$22 	Device not present
+$23 	Dir not found
+$25 	File name mismatch
+$28 	No Volumes 
+*/
+
 // FLOS exit codes
 #define NO_REBOOT       0
 #define REBOOT          0xff

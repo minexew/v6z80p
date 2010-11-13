@@ -17,7 +17,7 @@ typedef unsigned long  dword;
 
 // It is recommended to use BYTE, WORD, DWORD typedefs in your program.
 // (BYTE, WORD is already defined by SDCC headers)
-typedef unsigned DWORD;
+typedef unsigned long  DWORD;
 
 
 typedef unsigned short FIXED88;         // fixed point 8.8
