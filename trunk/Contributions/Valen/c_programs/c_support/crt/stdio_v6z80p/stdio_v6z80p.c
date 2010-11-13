@@ -7,14 +7,25 @@
 /*#include <os.h>
 
 #include <stdio.h>
+*/
 #include <string.h>
-#include <stdlib.h>
+
+/*#include <stdlib.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <crtbase.h>
 
-#define SHELL "sh.exe"
+
 */
+
+
+#define MAX_OPEN_FILES_IN_FLOS 1
+
+struct {
+    FILE arrFILE[MAX_OPEN_FILES_IN_FLOS];
+} stdio_v6z80p;
+
+
 
 
 int output(FILE *stream, const char *format, va_list args);
@@ -23,6 +34,12 @@ int input(FILE *stream, const unsigned char *format, va_list arglist);
 #define bigbuf(s) ((s)->flag & (_IOOWNBUF | _IOEXTBUF | _IOTMPBUF))
 #define anybuf(s) ((s)->flag & (_IOOWNBUF | _IOEXTBUF | _IOTMPBUF | _IONBF))
 #define inuse(s)  ((s)->flag & (_IORD |_IOWR |_IORW))
+
+void init_stdio_v6z80p(void)
+{
+
+    memset(stdio_v6z80p.arrFILE, 0, sizeof(stdio_v6z80p.arrFILE));
+}
 
 /*
 void init_stdio()
@@ -383,11 +400,6 @@ FILE *freopen(const char *filename, const char *mode, FILE *stream)
 }
 */
 
-#define MAX_OPEN_FILES_IN_FLOS 4
-
-struct {
-    FILE arrFILE[MAX_OPEN_FILES_IN_FLOS];
-} stdio_v6z80p;
 
 
 static void freeMemoryForFILE(FILE* const p)

@@ -6,7 +6,7 @@ handle_t open(const char *name, int flags, ...)
     if(FLOS_FindFile(&theFile, name))
         return 0;
     else 
-        return -1;
+        return -1;  // FLOS error
 }
 
 
@@ -18,8 +18,10 @@ DWORD read(handle_t f, void *data, DWORD size)
   FLOS_SetLoadLength(size);
   r = FLOS_ForceLoad( data, 0 );
 
+  if(!r && FLOS_GetLastError() == FLOS_FILESYSTEM_ERR__BEYOND_EOF)
+      return 0;     // beyond EOF
   if(!r)
-      return -1; // was error
-  else
-      return size;
+      return -1;    // FLOS error
+
+  return size;  // success
 }
