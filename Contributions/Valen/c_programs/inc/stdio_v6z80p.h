@@ -43,7 +43,9 @@ struct _iobuf
   int bufsiz;
   int phndl;
 
-  BOOL isAllocated;
+  BOOL  isAllocated;
+  DWORD filePosition;
+  DWORD fileSize;
 };
 
 typedef struct _iobuf FILE;

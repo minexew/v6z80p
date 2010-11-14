@@ -5,6 +5,10 @@ Test file  i/o functions.
 */
 
 // ----------------------------------------------------------------------
+char myFileBuf[4096];
+char myTestString[128];
+
+
 #ifdef SDCC
     #include <kernal_jump_table.h>
     #include <v6z80p_types.h>
@@ -20,8 +24,12 @@ Test file  i/o functions.
     #include <stdio.h>
     #include <stdio_v6z80p.h>        // provide fopen, fread, ...
 
-    #define MY_PRINT(str) FLOS_PrintString(str)
+    #define MY_PRINT(str)    FLOS_PrintString(str)
+    #define MY_PRINT_CR(str) FLOS_PrintStringLFCR(str)
     const char *myFilename = "TEST1.EXE";
+
+    BOOL test0(void);
+    int main(void) { test0(); return NO_REBOOT;}
 #else   // compiling for PC
 
     #include <stdio.h>
@@ -35,20 +43,20 @@ Test file  i/o functions.
     #define FALSE   0
     #define TRUE    1
 
-    #define MY_PRINT(str) printf(str)
+    #define MY_PRINT(str)    printf(str)
+    #define MY_PRINT_CR(str) printf(str); printf("\n");
     #define init_stdio_v6z80p()
-    BOOL test0(void);
-
-
 
     char *myFilename = "/home/valen/_1/test1.exe";
+
+    BOOL test0(void);
+    int main(void) { test0(); return 0;}
 #endif
 
-BOOL test0(void);
 
-char myFileBuf[4096];
-char myTestString[128];
-int main(void) { test0(); return NO_REBOOT;}
+
+
+
 
 BOOL test0(void)
 {
@@ -63,12 +71,12 @@ BOOL test0(void)
    sprintf(myTestString, "f: %x ", (DWORD)f);
    MY_PRINT(myTestString);
 
-    while(r) {
+    while(!feof(f)) {
         r = fread(myFileBuf, 1, sizeof(myFileBuf), f);
         sprintf(myTestString, "r: %x ", r);
         MY_PRINT(myTestString);
         sprintf(myTestString, "EOF: %x ", feof(f));
-        MY_PRINT(myTestString);
+        MY_PRINT_CR(myTestString);
     }
 
 
