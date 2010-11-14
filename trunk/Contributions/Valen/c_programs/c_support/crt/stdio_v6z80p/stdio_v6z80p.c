@@ -19,6 +19,8 @@
 */
 
 
+
+
 #define MAX_OPEN_FILES_IN_FLOS 1
 
 struct {
@@ -228,7 +230,8 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
 {
   int oflag;
   int streamflag;
-  handle_t handle;
+  //handle_t handle;
+  FLOS_FILE *pFLOS_File;
 
   switch (*mode)
   {
@@ -303,8 +306,14 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
     }
   }
 
-  handle = open(filename, oflag/*, S_IREAD | S_IWRITE*/);
-  if (handle < 0) return -1;
+  pFLOS_File = open(filename, oflag);
+  if (pFLOS_File < 0) return -1;
+
+  stream->fileSize     = pFLOS_File->size;
+  stream->filePosition = 0;
+
+  //sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);
+  //FLOS_PrintString(myTestString);
 
   stream->flag = streamflag;
   stream->cnt = 0;
@@ -443,6 +452,9 @@ FILE *fopen(const char *filename, const char *mode)
     freeMemoryForFILE(stream);
     return NULL;
   }
+
+
+
 
   return stream;
 }
@@ -714,11 +726,11 @@ size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
     if(nbytes == 0) return 0;
 
     nread = read(/*fileno(stream)*/0, buffer, nbytes);
-    if (nread == 0)
+    if (/*nread == 0 && */stream->filePosition + nbytes > stream->fileSize)
     {
       // End of file -- out of here
       stream->flag |= _IOEOF;
-      return 0;
+      return stream->fileSize - stream->filePosition;
     }
     else if ((long) nread < 0)
     {
@@ -727,6 +739,11 @@ size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
       return 0;
     }
 
+    //sprintf(myTestString, "stream->filePosition: %i ", stream->filePosition); FLOS_PrintStringLFCR(myTestString);
+    //sprintf(myTestString, "nread: %i ", nread);                               FLOS_PrintStringLFCR(myTestString);
+
+
+    stream->filePosition += nread;
     // We finished successfully, so just return
     return num;
 }
