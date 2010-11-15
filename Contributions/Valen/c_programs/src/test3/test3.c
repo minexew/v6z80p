@@ -56,31 +56,48 @@ char myTestString[128];
 
 
 
-
+WORD CalcCRC(BYTE *data, WORD size);
 
 BOOL test0(void)
 {
     FILE *f;
     size_t r = 1;
+    WORD sum = 0;
 
     init_stdio_v6z80p();
 
     f = fopen(myFilename, "rb");
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT(myTestString); return TRUE;}
 //    fclose(f);
 
-   sprintf(myTestString, "f: %x ", (DWORD)f);
-   MY_PRINT(myTestString);
+    sprintf(myTestString, "f: %x ", (DWORD)f);
+    MY_PRINT(myTestString);
 
-    while(!feof(f)) {
+    while(!feof(f) && !ferror(f)) {
         r = fread(myFileBuf, 1, sizeof(myFileBuf), f);
         sprintf(myTestString, "r: %x ", r);
         MY_PRINT(myTestString);
         sprintf(myTestString, "EOF: %x ", feof(f));
         MY_PRINT_CR(myTestString);
+
+        sum += CalcCRC(myFileBuf, r);
     }
 
 
+    sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
 
     return TRUE;
 }
 // ---------------------------------------------------------
+
+// Simple cyclic sum
+WORD CalcCRC(BYTE *data, WORD size)
+{
+    WORD sum = 0, i;
+
+    for(i=0; i<size; i++) {
+        sum += *data;
+        data++;
+    }
+    return sum;
+}

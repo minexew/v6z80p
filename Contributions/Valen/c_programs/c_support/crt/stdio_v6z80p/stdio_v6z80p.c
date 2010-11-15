@@ -25,6 +25,7 @@
 
 struct {
     FILE arrFILE[MAX_OPEN_FILES_IN_FLOS];
+    BYTE system_bank;
 } stdio_v6z80p;
 
 
@@ -41,6 +42,7 @@ void init_stdio_v6z80p(void)
 {
 
     memset(stdio_v6z80p.arrFILE, 0, sizeof(stdio_v6z80p.arrFILE));
+    stdio_v6z80p.system_bank = 0;
 }
 
 /*
@@ -307,13 +309,13 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
   }
 
   pFLOS_File = open(filename, oflag);
-  if (pFLOS_File < 0) return -1;
+  if (!pFLOS_File) return -1;
 
   stream->fileSize     = pFLOS_File->size;
   stream->filePosition = 0;
 
   //sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);
-  //FLOS_PrintString(myTestString);
+  //FLOS_PrintStringLFCR(myTestString);
 
   stream->flag = streamflag;
   stream->cnt = 0;
@@ -444,12 +446,14 @@ FILE *fopen(const char *filename, const char *mode)
   if (!stream)
   {
     errno = ENFILE;
+    FLOS_PrintStringLFCR("111");
     return NULL;
   }
 
   if (open_file(stream, filename, mode) < 0)
   {
     freeMemoryForFILE(stream);
+    FLOS_PrintStringLFCR("222");
     return NULL;
   }
 
@@ -715,6 +719,13 @@ int puts(const char *string)
 
 */
 
+// Which system bank to use, when call ForceLoad
+// bank - logical bank
+void fset_system_bank(unsigned char bank)
+{
+  stdio_v6z80p.system_bank = bank;
+}
+
 // A simple implementation of fread.
 // No any buffering (to save memory).
 size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
@@ -725,7 +736,7 @@ size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
     nbytes = size * num;
     if(nbytes == 0) return 0;
 
-    nread = read(/*fileno(stream)*/0, buffer, nbytes);
+    nread = read(/*fileno(stream)*/0, buffer, nbytes, stdio_v6z80p.system_bank);
     if (/*nread == 0 && */stream->filePosition + nbytes > stream->fileSize)
     {
       // End of file -- out of here

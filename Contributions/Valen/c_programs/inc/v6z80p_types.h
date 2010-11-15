@@ -16,7 +16,8 @@ typedef unsigned short word;
 typedef unsigned long  dword;
 
 // It is recommended to use BYTE, WORD, DWORD typedefs in your program.
-// (BYTE, WORD is already defined by SDCC headers)
+typedef unsigned char  BYTE;
+typedef unsigned short WORD;
 typedef unsigned long  DWORD;
 
 
