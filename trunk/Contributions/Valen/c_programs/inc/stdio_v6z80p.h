@@ -77,6 +77,7 @@ typedef struct _iobuf FILE;
 int filbuf(FILE *stream);
 int flsbuf(int, FILE *stream);
 
+void fset_system_bank(unsigned char bank);
 FILE *fdopen(int fd, const char *mode);
 FILE *freopen(const char *filename, const char *mode, FILE *stream);
 FILE *fopen(const char *filename, const char *mode);
