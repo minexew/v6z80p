@@ -22,6 +22,12 @@ int errno;
 typedef long fpos_t;
 #endif
 
+#ifndef _LOFF_T_DEFINED
+#define _LOFF_T_DEFINED
+typedef long loff_t;
+#endif
+
+
 #ifndef SEEK_SET
 #define SEEK_SET   0
 #define SEEK_CUR   1

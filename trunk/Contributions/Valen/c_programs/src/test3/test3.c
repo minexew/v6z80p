@@ -28,8 +28,7 @@ char myTestString[128];
     #define MY_PRINT_CR(str) FLOS_PrintStringLFCR(str)
     const char *myFilename = "TEST1.EXE";
 
-    BOOL test0(void);
-    int main(void) { test0(); return NO_REBOOT;}
+
 #else   // compiling for PC
 
     #include <stdio.h>
@@ -46,15 +45,19 @@ char myTestString[128];
     #define MY_PRINT(str)    printf(str)
     #define MY_PRINT_CR(str) printf(str); printf("\n");
     #define init_stdio_v6z80p()
+    #define NO_REBOOT 0
 
     char *myFilename = "/home/valen/_1/test1.exe";
 
-    BOOL test0(void);
-    int main(void) { test0(); return 0;}
 #endif
 
 
-
+BOOL test0(void);
+BOOL test1(void);
+int main(void) {
+    test0(); test1();
+    return NO_REBOOT;
+}
 
 WORD CalcCRC(BYTE *data, WORD size);
 
@@ -68,14 +71,15 @@ BOOL test0(void)
 
     f = fopen(myFilename, "rb");
     if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT(myTestString); return TRUE;}
-//    fclose(f);
+
 
     sprintf(myTestString, "f: %x ", (DWORD)f);
     MY_PRINT(myTestString);
 
+    // load file by 4KB chunks and calc simple CRC
     while(!feof(f) && !ferror(f)) {
         r = fread(myFileBuf, 1, sizeof(myFileBuf), f);
-        sprintf(myTestString, "r: %x ", r);
+        sprintf(myTestString, "readed: %x ", r);
         MY_PRINT(myTestString);
         sprintf(myTestString, "EOF: %x ", feof(f));
         MY_PRINT_CR(myTestString);
@@ -85,6 +89,43 @@ BOOL test0(void)
 
 
     sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
+    fclose(f);
+
+    return TRUE;
+}
+
+// NOTE! Do not use SEEK_END with binary streams!
+// A binary stream need not meaningfully support fseek calls with a whence value of SEEK_END.
+// See https://www.securecoding.cert.org/confluence/display/seccode/FIO19-C.+Do+not+use+fseek%28%29+and+ftell%28%29+to+compute+the+size+of+a+file
+// (So, there is no any SEEK_END in tests.)
+BOOL test1(void)
+{
+    FILE *f;
+    //size_t r = 1;
+    WORD sum = 0;
+    DWORD arr[] = {SEEK_SET,0,100, SEEK_SET,200,100, SEEK_SET,300,100,
+                   SEEK_CUR,0,100, SEEK_CUR,200,100, SEEK_CUR,300,100, -1};
+    WORD i = 0;
+    DWORD filePos,  bytesToRead, seekMode;
+
+
+    f = fopen(myFilename, "rb");
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT(myTestString); return TRUE;}
+
+    // read some parts of file
+    while(arr[i] != -1) {
+        seekMode    = arr[i];
+        filePos     = arr[i+1];
+        bytesToRead = arr[i+2];
+
+        fseek(f, filePos , seekMode);
+        fread(myFileBuf, 1, bytesToRead, f);
+        sum += CalcCRC(myFileBuf, bytesToRead);
+        i += 3;
+    }
+
+    sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
+    fclose(f);
 
     return TRUE;
 }

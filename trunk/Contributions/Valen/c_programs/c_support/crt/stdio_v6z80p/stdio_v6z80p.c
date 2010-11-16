@@ -314,8 +314,8 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
   stream->fileSize     = pFLOS_File->size;
   stream->filePosition = 0;
 
-  //sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);
-  //FLOS_PrintStringLFCR(myTestString);
+//  sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);
+//  FLOS_PrintStringLFCR(myTestString);
 
   stream->flag = streamflag;
   stream->cnt = 0;
@@ -947,29 +947,50 @@ size_t fwrite(const void *buffer, size_t size, size_t num, FILE *stream)
   // We finished successfully, so just return num
   return num;
 }
-
+*/
 int fseek(FILE *stream, long offset, int whence)
 {
-  if (whence != SEEK_SET && whence != SEEK_CUR && whence != SEEK_END)
-  {
-    errno = EINVAL;
-    return -1;
+    long offsetFromStart = 0;
+
+    if (whence != SEEK_SET && whence != SEEK_CUR && whence != SEEK_END)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    // Clear EOF flag
+    stream->flag &= ~_IOEOF;
+
+    // Flush buffer as necessary
+    //fflush(stream);
+
+    // If file opened for read/write, clear flags since we don't know
+    // what the user is going to do next.
+    if (stream->flag & _IORW) stream->flag &= ~(_IOWR | _IORD);
+
+    // FLOS wants "offset from start"
+    switch(whence) {
+        case SEEK_SET:
+            offsetFromStart = offset;
+            break;
+        case SEEK_CUR:
+            offsetFromStart = stream->filePosition + offset;
+            break;
+        // NOTE! A binary stream need not meaningfully support fseek calls with a whence value of SEEK_END.
+        // See https://www.securecoding.cert.org/confluence/display/seccode/FIO19-C.+Do+not+use+fseek%28%29+and+ftell%28%29+to+compute+the+size+of+a+file
+        case SEEK_END:
+            offsetFromStart = stream->fileSize + offset;
+            break;
+    }
+
+    // check bounds
+    if(offsetFromStart < 0 /*|| offsetFromStart >= stream->fileSize*/) return -1;
+    // Seek to the desired location and return
+    stream->filePosition = offsetFromStart;
+    return lseek(/*fileno(stream)*/0, offsetFromStart, whence) < 0 ? -1 : 0;
   }
 
-  // Clear EOF flag
-  stream->flag &= ~_IOEOF;
-
-  // Flush buffer as necessary
-  fflush(stream);
-
-  // If file opened for read/write, clear flags since we don't know
-  // what the user is going to do next.
-  if (stream->flag & _IORW) stream->flag &= ~(_IOWR | _IORD);
-
-  // Seek to the desired location and return
-  return lseek(fileno(stream), offset, whence) < 0 ? -1 : 0;
-}
-
+/*
 long ftell(FILE *stream)
 {
   long filepos;
