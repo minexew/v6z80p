@@ -27,3 +27,11 @@ DWORD read(handle_t f, void *data, DWORD size, BYTE system_bank)
 
   return size;  // success
 }
+
+loff_t lseek(handle_t f, loff_t offset, int origin)
+{
+    f; origin;
+    FLOS_SetFilePointer(offset);
+    return 0;  // success
+
+}
