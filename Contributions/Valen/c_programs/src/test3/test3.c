@@ -51,15 +51,17 @@ char myTestString[128];
 
 #endif
 
-
+long GetFileSize(FILE *f);
+WORD CalcCRC(BYTE *data, WORD size);
 BOOL test0(void);
 BOOL test1(void);
+
 int main(void) {
     test0(); test1();
     return NO_REBOOT;
 }
 
-WORD CalcCRC(BYTE *data, WORD size);
+
 
 BOOL test0(void)
 {
@@ -73,8 +75,7 @@ BOOL test0(void)
     if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT(myTestString); return TRUE;}
 
 
-    sprintf(myTestString, "f: %x ", (DWORD)f);
-    MY_PRINT(myTestString);
+//    sprintf(myTestString, "f: %x ", (DWORD)f); MY_PRINT(myTestString);
 
     // load file by 4KB chunks and calc simple CRC
     while(!feof(f) && !ferror(f)) {
@@ -94,24 +95,25 @@ BOOL test0(void)
     return TRUE;
 }
 
-// NOTE! Do not use SEEK_END with binary streams!
-// A binary stream need not meaningfully support fseek calls with a whence value of SEEK_END.
-// See https://www.securecoding.cert.org/confluence/display/seccode/FIO19-C.+Do+not+use+fseek%28%29+and+ftell%28%29+to+compute+the+size+of+a+file
-// (So, there is no any SEEK_END in tests.)
+
 BOOL test1(void)
 {
     FILE *f;
     //size_t r = 1;
     WORD sum = 0;
-    DWORD arr[] = {SEEK_SET,0,100, SEEK_SET,200,100, SEEK_SET,300,100,
-                   SEEK_CUR,0,100, SEEK_CUR,200,100, SEEK_CUR,300,100, -1};
+    DWORD arr[] = {SEEK_SET,0,100,      SEEK_SET,200,100,   SEEK_SET,300,100,
+                   SEEK_CUR,0,100,      SEEK_CUR,200,100,   SEEK_CUR,300,100,
+                   SEEK_END,-100,100,   SEEK_END,-200,100,  SEEK_END,-300,100,
+                   -1};
     WORD i = 0;
     DWORD filePos,  bytesToRead, seekMode;
 
+    sprintf(myTestString, "test1()"); MY_PRINT_CR(myTestString);
 
     f = fopen(myFilename, "rb");
     if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT(myTestString); return TRUE;}
 
+    sprintf(myTestString, "File size:%x", GetFileSize(f)); MY_PRINT_CR(myTestString);
     // read some parts of file
     while(arr[i] != -1) {
         seekMode    = arr[i];
@@ -122,6 +124,7 @@ BOOL test1(void)
         fread(myFileBuf, 1, bytesToRead, f);
         sum += CalcCRC(myFileBuf, bytesToRead);
         i += 3;
+
     }
 
     sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
@@ -131,14 +134,23 @@ BOOL test1(void)
 }
 // ---------------------------------------------------------
 
-// Simple cyclic sum
+// Simple cyclic sum (add all bytes)
 WORD CalcCRC(BYTE *data, WORD size)
 {
     WORD sum = 0, i;
 
     for(i=0; i<size; i++) {
-        sum += *data;
-        data++;
+        sum += data[i];
     }
     return sum;
+}
+
+long GetFileSize(FILE *f)
+{
+    long size;
+    fseek(f, 0, SEEK_END); // seek to end of file
+    size = ftell(f); // get current file pointer
+    fseek(f, 0, SEEK_SET); // seek back to beginning of file
+
+    return size;
 }

@@ -719,7 +719,7 @@ int puts(const char *string)
 
 */
 
-// Which system bank to use, when call ForceLoad
+// Which system bank to use, when call FLOS_ForceLoad().
 // bank - logical bank
 void fset_system_bank(unsigned char bank)
 {
@@ -990,23 +990,26 @@ int fseek(FILE *stream, long offset, int whence)
     return lseek(/*fileno(stream)*/0, offsetFromStart, whence) < 0 ? -1 : 0;
   }
 
-/*
+
 long ftell(FILE *stream)
 {
   long filepos;
 
-  if (stream->cnt < 0) stream->cnt = 0;    
-  if ((filepos = tell(fileno(stream))) < 0L) return -1L;
-  if (!bigbuf(stream)) return filepos - stream->cnt;
+  //if (stream->cnt < 0) stream->cnt = 0;
+  //if ((filepos = tell(fileno(stream))) < 0L) return -1L;
+  //if (!bigbuf(stream)) return filepos - stream->cnt;
 
-  if (stream->flag & _IORD)
+  /*if (stream->flag & _IORD)
     filepos -= stream->cnt;
   else if (stream->flag & _IOWR)
     filepos += (stream->ptr - stream->base);
+    */
 
+  filepos = stream->filePosition;
   return filepos;
 }
 
+/*
 void rewind(FILE *stream)
 {
   fseek(stream, 0L, SEEK_SET); 
