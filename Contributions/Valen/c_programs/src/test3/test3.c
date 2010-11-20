@@ -14,6 +14,7 @@ char myTestString[128];
     #include <v6z80p_types.h>
     #include <OSCA_hardware_equates.h>
     #include <macros_specific.h>
+    #include <macros.h>
     #include <set_stack.h>
 
     #include <os_interface_for_c/i_flos.h>
@@ -26,7 +27,11 @@ char myTestString[128];
 
     #define MY_PRINT(str)    FLOS_PrintString(str)
     #define MY_PRINT_CR(str) FLOS_PrintStringLFCR(str)
-    const char *myFilename = "TEST1.EXE";
+
+    #define BIG_BUFF 0x0000     // address of 32KB page area
+
+    const char *myFilename        = "TEST1.EXE";
+    const char *myFilenameBigFile = "BYEDA.MOD";
 
 
 #else   // compiling for PC
@@ -47,7 +52,11 @@ char myTestString[128];
     #define init_stdio_v6z80p()
     #define NO_REBOOT 0
 
-    char *myFilename = "/home/valen/_1/test1.exe";
+    #define BIG_BUFF bigBuffer
+    char bigBuffer[512*1024];  // 512KB
+
+    char *myFilename =        "/home/valen/_1/test1.exe";
+    char *myFilenameBigFile = "/home/valen/_1/byeda.mod";
 
 #endif
 
@@ -55,9 +64,11 @@ long GetFileSize(FILE *f);
 WORD CalcCRC(BYTE *data, WORD size);
 BOOL test0(void);
 BOOL test1(void);
+BOOL test2(void);
+void BigBuff_Filll(BYTE b);
 
 int main(void) {
-    test0(); test1();
+    test0(); test1(); test2();
     return NO_REBOOT;
 }
 
@@ -132,6 +143,42 @@ BOOL test1(void)
 
     return TRUE;
 }
+
+BOOL test2(void)
+{
+    FILE *f;
+
+    WORD sum = 0;
+    WORD i = 0, numChunksBy32KB;
+    DWORD sizeFile; //filePos,  bytesToRead, seekMode;
+
+
+    sprintf(myTestString, "test2()"); MY_PRINT_CR(myTestString);
+
+    f = fopen(myFilenameBigFile, "rb");
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilenameBigFile); MY_PRINT(myTestString); return TRUE;}
+
+    sizeFile = GetFileSize(f);
+    // calc how many 32KB chunks (system memory pages) in filesize
+    numChunksBy32KB =  sizeFile / 0x8000 + 1;
+    // zero big buffer
+    BigBuff_Filll(0);
+
+    // read the big file to big buffer
+    fread(BIG_BUFF, 1, sizeFile, f);
+
+    // iterate big buffer by 32KB chunks and calc CRC
+    for(i=0; i < numChunksBy32KB; i++){
+        sprintf(myTestString, "xxx"); MY_PRINT_CR(myTestString);
+        //sum += CalcCRC(BIG_BUFF, 0x8000);
+        sum += CalcCRC(BIG_BUFF + i*0x8000, 0x8000);
+
+    }
+    sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
+
+    return TRUE;
+}
+
 // ---------------------------------------------------------
 
 // Simple cyclic sum (add all bytes)
@@ -153,4 +200,13 @@ long GetFileSize(FILE *f)
     fseek(f, 0, SEEK_SET); // seek back to beginning of file
 
     return size;
+}
+
+void BigBuff_Filll(BYTE b)
+{
+#ifdef SDCC
+//    SET_SYSTEM_LOW_PAGE(0);
+#else
+    memset(bigBuffer, b, sizeof(bigBuffer));
+#endif
 }

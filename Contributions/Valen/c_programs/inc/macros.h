@@ -57,6 +57,7 @@ __sfr __at SYS_CLEAR_IRQ_FLAGS      io__sys_clear_irq_flags;
 __sfr __at SYS_MOUSE_DATA           io__sys_mouse_data;
 
 __sfr __at SYS_TIMER                io__sys_timer;
+__sfr __at SYS_LOW_PAGE             io__sys_low_page; 
 
 
 /* define memory mapped I/O devices. This is SDCC specific feature.*/
@@ -104,6 +105,10 @@ static volatile __at BITPLANE0A_LOC+3 unsigned char mm__bitplane0a_loc__byte3;
 // Set system memory page at address 0x8000-0xFFFF
 // (logic system memory pages are 0-14)
 #define SET_SYSTEM_PAGE(page)     io__sys_mem_select = (page + 1)          // add 1 to page (convert to hardware page number)
+
+#define SET_SYSTEM_LOW_PAGE(page) io__sys_low_page = (page)
+
+
 
 #define SET_SPRITE_PAGE(page)     mm__vreg_vidpage = ((page) | 0x80)       // set bit 7 - Set Sprite Page
 #define PAGE_IN_SPRITE_RAM()      (io__sys_mem_select |= 0x80)

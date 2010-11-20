@@ -1,7 +1,5 @@
-#ifndef OSCA_HARDWARE_EQUATES_H
-#define OSCA_HARDWARE_EQUATES_H
 
-//----- OSCA v635 Main system hardware control / peripheral ports -------------
+//----- OSCA v659 Main system hardware control / peripheral ports -------------
 
 #define SYS_MEM_SELECT	   0x00
 #define SYS_IRQ_PS2_FLAGS 	   0x01
@@ -15,7 +13,9 @@
 #define SYS_SDCARD_CTRL1	   0x05
 #define SYS_SDCARD_CTRL2	   0x06
 #define SYS_TIMER		   0x07
+#define SYS_VREG_READ	   0x07
 #define SYS_AUDIO_ENABLE	   0x08
+#define SYS_AUDIO_FLAGS	   0x08
 #define SYS_HW_FLAGS	   0x09
 #define SYS_HW_SETTINGS	   0x09
 #define SYS_SPI_PORT	   0x0a
@@ -25,6 +25,9 @@
 #define SYS_EEPROM_BYTE	   0x0d
 #define SYS_IO_PINS	   0x0e
 #define SYS_IO_DIR	   0x0f
+
+#define SYS_LOW_PAGE	   0x20
+#define SYS_VRAM_LOCATION	   0x21
 
 //---- Sound system ports ---------------------------------------------------
 
@@ -49,22 +52,9 @@
 #define AUDCHAN3_VOL	   0x1f
 
 
-// --- IDE Ports ------------------------------------------------------------
-
-#define IDE_REGISTER0 	   0x20
-#define IDE_REGISTER1 	   0x21
-#define IDE_REGISTER2 	   0x22
-#define IDE_REGISTER3 	   0x23
-#define IDE_REGISTER4 	   0x24
-#define IDE_REGISTER5 	   0x25
-#define IDE_REGISTER6 	   0x26
-#define IDE_REGISTER7 	   0x27
-#define IDE_HIGH_BYTE 	   0x28
-
-
 //------ Graphics registers -------------------------------------------------
 
-#define PALETTE 		   0x0
+#define PALETTE 		   0x0		
 
 #define VIDEO_REGISTERS	   0x200
 #define VREG_XHWS		   0x200		// video control registers
@@ -97,7 +87,7 @@
 #define LINEDRAW_REG1 	   0x222
 #define LINEDRAW_REG2 	   0x224
 #define LINEDRAW_REG3 	   0x226
-#define LINEDRAW_REG4 	   0x228
+#define LINEDRAW_REG4 	   0x228		
 #define LINEDRAW_REG5 	   0x22a
 #define LINEDRAW_REG6 	   0x22c
 #define LINEDRAW_REG7 	   0x22e
@@ -105,7 +95,7 @@
 #define LINEDRAW_LUT1 	   0x232
 #define LINEDRAW_LUT2 	   0x234
 #define LINEDRAW_LUT3 	   0x236
-#define LINEDRAW_LUT4 	   0x238
+#define LINEDRAW_LUT4 	   0x238		
 #define LINEDRAW_LUT5 	   0x23a
 #define LINEDRAW_LUT6 	   0x23c
 #define LINEDRAW_LUT7 	   0x23e
@@ -126,8 +116,13 @@
 #define BITPLANE5B_LOC	   0x274
 #define BITPLANE6B_LOC	   0x278
 #define BITPLANE7B_LOC	   0x27c
+#define BITPLANE_RESET	   0x243
+#define BITPLANE_MODULO	   0x247
 
-#define SPR_REGISTERS	   0x400		// sprite coord/def/size registers
+
+#define SPRITE_REGISTERS	   0x400		// sprite coord/def/size registers
+#define SPR_REGISTERS	   0x400		// alternate name
+
 #define MULT_TABLE	   0x600		// maths table (256 signed words)
 
 #define VREG_READ		   0x700		// video status read register
@@ -140,5 +135,3 @@
 #define VIDEO_BASE	   0x2000		// 8kb when banked in
 
 //--------------------------------------------------------------------------
-
-#endif /* OSCA_HARDWARE_EQUATES_H */

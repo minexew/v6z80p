@@ -1,8 +1,14 @@
 #!/bin/bash
 
+# Generate 3 files (for SDCC framework) from FLOS asm sources.
+# The files are generated in current dir, dont foget to move them to respect dirs.
 V6Z80P_path="/home/valen/_1/v6z80p_SVN/"
-# edit this (location of source asm file of FLOS)
-flos_asm_file=$V6Z80P_path"FLOS/FLOSv575.asm"
+
+# find name of source asm file (of FLOS)
+flos_search_pattern=$V6Z80P_path"FLOS/FLOSv*.asm"
+flos_asm_file=`find $flos_search_pattern`
+#echo $flos_asm_file
+
 
 
 # ---- Generate FLOS proxy jump table -------------

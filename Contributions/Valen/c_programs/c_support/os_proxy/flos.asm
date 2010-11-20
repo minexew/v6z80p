@@ -530,7 +530,7 @@ failed20
         POP_ALL_REGS
         ret
 
-
+        proxy__mouse_irq_code		  ;   start + $100 (added in v579)
 
 
 
