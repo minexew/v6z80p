@@ -87,3 +87,4 @@
 #define KJT_GET_ENVAR		   OS_START+0xf7   // (added in v572)
 #define KJT_DELETE_ENVAR		   OS_START+0xfa   // (added in v572)
 #define KJT_FILE_SECTOR_LIST	   OS_START+0xfd   // (added in v575)
+#define KJT_MOUSE_IRQ_CODE		   OS_START+0x100  // (added in v579)

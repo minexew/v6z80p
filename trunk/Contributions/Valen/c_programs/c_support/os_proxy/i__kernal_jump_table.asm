@@ -1,4 +1,4 @@
-; Machine generated. Dont edit. Source file: /home/valen/_1/v6z80p_SVN/FLOS/FLOSv575.asm
+; Machine generated. Dont edit. Source file: /home/valen/_1/v6z80p_SVN/FLOS/FLOSv579.asm
 ; FLOS proxy jump table (must be identical to Kernel jump table)
     jp proxy__print_string		  ;   start + $13
     jp proxy__clear_screen		  ;   start + $16
@@ -79,3 +79,4 @@
     jp proxy__get_envar		  ;   start + $f7 (added in v572)
     jp proxy__delete_envar		  ;   start + $fa (added in v572)
     jp proxy__file_sector_list	  ;   start + $fd (added in v575)
+    jp proxy__mouse_irq_code		  ;   start + $100 (added in v579)
