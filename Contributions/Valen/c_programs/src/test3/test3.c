@@ -33,7 +33,8 @@ char myTestString[128];
     const char *myFilename        = "TEST1.EXE";
     const char *myFilenameBigFile = "BYEDA.MOD";
 
-
+    void SystemLowPage_StartUse(void);
+    void SystemLowPage_StopUse(void);
 #else   // compiling for PC
 
     #include <stdio.h>
@@ -66,6 +67,7 @@ BOOL test0(void);
 BOOL test1(void);
 BOOL test2(void);
 void BigBuff_Filll(BYTE b);
+
 
 int main(void) {
     test0(); test1(); test2();
@@ -144,6 +146,7 @@ BOOL test1(void)
     return TRUE;
 }
 
+// Read big file (max size 448KB) to memory (to big buffer) and calc CRC.
 BOOL test2(void)
 {
     FILE *f;
@@ -165,13 +168,22 @@ BOOL test2(void)
     BigBuff_Filll(0);
 
     // read the big file to big buffer
+    fset_system_bank(2-1);      // pass logical bank number
     fread(BIG_BUFF, 1, sizeFile, f);
 
     // iterate big buffer by 32KB chunks and calc CRC
     for(i=0; i < numChunksBy32KB; i++){
         sprintf(myTestString, "xxx"); MY_PRINT_CR(myTestString);
-        //sum += CalcCRC(BIG_BUFF, 0x8000);
+        #ifdef SDCC
+
+        SystemLowPage_StartUse();
+        SET_SYSTEM_LOW_PAGE(2+i);
+        sum += CalcCRC(0x0000, 0x8000);
+        SystemLowPage_StopUse();
+
+        #else
         sum += CalcCRC(BIG_BUFF + i*0x8000, 0x8000);
+        #endif
 
     }
     sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
@@ -202,11 +214,47 @@ long GetFileSize(FILE *f)
     return size;
 }
 
+// BigBuff ---------------------------------------------------------
+// Size: 448KB (14 system memory pages * 32KB)
+// (Then compiling for PC, this buffer is just a global var.)
 void BigBuff_Filll(BYTE b)
 {
 #ifdef SDCC
-//    SET_SYSTEM_LOW_PAGE(0);
+    BYTE pageSysMem;
+    // clear all system memory pages (except 0 - this is FLOS page and 1 - our main page)
+    for(pageSysMem=2; pageSysMem<16; pageSysMem++) {
+        SystemLowPage_StartUse();
+        SET_SYSTEM_LOW_PAGE(pageSysMem);
+        memset(0x0000, b, 0x8000);
+        SystemLowPage_StopUse();
+    }
 #else
     memset(bigBuffer, b, sizeof(bigBuffer));
 #endif
 }
+
+
+#ifdef SDCC
+// Start use low paging.
+void SystemLowPage_StartUse(void)
+{
+    // set 6 and 7 bits
+    // This will page out the ROM/Palette and video registers,from CPU address space.
+    // Thus $0-$7ff = SYS RAM
+    io__sys_alt_write_page = 0x80 | 0x40;
+    DI();
+}
+
+// Stop use low paging.
+void SystemLowPage_StopUse(void)
+{
+
+    // clear 6 and 7 bits
+    // This will page in the ROM/Palette and video registers,to CPU address space.
+    // Thus $0-$7ff area will be in "normal" state.
+    io__sys_alt_write_page = 0;
+    // Put page 0 back to 0000 - 7FFF.
+    SET_SYSTEM_LOW_PAGE(0);
+    EI();
+}
+#endif

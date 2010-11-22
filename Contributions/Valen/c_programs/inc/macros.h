@@ -57,6 +57,7 @@ __sfr __at SYS_CLEAR_IRQ_FLAGS      io__sys_clear_irq_flags;
 __sfr __at SYS_MOUSE_DATA           io__sys_mouse_data;
 
 __sfr __at SYS_TIMER                io__sys_timer;
+__sfr __at SYS_ALT_WRITE_PAGE       io__sys_alt_write_page;
 __sfr __at SYS_LOW_PAGE             io__sys_low_page; 
 
 
