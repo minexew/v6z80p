@@ -3,12 +3,26 @@
     static FLOS_FILE theFile;
 
     //sprintf(myTestString, "name:%s", name); FLOS_PrintStringLFCR(myTestString);
-    flags;
-    if(FLOS_FindFile(&theFile, name)) {
-        return &theFile;
+    if(flags & O_BINARY) {
+        // "rb" open mode
+        if(FLOS_FindFile(&theFile, name)) {
+            return &theFile;
+        }
+        else
+            return NULL;  // FLOS error
     }
-    else 
-        return NULL;  // FLOS error
+
+    if(flags & (O_WRONLY | O_CREAT | O_TRUNC | O_BINARY)) {
+        // "wb" open mode
+        if(FLOS_CreateFile(name)) {
+            return (FLOS_FILE*)1;   // return some not NULL value
+        }
+        else
+            return NULL;  // FLOS error
+    }
+
+
+    return NULL;    // error, incorrect open flags
 }
 
 
@@ -24,6 +38,18 @@ DWORD read(handle_t f, void *data, DWORD size, BYTE system_bank)
 //      return 0;     // beyond EOF
   if(!r)
       return -1;    // FLOS error
+
+  return size;  // success
+}
+
+DWORD write(handle_t f, const void *data, DWORD size, BYTE system_bank, const char *pFilename)
+{
+  BOOL r;
+
+  f;
+  // Appends new data to an existing file
+  r = FLOS_WriteBytesToFile(pFilename, data, system_bank, size);
+  if(!r) return -1;    // FLOS error
 
   return size;  // success
 }

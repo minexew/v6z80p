@@ -311,7 +311,12 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
   pFLOS_File = open(filename, oflag);
   if (!pFLOS_File) return -1;
 
-  stream->fileSize     = pFLOS_File->size;
+  if(oflag & (O_WRONLY | O_CREAT | O_TRUNC | O_BINARY))
+    stream->fileSize     = 0;
+  else
+    if(oflag & O_BINARY)
+      stream->fileSize     = pFLOS_File->size;
+
   stream->filePosition = 0;
 
 //  sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);
@@ -322,6 +327,10 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
   stream->base = stream->ptr = NULL;
 //  stream->file = handle;
 //  stream->phndl = NOHANDLE;
+
+  // copy filename
+  stream->filename[0] = 0;
+  strcpy(stream->filename, filename);
 
   return 0;
 }
@@ -452,8 +461,7 @@ FILE *fopen(const char *filename, const char *mode)
 
   if (open_file(stream, filename, mode) < 0)
   {
-    freeMemoryForFILE(stream);
-    FLOS_PrintStringLFCR("222");
+    freeMemoryForFILE(stream);    
     return NULL;
   }
 
@@ -847,9 +855,36 @@ size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
   // We finished successfully, so just return num
   return num;
 }
+*/
+
+/// ----------------
+// A simple implementation of fwrite.
+// No any buffering (to save memory).
+size_t fwrite(const void *buffer, size_t size, size_t num, FILE *stream)
+{
+    DWORD nbytes;                // Number of bytes to write now
+    DWORD nwritten;                 // Number of bytes written
+
+    nbytes = size * num;
+    if(nbytes == 0) return 0;
+
+    nwritten = write(/*fileno(stream)*/0, buffer, nbytes, stdio_v6z80p.system_bank, stream->filename);
+    if ((long) nwritten < 0)
+    {
+      // Error -- out of here
+      stream->flag |= _IOERR;
+      return 0;
+    }
+
+    //sprintf(myTestString, "stream->filePosition: %i ", stream->filePosition); FLOS_PrintStringLFCR(myTestString);
+    //sprintf(myTestString, "nwritten: %i ", nwritten);                               FLOS_PrintStringLFCR(myTestString);
 
 
-
+    stream->filePosition += nwritten;
+    // We finished successfully, so just return
+    return num;
+}
+/*
 size_t fwrite(const void *buffer, size_t size, size_t num, FILE *stream)
 {
   const char *data;               // Point to where data comes from next

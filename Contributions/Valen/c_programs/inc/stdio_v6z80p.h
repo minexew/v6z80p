@@ -52,6 +52,7 @@ struct _iobuf
   BOOL  isAllocated;
   DWORD filePosition;
   DWORD fileSize;
+  char filename[128];       // we need to store filename of opened file (because FLOS func WriteBytesToFile require filename as argument)
 };
 
 typedef struct _iobuf FILE;
