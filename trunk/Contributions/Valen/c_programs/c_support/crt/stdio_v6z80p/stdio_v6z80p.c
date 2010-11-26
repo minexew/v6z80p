@@ -311,16 +311,15 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
   pFLOS_File = open(filename, oflag);
   if (!pFLOS_File) return -1;
 
-  if(oflag & (O_WRONLY | O_CREAT | O_TRUNC | O_BINARY))
-    stream->fileSize     = 0;
+  if( (oflag & OPEN_MODE_FLAGS__WRITE_BINARY) == OPEN_MODE_FLAGS__WRITE_BINARY )
+    stream->fileSize = 0;
   else
-    if(oflag & O_BINARY)
-      stream->fileSize     = pFLOS_File->size;
+    if( (oflag & OPEN_MODE_FLAGS__READ_BINARY) == OPEN_MODE_FLAGS__READ_BINARY )
+      stream->fileSize = pFLOS_File->size;
 
   stream->filePosition = 0;
 
-//  sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);
-//  FLOS_PrintStringLFCR(myTestString);
+//  sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);  FLOS_PrintStringLFCR(myTestString);
 
   stream->flag = streamflag;
   stream->cnt = 0;
@@ -455,7 +454,6 @@ FILE *fopen(const char *filename, const char *mode)
   if (!stream)
   {
     errno = ENFILE;
-    FLOS_PrintStringLFCR("111");
     return NULL;
   }
 

@@ -61,10 +61,11 @@ long GetFileSize(FILE *f);
 WORD CalcCRC(BYTE *data, WORD size);
 BOOL test0(void);
 BOOL test1(void);
+BOOL test2(void);
 
 
 int main(void) {
-    test0(); test1();
+    test0(); test1(); test2();
     return NO_REBOOT;
 }
 
@@ -79,7 +80,7 @@ BOOL test0(void)
     init_stdio_v6z80p();
 
     f = fopen(myFilename, "rb");
-    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT(myTestString); return TRUE;}
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT_CR(myTestString); return TRUE;}
 
 
 //    sprintf(myTestString, "f: %x ", (DWORD)f); MY_PRINT(myTestString);
@@ -118,7 +119,7 @@ BOOL test1(void)
     sprintf(myTestString, "test1()"); MY_PRINT_CR(myTestString);
 
     f = fopen(myFilename, "rb");
-    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT(myTestString); return TRUE;}
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT_CR(myTestString); return TRUE;}
 
     sprintf(myTestString, "File size:%x", GetFileSize(f)); MY_PRINT_CR(myTestString);
     // read some parts of file
@@ -141,6 +142,38 @@ BOOL test1(void)
 }
 
 
+BOOL test2(void)
+{
+    FILE *f;
+    size_t r = 1;
+    WORD sum = 0;
+
+    sprintf(myTestString, "test2()"); MY_PRINT_CR(myTestString);
+
+
+    f = fopen(myFilename, "rb");
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT_CR(myTestString); return TRUE;}
+
+
+//    sprintf(myTestString, "f: %x ", (DWORD)f); MY_PRINT(myTestString);
+
+    // load file (byte by byte) and calc simple CRC (slow!)
+    while(!feof(f) && !ferror(f)) {
+        r = fread(myFileBuf, 1, 1, f);
+//        sprintf(myTestString, "readed: %x ", r); MY_PRINT(myTestString);
+//        sprintf(myTestString, "EOF: %x ", feof(f)); MY_PRINT_CR(myTestString);
+
+        sum += CalcCRC(myFileBuf, r);
+//        sprintf(myTestString, "r: %x ", r); MY_PRINT_CR(myTestString);
+    }
+
+    sprintf(myTestString, "r: %x ", r); MY_PRINT_CR(myTestString);
+
+    sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
+    fclose(f);
+
+    return TRUE;
+}
 // Simple cyclic sum (add all bytes)
 WORD CalcCRC(BYTE *data, WORD size)
 {
