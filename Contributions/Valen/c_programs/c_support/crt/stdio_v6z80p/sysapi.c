@@ -1,21 +1,32 @@
- FLOS_FILE* open(const char *name, int flags)
+// "wb" mode
+#define OPEN_MODE_FLAGS__WRITE_BINARY (O_WRONLY | O_CREAT | O_TRUNC | O_BINARY)
+// "rb" mode
+#define OPEN_MODE_FLAGS__READ_BINARY  (O_RDONLY | O_BINARY)
+
+FLOS_FILE* open(const char *name, int flags)
 {
     static FLOS_FILE theFile;
 
-    //sprintf(myTestString, "name:%s", name); FLOS_PrintStringLFCR(myTestString);
-    if(flags & O_BINARY) {
-        // "rb" open mode
-        if(FLOS_FindFile(&theFile, name)) {
-            return &theFile;
+
+
+    if( (flags & OPEN_MODE_FLAGS__WRITE_BINARY) == OPEN_MODE_FLAGS__WRITE_BINARY ) {
+        // "wb" open mode
+        // Delete file, if it exist.
+        FLOS_EraseFile(name);
+        // Create new file
+        if(FLOS_CreateFile(name)) {
+            return (FLOS_FILE*)1;   // return some not NULL value
         }
         else
             return NULL;  // FLOS error
     }
 
-    if(flags & (O_WRONLY | O_CREAT | O_TRUNC | O_BINARY)) {
-        // "wb" open mode
-        if(FLOS_CreateFile(name)) {
-            return (FLOS_FILE*)1;   // return some not NULL value
+
+    if( (flags & OPEN_MODE_FLAGS__READ_BINARY) == OPEN_MODE_FLAGS__READ_BINARY ) {
+        // "rb" open mode
+        if(FLOS_FindFile(&theFile, name)) {
+//            sprintf(myTestString, "name:%s", name); FLOS_PrintStringLFCR(myTestString);
+            return &theFile;
         }
         else
             return NULL;  // FLOS error
