@@ -734,7 +734,7 @@ void fset_system_bank(unsigned char bank)
 
 // A simple implementation of fread.
 // No any buffering (to save memory).
-size_t fread(void *buffer, size_t size, size_t num, FILE *stream)
+size_t fread(void *buffer, long size, long num, FILE *stream)
 {
     DWORD nbytes;                // How much to read now
     DWORD nread;                 // How much we did read
