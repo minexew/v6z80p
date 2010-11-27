@@ -30,7 +30,8 @@ char myTestString[128];
 
 
 
-    const char *myFilename        = "TEST1.EXE";
+    const char *myFilename   = "TEST1.EXE";
+    const char *myFilenameW  = "TEST3.TXT";
 
 
 #else   // compiling for PC
@@ -49,23 +50,29 @@ char myTestString[128];
     #define MY_PRINT(str)    printf(str)
     #define MY_PRINT_CR(str) printf(str); printf("\n");
     #define init_stdio_v6z80p()
+    #define fset_system_bank(b)
     #define NO_REBOOT 0
 
 
-    char *myFilename =        "/home/valen/_1/test1.exe";
+    char *myFilename =      "/home/valen/_1/test1.exe";
+    char *myFilenameW =     "/home/valen/_1/test3.txt";
 
 
 #endif
 
 long GetFileSize(FILE *f);
 WORD CalcCRC(BYTE *data, WORD size);
+long CalcFileCRC_Slow(const char* filename);
+long CalcFileCRC(const char* filename);
+
 BOOL test0(void);
 BOOL test1(void);
 BOOL test2(void);
+BOOL test3(void);
 
 
 int main(void) {
-    test0(); test1(); test2();
+    test0(); test1(); test2(); test3();
     return NO_REBOOT;
 }
 
@@ -73,35 +80,22 @@ int main(void) {
 
 BOOL test0(void)
 {
-    FILE *f;
-    size_t r = 1;
     WORD sum = 0;
 
+    // init V6Z80P stdio lib
     init_stdio_v6z80p();
+    // Set the logical system memory bank for use with fread and fwrite functions.
+    // Info: How FLOS start program:
+    // - set logic bank 0 (in area 0x8000-0xFFFF)
+    // - load program and pass excution to entry point (0x5000)
+    fset_system_bank(0);
 
-    f = fopen(myFilename, "rb");
-    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT_CR(myTestString); return TRUE;}
-
-
-//    sprintf(myTestString, "f: %x ", (DWORD)f); MY_PRINT(myTestString);
-
-    // load file by 4KB chunks and calc simple CRC
-    while(!feof(f) && !ferror(f)) {
-        r = fread(myFileBuf, 1, sizeof(myFileBuf), f);
-        sprintf(myTestString, "readed: %x ", r);
-        MY_PRINT(myTestString);
-        sprintf(myTestString, "EOF: %x ", feof(f));
-        MY_PRINT_CR(myTestString);
-
-        sum += CalcCRC(myFileBuf, r);
-    }
-
-
+    sum = CalcFileCRC(myFilename);
     sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
-    fclose(f);
-
     return TRUE;
 }
+
+
 
 
 BOOL test1(void)
@@ -142,22 +136,61 @@ BOOL test1(void)
 }
 
 
+
 BOOL test2(void)
+{
+    WORD sum = 0;
+
+    sprintf(myTestString, "test2()"); MY_PRINT_CR(myTestString);
+    sum = CalcFileCRC_Slow(myFilename);
+    sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
+
+    return TRUE;
+}
+
+
+
+BOOL test3(void)
+{
+    FILE *f;
+    size_t r = 1;
+    WORD sum = 0, i;
+
+    sprintf(myTestString, "test3()"); MY_PRINT_CR(myTestString);
+    f = fopen(myFilenameW, "wb");
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilenameW); MY_PRINT_CR(myTestString); return TRUE;}
+
+    // fill buffer with some bytes
+    for(i=0; i<sizeof(myFileBuf); i++) {
+        myFileBuf[i] = (BYTE) i;
+//        sum += CalcCRC(myFileBuf, r);
+//        sprintf(myTestString, "r: %x ", r); MY_PRINT_CR(myTestString);
+    }
+    r = fwrite(myFileBuf, 1, sizeof(myFileBuf), f);
+
+//    sprintf(myTestString, "r: %x ", r); MY_PRINT_CR(myTestString);
+    fclose(f);
+
+    sum = CalcFileCRC(myFilenameW);
+    sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
+    return TRUE;
+}
+// --------------------------
+
+// load file, byte by byte (slow on V6Z80P),  and calc simple CRC
+long CalcFileCRC_Slow(const char* filename)
 {
     FILE *f;
     size_t r = 1;
     WORD sum = 0;
 
-    sprintf(myTestString, "test2()"); MY_PRINT_CR(myTestString);
-
-
-    f = fopen(myFilename, "rb");
-    if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT_CR(myTestString); return TRUE;}
+    f = fopen(filename, "rb");
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", filename); MY_PRINT_CR(myTestString); return -1;}
 
 
 //    sprintf(myTestString, "f: %x ", (DWORD)f); MY_PRINT(myTestString);
 
-    // load file (byte by byte) and calc simple CRC (slow!)
+
     while(!feof(f) && !ferror(f)) {
         r = fread(myFileBuf, 1, 1, f);
 //        sprintf(myTestString, "readed: %x ", r); MY_PRINT(myTestString);
@@ -169,11 +202,32 @@ BOOL test2(void)
 
     sprintf(myTestString, "r: %x ", r); MY_PRINT_CR(myTestString);
 
-    sprintf(myTestString, "CRC: %x ", sum); MY_PRINT_CR(myTestString);
     fclose(f);
 
-    return TRUE;
+    return sum;
 }
+
+// load file by 4KB chunks and calc simple CRC
+long CalcFileCRC(const char* filename)   {
+    FILE *f;
+    size_t r = 1;
+    WORD sum = 0;
+
+    f = fopen(filename, "rb");
+    if(!f) {sprintf(myTestString, "fopen failed. File:%s", filename); MY_PRINT_CR(myTestString); return -1;}
+
+    while(!feof(f) && !ferror(f)) {
+        r = fread(myFileBuf, 1, sizeof(myFileBuf), f);
+        sprintf(myTestString, "readed: %x ", r);  MY_PRINT(myTestString);
+        sprintf(myTestString, "EOF: %x ", feof(f));  MY_PRINT_CR(myTestString);
+
+        sum += CalcCRC(myFileBuf, r);
+    }
+
+    fclose(f);
+    return sum;
+}
+
 // Simple cyclic sum (add all bytes)
 WORD CalcCRC(BYTE *data, WORD size)
 {

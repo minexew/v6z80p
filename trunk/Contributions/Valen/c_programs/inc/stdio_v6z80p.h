@@ -105,7 +105,7 @@ int fputs(const char *string, FILE *stream);
 char *gets(char *buf);
 int puts(const char *string);
 
-size_t fread(void *buffer, size_t size, size_t num, FILE *stream);
+size_t fread(void *buffer, long size, long num, FILE *stream);
 size_t fwrite(const void *buffer, size_t size, size_t num, FILE *stream);
 
 int fseek(FILE *stream, long offset, int whence);
