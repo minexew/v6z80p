@@ -2,6 +2,9 @@
 TEST 3
 Basic test of file I/O functions.
 
+Can be compiled for V6Z80P and PC.
+Run on both platforms and compare output listings.
+If they are equ, then test is passed.
 */
 
 // ----------------------------------------------------------------------
@@ -23,14 +26,14 @@ char myTestString[128];
 
     // for use sprintf (this will add about 3KB of code)
     #include <stdio.h>
-    #include <stdio_v6z80p.h>        // provide fopen, fread, ...
+    #include <stdio_v6z80p.h>        // provide file I/O funcs (fopen, fread, ...)
 
     #define MY_PRINT(str)    FLOS_PrintString(str)
     #define MY_PRINT_CR(str) FLOS_PrintStringLFCR(str)
 
 
 
-    const char *myFilename   = "TEST1.EXE";
+    const char *myFilename   = "TEST3.EXE";
     const char *myFilenameW  = "TEST3.TXT";
 
 
@@ -54,7 +57,7 @@ char myTestString[128];
     #define NO_REBOOT 0
 
 
-    char *myFilename =      "/home/valen/_1/test1.exe";
+    char *myFilename =      "/home/valen/_1/test3.exe";
     char *myFilenameW =     "/home/valen/_1/test3.txt";
 
 
@@ -97,7 +100,7 @@ BOOL test0(void)
 
 
 
-
+// read some parts of file and and calc simple CRC
 BOOL test1(void)
 {
     FILE *f;
@@ -116,7 +119,7 @@ BOOL test1(void)
     if(!f) {sprintf(myTestString, "fopen failed. File:%s", myFilename); MY_PRINT_CR(myTestString); return TRUE;}
 
     sprintf(myTestString, "File size:%x", GetFileSize(f)); MY_PRINT_CR(myTestString);
-    // read some parts of file
+
     while(arr[i] != -1) {
         seekMode    = arr[i];
         filePos     = arr[i+1];
@@ -249,3 +252,7 @@ long GetFileSize(FILE *f)
     return size;
 }
 
+const char* intToBoolString(long v)
+{
+    return (v ? "TRUE" : "FALSE");
+}

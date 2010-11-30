@@ -16,7 +16,9 @@ objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.$(O)                   \
           $(basedir)/c_support/os_interface_for_c/obj/i_flos.$(O)         \
           $(basedir)/c_support/os_interface_for_c/obj/i_flos_lib.lib      \
           $(basedir)/c_support/os_proxy/obj/flos_proxy_code.$(O)          \
+          $(basedir)/c_support/stdio_v6z80p/obj/stdio_v6z80p.$(O)         \
           $(basedir)/src/$(prjname)/obj/myheap.$(O)
+
 
 INC=-I$(basedir)/inc
 
@@ -59,17 +61,14 @@ $(myd1)/obj/i_flos.$(O) : $(myd1)/i_flos.c
 # .rel <-- .c
 myd7   = $(basedir)/c_support/os_interface_for_c
 myd7_  = $(subst /,\,$(myd7))
-#$(myd7)/obj/FLOS%.rel : $(myd7)/FLOS%.c
-#	cd $(myd7_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) $<
 # Include Library makefile
 include $(myd7)/Makefile_lib
 
-# Library. OS interface for C.
-#$(myd7)/obj/i_flos_lib.lib : $(myd7)/obj/FLOS*.rel
-#	@echo -------------- Adding REL files to LIB ------------
-#	cd $(myd7_) && rem $?
-#set SDCCLIB_CC=sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) && sdcclib -l obj/i_flos_lib.lib myliblist.txt
 
+# stdio_v6z80p
+$(basedir)/c_support/stdio_v6z80p/obj/stdio_v6z80p.$(O) : $(basedir)/c_support/stdio_v6z80p/stdio_v6z80p.c      \
+                                                          $(basedir)/c_support/stdio_v6z80p/sysapi.c
+	cd $(basedir)/c_support/stdio_v6z80p/ &&  sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)  --no-std-crt0   stdio_v6z80p.c
 
 
 # Asm proxy (object file)
