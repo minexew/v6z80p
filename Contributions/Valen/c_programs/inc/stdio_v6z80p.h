@@ -1,9 +1,9 @@
 //
 // stdio_v6z80p.h
 //
-// Standard I/O routines for V6Z80P.
+// Standard file I/O routines for V6Z80P.
 //
-
+// Some minimal subset of ANSI C standard is implemented. Enough to load/write binary files.
 
 #ifndef STDIO_V6Z80P_H
 #define STDIO_V6Z80P_H
@@ -11,10 +11,12 @@
 //#include <sys/types.h>
 typedef int handle_t;
 
-#include "../c_support/crt/stdio_v6z80p/os.h"
+#include <v6z80p_types.h>
+#include <os_interface_for_c/i_flos.h>
+#include <os.h>
 
 
-int errno;
+extern int errno;
 
 
 #ifndef _FPOS_T_DEFINED
@@ -57,9 +59,9 @@ struct _iobuf
 
 typedef struct _iobuf FILE;
 
-#define stdin   __getstdhndl(0)
-#define stdout  __getstdhndl(1)
-#define stderr  __getstdhndl(2)
+//#define stdin   __getstdhndl(0)
+//#define stdout  __getstdhndl(1)
+//#define stderr  __getstdhndl(2)
 
 #define _IORD           0x0001
 #define _IOWR           0x0002
@@ -79,71 +81,90 @@ typedef struct _iobuf FILE;
 
 #define _IOCRLF         0x8000
 
+// Must be called once, to do init.
+void init_stdio_v6z80p(void);
 
 
-int filbuf(FILE *stream);
-int flsbuf(int, FILE *stream);
+//int filbuf(FILE *stream);
+//int flsbuf(int, FILE *stream);
 
 void fset_system_bank(unsigned char bank);
-FILE *fdopen(int fd, const char *mode);
-FILE *freopen(const char *filename, const char *mode, FILE *stream);
+//FILE *fdopen(int fd, const char *mode);
+//FILE *freopen(const char *filename, const char *mode, FILE *stream);
 FILE *fopen(const char *filename, const char *mode);
 
-FILE *popen(const char *command, const char *mode);
-int pclose(FILE *stream);
+//FILE *popen(const char *command, const char *mode);
+//int pclose(FILE *stream);
 
-void clearerr(FILE *stream);
+//void clearerr(FILE *stream);
 int fclose(FILE *stream);
-int fflush(FILE *stream);
+//int fflush(FILE *stream);
 
-int fgetc(FILE *stream);
-int fputc(int c, FILE *stream);
+//int fgetc(FILE *stream);
+//int fputc(int c, FILE *stream);
 
-char *fgets(char *string, int n, FILE *stream);
-int fputs(const char *string, FILE *stream);
+//char *fgets(char *string, int n, FILE *stream);
+//int fputs(const char *string, FILE *stream);
 
-char *gets(char *buf);
-int puts(const char *string);
+//char *gets(char *buf);
+//int puts(const char *string);
 
-size_t fread(void *buffer, long size, long num, FILE *stream);
-size_t fwrite(const void *buffer, size_t size, size_t num, FILE *stream);
+long fread(void *buffer, long size, long num, FILE *stream);
+long fwrite(const void *buffer, long size, long num, FILE *stream);
 
 int fseek(FILE *stream, long offset, int whence);
 long ftell(FILE *stream);
-void rewind(FILE *stream);
-int fsetpos(FILE *stream, const fpos_t *pos);
-int fgetpos(FILE *stream, fpos_t *pos);
+//void rewind(FILE *stream);
+//int fsetpos(FILE *stream, const fpos_t *pos);
+//int fgetpos(FILE *stream, fpos_t *pos);
 
-void perror(const char *message);
+//void perror(const char *message);
 
-void setbuf(FILE *stream, char *buffer);
-int setvbuf(FILE *stream, char *buffer, int type, size_t size);
+//void setbuf(FILE *stream, char *buffer);
+//int setvbuf(FILE *stream, char *buffer, int type, size_t size);
 
 int ungetc(int c, FILE *stream);
 
-int remove(const char *filename);
-int rename(const char *oldname, const char *newname);
+//int remove(const char *filename);
+//int rename(const char *oldname, const char *newname);
 
-FILE *tmpfile();
-char *tmpnam(char *string);
-char *tempnam(const char *dir, const char *prefix);
+//FILE *tmpfile();
+//char *tmpnam(char *string);
+//char *tempnam(const char *dir, const char *prefix);
+
+/*
+int vfprintf(FILE *stream, const char *fmt, va_list args);
+int fprintf(FILE *stream, const char *fmt, ...);
+
+int vprintf(const char *fmt, va_list args);
+int printf(const char *fmt, ...);
+
+int vsprintf(char *buf, const char *fmt, va_list args);
+int sprintf(char *buf, const char *fmt, ...);
+
+int vsnprintf(char *buf, size_t count, const char *fmt, va_list args);
+int snprintf(char *buf, size_t count, const char *fmt, ...);
+
+int fscanf(FILE *stream, const char *fmt, ...);
+int scanf(const char *fmt, ...);
+int sscanf(const char *buffer, const char *fmt, ...);
 
 
 
 FILE *__getstdhndl(int n);
-
+*/
 
 #define feof(stream)     ((stream)->flag & _IOEOF)
 #define ferror(stream)   ((stream)->flag & _IOERR)
-#define fileno(stream)   ((stream)->file)
+//#define fileno(stream)   ((stream)->file)
 
+/*
 #define getc(stream)     (--(stream)->cnt >= 0 ? 0xff & *(stream)->ptr++ : filbuf(stream))
 #define putc(c, stream)  (--(stream)->cnt >= 0 ? 0xff & (*(stream)->ptr++ = (char) (c)) :  flsbuf((c), (stream)))
 #define getchar()        getc(stdin)
 #define putchar(c)       putc((c), stdout)
+*/
 
-#include "../c_support/crt/stdio_v6z80p/sysapi.c"
-#include "../c_support/crt/stdio_v6z80p/stdio_v6z80p.c"
 
 
 #endif // STDIO_V6Z80P_H
