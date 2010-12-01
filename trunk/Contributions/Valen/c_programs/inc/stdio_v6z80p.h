@@ -123,7 +123,7 @@ long ftell(FILE *stream);
 //void setbuf(FILE *stream, char *buffer);
 //int setvbuf(FILE *stream, char *buffer, int type, size_t size);
 
-int ungetc(int c, FILE *stream);
+//int ungetc(int c, FILE *stream);
 
 //int remove(const char *filename);
 //int rename(const char *oldname, const char *newname);
