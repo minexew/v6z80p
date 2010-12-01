@@ -6,9 +6,9 @@ When a program returns to FLOS with a value in A other than zero,
 be displayed:
 
 ------------------------------------------------------------------
-Note! 'A' acts merely an index in a un-ordered list of messages
+Note! 'A' acts merely as an index in a un-ordered list of messages
 and these may not necessarily match the proper error codes
-returned by Kernal calls. IE, if a relavent message is to be
+returned by Kernal calls. IE, if a relevant message is to be
 displayed, then the program should translate the code returned
 by a kernal call to an appropriate value.
 ------------------------------------------------------------------
