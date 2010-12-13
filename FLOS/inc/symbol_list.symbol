@@ -182,6 +182,7 @@ sys_sdcard_ctrl2 EQU 00006H
 sys_serial_port	EQU 00004H
 sys_spi_port	EQU 0000AH
 sys_timer	EQU 00007H
+sys_vram_location EQU 00021H
 sys_vreg_read	EQU 00007H
 temphex		EQU 00B3AH
 use_mouse	EQU 00BF6H
