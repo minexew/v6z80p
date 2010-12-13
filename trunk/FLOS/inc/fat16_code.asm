@@ -1,8 +1,10 @@
 ;----------------------------------------------------------------------------------------------
-; Z80 FAT16 File System code for FLOS v1.12 by Phil @ Retroleum
+; Z80 FAT16 File System code for FLOS v1.13 by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.12 - "hl_to_filename" - If filename has forward slash at 9th (dot) character, it now counts as end of filename
+; Changes:1.13 - bugfix: "fs_sectors_per_fat" was not being updated by "fs_check_disk_format"
+;              - speeded up directory read routine
+;	1.12 - "hl_to_filename" - If filename has forward slash at 9th (dot) character, it now counts as end of filename
 ;	1.11 - "Dir not found" error now always $23 ($0b no longer used)
 ;	1.10 - changes for Volume based file access (IE: multiple partitions)
 ;              - added "fs_get_volume_label"
@@ -335,6 +337,7 @@ form_ok	ld a,(sector_buffer+$0d)		; get number of sectors in each cluster
 	ld hl,(sector_buffer+$0e)		; get 'sectors before FAT'
 	ld (fs_fat1_position),hl		; set FAT1 position
 	ld de,(sector_buffer+$16)		; get sectors per FAT
+	ld (fs_sectors_per_fat),de
 	add hl,de
 	ld (fs_fat2_position),hl		; set FAT2 position
 	add hl,de
@@ -1198,21 +1201,34 @@ fs_get_dir_entry
 nr_read	call fs_read_sector			;read the sector
 	ret c				;exit upon hardware error
 	
-	ld hl,sector_buffer
-	ld bc,(fs_dir_entry_line_offset)
-	add hl,bc
-	push hl
-	pop ix
-	ld a,(hl)
+	ld de,(fs_dir_entry_line_offset)
+ds_inloop	ld ix,sector_buffer
+	add ix,de
+	ld a,(ix)
 	or a				;dir line empty?
-	jr z,fs_goto_next_dir_entry		
-	cp $e5				;dir entry deleted?
-	jr z,fs_goto_next_dir_entry
-	cp $05				;special code = same as $e5
-	jr z,fs_goto_next_dir_entry
-	bit 3,(ix+$b)			;if this entry is a volume lable (or LF entry) ignore it
-	jr nz,fs_goto_next_dir_entry	
+	jr z,fs_dir_entry_free		
+	cp 0e5h				;dir entry deleted?
+	jr z,fs_dir_entry_free	
+	cp 05h				;special code = same as $e5
+	jr z,fs_dir_entry_free	
+	bit 3,(ix+0bh)			;if this entry is a volume lable (or LF entry) ignore it
+	jr z,fs_dir_entry_in_use		
 
+fs_dir_entry_free
+
+	ex de,hl
+	ld de,32
+	add hl,de
+	ex de,hl
+	bit 1,d
+	jr z,ds_inloop
+	jr ds_newsec
+
+fs_dir_entry_in_use
+
+	ld (fs_dir_entry_line_offset),de
+	push ix
+	pop hl
 	call os_clear_output_line
 	ld b,8				;8 chars in FAT16 filename
 	ld de,output_line
@@ -1259,7 +1275,8 @@ fs_goto_next_dir_entry
 	ld (fs_dir_entry_line_offset),hl
 	bit 1,h
 	jp z,fs_get_dir_entry
-	ld hl,0				
+
+ds_newsec	ld hl,0				
 	ld (fs_dir_entry_line_offset),hl	;line offset reset to 0
 
 	ld hl,fs_dir_entry_sector
