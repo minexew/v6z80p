@@ -2,6 +2,10 @@
 FLOS for V6Z80P version info:
 -----------------------------
 
+5.80 - 13/12/10 : Small bug in FAT16 routines fixed (fs_sectors_per_fat wasnt being updated)
+                  Improved speed of DIR display routines
+                  KJT_BCHL_memfill routine now much faster (thanks to Daniel for LDIR suggestion)
+
 5.79 - 01/09/10 : Added "kjt_mouse_irq_code" allowing external programs to use the kernal's
                   mouse IRQ routine even if it has its own interrupt handler. Main IRQ
                   handler changed a little.
