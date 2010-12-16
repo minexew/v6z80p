@@ -2,6 +2,9 @@
 FLOS for V6Z80P version info:
 -----------------------------
 
+5.81 - 16/12/10 : Bugfix: The new memfill routine in v580 didnt work for write only areas of RAM.
+                  Replaced with a routine that does, just as fast.
+
 5.80 - 13/12/10 : Small bug in FAT16 routines fixed (fs_sectors_per_fat wasnt being updated)
                   Improved speed of DIR display routines
                   KJT_BCHL_memfill routine now much faster (thanks to Daniel for LDIR suggestion)
