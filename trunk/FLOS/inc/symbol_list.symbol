@@ -66,7 +66,6 @@ cursorstatus	EQU 00B9BH
 de_store1	EQU 00B07H
 de_store2	EQU 00B0EH
 env_var_list	EQU 00480H
-fillbyte	EQU 00B3CH
 find_hexstringascii EQU 00B38H
 first_os_var	EQU 00B1EH
 hl_store1	EQU 00B09H
@@ -185,6 +184,7 @@ sys_timer	EQU 00007H
 sys_vram_location EQU 00021H
 sys_vreg_read	EQU 00007H
 temphex		EQU 00B3AH
+ui_index	EQU 00B3CH
 use_mouse	EQU 00BF6H
 video_base	EQU 02000H
 video_registers	EQU 00200H

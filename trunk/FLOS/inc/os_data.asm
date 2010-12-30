@@ -403,10 +403,6 @@ shifted_keymap	db $7e,$00			;$0e	;shifted
 	
 ;---------------------------------------------------------------------------------------------
 
-ui_index		db 0			; user input
-ui_string		ds OS_window_cols+2,0	; ""      ""
-
-
 pen_colours	dw $000,$00f,$f00,$f0f,$0f0,$0ff,$ff0,$fff
 		dw $555,$999,$ccc,$f71,$07f,$df8,$840
 
@@ -514,8 +510,6 @@ sys_driver_backup	db 0
 os_quiet_mode	db 0
 
 ;----------------------------------------------------------------------------------
-
-temp_string	ds OS_window_cols+2,0		
 
 bank_pre_cmd	db 0
 script_fn		ds 13,0

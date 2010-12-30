@@ -72,7 +72,7 @@ script_dir	dw 0
 find_hexstringascii db 0,0
 temphex		db 0
 os_linecount	db 0
-fillbyte		db 0 
+ui_index		db 0 
 
 commandstring	ds OS_window_cols+2,0
 output_line	ds OS_window_cols+2,0
