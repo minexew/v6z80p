@@ -43,10 +43,11 @@ os_lbnao	ld hl,(lb_load_addr)		;load the file
 	call kjt_force_load
 	ret nz
 
-	ld hl,os_hex_prefix_txt		;show "$"
+
+	ld de,filesize_cache_msw		
+show_bl	ld hl,os_hex_prefix_txt		;show "$"
 	call os_print_string	
 	ld hl,output_line
-	ld de,filesize_cache_msw
 	ld b,3
 	call n_hexbytes_to_ascii
 	ld (hl),0	

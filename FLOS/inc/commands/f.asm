@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"f" fill memory command. V6.03
+;"f" fill memory command. V6.04
 ;-----------------------------------------------------------------------
 
 os_cmd_f			
@@ -8,20 +8,19 @@ os_cmd_f
 
 	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jp z,os_no_args_error
-	ld a,e
-	ld (fillbyte),a
-		
+	ld c,e			;c = fill byte
+	
 	ld hl,(cmdop_end_address)	;check range is ok
-	ld bc,(cmdop_start_address)
+	ld de,(cmdop_start_address)
 	xor a			;clear carry
-	sbc hl,bc
+	sbc hl,de
 	jp c,os_range_error		;abort if end addr <= start addr
 
+	ld a,c			;get fill byte in A
 	ld b,h			;get length in bc
 	ld c,l
 	inc bc
-	ld hl,(cmdop_start_address)
-	ld a,(fillbyte)
+	ex de,hl			;get start address in HL
 	call os_bchl_memfill
 
 	ld a,$20			;OK completion message

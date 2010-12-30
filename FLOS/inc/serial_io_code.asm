@@ -127,9 +127,7 @@ serial_receive_file
 	ld a,1				; Set in-file timeout to 1 second
 	ld (serial_timeout),a
 
-	call os_cachebank			
-	ld a,(serial_bank)
-	call os_forcebank
+	call set_serial_bank			
 
 	call s_goodack			; send "OK" to start the first block
 
@@ -307,9 +305,7 @@ s_fncpyd	ld hl,serial_fileheader		; send file header
 	call s_waitack			; wait to receive "OK" acknowledge
 	ret c				; anything else gives a comms error
 	
-	call os_cachebank			; send file data
-	ld a,(serial_bank)
-	call os_forcebank
+	call set_serial_bank		; send file data
 
 	ld hl,(serial_address)
 	ld de,(serial_fileheader+16)		; length of file lo word
@@ -504,3 +500,12 @@ ssplim	djnz ssplim
 	
 ;-----------------------------------------------------------------------------------------------
 
+set_serial_bank
+
+	call os_cachebank			
+	ld a,(serial_bank)
+	call os_forcebank
+	ret
+
+;-----------------------------------------------------------------------------------------------
+	
