@@ -11,6 +11,8 @@ include "system_equates.asm"		; ""	""
 ; fills 0-$fff with $55
 ; disables all writes to video mode
 ; reads and copies 200-7ff to $8000 - pages should be 2,3,4,5,6,7
+;
+; This resets the system is it overwrites FLOS data areas.
 
 	org $5000
 
@@ -49,10 +51,8 @@ lp3	ld (hl),$55
 	xor a
 	out (sys_alt_write_page),a	;page video registers back in
 
-	ei
-	xor a	
-	ret
-		
+	jp 0
+
 	
 ;--------------------------------------------------------------------------------------
 	
