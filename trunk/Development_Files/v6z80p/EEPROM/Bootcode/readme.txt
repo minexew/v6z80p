@@ -8,10 +8,8 @@ primary and backup versions of the bootcode.
 
 
 If you have old versions of OSCA/FLOS, the latest version of the program
-"EEPROM.EXE" may not work. If this the case you can either use the command
-"FIRMWARE.EXE" to completely overwrite slots 0-2 with the latest bootcode
-and config data, or use the original version of EEPROM.EXE supplied the "old"
-subdirectory of this folder.
+"EEPROM.EXE" may not work. If this the case you use the command "FIRMWARE.EXE"
+to completely overwrite slots 0-2 with the latest bootcode and config data.
 
 
 **********************
