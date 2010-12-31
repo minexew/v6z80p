@@ -69,8 +69,7 @@ lp4	ld (hl),$bb
 	xor a
 	out (sys_alt_write_page),a	; Normal mode: ROM/palette at $000
 
-	ei
-	ret
+	jp 0
 		
 	
 ;--------------------------------------------------------------------------------------

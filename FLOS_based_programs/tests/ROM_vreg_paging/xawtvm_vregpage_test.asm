@@ -57,9 +57,7 @@ lp4	ld (hl),$cc
 	xor a
 	out (sys_alt_write_page),a	;page video registers back in
 
-	ei
-	xor a	
-	ret
+	jp 0
 		
 	
 ;--------------------------------------------------------------------------------------
