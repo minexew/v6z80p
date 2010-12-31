@@ -6,6 +6,9 @@ include "OSCA_hardware_equates.asm"
 include "system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
+;
+; Game v1.03  - Rocket sound fx fixed 31/12/2010
+;
 ; Game v1.02  - Updated 12/05/2010:
 ;
 ; Added keyboard controls Q,A,O,P
@@ -5650,7 +5653,7 @@ congrats_map	incbin "congrats_map.bin"
 ; SOUND FX
 ;--------------------------------------------------------------------------------------------------
 
-sfx_data		incbin "sfx_02.bin"
+sfx_data		incbin "sfx_03.bin"
 
 fx_list		dw sfx_data+0		;1  - arc
 		dw sfx_data+$20		;2  - bonus
