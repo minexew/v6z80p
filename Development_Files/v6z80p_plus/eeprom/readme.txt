@@ -4,7 +4,7 @@ burner or with the FLOS app "firmware.exe", IE:
 
 FIRMWARE default.bin 0
 
-Note: This is a pretty ham-fisted approach, most the time it is
+Note: This is a fairly ham-fisted approach, most the time it is
 best to use the more elegant app "EEPROM.EXE" which just updates
 the specific areas on the EEPROM. 
 
