@@ -1,5 +1,5 @@
 
-The following code snippet shows the template for FLOS Z80 programs and how
+The following code snippet shows a simple template for FLOS Z80 programs and how
 to call a kernal routine to say "Hello world!"
 
 See the folder "FLOS_based_programs/simple_examples" for more basic FLOS/OSCA
