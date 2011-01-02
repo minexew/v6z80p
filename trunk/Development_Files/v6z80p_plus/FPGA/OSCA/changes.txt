@@ -1,6 +1,9 @@
 Updates to OSCA
 ---------------
 
+665 - Setting Bit 4 of sys_alt_write_page allows writes between $000-$1ff to go to
+      the palette, whilst reads in that range return data from system RAM.
+
 664 - Video RAM window can be moved from default location $2000 to any 8KB boundary
       of Z80 address space (added the setting sys_vram_location @ port $21)
 
