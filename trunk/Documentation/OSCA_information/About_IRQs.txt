@@ -19,9 +19,18 @@ program to enable the IRQs if interrupts are required.
 Notes:
 ------
 
-From OSCA v656 onwards, it is possible to have read/write access the system RAM
-"underneath" the ROM at $000-$1ff (see the port "sys_alt_write_page"). However,
-paging in this memory pages out the colour palette so care must be taken if
-CPU access to the palette is required thereafter.
+It is possible to have read/write access the system RAM "underneath" the ROM/Palette
+at $000-$1ff (see the port "sys_alt_write_page"). In all there are three options
+for this memory range:
+
+A) Read ROM / Write palette (default)
+B) Read system RAM / write palette (set by bit 4 of sys_alt_write_page)
+c) Read System RAM / write system RAM (set by bit 6 of sys_alt_write_page)
+
+
+The IRQ vectors must be set appropriately in system RAM when non-ROM reads are
+enabled (and interrupts are required).
+
+
 
 
