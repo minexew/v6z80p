@@ -1,3 +1,7 @@
+
+FPGA pin connections for V6Z80P+ V1.0
+
+
 +------------------------------+
 |Pin Number|Signal Name        |
 +------------------------------+
@@ -77,10 +81,10 @@
 |P74       |spr_databus<5>     |
 |P75       |z80_clock_enable   |
 |P76       |                   |
-|P77       |                   |
+|P77       |(GCLK1 unused)     |
 |P78       |                   |
 |P79       |                   |
-|P80       |clock_16mhz        |
+|P80       |clock_16mhz (GCLK0)|
 |P81       |spr_databus<4>     |
 |P82       |spr_addrbus<12>    |
 |P83       |vram_addr_out<0>   |
@@ -147,12 +151,12 @@
 |P144      |                   |
 |P145      |                   |
 |P146      |horizontal_sync    |
-|P147      |tv_sync            |
-|P148      |jumper_vga         |
-|P149      |jumper_reset       |
-|P150      |jumper_nmi         |
-|P151      |expansion_pin_b    |
-|P152      |expansion_pin_a    |
+|P147      |tv_sync (vertical sync)
+|P148      |jumper_vga (Header pin E)
+|P149      |jumper_reset (Header pin D)
+|P150      |jumper_nmi (Header pin C)
+|P151      |expansion_pin_b (Header pin B)
+|P152      |expansion_pin_a (Header pin A)
 |P153      |eeprom_data_in     |
 |P154      |pic_link_ra5       |
 |P155      |                   |
@@ -182,10 +186,10 @@
 |P179      |sdc_clk            |
 |P180      |sdc_pow            |
 |P181      |sdc_dout           |
-|P182      |                   |
+|P182      |GCLK2 (header pin F)
 |P183      |                   |
 |P184      |                   |
-|P185      |                   |
+|P185      |GCLK3 (header pin G)
 |P186      |                   |
 |P187      |z80_address_bus<14>|
 |P188      |system_ram_a16     |
