@@ -28,8 +28,8 @@ non-commercial applications.
 Credits:
 --------
 
-PCB design, OSCA FPGA, FLOS Operating System and revelent apps by
-Phil Ruston 2008-2010
+PCB design, OSCA FPGA architecture, FLOS Operating System and revelent
+apps by Phil Ruston 2008-2011
 
 The FLOS "Disassemble" command uses the excellent "DISZ80" routine
 by John Kerr 1987.
