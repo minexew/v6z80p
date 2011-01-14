@@ -4,19 +4,16 @@ IMPORTANT!
 Please make sure you use files from the correct folder as the
 FPGA config files are not compatible between PCBs.
 
-* Files in the "V6Z80P" folder are for the original V6Z80P PCB (made 
-  prior to August 2010, marked "V6Z80P Rev 1.1", (8 pin mini DIN socket
-  for video)
+* The original V6Z80P PCB was made prior to August 2010 and marked
+  "V6Z80P Rev 1.1"  (it has an 8 pin mini DIN socket for video)
 
-* Files in the "V6Z80P_plus" folder are for the V6Z80P+ V1.0 PCB
-  (made between August 2010 and Dec 2010, PCB is marked
-  "V6Z80P+ Rev1.0", and has a 15pin standard VGA socket)
+* The V6Z80P+ V1.0 PCB was made between August 2010 and Dec 2010, the
+  PCB is marked "V6Z80P+ Rev1.0", it has a 15pin standard VGA socket)
 
-* Files in the "V6Z80P_plus_v.1" folder are for the V6Z80P+ V1.1
-  which allows alternative clock inputs (and FPGA control of the CPU
-  clock) Normally the OSC SEL switch is in the DOWN POSITION. 
-  Note: The V6Z80P+ v1.1 PCB can also use the config files for the
-  V6Z80P+ v1.0 PCB AS LONG AS THE OSC SWITCH IS IN THE UP POSITION.
+* The V6Z80P+ V1.1 was made after Jan 2011 and is marked "V6Z80P+ Rev 1.1"
+  (This board allows FPGA control of the CPU clock.) Normally the OSC SEL
+  switch is in the DOWN POSITION but when set UP, the V6Z80P+ v1.1 is compatible
+  with the config files for the V6Z80P+ v1.0.
 
 
 If developing new V6Z80P configs:
