@@ -1,0 +1,17 @@
+
+V6Z80P+ CONFIG PIC: Pin connections (firmware V630)
+---------------------------------------------------
+
+				 16F627/8A
+		                 ___   ___
+				|   '-'   |
+	        CONF CCLK <- A2 |1      18| A1 -> SPI (EEPROM) CLK
+        SPI D_IN (EEPROM) <- A3 |2      17| A0 -> SPI (EEPROM) /CS
+	      Unused  O/D <- A4 |3      16| XTAL
+    PIC/FPGA Comms CLK IN -> A5 |4      15| XTAL
+		            GND |5      14| 3.3V
+	   	 CONF PGM <- B0 |6      13| B7 -> PIC/FPGA comms CLK OUT
+	       CONF INIT  -> B1 |7      12| B6 <- JUMPER / SWITCH (JTAG MODE)
+	       CONF DONE  -> B2 |8      11| B5 -> Unused
+      SPI (EEPROM) D_OUT  -> B3 |9      10| B4 -> LED
+			        !_________!
