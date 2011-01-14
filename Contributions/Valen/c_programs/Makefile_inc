@@ -15,8 +15,8 @@ RM=del
 objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.$(O)                   \
           $(basedir)/c_support/os_interface_for_c/obj/i_flos.$(O)         \
           $(basedir)/c_support/os_interface_for_c/obj/i_flos_lib.lib      \
+          $(basedir)/c_support/stdio_v6z80p/obj/stdio_v6z80p_lib.lib          \
           $(basedir)/c_support/os_proxy/obj/flos_proxy_code.$(O)          \
-          $(basedir)/c_support/stdio_v6z80p/obj/stdio_v6z80p.$(O)         \
           $(basedir)/src/$(prjname)/obj/myheap.$(O)
 
 
@@ -66,9 +66,13 @@ include $(myd7)/Makefile_lib
 
 
 # stdio_v6z80p
-$(basedir)/c_support/stdio_v6z80p/obj/stdio_v6z80p.$(O) : $(basedir)/c_support/stdio_v6z80p/stdio_v6z80p.c      \
-                                                          $(basedir)/c_support/stdio_v6z80p/sysapi.c
-	cd $(basedir)/c_support/stdio_v6z80p/ &&  sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)  --no-std-crt0   stdio_v6z80p.c
+#$(basedir)/c_support/stdio_v6z80p/obj/stdio_v6z80p.$(O) : $(basedir)/c_support/stdio_v6z80p/stdio_v6z80p.c      \
+#                                                          $(basedir)/c_support/stdio_v6z80p/sysapi.c
+#	cd $(basedir)/c_support/stdio_v6z80p/ &&  sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout)  --no-std-crt0   stdio_v6z80p.c
+myd8   = $(basedir)/c_support/stdio_v6z80p
+myd8_  = $(subst /,\,$(myd8))
+# Include Library makefile
+include $(myd8)/Makefile_lib
 
 
 # Asm proxy (object file)

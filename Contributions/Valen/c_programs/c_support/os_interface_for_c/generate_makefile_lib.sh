@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# Generate makefile for lib of FLOS functions.
+# Run this script, when you added new FLOS_xxxxxxxx.c file (with new function).
 regex1="\(FLOS_.*\)\.c"
 
 echo "# Machine generated. Dont edit."                                    >  Makefile_lib

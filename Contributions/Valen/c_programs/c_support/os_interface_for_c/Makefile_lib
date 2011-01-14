@@ -40,6 +40,8 @@ $(myd7)/obj/FLOS_ParentDir.rel : $(myd7)/FLOS_ParentDir.c
 	cd $(myd7_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) FLOS_ParentDir.c
 $(myd7)/obj/FLOS_PrintString.rel : $(myd7)/FLOS_PrintString.c 
 	cd $(myd7_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) FLOS_PrintString.c
+$(myd7)/obj/FLOS_ReadSysramFlat.rel : $(myd7)/FLOS_ReadSysramFlat.c 
+	cd $(myd7_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) FLOS_ReadSysramFlat.c
 $(myd7)/obj/FLOS_RestoreDirPosition.rel : $(myd7)/FLOS_RestoreDirPosition.c 
 	cd $(myd7_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) FLOS_RestoreDirPosition.c
 $(myd7)/obj/FLOS_RootDir.rel : $(myd7)/FLOS_RootDir.c 
@@ -82,6 +84,7 @@ $(myd7)/obj/i_flos_lib.lib :   \
             $(myd7)/obj/FLOS_MakeDir.rel             \
             $(myd7)/obj/FLOS_ParentDir.rel             \
             $(myd7)/obj/FLOS_PrintString.rel             \
+            $(myd7)/obj/FLOS_ReadSysramFlat.rel             \
             $(myd7)/obj/FLOS_RestoreDirPosition.rel             \
             $(myd7)/obj/FLOS_RootDir.rel             \
             $(myd7)/obj/FLOS_SetCursorPos.rel             \
