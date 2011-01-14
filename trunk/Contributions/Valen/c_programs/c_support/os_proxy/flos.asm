@@ -503,7 +503,19 @@ failed20
 
         proxy__mount_volumes           ;   start + $dc (added in v562)
         proxy__get_device_info             ;   start + $df (added in v565)
+
         proxy__read_sysram_flat    ;   start + $e2 (added in v570)
+        PUSH_ALL_REGS
+        GET_I_DATA l, h, e, a           ; 1 byte of 4 bytes, is dummy/unused
+                                        ; e:hl = address
+        call kjt_read_sysram_flat    ; function don't return result code 
+
+        ld ix, I_DATA
+
+        SET_I_DATA a              ; a  = byte read from address
+        POP_ALL_REGS
+        ret
+
         proxy__write_sysram_flat   ;   start + $e5 (added in v570)
         proxy__get_mouse_disp		  ;   start + $e8 (added in v571)
         proxy__get_dir_cluster		  ;   start + $eb (added in v572)

@@ -157,6 +157,8 @@ V6Z80P_EXTERN void FLOS_GetVersion(word* os_version_word, word* hw_version_word)
 // Mouse --------------------------------------
 V6Z80P_EXTERN BOOL FLOS_GetMousePosition(MouseStatus* ms);
 
+V6Z80P_EXTERN byte FLOS_ReadSysramFlat(const dword address);
+
 // helpers --------------------------------------
 V6Z80P_EXTERN void FLOS_PrintStringLFCR(const char* string);
 

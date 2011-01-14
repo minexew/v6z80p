@@ -1,0 +1,10 @@
+# TODO: generate this file in automatic way
+
+$(myd8)/obj/stdio_v6z80p.rel : $(myd8)/stdio_v6z80p.c 
+	cd $(myd8_) && sdcc -c -o obj/ $(INC) --std-sdcc99  -mz80   --opt-code-speed $(use_stdout) stdio_v6z80p.c
+ 
+$(myd8)/obj/stdio_v6z80p_lib.lib :   \
+            $(myd8)/obj/stdio_v6z80p.rel             \
+ 
+	cd $(myd8_) && sdcclib -l obj/stdio_v6z80p_lib.lib myliblist.txt  
+ 
