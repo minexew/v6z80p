@@ -100,5 +100,5 @@ FLOS or OSCA set up, update the firmware in FLOS with the command:
 
 FIRMWARE default.bin 0
 
-using the default.bin file from the EEPROM folder
+using the default.bin file from the EEPROM/EEPROM_Image folder
 ---------------------------------------------------------------------------------
