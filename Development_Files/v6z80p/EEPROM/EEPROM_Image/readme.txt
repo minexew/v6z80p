@@ -1,12 +1,13 @@
 default.bin is an EEPROM image file. It can be written to
-EEPROM location $0 (block 0) either with an external eeprom
-burner or with the FLOS app "firmware.exe", IE:
+EEPROM location $0 (block 0) with the FLOS app "firmware.exe", IE:
 
 FIRMWARE default.bin 0
 
-Note: This is a pretty ham-fisted approach, most the time it is
-best to use the more elegant app "EEPROM.EXE" which just updates
-the specific areas on the EEPROM. 
+Note: This is a fairly ham-fisted approach, and only normally used to
+update the OS/Bootcode/FPGA config in one go from very old versions.
+Most the time it is best to use the more elegant app "EEPROM.EXE"
+which just updates the specific areas on the EEPROM. 
+
 
 
 Contents:
