@@ -96,10 +96,9 @@ There are 3 different ways to overcome a bad configuration selection
 Notes:
 
 If the version of EEPROM.EXE you have is not compatible with your current
-FLOS or OSCA set up, the original version is supplied in the bootcode/old
-folder. When using it, it's probably best to tap ESC on boot, send the
-original version of FLOS serially, and load EEPROM.EXE serially also.
-Failing that, use FIRMWARE.EXE to directly rewrite SLOTS 0-2 from an
-image file.
+FLOS or OSCA set up, update the firmware in FLOS with the command:
 
+FIRMWARE default.bin 0
+
+using the default.bin file from the EEPROM folder
 ---------------------------------------------------------------------------------
