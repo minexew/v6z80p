@@ -47,6 +47,8 @@ is also different to the original V6Z80P.
 
 The PCB mounting holes are in different locations.
 
+The joystick ports supply 3.3v to pin 5 via 22ohm resistors (this should
+make them Megadrive pad compatible).
 
 
 V6Z80P PLUS v1.1
