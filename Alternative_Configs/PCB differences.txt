@@ -11,7 +11,7 @@ are two LEDs (excluding the SD card LED) for system status.
 
 
 
-V6Z80P+ V1.1
+V6Z80P+ V1.0
 ------------
 
 This board has a standard 15pin VGA connector for video output and a 3 pin
@@ -47,10 +47,12 @@ is also different to the original V6Z80P.
 
 The PCB mounting holes are in different locations.
 
+The joystick ports supply 3.3v to pin 5 via 22ohm resistors (this should
+make them Megadrive pad compatible).
 
 
-V6Z80P PLUS v1.1
-----------------
+V6Z80P+ v1.1
+------------
 
 Made after Jan 2011. This board better allows alternative clock inputs
 and CPU clock control.
