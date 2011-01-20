@@ -1,9 +1,0 @@
-Updates to OSCA
----------------
-
-667 - No new features above v665, however the sound system has been optimized
-      and with the compilation option "keep hierachy" set to "soft" the used
-      FPGA slices figure has dropped from 99% to 90%
-
-
-(No previous versions released for the V6Z80P+ V1.1 PCB)
