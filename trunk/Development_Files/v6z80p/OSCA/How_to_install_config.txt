@@ -1,0 +1,89 @@
+
+Installing an FPGA config onto the EEPROM
+-----------------------------------------
+
+1. Optional: Copy the relevant FPGA config *.bin file to the SD card.
+
+2. Boot into FLOS.
+
+3. Load the EEPROM tool (eeprom.exe)
+
+    ( If EEPROM.EXE is not on your SD card..                            )
+    ( Enter command "RX !"                                              )
+    ( Send EEPROM.EXE from the utils folder with the PC serial link app )
+
+4. Choose Option 1 "Write config to slot".
+
+5. Choose an inactive slot.
+
+6. Locate the config .bin file on disk, or send it (from "Config File" folder)
+   with the Serial Link app, choosing the "RS232" option in the dialog box for
+   serial download.
+
+7. Wait for file to load, write to EEPROM and complete verification.
+
+8. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
+
+9. When prompted, choose to reconfigure from whichever slot you
+   used in step 5
+
+10. The FPGA restarts with the new FPGA firmware. This selection
+    persists until power off (or changed again with this util)
+
+11. If everything is OK, you can reload the EEPROM tool and choose option 3
+    to make the new slot active.
+
+   ( If you want, you can just rewrite the active slot in the first place, but       )
+   ( the method above allows you to test the new config before making it the         )
+   ( default startup config.  IE: If you accidentally overwrite the current Active   ) 
+   ( Slot data with a bad config, the system will not start at power on and you'll   )
+   ( be forced to use one of the manual config options to correct it - details below )
+
+   ( It is recommended that a known-working OSCA config file is always left in slot 1 )
+
+
+Emergency recovery options (v6Z80P+ version)
+--------------------------------------------
+ 
+There are 2 ways to overcome a bad configuration selection (IE: when the system does
+not boot.)
+
+
+Method 1: Manual Slot Selection (You must actually have a working configuration
+          file in slot 1 to 7 for this to be any use)
+      
+      1. Power off.
+
+      2. Install jumper J2 only
+
+      3. Power on (yellow led flashes rapidly). 
+
+      4. Remove jumper J2 again
+
+      5. The yellow LED will flash once, pause about 5 seconds, then flash twice,
+         pause 5 seconds, then flash three times and so on - the number of flashes
+         represents the slot selection. During the pause following the slot
+         selection you require, replace the jumper - the LED will then stay
+         on permanently signifying that the slot has been set.
+
+      6. Power off and remove Jumper J2.
+   
+ 
+Method 2: JTAG configuration. (If none of the first seven slots contain OSCA)
+          
+      1. Connect a Xilinx JTAG cable to the V6Z80P.
+
+      2. Install jumpers J1 and J2.
+
+      3. Load the most recent OSCA project into Xilinx webpack ISE and send the OSCA
+         config .bit file from the PC to the V6Z80P via JTAG (using Impact)
+
+      4. If the bootcode is intact in the EEPROM, the system will start as normal
+         allowing you to load EEPROM.EXE via FLOS and set the slot / download a
+         working OSCA config. If the bootcode checksum fails the screen will
+         flash magenta, then grey. At this point you can download the bootcode
+         .epr file manually using the serial link. (You can force serial download
+         of the bootcode at power on by holding up+right+fire on a joypad in port 0)
+
+      5. Remove jumpers J1 and J2 next time you power off so that the system
+         automatically configures from the EEPROM.
