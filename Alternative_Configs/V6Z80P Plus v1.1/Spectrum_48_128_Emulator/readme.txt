@@ -1,5 +1,5 @@
 
-Spectrum 128 / 48 Emulator for V6Z80P by Phil Ruston 2009-2011
+Spectrum 128 / 48 Emulator for V6Z80P+ by Phil Ruston 2009-2011
 --------------------------------------------------------------
 
 v 1011 - 3.5MHz clock for more accurate Spectrum timing,
@@ -25,7 +25,7 @@ Installing the FPGA config
 
 6. Choose "L" to load config file from disk.
 
-7. Enter filename "spec128p.bin" (for PAL) or "spec128n.bin" (for NTSC)
+7. Enter filename "SpecEmuP.bin" (for PAL) or "SpecEmuN.bin" (for NTSC)
    both versions support VGA 60Hz with 50Hz option
 
 8. Wait for file to write to EEPROM and complete verification.
@@ -66,6 +66,6 @@ Tech
 
 If you remove the bootcode.exe file, you can download one serially
 when the error message flashes. This is useful for testing new
-bootcode programs.
+bootcode programs. (Untested on v1011)
 
 
