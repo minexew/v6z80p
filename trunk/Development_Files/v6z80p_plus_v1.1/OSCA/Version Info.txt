@@ -1,0 +1,19 @@
+
+Version names ending in 'N' are for NTSC TV
+Version names ending in 'P' are for PAL TV
+Both support VGA output.
+
+
+
+Updates to OSCA
+---------------
+
+668 - 255 colour flood mode added. In flood mode, When bit 4 of vreg_vidctrl is
+      set the rule is simplified to: If pixel is 0, repeat last colour.
+
+667 - No new features above v665, however the sound system has been optimized
+      and with the compilation option "keep hierachy" set to "soft" the used
+      FPGA slices figure has dropped from 99% to 90%
+
+
+(No previous versions released for the V6Z80P+ V1.1 PCB)
