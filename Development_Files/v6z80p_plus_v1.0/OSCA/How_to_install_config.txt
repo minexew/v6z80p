@@ -12,25 +12,28 @@ Installing an FPGA config onto the EEPROM
     ( Enter command "RX !"                                              )
     ( Send EEPROM.EXE from the utils folder with the PC serial link app )
 
-4. Choose Option 1 "Write config to slot".
+4. Update the bootcode to the latest version ("bootcode.epr") if necessary.
+   (Only required if updating from a version of OSCA prior to V661)
+   
+5. Choose Option 1 "Write config to slot".
 
-5. Choose an inactive slot.
+6. Choose an inactive slot.
 
-6. Locate the config .bin file on disk, or send it (from "Config File" folder)
+7. Locate the config .bin file on disk, or send it (from "Config File" folder)
    with the Serial Link app, choosing the "RS232" option in the dialog box for
    serial download.
 
-7. Wait for file to load, write to EEPROM and complete verification.
+8. Wait for file to load, write to EEPROM and complete verification.
 
-8. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
+9. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
 
-9. When prompted, choose to reconfigure from whichever slot you
+10. When prompted, choose to reconfigure from whichever slot you
    used in step 5
 
-10. The FPGA restarts with the new FPGA firmware. This selection
+11. The FPGA restarts with the new FPGA firmware. This selection
     persists until power off (or changed again with this util)
 
-11. If everything is OK, you can reload the EEPROM tool and choose option 3
+12. If everything is OK, you can reload the EEPROM tool and choose option 3
     to make the new slot active.
 
    ( If you want, you can just rewrite the active slot in the first place, but       )
