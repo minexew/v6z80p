@@ -12,8 +12,9 @@ Installing an FPGA config onto the EEPROM
     ( Enter command "RX !"                                              )
     ( Send EEPROM.EXE from the utils folder with the PC serial link app )
 
-4. Update the bootcode to the latest version ("bootcode.epr") if necessary.
-   (Only required if updating from a version of OSCA prior to V661)
+4. Update the bootcode to the latest version if necessary:
+   (see Development_Files\v6z80p_plus_v1.0\EEPROM\Bootcode\bootcode.epr) This is
+    mandatory if updating from a version of OSCA prior to V661)
    
 5. Choose Option 1 "Write config to slot".
 
@@ -43,6 +44,26 @@ Installing an FPGA config onto the EEPROM
    ( be forced to use one of the manual config options to correct it - details below )
 
    ( It is recommended that a known-working OSCA config file is always left in slot 1 )
+
+
+-------------------------------------------------------------------------------
+
+Note:
+
+It is possible to update FLOS/bootcode/OSCA in slots 0 and 1 in one go using
+the FLOS command:
+
+FIRMWARE.EXE default.bin 0
+
+Normally this is only used to set up a new board or update very old systems
+(as the default.bin files are not regularly updated). The "default.bin" file
+is in the folder Development_Files\v6z80p_plus_v1.0\EEPROM\eeprom_image
+
+(Slot 1 should be the ACTIVE SLOT if the FIRMWARE.EXE command is used, so that
+the system starts from the newly written config. It does not set the slot itself.)
+
+---------------------------------------------------------------------------------
+
 
 
 Emergency recovery options (v6Z80P+ version)
