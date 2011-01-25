@@ -97,7 +97,7 @@ FIRMWARE.EXE default.bin 0
 
 Normally this is only used to set up a new board or update very old systems
 (as the default.bin files are not regularly updated). The "default.bin" file
-is in the folder Development_Files\v6z80p\EEPROM\eeprom_image
+is in the folder Development_Files\v6z80p\EEPROM
 
 (Slot 1 should be the ACTIVE SLOT if the FIRMWARE.EXE command is used, so that
 the system starts from the newly written config. It does not set the slot itself.)
