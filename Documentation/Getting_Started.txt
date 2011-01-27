@@ -17,8 +17,9 @@ Brief description of the V6Z80P PCB
 The board is a 2-layer PCB, comprising mainly of a 20MHz Z80 CPU, Spartan 2 FPGA
 and 3 memory chips on their own seperate buses. It offers 12bit colour and stereo
 sound output, connectors for PC standard PS/2 keyboard and mouse, Atari 2600 joysticks,
-RS232 serial and SD card IO. The V6Z80P should be powered from a regulated 7.5 to 9.0 Volt DC
-mains adapter with a 2.1mm jack (centre positive) capable of supplying about 1Amp (or more).
+RS232 serial and SD card IO. The V6Z80P should be powered from a regulated 7.5 to
+9.0 Volt DC mains adapter with a 2.1mm jack (centre positive) capable of supplying
+about 1Amp (or more).
 
 
 
