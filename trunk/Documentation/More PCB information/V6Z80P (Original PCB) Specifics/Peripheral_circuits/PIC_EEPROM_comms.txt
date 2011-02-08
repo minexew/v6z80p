@@ -1,0 +1,115 @@
+PIC / EEPROM Communications
+---------------------------
+
+Once the FPGA has been configured, the CPU can communicate with the config PIC
+microcontroller via the FPGA. The PIC firmware allows the EEPROM to be reprogrammed
+and data to be downloaded from it. Also, the FPGA can be made to reconfigure from
+an arbitary address in the EEPROM.
+
+Aside from the signals used during configuration, there are 2 outputs from the FPGA
+to the PIC, one input to the FPGA from the PIC and one input direct from the data_out
+pin of the EEPROM to the FPGA.
+
+
+Hardware connections
+--------------------
+
+
+P107 - From FPGA to PIC - PIC RB1 Data (OSCA's Z80 port sys_pic_comms - bit 0 output)  
+
+P154 - From FPGA to PIC - PIC RA5 Clock (OSCA's Z80 port sys_pic_comms - bit 1 output)  
+
+P161 - From PIC To FPGA - PIC RB7 Clock/Busy (OSCA's Z80 port sys_hw_flags - bit 3 input
+                                  (also serial-parallel converter clock)  
+
+P153 - From EEPROM To FPGA & PIC EEPROM - Data (converted to bytes, read from OSCA's
+                                          Z80 port: sys_eeprom_byte) 
+
+
+Sending commands and args
+--------------------------
+
+Command and argument bytes are sent serially to the PIC MSb first, with bits latched by the
+PIC on the rising edge of the clock line. FPGA Pins 107 and 154 are used to for this - these
+are mapped into the OSCA port sys_pic_comms). To prevent bits being missed or the system
+timing out, the bit rate should be between 2KHz and 100 KHz. If a clock/busy signal is received
+from the PIC (FPGA P161 - OSCA port sys_hw_flags) this indicates the data is not acceptible
+(args out of range etc)
+
+
+PIC Command List:
+-----------------
+
+$88 + $a1 
+Immediately reconfigure the FPGA from the current config address base
+
+$88 + $b8 + $low + $middle + $high address bytes 
+Set the config address base
+
+$88 + $37 + $d8 + $06 
+make the current FPGA config base address permanent (store in PIC's flashram) 
+Programming mode must be enabled first)
+
+$88 + $c9 
+send data to FPGA using current databurst base address and length
+
+$88 + $d4 + $low + $middle + $high address bytes 
+Set databurst address base
+
+$88 + $e2 + $low + $middle + $high count bytes 
+Set databurst length
+
+$88 + $25 + $fa + $99 
+Enable EEPROM programming
+
+$88 + $1f 
+Disable EEPROM programming
+
+$88 + $f5 + $low + $middle + $high address bytes 
+Erase 64KB block of SPI EEPROM ($middle and $low = $00) (Programming mode must be enabled first)
+
+$88 + $98 + $low + $middle + $high address bytes + 64 data bytes 
+Program bytes into SPI EEPROM (The 64KB EEPROM block in which the bytes are to be located
+must be erased prior to programming new data.)
+
+$88 + $53 (added in v6.17 - Nov '09)
+Request EEPROM sends its ID byte (response to SPI command $AB)
+
+$88 + $76 (added in v6.17 - Nov '09) 
+Request PIC sends the MSB of config base address (IE: slot selection * 2) As this is sent
+from the PIC and not the EEPROM it is a "manual" 8 bit sequence. Upon each rising clock
+edge sent from the FPGA, the PIC presents a new data bit on RB7 (MSB is sent first).
+Therefore the 8 bits should ideally be read by the CPU near the falling clock edges.
+
+$88 + $4e (added in v6.18 - Nov' 09)
+Request PIC sends its firmware revision (last two BCD digits of the firmware version.
+EG: if fw version is 6.18, the byte is $18)  The byte is sent in the same way as the active
+slot.
+
+
+Reading data from EEPROM
+------------------------
+
+A "send databurst" command sequence is first sent to the PIC. Afterwards, the outgoing clock
+line (FPGA P154 -> PIC RA5) should be raised (set port sys_pic_comms bit 1) - this prompts
+the PIC to send eight bits of data. When the bits have been received (in OSCA, the "byte ready"
+flag in port sys_hw_flags becomes set), the clock line should then be cleared and the byte
+received read (from port sys_eeprom_byte). When this port is read, the serial count and byte
+received flags are reset. The clock should stay low for at least 4 microseconds (to ensure
+that the PIC does not miss it). This cycle should be repeated for the all bytes required.
+
+
+Sending data to burn to EEPROM
+------------------------------
+
+Due to limitations imposed by the EEPROM, the entire 64KB page must be erased before
+inserting arbitary data into it. Therefore if only a few bytes are required to be changed,
+the entire page must first be read, the data changed in a buffer, the EEPROM page erased
+and the new 64KB of data uploaded from the buffer.
+
+Also, although the EEPROM can accept single bytes for programming, the V6Z80P currently
+stipulates that 64 byte packets must be sent. When sending DATA to the PIC, the CPU
+should check for a clock high from the PIC (FPGA pin 161 - routed to OSCA's
+sys_hw_flags port bit 3). This means the CPU should pause the transmission as the
+PIC/EEPROM is busy (burning to flashram etc).
+
