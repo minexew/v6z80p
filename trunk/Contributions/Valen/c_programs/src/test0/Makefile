@@ -9,7 +9,7 @@ include ../../Makefile_inc
 
 # Project specific rules
 obj/test0.rel : test0.c 
-	sdcc -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DOWN_SP=$(stack) test0.c 
+	sdcc -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) test0.c 
 
 
 

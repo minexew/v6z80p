@@ -10,14 +10,14 @@ stack      = 0x8000
 # Include main makefile
 include ../../Makefile_inc
 
-CFLAGS=-c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed --use-stdout
+CFLAGS=-c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)
 # Project specific rules
 obj/tstsnd1.rel : tstsnd1.c  fx_player/sound_fx.h fx_player/sound_fx.c
 	sdcc $(CFLAGS)  -DSOUND_FX_CODE=$(sound_fx_code) -DOWN_SP=$(stack)  tstsnd1.c
 
 # compile fx_player code to separate segment FX_PLAYER_CODE
 fx_player/obj/fx_player_code.rel : fx_player/obj/fx_player_code.c
-	sdcc -c -o fx_player/obj/ --std-sdcc99   -mz80   --opt-code-speed --use-stdout  \
+	sdcc -c -o fx_player/obj/ --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  \
         --constseg FX_PLAYER_CODE fx_player/obj/fx_player_code.c
 
 # assemble fx_player_code

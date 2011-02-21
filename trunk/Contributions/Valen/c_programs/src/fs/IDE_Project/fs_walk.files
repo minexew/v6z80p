@@ -1,8 +1,8 @@
-../list_view.c
-../fs_walk.c
-../util.c
-../display_flos.c
-../os_onexit.c
-../os_cmd.c
-../user_actions.c
-../config.c
+list_view.c
+fs_walk.c
+util.c
+display_flos.c
+os_onexit.c
+os_cmd.c
+user_actions.c
+config.c

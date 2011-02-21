@@ -50,30 +50,30 @@ void ListView_Update(ListView* this) {
     i=this->firstVisibleIndex;
     while( i < (this->firstVisibleIndex+height) &&  i < this->numItems ) {
         // erase select chars
-        FLOS_SetCursorPos(x, y);
-        FLOS_PrintString(" "); 
-        FLOS_SetCursorPos(x+width-1, y);
-        FLOS_PrintString(" "); 
+        Display_SetCursorPos(x, y);
+        Display_PrintString(" ");
+        Display_SetCursorPos(x+width-1, y);
+        Display_PrintString(" ");
 
         // if current item is selected, set pen for selected item
-        (i == this->selectedIndex) ? FLOS_SetPen(PEN_SELECTED) : FLOS_SetPen(PEN_DEFAULT); 
+        (i == this->selectedIndex) ? Display_SetPen(PEN_SELECTED) : Display_SetPen(PEN_DEFAULT);
          // if .exe file
-        if(strstr(p, ".EXE") != NULL && i != this->selectedIndex) FLOS_SetPen(PEN_FILE_EXE); 
+        if(strstr(p, ".EXE") != NULL && i != this->selectedIndex) Display_SetPen(PEN_FILE_EXE);
             
 
         // print item
-        FLOS_SetCursorPos(x+1, y);
-        FLOS_PrintStringLFCR(p); 
+        Display_SetCursorPos(x+1, y);
+        Display_PrintStringLFCR(p);
 
         strl = strlen(p);
         // erase last chars in row
         if(strl < this->width-2) {
-            FLOS_SetCursorPos(x+1+strl, y);
-            for(k=0; k<(this->width-2-strl); k++) FLOS_PrintString(" "); 
+            Display_SetCursorPos(x+1+strl, y);
+            for(k=0; k<(this->width-2-strl); k++) Display_PrintString(" ");
         }
 
         // reset color
-        FLOS_SetPen(PEN_DEFAULT);
+        Display_SetPen(PEN_DEFAULT);
 
         p = p + strlen(p) + 1;
 /*
@@ -171,13 +171,13 @@ void ListView_update_own_textfield(ListView* this)
     word numitems;
 
     // pos to one line below listview window
-    FLOS_SetCursorPos(this->x, this->y+this->height);
-    FLOS_PrintString("---> ");
+    Display_SetCursorPos(this->x, this->y+this->height);
+    Display_PrintString("---> ");
 
     numitems = ListView_GetNumItems(this); 
     _uitoa(numitems, buffer, 10);
-    FLOS_PrintString(buffer);
+    Display_PrintString(buffer);
 
-    FLOS_PrintString(" entries");
+    Display_PrintString(" entries");
 
 }
