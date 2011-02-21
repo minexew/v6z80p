@@ -22,7 +22,8 @@ objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.$(O)                   \
 
 INC=-I$(basedir)/inc
 
-# output redirection to stdout (instead of stderr), for Windows shell
+# Output redirection to stdout (instead of stderr), for Windows shell.
+# Also QtCreator IDE want redirection to stderr.
 # use_stdout = "--use-stdout"
 
      

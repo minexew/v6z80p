@@ -68,6 +68,7 @@ word numStrings;        //
 #define FILENAME_LEN    8+1+3                // FILENAME + dot + EXT  
 
 #include "util.c"
+#include "display_flos.c"
 
 #include "os_onexit.c"
 #include "os_cmd.c"
@@ -80,6 +81,7 @@ ListView lview;
 void fill_ListView_by_entries_from_current_dir(void);
 
 #include "user_actions.c"
+
 
 
 int main (void)
@@ -104,7 +106,7 @@ int main (void)
 
 
     MarkFrameTime(0x00f);
-    FLOS_ClearScreen();
+    Display_ClearScreen();
     clear_keyboard_buffer();
 
 
@@ -233,8 +235,8 @@ void clear_area(byte x, byte y, byte width, byte height)
 
     for(cur_y=y; cur_y<y+height; cur_y++) {
         for(cur_x=x; cur_x<x+width; cur_x++) {
-            FLOS_SetCursorPos(cur_x, cur_y);
-            FLOS_PrintString(" "); 
+            Display_SetCursorPos(cur_x, cur_y);
+            Display_PrintString(" ");
         }
     }
 

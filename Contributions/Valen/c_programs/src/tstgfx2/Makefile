@@ -9,7 +9,7 @@ include ../../Makefile_inc
 
 # Project specific rules
 obj/tstgfx2.rel : tstgfx2.c object_32x28.c
-	sdcc -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed --use-stdout  -DOWN_SP=$(stack) tstgfx2.c 
+	sdcc -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) tstgfx2.c 
 
 
 object_32x28.c : data/object_32x28.bin data/object_palette.bin
