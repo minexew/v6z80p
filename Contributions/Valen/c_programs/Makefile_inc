@@ -34,8 +34,6 @@ v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)
 	sdcc  -o obj/ -mz80   $(use_stdout)  --no-std-crt0   $(linkopt)  -Wl-b_FLOS_PROXY_CODE=0x5080  $(objects) $(prjobjects)
 	ren obj\crt0_v6z80p.ihx $(prjname).ihx
 	@echo ------------- IHX to BIN convertion ---------
-#	..\..\c_support\tools\BINEX.EXE /X /%%+0 /!-  obj\$(prjname).ihx
-#	..\..\c_support\tools\binex.exe /B /!-        obj\$(prjname).ihx
 	..\..\c_support\tools\srec_cat obj\$(prjname).ihx -intel -offset -0x5000   -o obj\$(prjname).exe -binary  
 # -- copy to EXE dir
 #	ren obj\00005000.bin $(prjname).exe
