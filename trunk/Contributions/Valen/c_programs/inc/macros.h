@@ -15,10 +15,14 @@
 #define BITMAP_MODE             0x00            // bit 0 = 0 (bitmap mode)
 #define TILE_MAP_MODE           1
 #define WIDE_LEFT_BORDER        2
-// in bitmap mode
+// ---- in bitmap mode
 #define CHUNKY_PIXEL_MODE       0x80            // bit 7 = 1 (chunky pixel mode)
-// in extended tilemap mode
+// ---- in extended tilemap mode
 #define DUAL_PLAY_FIELD         0x80
+// (bit 3, of vidctrl)
+#define TILE_SIZE_8x8           8
+#define TILE_SIZE_16x16         0
+
 
 // vreg_window bits
 #define SWITCH_TO_X_WINDOW_REGISTER   4
