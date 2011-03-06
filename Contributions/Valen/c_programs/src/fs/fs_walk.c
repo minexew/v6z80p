@@ -8,7 +8,7 @@ changelog
 
 
 0.012
-- added config file FS_WALK.CFG
+- added config file FS.CFG
 - added ability to delete file and empty folder
 0.013
 - now works fine with FLOS v560+
@@ -25,16 +25,22 @@ changelog
 #include <v6z80p_types.h>
 #include <OSCA_hardware_equates.h>
 #include <scan_codes.h>
-
-#include <os_interface_for_c/i_flos.h>
+#include <macros.h>
+#include <macros_specific.h>
 #include <set_stack.h>
+#include <os_interface_for_c/i_flos.h>
+
 
 #include <fs_walk/fs_walk.h>
 
 #include <stdlib.h>
 #include <string.h>
 
+#include "display.h"
 
+// define one of two possible video modes
+//#define USE_FLOS_DISPALY
+#define USE_TILEMAP_DISPALY
 
 #define OS_VERSION_REQ  0x560           // OS version req. to run this program
 #define FLOS_START_ADDR 0x1000
@@ -68,13 +74,22 @@ word numStrings;        //
 #define FILENAME_LEN    8+1+3                // FILENAME + dot + EXT  
 
 #include "util.c"
+#include "../../src/lib/video_mode.c"
+
+#ifdef  USE_FLOS_DISPALY
 #include "display_flos.c"
+#endif
+#ifdef  USE_TILEMAP_DISPALY
+#include "display_tilemap.c"
+#endif
 
 #include "os_onexit.c"
 #include "os_cmd.c"
 
 #include "list_view.c"
 #include "config.c"
+
+
 
 ListView lview;     
 
@@ -106,6 +121,7 @@ int main (void)
 
 
     MarkFrameTime(0x00f);
+    Display_InitVideoMode();
     Display_ClearScreen();
     clear_keyboard_buffer();
 

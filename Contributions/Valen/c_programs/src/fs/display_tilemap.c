@@ -1,9 +1,10 @@
 // Display functions
-// using FLOS output.
+// using tilemap 8x8 video mode.
 
 void Display_InitVideoMode(void)
 {
-    return;
+    // select tile mode, extended (2 bytes per tilenumber), 8x8, no "left wide border"
+    VideoMode_InitTilemapMode(DUAL_PLAY_FIELD | TILE_SIZE_8x8, EXTENDED_TILE_MAP_MODE);
 }
 
 void Display_SetCursorPos(BYTE x, BYTE y)
