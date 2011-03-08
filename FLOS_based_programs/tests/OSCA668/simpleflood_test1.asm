@@ -11,6 +11,8 @@ include "system_equates.asm"
 
 
 ;----------------------------------------------------------------------------------------------------------
+	
+	ld hl,arse_biscuits
 
 	ld a,%00000000		; select y window pos register
 	ld (vreg_rasthi),a		; 
