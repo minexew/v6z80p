@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.18 - P.Ruston '08 - '10    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.19 - P.Ruston '08 - '10    *
 ; ****************************************************************************
 ;
 ;
@@ -1270,8 +1270,28 @@ show_slot_ids
 	ld hl,current_slots_text
 	call kjt_print_string
 
-	ld a,1
+	call kjt_get_cursor_position
+	ld (cursor_pos),bc
+	
+	ld a,0
 id_loop	ld (working_slot),a
+	ld bc,(cursor_pos)
+	cp 16
+	jr nz,sameside
+	push af
+	ld a,c
+	sub 16
+	ld c,a
+	pop af
+
+sameside	jr c,leftside
+	ld b,20	
+
+leftside	call kjt_set_cursor_position
+	inc c
+	ld (cursor_pos),bc
+
+	ld a,(working_slot)			
 	ld hl,slot_number_text
 	call kjt_hex_byte_to_ascii
 	ld hl,slot_text
@@ -1280,7 +1300,12 @@ id_loop	ld (working_slot),a
 	call kjt_print_string
 	
 	ld a,(working_slot)			;read in EEPROM page that contains the ID string
-	ld h,a
+	or a
+	jr nz,notszero
+	ld hl,bootcode_text
+	jr id_ok	
+
+notszero	ld h,a
 	ld l,0
 	add hl,hl
 	ld de,$01fb
@@ -1410,12 +1435,32 @@ wbc_byte2	in a,(sys_hw_flags)			; have 8 bits been received?
 gbcbyte2	xor a			
 	out (sys_pic_comms),a		; drop PIC clock line, PIC will then wait for next high 
 	in a,(sys_eeprom_byte)		; read byte received, clear bit count
+
 	push af
 	ld hl,eeprom_id_text
 	call kjt_print_string
 	pop af
-	ld (eeprom_id_byte),a	
-	sub $11
+
+	cp $bf				; If SST25VF type EEPROM is present, we'll have received
+	jr nz,non_sst			; manufacturer's ID ($BF) not the capacity
+
+	ld hl,sst25vf_text
+	call kjt_print_string	
+	ld a,$88				; Use alternate "Get EEPROM ID" command to find ID 
+	call send_byte_to_pic		
+	ld a,$6c
+	call send_byte_to_pic
+   	ld hl,eeprom_id_byte			
+	call read_pic_byte
+	ld a,(hl)
+	jr got_eid
+	
+non_sst	push af
+	ld hl,at25x_text
+	call kjt_print_string
+	pop af
+got_eid	ld (eeprom_id_byte),a	
+	sub $11	
 	ld l,a
 	ld h,0
 	add hl,hl
@@ -1554,7 +1599,7 @@ include "file_requesters_with_rs232.asm"
 
 
 start_text1	db 11," ************************************ ",11
-		db    " * V6Z80P ONBOARD EEPROM TOOL V1.18 * ",11
+		db    " * V6Z80P ONBOARD EEPROM TOOL V1.19 * ",11
 		db    " ************************************ ",11,0
 		
 start_text2	db 11
@@ -1701,10 +1746,10 @@ os_warn_txt	db 11,"Caution! An Operating System may be",11
 warn_active_slot_txt db 11,11,"ERROR! Writing data to a block within",11
 		 db "the Active Slot is not allowed!",11,0
 
-current_slots_text	db 11,"Current EEPROM slot contents..",11,11
-		db " SLOT 00 - BOOTCODE / OS etc",11,0
+current_slots_text	db 11,"Current EEPROM slot contents..",11,11,0
+bootcode_text	db "BOOTCODE ETC",0
 
-slot_text		db 11," SLOT ",0
+slot_text		db " ",0
 slot_number_text	db "xx - ",0
 unknown_text	db "UNKNOWN",0
 
@@ -1715,14 +1760,17 @@ current_slot_txt	db 11,11,"Current Active Slot: "
 active_slot_txt	db "xx",11,11,0
 
 
-eeprom_id_text	db 11,"Detected EEPROM type: 25x",0
+eeprom_id_text	db 11,"Detected EEPROM type: ",0
+at25x_text	db "25*",0
+sst25vf_text	db "SST25VF",0
 
-eeprom_id_list	db "20 (256KB)    ",11,0	;id = $11
-		db "40 (512KB)    ",11,0	;id = $12
-		db "80 (1MB)      ",11,0	;id = $13
-		db "16 (2MB)      ",11,0	;id = $14
-		db "32 (4MB)      ",11,0	;id = $15
-		db "64 (8MB)      ",11,0	;id = $16
+eeprom_id_list	db "20 (256KB)",11,0,0,0,0,0	;id = $11
+		db "40 (512KB)",11,0,0,0,0,0	;id = $12
+		db "80 (1MB)  ",11,0,0,0,0,0	;id = $13
+		db "16 (2MB)  ",11,0,0,0,0,0	;id = $14
+		db "32 (4MB)  ",11,0,0,0,0,0	;id = $15
+		db "64 (8MB)  ",11,0,0,0,0,0	;id = $16
+
 
 no_id_text	db 11,"EEPROM: Unknown - Assuming 25x40 (512KB)",0
 
@@ -1762,6 +1810,8 @@ prog_figures	db "--- KB complete..",13,0
 new_line		db 11,0
 
 page_count	dw 0
+
+cursor_pos	dw 0
 
 ;---------------------------------------------------------------------------------------
 
