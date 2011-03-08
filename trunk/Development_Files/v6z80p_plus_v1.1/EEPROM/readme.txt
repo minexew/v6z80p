@@ -20,10 +20,8 @@ $1F000-$1FFFF - Bootcode 6.13 (backup)
 
 [SLOT 1]
 
-$20000-$3FFFF - OSCA v667 PAL for V6Z80P+V1.1 (PAL)
+$20000-$3FFFF - OSCA v668 PAL for V6Z80P+V1.1
 
+[SLOT 2]
 
-
-
-
-
+$40000-$5FFFF - OSCA v668 NTSC for V6Z80P+v1.1 
