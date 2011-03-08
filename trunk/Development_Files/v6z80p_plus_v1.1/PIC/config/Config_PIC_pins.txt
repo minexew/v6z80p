@@ -1,5 +1,5 @@
 
-V6Z80P+ CONFIG PIC: Pin connections (firmware V630)
+V6Z80P+ CONFIG PIC: Pin connections (firmware V635)
 ---------------------------------------------------
 
 				 16F627/8A
