@@ -54,7 +54,7 @@ make them Megadrive pad compatible).
 V6Z80P+ v1.1
 ------------
 
-Made after Jan 2011. This board better allows alternative clock inputs
+Made in Jan 2011. This board better allows alternative clock inputs
 and CPU clock control.
 
 The board is marked "V6Z80P+ Rev1.1"
@@ -92,4 +92,20 @@ The 3.3v regulator for the SD card now uses a SOT223 footprint
 instead of SOIC-8
 
 The PCB mounting holes are in different locations.
+
+
+V6Z80P+ v1.1b
+-------------
+
+Made in March 2011 this board has the same main features as the +v1.1
+withe the following changes:
+
+The SD card connector is a push-push type and located in a slightly
+different position. 
+
+There are wider pads for the 8-pin EEPROM
+
+The "OSC SEL" switch has been removed as it turned out to be unnecessary
+to have a fall-back mode where the main oscillator drives the CPU
+directly.
 
