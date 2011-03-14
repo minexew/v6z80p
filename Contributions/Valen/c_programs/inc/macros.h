@@ -129,4 +129,7 @@ static volatile __at BITPLANE0A_LOC+3 unsigned char mm__bitplane0a_loc__byte3;
 // RGB to 12bit V6Z80P palette value
 #define RGB2WORD(r,g,b)         (   (word) ((r/16<<8)+(g/16<<4)+(b/16))   )
 
+// tilemaps video page (tilemaps start at VRAM 0x70000)
+#define TILEMAPS_VIDEO_PAGE                (0x70000/0x2000)
+
 #endif /* MACROS_H */

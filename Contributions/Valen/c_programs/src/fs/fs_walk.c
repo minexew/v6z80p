@@ -37,6 +37,7 @@ changelog
 #include <string.h>
 
 #include "display.h"
+#include "../../src/lib/assert_v6.h"
 
 // define one of two possible video modes
 //#define USE_FLOS_DISPALY
@@ -75,6 +76,7 @@ word numStrings;        //
 
 #include "util.c"
 #include "../../src/lib/video_mode.c"
+#include "../../src/lib/assert_v6.c"
 
 #ifdef  USE_FLOS_DISPALY
 #include "display_flos.c"
@@ -121,7 +123,8 @@ int main (void)
 
 
     MarkFrameTime(0x00f);
-    Display_InitVideoMode();
+    if(!Display_InitVideoMode())
+        return NO_REBOOT;
     Display_ClearScreen();
     clear_keyboard_buffer();
 
@@ -142,7 +145,7 @@ int main (void)
     FLOS_PrintStringLFCR(buffer);
 */
 
-
+    FLOS_FlosDisplay();
     if(request_spawn_command)
         return SPAWN_COMMAND;
 

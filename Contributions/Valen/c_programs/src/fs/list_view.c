@@ -1,5 +1,5 @@
 #define PEN_DEFAULT     0x07
-#define PEN_SELECTED    0xa0
+#define PEN_SELECTED    0xa9
 #define PEN_FILE_EXE    0x05
 
 

@@ -210,10 +210,10 @@ void print_box(byte x, byte y, byte w, byte h)
     byte i, j;
     //const char *p = "----------------------";
     for(i=0; i<h; i++) {
-        FLOS_SetCursorPos(x, y+i); 
-        if(i == 0)   { for(j=0; j<w; j++) FLOS_PrintString("-"); continue; }
-        if(i == h-1) { for(j=0; j<w; j++) FLOS_PrintString("-"); continue; }
-        FLOS_PrintString("+"); for(j=0; j<w-2; j++) FLOS_PrintString(" "); FLOS_PrintString("+");
+        Display_SetCursorPos(x, y+i);
+        if(i == 0)   { for(j=0; j<w; j++) Display_PrintString("-"); continue; }
+        if(i == h-1) { for(j=0; j<w; j++) Display_PrintString("-"); continue; }
+        Display_PrintString("+"); for(j=0; j<w-2; j++) Display_PrintString(" "); Display_PrintString("+");
                         
     }
 
@@ -233,10 +233,10 @@ BOOL delete_dir_entry(void)
 
     x = 1; y = 1;
     print_box(x, y, 20, 4+2);
-    FLOS_SetCursorPos(x+2, y+1);  FLOS_PrintString("Delete "); 
-    FLOS_SetCursorPos(x+2, y+2);  FLOS_PrintString(p); 
-    FLOS_SetCursorPos(x+2, y+3);
-    FLOS_PrintString("Y/N ?"); 
+    Display_SetCursorPos(x+2, y+1);  Display_PrintString("Delete ");
+    Display_SetCursorPos(x+2, y+2);  Display_PrintString(p);
+    Display_SetCursorPos(x+2, y+3);
+    Display_PrintString("Y/N ?");
 
     FLOS_WaitKeyPress(&asciicode, &scancode);
     if(scancode == SC_Y) {
