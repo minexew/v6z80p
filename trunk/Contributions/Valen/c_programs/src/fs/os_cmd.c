@@ -96,8 +96,7 @@ word split_string_to_many_strings(void) {
 
 void PrintMessage(const char* str)
 {
-    FLOS_PrintString(str);
-    FLOS_PrintString(PS_LFCR);
+    Display_PrintStringLFCR(str);
 
 }
 
