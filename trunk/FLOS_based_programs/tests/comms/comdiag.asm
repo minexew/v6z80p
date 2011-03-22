@@ -1,5 +1,5 @@
 ;=======================================================================================
-; SERIAL LINK DIAG
+; SERIAL LINK DIAG 0.02
 ;=======================================================================================
 
 ;---Standard header for OSCA and OS ----------------------------------------
@@ -47,6 +47,8 @@ notquit	ld a,b
 	jp z,baud_lo
 	cp "3"
 	jp z,rec_test
+	cp "4"
+	jp z,rx_byte_test
 	jp mainloop
 
 ;---------------------------------------------------------------------------------------
@@ -293,12 +295,36 @@ s_badack	ld a,"X"				; send "bad ack" to stop file
 
 ;----------------------------------------------------------------------------------
 
+rx_byte_test
+
+	ld hl,show_bytes_text
+	call kjt_print_string
+	
+rx_loop	ld a,$8a			;wait 10 seconds (quit if ESC pressed)
+	call kjt_serial_rx_byte
+	jr nc,rx_byte		;if carry clear, received a byte
+	cp $2a
+	jp z,mainloop
+	jr rx_loop
+	
+rx_byte	ld hl,hex_text+1
+	call kjt_hex_byte_to_ascii
+	ld hl,hex_text
+	call kjt_print_string
+	jr rx_loop
+
+
+;----------------------------------------------------------------------------------
+
+
 serial_headertag	db "Z80P.FHEADER"		;12 chars
 
 start_text	db "Serial link diagnostic tool v0.01",11,11,0
 
-menu_text		db 11,11,"Press:",11,11, "1 - BAUD = 115200",11,"2 - BAUD = 57600",11
-		db "3 - Test file transfer - receive",11,11,0
+menu_text		db 11,11,"Press:",11,11
+		db "1 - BAUD = 115200",11,"2 - BAUD = 57600",11
+		db "3 - Test file transfer - receive",11
+		db "4 - Display individual bytes received",11,11,0
 		db "ESC - quit",11,11,0
 
 waiting_text	db "Waiting for serial file transfer..",11,0
@@ -343,6 +369,9 @@ aborted_text	db 11,11,"File was not saved",11,11,0
 
 len_lo		dw 0
 len_hi		dw 0
+
+show_bytes_text	db "Bytes received: (ESC to quit)",11,11,0
+hex_text		db "$-- ",0
 
 filename		db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
