@@ -18,12 +18,14 @@ void Display_PrintChar(BYTE c);
 void Display_InitFont(void);
 BOOL Display_LoadFont(void);
 void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress);
+void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress);
 void Display_SetPalette(void);
+//void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddress, BYTE fontColor);
 
 struct {
     BYTE cursor_x;
     BYTE cursor_y;
-    BYTE cursor_color;
+    BYTE cursor_color, backgr_color;
 } display;
 
 BYTE fontBuffer[0x300];
@@ -40,6 +42,7 @@ BOOL Display_InitVideoMode(void)
     }
     MarkFrameTime(2);
     //mm__vreg_vidctrl = 4;
+    //VideoMode_SetupDisplayWindowSize(0xF, 0x0, 0xF, 0x0);
     Display_InitFont();
     //mm__vreg_vidctrl = 0;
     MarkFrameTime(0);
@@ -50,6 +53,8 @@ BOOL Display_InitVideoMode(void)
 
     display.cursor_x = display.cursor_y = 0;
     display.cursor_color = 7;
+    display.backgr_color = 2;
+
 
 
     TileMap_8x8_FillPlayfieldA(0, 0x800, 0);
@@ -86,15 +91,30 @@ void Display_PrintStringLFCR(const char* str)
     display.cursor_x = 0;
 }
 
-// Simulate FLOS font numbers.
-// 0 - transparent (shows "paper" colour)
-//			1 - black
-//			2 - blue
-//                      ...
+// Simulate FLOS font numbers and colors.
+/*
+        0 - transparent (shows "paper" colour)
+        1 - black
+        2 - blue
+        3 - red
+        4 - magenta
+        5 - green
+        6 - cyan
+        7 - yellow
+        8 - white
+        9 - dark grey
+        a - mid grey
+        b - light grey
+        c - orange
+        d - light blue
+        e - light green
+        f - brown
+*/
 void Display_SetPen(BYTE color)
 {
     //if(color > 0) color--;
     display.cursor_color = color & 0x0F;
+    display.backgr_color = (color & 0xF0) >> 4;
 }
 
 void Display_ClearScreen(void)
@@ -122,29 +142,39 @@ void TileMap_PutTileToTilemap(BYTE x, BYTE y, WORD tileNumber)
 #define FONT_8x8_SIZE   (96*8*8)
 void Display_InitFont(void)
 {
-    DWORD fontVideoAddress;
+    DWORD destVideoAddress;
     BYTE colorIndex;
 
-    // make 15 fonts
-    fontVideoAddress = 0;
+    // make 15 fonts, with color index 1 to 15
+    destVideoAddress = 0;
     for(colorIndex=1; colorIndex<16; colorIndex++) {
-        Display_CreateChunkyFont(colorIndex, fontVideoAddress);
-        fontVideoAddress += FONT_8x8_SIZE;
+        Display_CreateChunkyFont(colorIndex, destVideoAddress);
+        destVideoAddress += FONT_8x8_SIZE;
+    }
+
+
+    // Make 15 tiles, with color index 1 to 15 (will be used as background tiles)
+    // Put in video memory right after fonts.
+    //fontVideoAddress = 0;
+    for(colorIndex=1; colorIndex<16; colorIndex++) {
+        Display_FillTile8x8(colorIndex, destVideoAddress);
+        destVideoAddress += 8*8;
     }
 }
 
 
 
-// Create chunky font, from current FLOS bitmap font.
+// Create chunky font, from FLOS bitmap font (1bit per pixel).
 // Font 96 chars.
 //
 // fontVideoAddress - must be div by 8 without remainder
 void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress)
 {
+    BYTE b;
     WORD i;
-    BYTE b, j;
-    WORD destChar, destCharY;
-    BYTE mask;
+
+    BYTE destChar, destCharY;
+    BYTE mask, j;
     BYTE* pDestFont;
 
     //BYTE videoBank; WORD videoOffset;   // VRAM, destination for chunky font (byte per pixel)
@@ -168,30 +198,63 @@ void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress)
         mask = 0x80;
         for(j=0; j<8; j++) {
             ASSERT_V6( pDestFont < ((BYTE*)VIDEO_BASE + 0x2000) );
-            (b & mask) ? (*pDestFont = fontColor) : (*pDestFont = 0);
-
-            mask = mask >> 1;
+            *pDestFont = (b & mask) ? (fontColor) : (0);
             pDestFont++;
 
+            mask = mask >> 1;
         }
+
+
+
         if(++destChar == 96) {destChar = 0; destCharY++;}
     }
 
     PAGE_OUT_VIDEO_RAM();
 }
 
+// Calc video page and video pointer from linear video address.
+#define CALC_VIDEO_PAGE_NUMBER(dw)       (dw/0x2000)
+#define CALC_PTR_TO_VIDEO_WINDOW(dw)     ( (BYTE*)(VIDEO_BASE + ((WORD)dw & 0x1FFF)) )
+#define IS_PTR_WITHIN_VIDEO_WINDOW(p)    (p < ((BYTE*)VIDEO_BASE + 0x2000) )
+
+// Fill tile. Size 8x8 pixels.
+//
+// videoAddress - must be div by 64 without remainder
+void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress)
+{
+    BYTE* pDest;
+
+    //
+    ASSERT_V6( (videoAddress & 63) == 0);
+
+    PAGE_IN_VIDEO_RAM();
+    SET_VIDEO_PAGE( CALC_VIDEO_PAGE_NUMBER(videoAddress) );
+    pDest = CALC_PTR_TO_VIDEO_WINDOW(videoAddress);
+    ASSERT_V6( IS_PTR_WITHIN_VIDEO_WINDOW(pDest + 64 - 1) );
+
+    memset(pDest, colorIndex, 8*8);
+    PAGE_OUT_VIDEO_RAM();
+}
+
+#define FIRST_BACKGROUND_TILE_NUMBER    ( (WORD)(FONT_8x8_SIZE*15UL / 64) )
 void Display_PrintChar(BYTE c)
 {
     WORD tileNumber;
-    BYTE cursorColor;
+    BYTE color;
 
     tileNumber = c - 0x20;              // ASCII code to tile number
     // correct tilenumber, according to current color
-    cursorColor = (display.cursor_color > 0) ? display.cursor_color - 1 : display.cursor_color;
-    tileNumber +=  cursorColor * 96;
+    //color = (display.cursor_color > 0) ? display.cursor_color - 1 : display.cursor_color;
+    //tileNumber +=  color * 96;
 
-//tileNumber += 15 * 96;
 
+    // char tile
+    //TileMap_PutTileToTilemap(display.cursor_x, display.cursor_y, tileNumber);
+
+    // background tile
+    // correct tilenumber, according to current color
+    color = (display.backgr_color > 0) ? display.backgr_color - 1 : display.backgr_color;
+    tileNumber =  FIRST_BACKGROUND_TILE_NUMBER + color;
     TileMap_PutTileToTilemap(display.cursor_x, display.cursor_y, tileNumber);
 }
 
@@ -209,10 +272,32 @@ BOOL Display_LoadFont(void)
     return TRUE;
 }
 
-//void Display_CloneChunkyFont(DWORD fontVideoAddress, BYTE fontColor, )
-//{
+/*
+void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddress, BYTE fontColor)
+{
 
-//}
+    BYTE* pFont = 0;
+    BYTE bytePixel;
+    WORD i;
+
+    PAGE_IN_VIDEO_RAM();
+    for(i=0; i<FONT_8x8_SIZE; i++) {
+        // get pixel
+//        SET_VIDEO_PAGE(srcFontVideoAddress/0x2000);
+//        pFont = (BYTE*)(VIDEO_BASE + ((WORD)srcFontVideoAddress & 0x1FFF));
+        bytePixel = *pFont;
+
+        // put pixel
+        SET_VIDEO_PAGE(destFontVideoAddress/0x2000);
+        pFont = (BYTE*)(VIDEO_BASE + ((WORD)destFontVideoAddress & 0x1FFF));
+        *pFont = (bytePixel == 0) ? 0 : fontColor ;
+        // advance linear video addresses
+        srcFontVideoAddress++; destFontVideoAddress++;
+    }
+    PAGE_OUT_VIDEO_RAM();
+
+}
+*/
 
 // 16 primary colors
 const WORD myPalette[] = {
@@ -247,15 +332,15 @@ void Display_SetPalette(void)
     memcpy((void*) PALETTE, myPalette, sizeof(myPalette));
 
     Display_SetCursorPos(0, 26);
-    Display_SetPen(0); Display_PrintString("ABCD1234");
-    Display_SetPen(1); Display_PrintString("ABCD1234");
-    Display_SetPen(2); Display_PrintString("ABCD1234");
-    Display_SetPen(3); Display_PrintString("ABCD1234");
-    Display_SetPen(4); Display_PrintString("ABCD1234");
-    Display_SetPen(5); Display_PrintString("ABCD1234");
+    Display_SetPen(0x30); Display_PrintString("ABCD1234");
+    Display_SetPen(0x31); Display_PrintString("ABCD1234");
+    Display_SetPen(0x32); Display_PrintString("ABCD1234");
+    Display_SetPen(0x33); Display_PrintString("ABCD1234");
+    Display_SetPen(0x34); Display_PrintString("ABCD1234");
+    Display_SetPen(0x35); Display_PrintString("ABCD1234");
     Display_SetCursorPos(0, 27);
-    Display_SetPen(6); Display_PrintString("ABCD1234");
-    Display_SetPen(7); Display_PrintString("ABCD1234");
+    Display_SetPen(0x36); Display_PrintString("ABCD1234");
+    Display_SetPen(0x37); Display_PrintString("ABCD1234");
 
 
     Display_SetCursorPos(0, 28);
