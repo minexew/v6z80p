@@ -27,7 +27,7 @@ ls | grep FLOS_ - | sed 's/'$regex1'/            $(myd7)\/obj\/\1.rel           
 echo ' ' >> Makefile_lib
 # make section
 echo 'xxx' | sed 's/xxx/\tcd $(myd7_) \&\& sdcclib -l obj\/i_flos_lib.lib myliblist.txt  /' - >> Makefile_lib
-ls | grep FLOS_ - | sed 's/'$regex1'/obj\/\1.rel/   ' -  >> myliblist.txt
+ls | grep FLOS_ - | sed 's/'$regex1'/obj\/\1.rel/   ' -  > myliblist.txt
 echo ' ' >> Makefile_lib
 
 

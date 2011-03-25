@@ -140,6 +140,7 @@ V6Z80P_EXTERN void FLOS_FlosDisplay(void);
 V6Z80P_EXTERN void FLOS_WaitVRT(void);
 V6Z80P_EXTERN void FLOS_SetPen(byte color);
 V6Z80P_EXTERN BOOL FLOS_SetCursorPos(byte x, byte y);
+V6Z80P_EXTERN void FLOS_ScrollUp(void);
 
 // ---------------
 V6Z80P_EXTERN void FLOS_WaitKeyPress(byte* pASCII, byte* pScancode);
