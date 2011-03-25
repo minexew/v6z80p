@@ -460,7 +460,13 @@ failed15
         proxy__draw_cursor    ;os_start + $bb
 
         proxy__get_pen       ;os_start+0xbe
+
         proxy__scroll_up       ;os_start+0xc1
+        PUSH_ALL_REGS
+        call kjt_scroll_up
+        POP_ALL_REGS
+        ret
+
         proxy__flos_display       ;os_start+0xc4
         PUSH_ALL_REGS
         call kjt_flos_display

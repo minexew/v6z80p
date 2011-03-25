@@ -428,11 +428,11 @@ BOOL test6(void)
 
 BOOL test7(void)
 {
+    BYTE i;
 
-    FLOS_PrintStringLFCR("ScrollUp 3 times...");
-    FLOS_ScrollUp();
-    FLOS_ScrollUp();
-    FLOS_ScrollUp();
+    FLOS_PrintStringLFCR("ScrollUp 4 times...");
+    for(i=0; i<4; i++) 
+        FLOS_ScrollUp();
 
 
     return TRUE;
