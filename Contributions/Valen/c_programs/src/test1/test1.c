@@ -29,6 +29,7 @@ BOOL test3(void);
 BOOL test4(void);
 BOOL test5(void);
 BOOL test6(void);
+BOOL test7(void);
 
 void proccess_cmd_line(void);
 void DiagMessage(char* pMsg, const char* pFilename);
@@ -76,6 +77,7 @@ int main (void)
     CALL_TEST(4);
     CALL_TEST(5);
     CALL_TEST(6);
+    CALL_TEST(7);
 
 
     FLOS_PrintStringLFCR("TEST OK");
@@ -423,6 +425,20 @@ BOOL test6(void)
 
     return TRUE;
 }
+
+BOOL test7(void)
+{
+
+    FLOS_PrintStringLFCR("ScrollUp 3 times...");
+    FLOS_ScrollUp();
+    FLOS_ScrollUp();
+    FLOS_ScrollUp();
+
+
+    return TRUE;
+}
+
+
 
 void DiagMessage(char* pMsg, const char* pFilename)
 {
