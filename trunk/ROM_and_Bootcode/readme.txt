@@ -71,6 +71,11 @@ BAUD on boot with Function keys F11 (slow) and F12 (fast)
 ROM code
 --------
 
+v6.16 (26/03/2011):
+
+Sets audio panning register to original 0/2=left, 1/3=right format.
+
+
 v6.15 (25/10/2010):
 
 Clears new port "sys_vram_location", ensuring VRAM is placed at $2000 on reset.
