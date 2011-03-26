@@ -28,6 +28,7 @@ sys_io_dir	equ $0f
 
 sys_low_page	equ $20
 sys_vram_location	equ $21
+sys_audio_panning	equ $22
 
 ;---- Sound system ports ---------------------------------------------------
 
