@@ -7,6 +7,9 @@ Both support VGA output.
 Updates to OSCA
 ---------------
 
+669 - Audio mixing changed. Channels can be directed to left, right or both.
+      Controlled by sys_audio_panning (port $22)
+
 668 - 255 colour flood mode added. In flood mode, When bit 4 of vreg_vidctrl is
       set the rule is simplified to: If pixel is 0, repeat last colour.
 
