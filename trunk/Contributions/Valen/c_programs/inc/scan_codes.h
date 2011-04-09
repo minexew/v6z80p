@@ -1,4 +1,4 @@
-// scan codes for AT keyboard
+// scan codes for PC AT keyboard
 // http://www.barcodeman.com/altek/mule/scandoc.php
 
 #define SC_ESC          0x76
@@ -12,6 +12,7 @@
 #define SC_PGDOWN       0x7A
 #define SC_HOME         0x6C
 #define SC_END          0x69
+#define SC_F3           0x04
 #define SC_F4           0x0C
 #define SC_F8           0x0A
 

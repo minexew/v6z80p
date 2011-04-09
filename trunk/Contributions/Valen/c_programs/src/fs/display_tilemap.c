@@ -5,13 +5,17 @@
 // Playfield B - chars 8x8
 
 
-// Display Window sizes:
+// Display Window size (hardware values):
 // Width  368 pixels
 #define X_WINDOW_START                0x7
 #define X_WINDOW_STOP                 0xE
 // Height 240 lines
-#define Y_WINDOW_START                0x3
-#define Y_WINDOW_STOP                 0xD
+#define Y_WINDOW_START                0x2
+#define Y_WINDOW_STOP                 0xC
+
+// Display window size, in pixels.
+#define SCREEN_WIDTH                  368
+#define SCREEN_HEIGHT                 240
 
 
 void Display_PrintChar(BYTE c);
@@ -22,6 +26,16 @@ void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress);
 void Display_SetPalette(void);
 //void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddress, BYTE fontColor);
 
+
+#define PF_A       0
+#define PF_B       1
+
+// Video memory map:
+// 0000 - Tiles for 8x8 font. Total: 15 fonts, with different color indexes (1-15).
+// then - Tiles for solid background. Total:  15 tiles, with different color indexes (1-15).
+
+#define FIRST_BACKGROUND_TILE_NUMBER    ( (WORD)(FONT_8x8_SIZE*15UL / 64) )
+
 struct {
     BYTE cursor_x;
     BYTE cursor_y;
@@ -31,6 +45,7 @@ struct {
 BYTE fontBuffer[0x300];
 
 
+#define DISABLE_NON_SPRITE_VIDEO        mm__vreg_vidctrl = 4;
 
 // public functions -------------------
 BOOL Display_InitVideoMode(void)
@@ -41,14 +56,13 @@ BOOL Display_InitVideoMode(void)
         return FALSE;
     }
     MarkFrameTime(2);
-    //mm__vreg_vidctrl = 4;
-    //VideoMode_SetupDisplayWindowSize(0xF, 0x0, 0xF, 0x0);
+    // disable hardware data fetching from video memory, because we want write to video memory at highest speed
+    DISABLE_NON_SPRITE_VIDEO;
     Display_InitFont();
-    //mm__vreg_vidctrl = 0;
     MarkFrameTime(0);
 
     // select tile mode, extended (2 bytes per tilenumber), 8x8, no "left wide border"
-    VideoMode_InitTilemapMode(/*DUAL_PLAY_FIELD |*/ TILE_SIZE_8x8, EXTENDED_TILE_MAP_MODE);
+    VideoMode_InitTilemapMode(DUAL_PLAY_FIELD | TILE_SIZE_8x8, EXTENDED_TILE_MAP_MODE);
     VideoMode_SetupDisplayWindowSize(X_WINDOW_START, X_WINDOW_STOP, Y_WINDOW_START, Y_WINDOW_STOP);
 
     display.cursor_x = display.cursor_y = 0;
@@ -57,7 +71,8 @@ BOOL Display_InitVideoMode(void)
 
 
 
-    TileMap_8x8_FillPlayfieldA(0, 0x800, 0);
+    TileMap_8x8_FillPlayfield(PF_A, 0, 0x800, 0);
+    TileMap_8x8_FillPlayfield(PF_B, 0, 0x800, 0);
     Display_SetPalette();
 
     return TRUE;
@@ -77,6 +92,7 @@ void Display_PrintString(const char* str)
     while(*str) {
         Display_PrintChar(*str);
         display.cursor_x++;
+        if(display.cursor_x >= SCREEN_WIDTH/8) display.cursor_x = 0;
         str++;
     }
 }
@@ -125,13 +141,14 @@ void Display_ClearScreen(void)
 // private functions -------------------
 
 
-// Playfield A Buffer 0
-void TileMap_PutTileToTilemap(BYTE x, BYTE y, WORD tileNumber)
+// Playfield A or B.  Buffer 0.
+// playfieldNumber: 0 pf A, 1 pf B
+void TileMap_PutTileToTilemap(BYTE playfieldNumber, BYTE x, BYTE y, WORD tileNumber)
 {
     BYTE* pTilemap;
 
     PAGE_IN_VIDEO_RAM();
-    SET_VIDEO_PAGE(TILEMAPS_VIDEO_PAGE);
+    SET_VIDEO_PAGE(TILEMAPS_VIDEO_PAGE + playfieldNumber);  // video addr: 8KB - PF A, then 8KB PF_B
     pTilemap = (byte*)(VIDEO_BASE + y*64 + x);
     *pTilemap         = (byte) tileNumber;         //LSB
     *(pTilemap+0x800) = (byte)(tileNumber >> 8); //MSB
@@ -236,26 +253,25 @@ void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress)
     PAGE_OUT_VIDEO_RAM();
 }
 
-#define FIRST_BACKGROUND_TILE_NUMBER    ( (WORD)(FONT_8x8_SIZE*15UL / 64) )
+
 void Display_PrintChar(BYTE c)
 {
     WORD tileNumber;
     BYTE color;
 
+    // char tile ---
     tileNumber = c - 0x20;              // ASCII code to tile number
     // correct tilenumber, according to current color
-    //color = (display.cursor_color > 0) ? display.cursor_color - 1 : display.cursor_color;
-    //tileNumber +=  color * 96;
+    color = (display.cursor_color > 0) ? display.cursor_color - 1 : display.cursor_color;
+    tileNumber +=  color * 96;
+    ASSERT_V6(display.cursor_x < SCREEN_WIDTH/8); ASSERT_V6(display.cursor_y < SCREEN_HEIGHT/8); ASSERT_V6(tileNumber < 2048);
+    TileMap_PutTileToTilemap(PF_B, display.cursor_x, display.cursor_y, tileNumber);
 
-
-    // char tile
-    //TileMap_PutTileToTilemap(display.cursor_x, display.cursor_y, tileNumber);
-
-    // background tile
+    // background tile ---
     // correct tilenumber, according to current color
     color = (display.backgr_color > 0) ? display.backgr_color - 1 : display.backgr_color;
     tileNumber =  FIRST_BACKGROUND_TILE_NUMBER + color;
-    TileMap_PutTileToTilemap(display.cursor_x, display.cursor_y, tileNumber);
+    TileMap_PutTileToTilemap(PF_A, display.cursor_x, display.cursor_y, tileNumber);
 }
 
 
@@ -331,27 +347,27 @@ void Display_SetPalette(void)
 
     memcpy((void*) PALETTE, myPalette, sizeof(myPalette));
 
-    Display_SetCursorPos(0, 26);
+    /*Display_SetCursorPos(0, 26);
     Display_SetPen(0x30); Display_PrintString("ABCD1234");
     Display_SetPen(0x31); Display_PrintString("ABCD1234");
     Display_SetPen(0x32); Display_PrintString("ABCD1234");
     Display_SetPen(0x33); Display_PrintString("ABCD1234");
     Display_SetPen(0x34); Display_PrintString("ABCD1234");
-    Display_SetPen(0x35); Display_PrintString("ABCD1234");
     Display_SetCursorPos(0, 27);
+    Display_SetPen(0x35); Display_PrintString("ABCD1234");
     Display_SetPen(0x36); Display_PrintString("ABCD1234");
     Display_SetPen(0x37); Display_PrintString("ABCD1234");
 
 
     Display_SetCursorPos(0, 28);
-    Display_SetPen(8); Display_PrintString("ABCD1234");
-    Display_SetPen(9); Display_PrintString("ABCD1234");
+    Display_SetPen(8);  Display_PrintString("ABCD1234");
+    Display_SetPen(9);  Display_PrintString("ABCD1234");
     Display_SetPen(10); Display_PrintString("ABCD1234");
     Display_SetPen(11); Display_PrintString("ABCD1234");
-    Display_SetPen(12); Display_PrintString("ABCD1234");
-    Display_SetPen(13); Display_PrintString("ABCD1234");
+    Display_SetPen(12); Display_PrintString("ABCD1234"); 
     Display_SetCursorPos(0, 29);
+    Display_SetPen(13); Display_PrintString("ABCD1234");
     Display_SetPen(14); Display_PrintString("ABCD1234");
     Display_SetPen(15); Display_PrintString("ABCD1234");
-
+    */
 }
