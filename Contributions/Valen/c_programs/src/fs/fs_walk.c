@@ -53,7 +53,7 @@ void clear_area(byte x, byte y, byte width, byte height);
 void PrintMessage(const char* str);
 BOOL check_OS_version(void);
 void clear_keyboard_buffer(void);
-
+void DisplayHelpString(void);
 
 BOOL request_exit = FALSE;              // exit program request flag
 BOOL request_spawn_command = FALSE;     // spawn command request flag
@@ -126,6 +126,7 @@ int main (void)
     if(!Display_InitVideoMode())
         return NO_REBOOT;
     Display_ClearScreen();
+    Display_SetPen(PEN_DEFAULT);
     clear_keyboard_buffer();
 
 
@@ -137,6 +138,7 @@ int main (void)
 
 
     fill_ListView_by_entries_from_current_dir();
+    DisplayHelpString();
     main_loop();
 
 /*
@@ -157,9 +159,10 @@ void fill_ListView_by_entries_from_current_dir(void)
 {
     char* mybuf;
 
-    // cleat list view area
+    Display_SetPen(PEN_DEFAULT);
+    // clear list view area
     clear_area(lview.x, lview.y, lview.width, lview.height);
-    // cleat txt area ("xxxx entries")
+    // clear txt area ("xxxx entries")
     clear_area(lview.x, lview.y + lview.height, lview.width, 1);
 
     // reset string (buffer) len to zero
@@ -182,6 +185,7 @@ void main_loop(void)
     word numitems, selectedIndex;
     byte step;
 
+    Display_SetPen(PEN_DEFAULT);
     asciicode = scancode = 0;
     while(scancode != SC_ESC && !request_exit) {
         FLOS_WaitKeyPress(&asciicode, &scancode);
@@ -226,6 +230,13 @@ void main_loop(void)
                 MarkFrameTime(0xf00);   // set pal zero color to red, if error
 
         }
+
+        if(scancode == SC_F3) {
+            if(!f3_pressed())
+                MarkFrameTime(0xf00);   // set pal zero color to red, if error
+
+        }
+
         if(scancode == SC_F8) {
             if(!delete_dir_entry())
                 MarkFrameTime(0xf00);   // set pal zero color to red, if error
@@ -283,3 +294,18 @@ void clear_keyboard_buffer(void) {
     while( FLOS_GetKeyPress(&ASCII, &Scancode) );
         //FLOS_PrintString("~"); 
 }
+
+void DisplayHelpString(void) {
+    BYTE c1 = 8,  c2 = 0x51;
+    BYTE i;
+    const static char* strHelp[] = {
+        "1", "Help  ", "3", "View  ", "4", "Edit  ", "8", "Delete" };
+
+    Display_SetCursorPos(0, SCREEN_HEIGHT/8 - 1);
+    for( i=0; i<sizeof(strHelp) / sizeof(strHelp[0]) ; i+=2 ) {
+        Display_SetPen(c1); Display_PrintString(strHelp[i]  );
+        Display_SetPen(c2); Display_PrintString(strHelp[i+1]);
+    }
+
+}
+

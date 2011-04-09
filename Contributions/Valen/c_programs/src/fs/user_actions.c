@@ -1,11 +1,16 @@
 BOOL enter_pressed(void);
 BOOL f4_pressed(void);
+BOOL f3_pressed(void);
 BOOL do_action_based_on_file_extension(const char* filename);
 
 BOOL request_to_exit_and_execute_command_with_filename(const char* command, const char* filename);
 BOOL extract_filename_from_buffer(const char* pFrom, char* pTo);
 const char* GetFilenameOfSelectedItem(ListView* pLview);
 BOOL IsSelectedItem_DIR(ListView* pLview);
+BOOL ExecuteCommandWithSelectedItem(const char* strCommand);
+
+
+BOOL GUI_MessageBox_YesNow(const char* strHeader, const char* str1, BYTE x, BYTE y, BYTE width, BYTE height);
 
 /*struct {
     short prevSelectedIndex;
@@ -152,9 +157,25 @@ BOOL request_to_exit_and_execute_command_with_filename(const char* command, cons
     return TRUE;
 }
 
+BOOL f1_pressed(void)
+{
+
+    return TRUE;
+}
+
+BOOL f3_pressed(void)
+{
+    return ExecuteCommandWithSelectedItem("HEXOR ");
+}
 
 BOOL f4_pressed(void)
 {
+    return ExecuteCommandWithSelectedItem("TEXTEDIT ");
+}
+
+BOOL ExecuteCommandWithSelectedItem(const char* strCommand)
+{
+
     const char *p = GetFilenameOfSelectedItem(&lview);
     if(!p) return FALSE;
 
@@ -163,13 +184,12 @@ BOOL f4_pressed(void)
     if(IsSelectedItem_DIR(&lview))
         return TRUE;
 
-    if(!request_to_exit_and_execute_command_with_filename("TEXTEDIT ", p))
+    if(!request_to_exit_and_execute_command_with_filename(strCommand, p))
         return FALSE;
 
 
     return TRUE;
 }
-
 
 BOOL IsSelectedItem_DIR(ListView* pLview)
 {
@@ -221,9 +241,9 @@ void print_box(byte x, byte y, byte w, byte h)
 
 BOOL delete_dir_entry(void)
 {
-    BOOL r = TRUE;
-    byte asciicode, scancode;
-    byte x, y;
+    BOOL r = TRUE, result;
+    //byte asciicode, scancode;
+    //byte x, y;
     const char *p = GetFilenameOfSelectedItem(&lview);
     if(!p) return FALSE;
 
@@ -231,6 +251,20 @@ BOOL delete_dir_entry(void)
         return TRUE;
 
 
+    result = GUI_MessageBox_YesNow("Delete", p, 1, 1, 20, 4+2);
+    if(result) {
+        if(IsSelectedItem_DIR(&lview))
+            r = FLOS_DeleteDir(p);
+        else {
+            r = FLOS_EraseFile(p);
+        }
+        fill_ListView_by_entries_from_current_dir();
+    } else {
+        // clear list view area, erase request box
+        clear_area(lview.x, lview.y, lview.width, lview.height);
+    }
+
+/*
     x = 1; y = 1;
     print_box(x, y, 20, 4+2);
     Display_SetCursorPos(x+2, y+1);  Display_PrintString("Delete ");
@@ -252,9 +286,30 @@ BOOL delete_dir_entry(void)
         // clear list view area, erase request box
         clear_area(lview.x, lview.y, lview.width, lview.height);     
     }
+*/
 
     // redraw listbox
     ListView_Update(&lview);
 
     return r;
 }
+
+BOOL GUI_MessageBox_YesNow(const char* strHeader, const char* str1, BYTE x, BYTE y, BYTE width, BYTE height)
+{
+    byte asciicode, scancode;
+
+    print_box(x, y, width, height);
+    Display_SetCursorPos(x+2, y+1);  Display_PrintString(strHeader);
+    Display_SetCursorPos(x+2, y+2);  Display_PrintString(str1);
+    Display_SetCursorPos(x+2, y+3);
+    Display_PrintString("Y/N ?");
+
+    FLOS_WaitKeyPress(&asciicode, &scancode);
+    if(scancode == SC_Y) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+
+

@@ -43,10 +43,11 @@ void VideoMode_InitTilemapMode(byte additionalBits_vidctrl, byte additionalBits_
 // (Buffers 0 and 1)
 //
 // fillSize - max is 0x800
-void TileMap_8x8_FillPlayfieldA(WORD offset, WORD fillSize, WORD tileNumber)
+// playfieldNumber: 0 pf A, 1 pf B
+void TileMap_8x8_FillPlayfield(BYTE playfieldNumber, WORD offset, WORD fillSize, WORD tileNumber)
 {
     PAGE_IN_VIDEO_RAM();
-    SET_VIDEO_PAGE(TILEMAPS_VIDEO_PAGE);
+    SET_VIDEO_PAGE(TILEMAPS_VIDEO_PAGE + playfieldNumber);
     memset((byte*)(VIDEO_BASE       + offset),   (byte)tileNumber,           fillSize); //LSB
     memset((byte*)(VIDEO_BASE+0x800 + offset),   (byte)(tileNumber >> 8),    fillSize); //MSB
     PAGE_OUT_VIDEO_RAM();
