@@ -1,6 +1,7 @@
 BOOL enter_pressed(void);
 BOOL f4_pressed(void);
 BOOL f3_pressed(void);
+BOOL f1_pressed(void);
 BOOL do_action_based_on_file_extension(const char* filename);
 
 BOOL request_to_exit_and_execute_command_with_filename(const char* command, const char* filename);
@@ -10,7 +11,8 @@ BOOL IsSelectedItem_DIR(ListView* pLview);
 BOOL ExecuteCommandWithSelectedItem(const char* strCommand);
 
 
-BOOL GUI_MessageBox_YesNow(const char* strHeader, const char* str1, BYTE x, BYTE y, BYTE width, BYTE height);
+BOOL GUI_MessageBox_YesNow(const char* strText, const char* strCaption, BYTE x, BYTE y, BYTE width, BYTE height);
+void GUI_MessageBox(const char* strText, const char* strCaption, BYTE x, BYTE y, BYTE width, BYTE height);
 
 /*struct {
     short prevSelectedIndex;
@@ -159,7 +161,8 @@ BOOL request_to_exit_and_execute_command_with_filename(const char* command, cons
 
 BOOL f1_pressed(void)
 {
-
+    GUI_MessageBox("FS-WALK v0.014", "Info", 1, 1, 20, 4+2);
+    ListView_Update(&lview);
     return TRUE;
 }
 
@@ -251,7 +254,7 @@ BOOL delete_dir_entry(void)
         return TRUE;
 
 
-    result = GUI_MessageBox_YesNow("Delete", p, 1, 1, 20, 4+2);
+    result = GUI_MessageBox_YesNow(p, "Delete", 1, 1, 20, 4+2);
     if(result) {
         if(IsSelectedItem_DIR(&lview))
             r = FLOS_DeleteDir(p);
@@ -264,29 +267,6 @@ BOOL delete_dir_entry(void)
         clear_area(lview.x, lview.y, lview.width, lview.height);
     }
 
-/*
-    x = 1; y = 1;
-    print_box(x, y, 20, 4+2);
-    Display_SetCursorPos(x+2, y+1);  Display_PrintString("Delete ");
-    Display_SetCursorPos(x+2, y+2);  Display_PrintString(p);
-    Display_SetCursorPos(x+2, y+3);
-    Display_PrintString("Y/N ?");
-
-    FLOS_WaitKeyPress(&asciicode, &scancode);
-    if(scancode == SC_Y) {
-        //FLOS_SetCursorPos(20, 1);  FLOS_PrintString("XXXXX"); 
-
-        if(IsSelectedItem_DIR(&lview))
-            r = FLOS_DeleteDir(p);
-        else {
-            r = FLOS_EraseFile(p);
-        }
-        fill_ListView_by_entries_from_current_dir();
-    } else {
-        // clear list view area, erase request box
-        clear_area(lview.x, lview.y, lview.width, lview.height);     
-    }
-*/
 
     // redraw listbox
     ListView_Update(&lview);
@@ -294,13 +274,13 @@ BOOL delete_dir_entry(void)
     return r;
 }
 
-BOOL GUI_MessageBox_YesNow(const char* strHeader, const char* str1, BYTE x, BYTE y, BYTE width, BYTE height)
+BOOL GUI_MessageBox_YesNow(const char* strText, const char* strCaption, BYTE x, BYTE y, BYTE width, BYTE height)
 {
     byte asciicode, scancode;
 
     print_box(x, y, width, height);
-    Display_SetCursorPos(x+2, y+1);  Display_PrintString(strHeader);
-    Display_SetCursorPos(x+2, y+2);  Display_PrintString(str1);
+    Display_SetCursorPos(x+2, y+1);  Display_PrintString(strCaption);
+    Display_SetCursorPos(x+2, y+2);  Display_PrintString(strText);
     Display_SetCursorPos(x+2, y+3);
     Display_PrintString("Y/N ?");
 
@@ -312,4 +292,17 @@ BOOL GUI_MessageBox_YesNow(const char* strHeader, const char* str1, BYTE x, BYTE
     }
 }
 
+void GUI_MessageBox(const char* strText, const char* strCaption, BYTE x, BYTE y, BYTE width, BYTE height)
+{
+    byte asciicode, scancode;
+
+    print_box(x, y, width, height);
+    Display_SetCursorPos(x+2, y+1);  Display_PrintString(strCaption);
+    Display_SetCursorPos(x+2, y+2);  Display_PrintString(strText);
+    Display_SetCursorPos(x+2, y+3);
+    Display_PrintString("tap any key...");
+
+    FLOS_WaitKeyPress(&asciicode, &scancode);
+
+}
 
