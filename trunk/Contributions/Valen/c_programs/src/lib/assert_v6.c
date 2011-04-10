@@ -1,3 +1,4 @@
+#ifdef DEBUG
 void _assert_v6(char *expr, const char *filename, unsigned int linenumber)
 {
         BYTE myBuf[32];
@@ -28,3 +29,4 @@ void _assert_v6(char *expr, const char *filename, unsigned int linenumber)
 
 
 }
+#endif

@@ -61,19 +61,19 @@ BOOL Display_InitVideoMode(void)
     Display_InitFont();
     MarkFrameTime(0);
 
-    // select tile mode, extended (2 bytes per tilenumber), 8x8, no "left wide border"
-    VideoMode_InitTilemapMode(DUAL_PLAY_FIELD | TILE_SIZE_8x8, EXTENDED_TILE_MAP_MODE);
-    VideoMode_SetupDisplayWindowSize(X_WINDOW_START, X_WINDOW_STOP, Y_WINDOW_START, Y_WINDOW_STOP);
 
     display.cursor_x = display.cursor_y = 0;
     display.cursor_color = 7;
     display.backgr_color = 2;
 
 
-
     TileMap_8x8_FillPlayfield(PF_A, 0, 0x800, 0);
     TileMap_8x8_FillPlayfield(PF_B, 0, 0x800, 0);
     Display_SetPalette();
+
+    // select tile mode, extended (2 bytes per tilenumber), 8x8, no "left wide border"
+    VideoMode_InitTilemapMode(DUAL_PLAY_FIELD | TILE_SIZE_8x8, EXTENDED_TILE_MAP_MODE);
+    VideoMode_SetupDisplayWindowSize(X_WINDOW_START, X_WINDOW_STOP, Y_WINDOW_START, Y_WINDOW_STOP);
 
     return TRUE;
 }

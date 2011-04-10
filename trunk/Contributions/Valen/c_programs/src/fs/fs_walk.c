@@ -146,8 +146,9 @@ int main (void)
     _uitoa(numStrings, buffer, 16);
     FLOS_PrintStringLFCR(buffer);
 */
-
+    FLOS_ClearScreen();
     FLOS_FlosDisplay();
+
     if(request_spawn_command)
         return SPAWN_COMMAND;
 
@@ -228,19 +229,20 @@ void main_loop(void)
         if(scancode == SC_F4) {
             if(!f4_pressed())
                 MarkFrameTime(0xf00);   // set pal zero color to red, if error
-
         }
 
         if(scancode == SC_F3) {
             if(!f3_pressed())
                 MarkFrameTime(0xf00);   // set pal zero color to red, if error
-
+        }
+        if(scancode == SC_F1) {
+            if(!f1_pressed())
+                MarkFrameTime(0xf00);   // set pal zero color to red, if error
         }
 
         if(scancode == SC_F8) {
             if(!delete_dir_entry())
                 MarkFrameTime(0xf00);   // set pal zero color to red, if error
-
         }
 
 
@@ -299,7 +301,7 @@ void DisplayHelpString(void) {
     BYTE c1 = 8,  c2 = 0x51;
     BYTE i;
     const static char* strHelp[] = {
-        "1", "Help  ", "3", "View  ", "4", "Edit  ", "8", "Delete" };
+        "1", "Help  ", "3", "View  ", "4", "Edit  ", "8", "Delete", "ESC", "Exit" };
 
     Display_SetCursorPos(0, SCREEN_HEIGHT/8 - 1);
     for( i=0; i<sizeof(strHelp) / sizeof(strHelp[0]) ; i+=2 ) {
