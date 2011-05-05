@@ -69,7 +69,6 @@ If com$ = "undefined"
   com$ = "COM"+Str(findcom)
   Gosub open_com_port
  Until comok=1 Or findcom = 10
-
 Else
  Gosub open_com_port
  If comok = 0
@@ -80,7 +79,7 @@ Else
   EndIf
 EndIf
 
- If findcom = 10
+ If findcom = 10 And comok=0
   MessageRequester("Serial Link","Cant find a com port!" + Chr(13) , 0)
   End
  EndIf
@@ -598,6 +597,7 @@ wait_ack:
 Return
 ;--------------------------------------------------------------------------------------
 ; IDE Options = PureBasic 4.30 (Windows - x86)
-; CursorPosition = 29
+; CursorPosition = 81
+; FirstLine = 39
 ; Folding = -
 ; Executable = ..\Serial_link_v2_9.exe
