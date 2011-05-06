@@ -1,3 +1,8 @@
+v3.0
+----
+
+"WW" wait acks now allowed in body of file transfer (sending)
+
 v2.9
 ----
 
