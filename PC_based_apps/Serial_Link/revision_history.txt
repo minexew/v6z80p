@@ -1,3 +1,8 @@
+v3.1
+----
+
+Com Port detection fixed.. again..
+
 v3.0
 ----
 
