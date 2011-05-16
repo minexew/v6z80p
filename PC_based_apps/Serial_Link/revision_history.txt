@@ -1,7 +1,12 @@
+v3.2
+----
+
+Com Port detection fixed.. again.. Structured BASIC sucks.
+
 v3.1
 ----
 
-Com Port detection fixed.. again..
+Com Port detection fixed..
 
 v3.0
 ----
