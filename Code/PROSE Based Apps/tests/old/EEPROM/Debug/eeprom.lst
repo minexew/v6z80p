@@ -1,0 +1,1717 @@
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   1
+
+
+PC     Object              I  Line    Source 
+                           A     1    ;******************************************
+                           A     2    ; FPGA config updater v0.06 for PROSE/EZ80P
+                           A     3    ;******************************************
+                           A     4    
+                           A     5    ;----------------------------------------------
+                           A     6    
+       00000000            A     7    amoeba_version_req	equ	0				; 0 = d
+       00000000            A     8    prose_version_req	equ 0				; 0 = d
+       00000001            A     9    ADL_mode			equ 1				; 0 if 
+       00010000            A    10    load_location		equ 10000h			; anywh
+                           A    11    
+                           B     0    			include	'PROSE_header.asm'
+                           B     1    ;--- EZ80 Internal CPU Ports ------------------
+                           B     2    
+       0000009A            B     3    PB_DR			equ 09ah
+       0000009B            B     4    PB_DDR			equ 09bh
+       0000009C            B     5    PB_ALT1			equ 09ch
+       0000009D            B     6    PB_ALT2			equ 09dh
+                           B     7    
+       0000009E            B     8    PC_DR			equ 09eh
+       0000009F            B     9    PC_DDR			equ 09fh
+       000000A0            B    10    PC_ALT1			equ 0a0h
+       000000A1            B    11    PC_ALT2			equ 0a1h
+                           B    12    
+       000000A2            B    13    PD_DR			equ 0a2h
+       000000A3            B    14    PD_DDR			equ 0a3h
+       000000A4            B    15    PD_ALT1			equ 0a4h
+       000000A5            B    16    PD_ALT2			equ 0a5h
+                           B    17    
+       000000C0            B    18    UART0_RBR		equ 0c0h
+       000000C0            B    19    UART0_THR		equ 0c0h
+       000000C0            B    20    UART0_BRG_L		equ 0c0h
+       000000C1            B    21    UART0_BRG_H		equ 0c1h
+       000000C1            B    22    UART0_IER		equ 0c1h
+       000000C2            B    23    UART0_FCTL		equ 0c2h
+       000000C3            B    24    UART0_LCTL		equ 0c3h
+       000000C4            B    25    UART0_MCTL		equ 0c4h
+       000000C5            B    26    UART0_LSR		equ 0c5h
+                           B    27    
+       000000A8            B    28    CS0_LBR			equ 0a8h			;eZ80 wait 
+       000000A9            B    29    CS0_UBR			equ 0a9h
+       000000AA            B    30    CS0_CTL			equ 0aah			
+       000000AB            B    31    CS1_LBR			equ 0abh			;eZ80 wait 
+       000000AC            B    32    CS1_UBR			equ 0ach
+       000000AD            B    33    CS1_CTL			equ 0adh
+       000000AE            B    34    CS2_LBR			equ 0aeh			;eZ80 wait 
+       000000AF            B    35    CS2_UBR			equ 0afh
+       000000B0            B    36    CS2_CTL			equ 0b0h
+       000000B1            B    37    CS3_LBR			equ 0b1h			;eZ80 wait 
+       000000B2            B    38    CS3_UBR			equ 0b2h
+       000000B3            B    39    CS3_CTL			equ 0b3h
+                           B    40    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   2
+
+
+PC     Object              I  Line    Source ..\..\..\includes\PROSE_header.asm
+       00000080            B    41    TMR0_CTL		equ 080h			;timer 0 eq
+       00000081            B    42    TMR0_DR_L		equ 081h
+       00000081            B    43    TMR0_RR_L		equ 081h
+       00000082            B    44    TMR0_DR_H		equ 082h
+       00000082            B    45    TMR0_RR_H		equ 082h
+       00000092            B    46    TMR_ISS			equ 092h
+                           B    47    
+       000000ED            B    48    RTC_CTRL		equ 0edh			;RTC equate
+       000000EC            B    49    RTC_ACTRL		equ 0ech
+       000000E0            B    50    RTC_SEC			equ 0e0h
+       000000E1            B    51    RTC_MIN			equ 0e1h
+       000000E2            B    52    RTC_HRS			equ 0e2h
+       000000E3            B    53    RTC_DOW			equ 0e3h
+       000000E4            B    54    RTC_DOM			equ 0e4h
+       000000E5            B    55    RTC_MON			equ 0e5h
+       000000E6            B    56    RTC_YR			equ 0e6h
+       000000E7            B    57    RTC_CEN			equ 0e7h
+                           B    58    
+                           B    59    ;-- EZ80P Hardware equates --------------------
+                           B    60    
+       00000000            B    61    port_pic_data  			equ 000h
+       00000001            B    62    port_pic_ctrl			equ 001h
+       00000001            B    63    port_hw_flags			equ 001h
+       00000002            B    64    port_sdc_ctrl			equ 002h	; this is a
+       00000002            B    65    port_keyboard_data		equ 002h
+       00000003            B    66    port_sdc_data		 	equ 003h	
+       00000004            B    67    port_memory_paging		equ 004h
+       00000005            B    68    port_irq_ctrl			equ 005h
+       00000006            B    69    port_nmi_ack			equ 006h
+       00000007            B    70    port_ps2_ctrl			equ 007h
+       00000008            B    71    port_selector			equ 008h
+       00000006            B    72    port_mouse_data			equ 006h
+       00000009            B    73    port_clear_flags		equ 009h
+                           B    74    
+       00000000            B    75    sdc_power				equ 0		;(port_sd_c
+       00000001            B    76    sdc_cs					equ 1		;(port_sd_c
+       00000002            B    77    sdc_speed				equ 2 		;(port_sd_c
+                           B    78    
+       00000004            B    79    sdc_serializer_busy		equ 4 		;(port_hw_f
+       00000005            B    80    vrt						equ 5		;(port_hw_f
+                           B    81    
+                           B    82    
+                           B    83    ;-- Memory locations --------------------------
+                           B    84    
+       00800000            B    85    vram_a_addr				equ 0800000h
+       00C00000            B    86    vram_b_addr				equ 0c00000h
+                           B    87    
+                           B    88    ;-- Hardware registers ------------------------
+                           B    89    
+       00FF0000            B    90    hw_palette				equ 0ff0000h
+       00FF0800            B    91    hw_sprite_registers		equ 0ff0800h
+       00FF1000            B    92    hw_video_parameters		equ 0ff1000h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   3
+
+
+PC     Object              I  Line    Source ..\..\..\includes\PROSE_header.asm
+       00FF1400            B    93    hw_audio_registers		equ 0ff1400h
+       00FF1800            B    94    hw_video_settings		equ 0ff1800h
+                           B    95    
+       00FF1000            B    96    tilemap_parameters		equ hw_video_parameters
+       00FF1020            B    97    bitmap_parameters		equ hw_video_parameters
+                           B    98    
+       00FF1800            B    99    video_control			equ hw_video_settings+0
+       00FF1801            B   100    sprite_control			equ hw_video_settings+0
+       00FF1802            B   101    bgnd_palette_select		equ hw_video_settings+0
+       00FF1803            B   102    sprite_palette_select	equ hw_video_settings+0
+       00FF1804            B   103    right_border_position	equ hw_video_settings+0
+                           B   104    
+                           B   105    ;----------------------------------------------
+                           B   106    
+       00000A00            B   107    os_start 	equ 0a00h
+                           B   108    
+       00000A14            B   109    prose_return equ os_start+14h
+       00000A20            B   110    prose_kernal equ os_start+20h
+                           B   111    
+                           B   112    ;----------------------------------------------
+                           B   113    ; Kernal Jump Table values for mode PROSE
+                           B   114    ;----------------------------------------------
+                           B   115    		
+       00000000            B   116    kr_mount_volumes				equ 00h	
+       00000001            B   117    kr_get_device_info				equ 01h	
+       00000002            B   118    kr_check_volume_format			equ 02h	
+       00000003            B   119    kr_change_volume				equ 03h	
+       00000004            B   120    kr_get_volume_info				equ 04h	
+       00000005            B   121    kr_format_device				equ 05h	
+       00000006            B   122    kr_make_dir						equ 06h
+                           B   123    
+       00000007            B   124    kr_change_dir					equ 07h	
+       00000008            B   125    kr_parent_dir					equ 08h	
+       00000009            B   126    kr_root_dir						equ 09h
+       0000000A            B   127    kr_delete_dir					equ 0ah
+       0000000B            B   128    kr_find_file					equ 0bh
+       0000000C            B   129    kr_set_file_pointer				equ 0ch
+       0000000D            B   130    kr_set_load_length				equ 0dh
+       0000000E            B   131    kr_read_file					equ 0eh
+                           B   132    
+       0000000F            B   133    kr_erase_file					equ 0fh
+       00000010            B   134    kr_rename_file					equ 10h
+       00000011            B   135    kr_create_file					equ 11h
+       00000012            B   136    kr_write_file					equ 12h
+       00000013            B   137    kr_get_total_sectors			equ 13h
+       00000014            B   138    kr_dir_list_first_entry			equ 14h
+       00000015            B   139    kr_dir_list_get_entry			equ 15h
+       00000016            B   140    kr_dir_list_next_entry			equ 16h
+                           B   141    
+       00000017            B   142    kr_read_sector					equ 17h
+       00000018            B   143    kr_write_sector					equ 18h
+       00000019            B   144    kr_file_sector_list				equ 19h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   4
+
+
+PC     Object              I  Line    Source ..\..\..\includes\PROSE_header.asm
+       0000001A            B   145    kr_get_dir_cluster				equ 1ah
+       0000001B            B   146    kr_set_dir_cluster				equ 1bh
+       0000001C            B   147    kr_get_dir_name					equ 1ch
+       0000001D            B   148    kr_wait_key						equ 1dh
+       0000001E            B   149    kr_get_key						equ 1eh
+                           B   150    
+       0000001F            B   151    kr_get_key_mod_flags			equ 1fh
+       00000020            B   152    kr_serial_receive_header		equ 20h
+       00000021            B   153    kr_serial_receive_file			equ 21h
+       00000022            B   154    kr_serial_send_file				equ 22h
+       00000023            B   155    kr_serial_tx_byte				equ 23h
+       00000024            B   156    kr_serial_rx_byte				equ 24h
+                           B   157    
+       00000025            B   158    kr_print_string					equ 25h
+       00000026            B   159    kr_clear_screen					equ 26h
+       00000027            B   160    kr_wait_vrt						equ 27h
+       00000028            B   161    kr_set_cursor_position			equ 28h
+       00000029            B   162    kr_plot_char					equ 29h
+       0000002A            B   163    kr_set_pen						equ 2ah
+       0000002B            B   164    kr_background_colours			equ 2bh
+       0000002C            B   165    kr_draw_cursor					equ 2ch
+       0000002D            B   166    kr_get_pen						equ 2dh
+       0000002E            B   167    kr_scroll_up					equ 2eh
+       0000002F            B   168    kr_os_display					equ 2fh
+       00000030            B   169    kr_get_display_size				equ 30h
+       00000031            B   170    kr_get_charmap_addr_xy			equ 31h
+       00000032            B   171    kr_get_cursor_position			equ 32h
+                           B   172    
+       00000033            B   173    kr_set_envar					equ 33h
+       00000034            B   174    kr_get_envar					equ 34h
+       00000035            B   175    kr_delete_envar					equ 35h
+                           B   176    
+       00000036            B   177    kr_set_mouse_window				equ 36h
+       00000037            B   178    kr_get_mouse_position			equ 37h
+       00000038            B   179    kr_get_mouse_motion				equ 38h
+                           B   180    
+       00000039            B   181    kr_time_delay					equ 39h
+       0000003A            B   182    kr_compare_strings				equ 3ah
+       0000003B            B   183    kr_hex_byte_to_ascii			equ 3bh
+       0000003C            B   184    kr_ascii_to_hex_word			equ 3ch
+       0000003D            B   185    kr_get_string					equ 3dh
+                           B   186    
+       0000003E            B   187    kr_get_version					equ 3eh
+       0000003F            B   188    kr_dont_store_registers			equ 3fh
+       00000040            B   189    kr_os_video_settings			equ 40h
+       00000041            B   190    kr_read_rtc						equ 41h
+       00000042            B   191    kr_write_rtc					equ 42h
+                           B   192    
+       00000043            B   193    kr_get_keymap_location			equ 43h
+                           B   194    
+                           B   195    ;----------------------------------------------
+                           B   196    ; Standard PROSE executable header
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   5
+
+
+PC     Object              I  Line    Source ..\..\..\includes\PROSE_header.asm
+                           B   197    ;----------------------------------------------
+                           B   198    
+                           B   199    
+                           B   200    	IF ADL_mode = 0
+                           B   201    		org load_location&0ffffh	; if Z80 mo
+                           B   202    	ELSE
+010000                     B   203    		org load_location			; otherwise
+                           B   204    	ENDIF
+                           B   205    	
+                           B   206    		.assume ADL = 1				; All PROSE
+                           B   207    
+010000 18 0E               B   208    		jr skip_header				; $0 - Jump
+010002 50524F              B   209    		db 'PRO'					; $2 - ASCI
+010005 000001              B   210    mb_loc	dw24 load_location			; $5 - Desi
+010008 000000              B   211    		dw24 0						; $8 - If >
+01000B 0000                B   212    		dw prose_version_req		; $B - If >
+01000D 0000                B   213    		dw amoeba_version_req		; $D - If >
+01000F 01                  B   214    		db ADL_mode					; $F - Z80 
+                           B   215    
+010010                     B   216    skip_header
+                           B   217    	
+                           B   218    	IF ADL_mode = 0 
+                           B   219    		
+                           B   220    mbase_offset equ load_location & 0ff0000h
+                           B   221    
+                           B   222    		ld a,load_location/65536	; Additiona
+                           B   223    		ld MB,a						; Set MBASE
+                           B   224    		jp.sis go_z80_mode			; switches 
+                           B   225    
+                           B   226    go_z80_mode
+                           B   227    
+                           B   228    		.assume ADL = 0
+                           B   229    
+                           B   230    	ENDIF
+                           B   231    	
+                           B   232    ;----------------------------------------------
+                           B   233    	
+                           A    13    
+                           A    14    ;----------------------------------------------
+                           A    15    
+010010 3E26                A    16    first_run		ld a,kr_clear_screen
+010012 5BCD200A 00         A    17    				call.lil prose_kernal
+010017 21 85 0A 01         A    18    				ld hl,app_msg
+01001B CD 7B 08 01         A    19    				call print_string
+                           A    20    
+01001F ED3800              A    21    				in0 a,(port_pic_data)			                           A    22    			
+010022 CD 98 08 01         A    23    				call short_pause
+                           A    24    
+010026 CD 29 09 01         A    25    				call get_slot_count
+                           A    26    						
+01002A CD 50 09 01         A    27    				call get_boot_slot
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   6
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+01002E DA 93 05 01         A    28    				jp c,timeout
+010032 32 01 0F 01         A    29    				ld (boot_slot),a
+010036 3C                  A    30    				inc a
+010037 32 89 0D 01         A    31    				ld (target_slot),a
+01003B 21 BE 0E 01         A    32    				ld hl,slot_count
+01003F BE                  A    33    				cp (hl)
+010040 20 16               A    34    				jr nz,go_slots
+010042 AF                  A    35    				xor a
+010043 32 89 0D 01         A    36    				ld (target_slot),a
+010047 18 0F               A    37    				jr go_slots
+                           A    38    
+010049 3E26                A    39    begin_app		ld a,kr_clear_screen
+01004B 5BCD200A 00         A    40    				call.lil prose_kernal
+                           A    41    				
+010050 21 85 0A 01         A    42    				ld hl,app_msg
+010054 CD 7B 08 01         A    43    				call print_string
+                           A    44    
+010058 21 C0 0E 01         A    45    go_slots		ld hl,slots_txt
+01005C CD 7B 08 01         A    46    				call print_string
+010060 CD A4 08 01         A    47    				call show_slots
+                           A    48    				
+010064 21 FF 0C 01         A    49    				ld hl,ascii_hex					010068 3A 89 0D 01         A    50    				ld a,(target_slot)
+01006C 5F                  A    51    				ld e,a
+01006D 3E3B                A    52    				ld a,kr_hex_byte_to_ascii
+01006F 5BCD200A 00         A    53    				call.lil prose_kernal
+010074 21 75 0D 01         A    54    				ld hl,target_slot_txt
+010078 CD 7B 08 01         A    55    				call print_string
+01007C 21 FF 0C 01         A    56    				ld hl,ascii_hex
+010080 CD 7B 08 01         A    57    				call print_string
+                           A    58    
+010084 21 FF 0C 01         A    59    				ld hl,ascii_hex					010088 3A 01 0F 01         A    60    				ld a,(boot_slot)
+01008C 5F                  A    61    				ld e,a
+01008D 3E3B                A    62    				ld a,kr_hex_byte_to_ascii
+01008F 5BCD200A 00         A    63    				call.lil prose_kernal
+010094 21 63 0D 01         A    64    				ld hl,boot_slot_txt
+010098 CD 7B 08 01         A    65    				call print_string
+01009C 21 FF 0C 01         A    66    				ld hl,ascii_hex
+0100A0 CD 7B 08 01         A    67    				call print_string
+                           A    68    
+                           A    69    					
+0100A4 CD 61 09 01         A    70    				call get_sr
+0100A8 DA 93 05 01         A    71    				jp c,timeout
+0100AC 32 EB 0F 01         A    72    				ld (current_sr),a
+0100B0 21 FF 0C 01         A    73    				ld hl,ascii_hex					0100B4 3A EB 0F 01         A    74    				ld a,(current_sr)
+0100B8 5F                  A    75    				ld e,a
+0100B9 3E3B                A    76    				ld a,kr_hex_byte_to_ascii
+0100BB 5BCD200A 00         A    77    				call.lil prose_kernal
+0100C0 21 EC 0F 01         A    78    				ld hl,sr_txt
+0100C4 CD 7B 08 01         A    79    				call print_string
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   7
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+0100C8 21 FF 0C 01         A    80    				ld hl,ascii_hex
+0100CC CD 7B 08 01         A    81    				call print_string
+                           A    82    				
+0100D0 CD 74 0A 01         A    83    				call show_fw					0100D4 DA 93 05 01         A    84    				jp c,timeout
+0100D8 21 FF 0C 01         A    85    				ld hl,ascii_hex
+0100DC 5F                  A    86    				ld e,a
+0100DD 3E3B                A    87    				ld a,kr_hex_byte_to_ascii
+0100DF 5BCD200A 00         A    88    				call.lil prose_kernal
+0100E4 21 03 0D 01         A    89    				ld hl,firmware
+0100E8 CD 7B 08 01         A    90    				call print_string
+0100EC 21 FF 0C 01         A    91    				ld hl,ascii_hex
+0100F0 CD 7B 08 01         A    92    				call print_string
+                           A    93    						
+0100F4 21 9C 0E 01         A    94    				ld hl,cr_txt
+0100F8 CD 7B 08 01         A    95    				call print_string
+                           A    96    
+                           A    97    ;----------------------------------------------
+                           A    98    ;Menu
+                           A    99    ;----------------------------------------------
+                           A   100    		
+0100FC 21 A5 0D 01         A   101    				ld hl,menu_txt
+010100 CD 7B 08 01         A   102    				call print_string
+                           A   103    			
+010104 3E1D                A   104    menu			ld a,kr_wait_key
+010106 5BCD200A 00         A   105    				call.lil prose_kernal
+01010B FE76                A   106    				cp 76h
+01010D 28 27               A   107    				jr z,quit
+01010F 78                  A   108    				ld a,b
+010110 FE63                A   109    				cp 'c'
+010112 CA 3B 01 01         A   110    				jp z,select_target_slot
+010116 FE72                A   111    				cp 'r'
+010118 CA 9B 01 01         A   112    				jp z,reconfigure_from_target_sl
+01011C FE6D                A   113    				cp 'm'
+01011E CA E3 01 01         A   114    				jp z,make_slot_active
+010122 FE77                A   115    				cp 'w'
+010124 CA 94 02 01         A   116    				jp z,download_write
+010128 FE65                A   117    				cp 'e'
+01012A CA CD 04 01         A   118    				jp z,opt5_erase_slot
+01012E FE73                A   119    				cp 's'
+010130 CA FC 04 01         A   120    				jp z,set_protection_bits
+                           A   121    				
+010134 18 CE               A   122    				jr menu
+010136 AF                  A   123    quit			xor a
+010137 C3140A00            A   124    				jp prose_return
+                           A   125    				
+                           A   126    ;----------------------------------------------
+                           A   127    
+01013B                     A   128    select_target_slot
+                           A   129    
+01013B 21 8A 0D 01         A   130    				ld hl,select_slot_txt
+01013F CD 7B 08 01         A   131    				call print_string
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   8
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010143 3E3D                A   132    ss_waitk		ld a,kr_get_string	
+010145 5BCD200A 00         A   133    				call.lil prose_kernal
+01014A B7                  A   134    				or a
+01014B CA 49 00 01         A   135    				jp z,begin_app
+01014F 3E3C                A   136    				ld a,kr_ascii_to_hex_word		010151 5BCD200A 00         A   137    				call.lil prose_kernal
+010156 B7                  A   138    				or a
+010157 C2 49 00 01         A   139    				jp nz,begin_app
+01015B 3A BE 0E 01         A   140    				ld a,(slot_count)
+01015F 3D                  A   141    				dec a
+010160 BB                  A   142    				cp e
+010161 DA 49 00 01         A   143    				jp c,begin_app
+010165 7B                  A   144    				ld a,e
+010166 32 89 0D 01         A   145    				ld (target_slot),a
+                           A   146    				
+01016A 3A 01 0F 01         A   147    				ld a,(boot_slot)
+01016E 21 89 0D 01         A   148    				ld hl,target_slot
+010172 BE                  A   149    				cp (hl)
+010173 20 22               A   150    				jr nz,sltok
+010175 21 02 0F 01         A   151    				ld hl,bs_conf_txt
+010179 CD 7B 08 01         A   152    				call print_string
+01017D 3E1D                A   153    				ld a,kr_wait_key
+01017F 5BCD200A 00         A   154    				call.lil prose_kernal
+010184 78                  A   155    				ld a,b
+010185 FE79                A   156    				cp 'y'
+010187 28 0E               A   157    				jr z,sltok
+                           A   158    				
+010189 21 89 0D 01         A   159    				ld hl,target_slot
+01018D 34                  A   160    				inc (hl)
+01018E 3A BE 0E 01         A   161    				ld a,(slot_count)
+010192 BE                  A   162    				cp (hl)
+010193 20 02               A   163    				jr nz,sltok
+010195 3600                A   164    				ld (hl),0
+                           A   165    
+010197 C3 49 00 01         A   166    sltok			jp begin_app
+                           A   167    
+                           A   168    ;----------------------------------------------
+                           A   169    
+01019B                     A   170    reconfigure_from_target_slot
+                           A   171    
+01019B 3E88                A   172    				ld a,088h						01019D CD 1A 08 01         A   173    				call send_byte_to_pic
+0101A1 3EB8                A   174    				ld a,0b8h
+0101A3 CD 1A 08 01         A   175    				call send_byte_to_pic
+0101A7 3E16                A   176    				ld a,016h		
+0101A9 CD 1A 08 01         A   177    				call send_byte_to_pic
+0101AD 3A 89 0D 01         A   178    				ld a,(target_slot)	
+0101B1 CD 1A 08 01         A   179    				call send_byte_to_pic
+0101B5 CD F9 07 01         A   180    				call get_byte_from_pic
+0101B9 DA 93 05 01         A   181    				jp c,timeout
+0101BD FE00                A   182    				cp 0
+0101BF C2 78 05 01         A   183    				jp nz,bad_pic_response
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:   9
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+                           A   184    
+0101C3 3E88                A   185    				ld a,088h						0101C5 CD 1A 08 01         A   186    				call send_byte_to_pic
+0101C9 3EA1                A   187    				ld a,0a1h
+0101CB CD 1A 08 01         A   188    				call send_byte_to_pic
+0101CF 3E3F                A   189    				ld a,03fh		
+0101D1 CD 1A 08 01         A   190    				call send_byte_to_pic
+0101D5 3E62                A   191    				ld a,062h	
+0101D7 CD 1A 08 01         A   192    				call send_byte_to_pic
+0101DB CD 8C 08 01         A   193    				call pause
+0101DF C3 49 00 01         A   194    				jp begin_app
+                           A   195    
+                           A   196    ;----------------------------------------------
+                           A   197    
+0101E3                     A   198    make_slot_active
+                           A   199    
+0101E3 11000000            A   200    				ld de,0							0101E7 3A 89 0D 01         A   201    				ld a,(target_slot)
+0101EB 5F                  A   202    				ld e,a
+0101EC 21 FF 0F 01         A   203    				ld hl,slots_valid
+0101F0 19                  A   204    				add hl,de
+0101F1 7E                  A   205    				ld a,(hl)
+0101F2 B7                  A   206    				or a
+0101F3 20 16               A   207    				jr nz,slotval
+0101F5 21 55 0F 01         A   208    				ld hl,noconf_txt				0101F9 CD 7B 08 01         A   209    				call print_string
+0101FD 3E1D                A   210    				ld a,kr_wait_key
+0101FF 5BCD200A 00         A   211    				call.lil prose_kernal
+010204 78                  A   212    				ld a,b
+010205 FE79                A   213    				cp 'y'
+010207 C2 49 00 01         A   214    				jp nz,begin_app
+                           A   215    
+01020B 3E88                A   216    slotval			ld a,088h						01020D CD 1A 08 01         A   217    				call send_byte_to_pic
+010211 3EB8                A   218    				ld a,0b8h
+010213 CD 1A 08 01         A   219    				call send_byte_to_pic
+010217 3E16                A   220    				ld a,016h		
+010219 CD 1A 08 01         A   221    				call send_byte_to_pic
+01021D 3A 89 0D 01         A   222    				ld a,(target_slot)	
+010221 CD 1A 08 01         A   223    				call send_byte_to_pic
+010225 CD F9 07 01         A   224    				call get_byte_from_pic
+010229 DA 93 05 01         A   225    				jp c,timeout
+01022D FE00                A   226    				cp 0
+01022F C2 78 05 01         A   227    				jp nz,bad_pic_response
+                           A   228    
+010233 CD CB 07 01         A   229    				call enable_pic_writes
+010237 DA 93 05 01         A   230    				jp c,timeout
+01023B FE00                A   231    				cp 0
+01023D C2 78 05 01         A   232    				jp nz,bad_pic_response
+                           A   233    				
+010241 3E88                A   234    				ld a,088h						010243 CD 1A 08 01         A   235    				call send_byte_to_pic
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  10
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010247 3E37                A   236    				ld a,037h
+010249 CD 1A 08 01         A   237    				call send_byte_to_pic
+01024D 3ED8                A   238    				ld a,0d8h		
+01024F CD 1A 08 01         A   239    				call send_byte_to_pic
+010253 3E06                A   240    				ld a,006h		
+010255 CD 1A 08 01         A   241    				call send_byte_to_pic
+010259 CD F9 07 01         A   242    				call get_byte_from_pic
+01025D DA 93 05 01         A   243    				jp c,timeout
+010261 FE00                A   244    				cp 0
+010263 C2 78 05 01         A   245    				jp nz,bad_pic_response
+                           A   246    				
+010267 CD E8 07 01         A   247    				call disable_pic_writes
+01026B DA 93 05 01         A   248    				jp c,timeout
+01026F FE00                A   249    				cp 0
+010271 C2 78 05 01         A   250    				jp nz,bad_pic_response
+                           A   251    				
+010275 CD 50 09 01         A   252    				call get_boot_slot
+010279 DA 93 05 01         A   253    				jp c,timeout
+01027D 32 01 0F 01         A   254    				ld (boot_slot),a
+                           A   255    				
+010281 21 E9 0E 01         A   256    				ld hl,bs_done
+010285 CD 7B 08 01         A   257    				call print_string
+010289 3E1D                A   258    				ld a,kr_wait_key
+01028B 5BCD200A 00         A   259    				call.lil prose_kernal
+010290 C3 49 00 01         A   260    				jp begin_app
+                           A   261    				
+                           A   262    ;----------------------------------------------
+                           A   263    
+010294                     A   264    download_write
+010294 21 4E 10 01         A   265    				ld hl,buffer
+010298 01000004            A   266    				ld bc,256*1024
+01029C 3EFF                A   267    				ld a,0ffh
+01029E 77                  A   268    clbuflp			ld (hl),a
+01029F EDA1                A   269    				cpi
+0102A1 EA 9E 02 01         A   270    				jp pe,clbuflp
+                           A   271    				
+0102A5 21 00 0B 01         A   272    				ld hl,write_cfg
+0102A9 CD 7B 08 01         A   273    				call print_string
+                           A   274    				
+0102AD 21 1F 10 01         A   275    				ld hl,input_string
+0102B1 22 E6 0E 01         A   276    				ld (fn_addr),hl
+0102B5 1E0C                A   277    				ld e,12
+0102B7 3E3D                A   278    				ld a,kr_get_string	
+0102B9 5BCD200A 00         A   279    				call.lil prose_kernal
+0102BE C2 F0 02 01         A   280    				jp nz,serial_dl
+                           A   281    								
+0102C2 3E0B                A   282    				ld a,kr_find_file
+0102C4 5BCD200A 00         A   283    				call.lil prose_kernal
+0102C9 C2 B4 07 01         A   284    				jp nz,load_error
+0102CD 21 4E 10 01         A   285    				ld hl,buffer
+0102D1 3E0E                A   286    				ld a,kr_read_file
+0102D3 5BCD200A 00         A   287    				call.lil prose_kernal
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  11
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+0102D8 C2 B4 07 01         A   288    				jp nz,load_error
+0102DC 21 9C 0E 01         A   289    				ld hl,cr_txt
+0102E0 CD 7B 08 01         A   290    				call print_string
+0102E4 21 9C 0E 01         A   291    				ld hl,cr_txt
+0102E8 CD 7B 08 01         A   292    				call print_string			
+0102EC C3 39 03 01         A   293    				jp dl_done
+                           A   294    				
+                           A   295    
+0102F0 21 39 0B 01         A   296    serial_dl		ld hl,download
+0102F4 CD 7B 08 01         A   297    				call print_string
+                           A   298    
+0102F8 1E01                A   299    get_hdr_loop	ld e,1							0102FA 21 9E 0E 01         A   300    				ld hl,filename
+0102FE 3E20                A   301    				ld a,kr_serial_receive_header
+010300 5BCD200A 00         A   302    				call.lil prose_kernal
+010305 B7                  A   303    				or a
+010306 28 15               A   304    				jr z,got_header
+                           A   305    				
+010308 FE83                A   306    				cp 083h							01030A C2 9D 07 01         A   307    				jr nz,comms_error
+01030E 3E1E                A   308    				ld a,kr_get_key
+010310 5BCD200A 00         A   309    				call.lil prose_kernal
+010315 FE76                A   310    				cp 076h							010317 20 DF               A   311    				jr nz,get_hdr_loop
+010319 C3 49 00 01         A   312    				jp begin_app
+                           A   313    				
+01031D DD22 E6 0E 01       A   314    got_header		ld (fn_addr),ix
+010322 21 62 0B 01         A   315    				ld hl,receiving					010326 CD 7B 08 01         A   316    				call print_string
+                           A   317    
+01032A 3E21                A   318    				ld a,kr_serial_receive_file
+01032C 21 4E 10 01         A   319    				ld hl,buffer
+010330 5BCD200A 00         A   320    				call.lil prose_kernal
+010335 C2 9D 07 01         A   321    				jp nz,comms_error
+                           A   322    
+010339 2A E6 0E 01         A   323    dl_done			ld hl,(fn_addr)
+01033D 11 DE 0F 03         A   324    				ld de,buffer+01ff90h			010341 0610                A   325    				ld b,16
+010343 7E                  A   326    cfnlp			ld a,(hl)
+010344 12                  A   327    				ld (de),a
+010345 B7                  A   328    				or a
+010346 28 06               A   329    				jr z,cfnd
+010348 23                  A   330    				inc hl
+010349 13                  A   331    				inc de
+01034A 10 F7               A   332    				djnz cfnlp
+01034C AF                  A   333    				xor a
+01034D 12                  A   334    				ld (de),a
+01034E                     A   335    cfnd
+                           A   336    
+01034E CD 72 09 01         A   337    				call erase_slot
+010352 DA 93 05 01         A   338    				jp c,timeout
+010356 FE00                A   339    				cp 0
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  12
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010358 C2 78 05 01         A   340    				jp nz,bad_pic_response
+01035C CD DD 09 01         A   341    				call check_erasure
+010360 DA 93 05 01         A   342    				jp c,timeout
+010364 C2 E9 04 01         A   343    				jp nz,bad_erase
+                           A   344    				
+                           A   345    
+                           A   346    
+010368 CD CB 07 01         A   347    				call enable_pic_writes
+01036C D8                  A   348    				ret c
+01036D FE00                A   349    				cp 0
+01036F C0                  A   350    				ret nz
+                           A   351    
+010370 21 C2 0B 01         A   352    				ld hl,writing					010374 CD 7B 08 01         A   353    				call print_string
+010378 21 4E 10 01         A   354    				ld hl,buffer
+01037C 11000000            A   355    				ld de,0
+010380 3A 89 0D 01         A   356    				ld a,(target_slot)
+010384 CB27                A   357    				sla a
+010386 57                  A   358    				ld d,a							010387 01000200            A   359    				ld bc,0200h						01038B D5                  A   360    lp1				push de
+01038C C5                  A   361    				push bc
+01038D CD A6 05 01         A   362    				call write_eeprom_page
+010391 C1                  A   363    				pop bc
+010392 D1                  A   364    				pop de
+010393 DA 93 05 01         A   365    				jp c,timeout
+010397 FE00                A   366    				cp 0
+010399 C2 78 05 01         A   367    				jp nz,bad_pic_response
+01039D 13                  A   368    				inc de							01039E 0B                  A   369    				dec bc
+01039F 78                  A   370    				ld a,b
+0103A0 B1                  A   371    				or c
+0103A1 20 E8               A   372    				jr nz,lp1
+                           A   373    
+0103A3 CD E8 07 01         A   374    				call disable_pic_writes
+0103A7 DA 93 05 01         A   375    				jp c,timeout
+0103AB FE00                A   376    				cp 0
+0103AD C2 78 05 01         A   377    				jp nz,bad_pic_response
+                           A   378    			
+                           A   379    
+                           A   380    
+                           A   381    
+                           A   382    
+0103B1 3E88                A   383    				ld a,088h						0103B3 CD 1A 08 01         A   384    				call send_byte_to_pic
+0103B7 3ED4                A   385    				ld a,0d4h
+0103B9 CD 1A 08 01         A   386    				call send_byte_to_pic
+0103BD 3E00                A   387    				ld a,000h			
+0103BF CD 1A 08 01         A   388    				call send_byte_to_pic			0103C3 3E00                A   389    				ld a,000h	
+0103C5 CD 1A 08 01         A   390    				call send_byte_to_pic			0103C9 3A 89 0D 01         A   391    				ld a,(target_slot)
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  13
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+0103CD CB27                A   392    				sla a
+0103CF CD 1A 08 01         A   393    				call send_byte_to_pic			                           A   394    
+0103D3 CD F9 07 01         A   395    				call get_byte_from_pic			0103D7 DA 93 05 01         A   396    				jp c,timeout
+0103DB FE00                A   397    				cp 0
+0103DD C2 78 05 01         A   398    				jp nz,bad_pic_response
+                           A   399    
+0103E1 3E88                A   400    				ld a,088h						0103E3 CD 1A 08 01         A   401    				call send_byte_to_pic
+0103E7 3EE2                A   402    				ld a,0e2h
+0103E9 CD 1A 08 01         A   403    				call send_byte_to_pic
+0103ED 3E00                A   404    				ld a,00h			
+0103EF CD 1A 08 01         A   405    				call send_byte_to_pic			0103F3 3E00                A   406    				ld a,00h	
+0103F5 CD 1A 08 01         A   407    				call send_byte_to_pic			0103F9 3E02                A   408    				ld a,02h
+0103FB CD 1A 08 01         A   409    				call send_byte_to_pic			                           A   410    	
+0103FF CD F9 07 01         A   411    				call get_byte_from_pic			010403 DA 93 05 01         A   412    				jp c,timeout
+010407 FE00                A   413    				cp 0
+010409 C2 78 05 01         A   414    				jp nz,bad_pic_response
+                           A   415    
+01040D 21 40 0C 01         A   416    				ld hl,verifying					010411 CD 7B 08 01         A   417    				call print_string
+                           A   418    
+010415 3E88                A   419    				ld a,088h						010417 CD 1A 08 01         A   420    				call send_byte_to_pic
+01041B 3EC0                A   421    				ld a,0c0h
+01041D CD 1A 08 01         A   422    				call send_byte_to_pic
+010421 CD F9 07 01         A   423    				call get_byte_from_pic			010425 DA 93 05 01         A   424    				jp c,timeout
+010429 FE00                A   425    				cp 0
+01042B C2 78 05 01         A   426    				jp nz,bad_pic_response
+                           A   427    
+01042F 21 4E 10 03         A   428    				ld hl,buffer+020000h
+010433 11000000            A   429    				ld de,0
+010437 3E01                A   430    lp2				ld a,01h
+010439 01010000            A   431    				ld bc,port_pic_ctrl
+01043D ED79                A   432    				out (bc),a						01043F CD F9 07 01         A   433    				call get_byte_from_pic
+010443 DA 93 05 01         A   434    				jp c,timeout
+010447 77                  A   435    				ld (hl),a
+010448 23                  A   436    				inc hl
+                           A   437    
+010449 3E00                A   438    				ld a,00h
+01044B 01010000            A   439    				ld bc,port_pic_ctrl
+01044F ED79                A   440    				out (bc),a						010451 CD F9 07 01         A   441    				call get_byte_from_pic
+010455 DA 93 05 01         A   442    				jp c,timeout
+010459 77                  A   443    				ld (hl),a
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  14
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+01045A 23                  A   444    				inc hl
+01045B 1B                  A   445    				dec de
+01045C 7A                  A   446    				ld a,d
+01045D B3                  A   447    				or e
+01045E 20 D7               A   448    				jr nz,lp2
+                           A   449    
+                           A   450    
+                           A   451    
+                           A   452    
+010460 21 4E 10 01         A   453    				ld hl,buffer					010464 11 4E 10 03         A   454    				ld de,buffer+020000h
+010468 0600                A   455    				ld b,0
+01046A C5                  A   456    lp4				push bc
+01046B 01000000            A   457    				ld bc,0h
+01046F 1A                  A   458    lp3				ld a,(de)
+010470 BE                  A   459    				cp (hl)
+010471 20 21               A   460    				jr nz,ver_bad
+010473 23                  A   461    				inc hl
+010474 13                  A   462    				inc de
+010475 03                  A   463    				inc bc
+010476 78                  A   464    				ld	a,b
+010477 B1                  A   465    				or c
+010478 20 F5               A   466    				jr nz,lp3
+01047A C1                  A   467    				pop bc
+01047B 04                  A   468    				inc b
+01047C 78                  A   469    				ld a,b
+01047D FE02                A   470    				cp 2
+01047F 20 E9               A   471    				jr nz,lp4
+                           A   472    
+010481 21 52 0C 01         A   473    				ld hl,completed					010485 CD 7B 08 01         A   474    				call print_string
+                           A   475    				
+010489 3E1D                A   476    				ld a,kr_wait_key
+01048B 5BCD200A 00         A   477    				call.lil prose_kernal
+010490 C3 49 00 01         A   478    end_prog		jp begin_app
+                           A   479    
+010494 C1                  A   480    ver_bad			pop bc
+010495 E5                  A   481    				push hl
+010496 D5                  A   482    				push de
+010497 21 7F 0C 01         A   483    				ld hl,ver_fail
+01049B CD 7B 08 01         A   484    				call print_string
+01049F 21 A0 0E 01         A   485    				ld hl,written
+0104A3 CD 7B 08 01         A   486    				call print_string
+0104A7 D1                  A   487    				pop de
+0104A8 E1                  A   488    				pop hl
+0104A9 ED53 27 0D 01       A   489    				ld (bad_addr),de
+0104AE CD 2B 08 01         A   490    				call show_mem					0104B2 21 AF 0E 01         A   491    				ld hl,readback
+0104B6 CD 7B 08 01         A   492    				call print_string
+0104BA 2A 27 0D 01         A   493    				ld hl,(bad_addr)
+0104BE CD 2B 08 01         A   494    				call show_mem					                           A   495    				
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  15
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+0104C2 3E1D                A   496    				ld a,kr_wait_key
+0104C4 5BCD200A 00         A   497    				call.lil prose_kernal
+0104C9 C3 49 00 01         A   498    				jp begin_app
+                           A   499    
+                           A   500    
+                           A   501    ;----------------------------------------------
+                           A   502    
+0104CD                     A   503    opt5_erase_slot
+                           A   504    
+0104CD CD 72 09 01         A   505    				call erase_slot
+0104D1 DA 93 05 01         A   506    				jp c,timeout
+0104D5 FE00                A   507    				cp 0
+0104D7 C2 78 05 01         A   508    				jp nz,bad_pic_response
+                           A   509    				
+0104DB CD DD 09 01         A   510    				call check_erasure
+0104DF DA 93 05 01         A   511    				jp c,timeout
+0104E3 21 BA 0C 01         A   512    				ld hl,erase_ok_txt
+0104E7 28 04               A   513    				jr z,erase_ok
+0104E9 21 D1 0C 01         A   514    bad_erase		ld hl,erase_bad_txt
+0104ED CD 7B 08 01         A   515    erase_ok		call print_string
+0104F1 3E1D                A   516    				ld a,kr_wait_key
+0104F3 5BCD200A 00         A   517    				call.lil prose_kernal
+0104F8 C3 49 00 01         A   518    				jp begin_app			
+                           A   519    				
+                           A   520    ;----------------------------------------------
+                           A   521    
+0104FC                     A   522    set_protection_bits
+                           A   523    
+0104FC 21 8E 0F 01         A   524    				ld hl,enter_sr_txt
+010500 CD 7B 08 01         A   525    				call print_string
+010504 3E3D                A   526    				ld a,kr_get_string	
+010506 5BCD200A 00         A   527    				call.lil prose_kernal
+01050B B7                  A   528    				or a
+01050C CA 49 00 01         A   529    				jp z,begin_app
+010510 3E3C                A   530    				ld a,kr_ascii_to_hex_word		010512 5BCD200A 00         A   531    				call.lil prose_kernal
+010517 B7                  A   532    				or a
+010518 C2 49 00 01         A   533    				jp nz,begin_app
+                           A   534    
+01051C 7B                  A   535    				ld a,e
+01051D 32 EA 0F 01         A   536    				ld (new_sr),a
+                           A   537    				
+010521 CD CB 07 01         A   538    				call enable_pic_writes
+010525 DA 93 05 01         A   539    				jp c,timeout
+010529 FE00                A   540    				cp 0
+01052B C2 78 05 01         A   541    				jp nz,bad_pic_response
+                           A   542    				
+01052F 3E88                A   543    				ld a,088h						010531 CD 1A 08 01         A   544    				call send_byte_to_pic
+010535 3E8B                A   545    				ld a,08bh
+010537 CD 1A 08 01         A   546    				call send_byte_to_pic
+01053B 3E8B                A   547    				ld a,08bh
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  16
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+01053D CD 1A 08 01         A   548    				call send_byte_to_pic
+010541 3A EA 0F 01         A   549    				ld a,(new_sr)	
+010545 CD 1A 08 01         A   550    				call send_byte_to_pic
+                           A   551    				
+010549 CD F9 07 01         A   552    				call get_byte_from_pic			01054D DA 93 05 01         A   553    				jp c,timeout
+010551 FE00                A   554    				cp 0
+010553 C2 78 05 01         A   555    				jp nz,bad_pic_response
+                           A   556    
+010557 CD E8 07 01         A   557    				call disable_pic_writes
+01055B DA 93 05 01         A   558    				jp c,timeout
+01055F FE00                A   559    				cp 0
+010561 C2 78 05 01         A   560    				jp nz,bad_pic_response
+                           A   561    
+010565 21 CA 0F 01         A   562    				ld hl,sr_set_txt
+010569 CD 7B 08 01         A   563    				call print_string
+01056D 3E1D                A   564    				ld a,kr_wait_key
+01056F 5BCD200A 00         A   565    				call.lil prose_kernal
+010574 C3 49 00 01         A   566    				jp begin_app
+                           A   567    				
+                           A   568    ;----------------------------------------------
+                           A   569    
+010578                     A   570    bad_pic_response
+                           A   571    				
+010578 21 FF 0C 01         A   572    				ld hl,ascii_hex
+01057C CD 83 08 01         A   573    				call hex_byte_to_ascii
+010580 21 E7 0C 01         A   574    				ld hl,report_byte
+010584 CD 7B 08 01         A   575    				call print_string
+010588 3E1D                A   576    				ld a,kr_wait_key
+01058A 5BCD200A 00         A   577    				call.lil prose_kernal
+01058F C3 49 00 01         A   578    				jp begin_app
+                           A   579    
+010593 21 15 0D 01         A   580    timeout			ld hl,timeout_msg
+010597 CD 7B 08 01         A   581    				call print_string
+01059B 3E1D                A   582    				ld a,kr_wait_key
+01059D 5BCD200A 00         A   583    				call.lil prose_kernal
+0105A2 C3 49 00 01         A   584    				jp begin_app
+                           A   585    
+                           A   586    
+                           A   587    
+                           A   588    				
+                           A   589    
+                           A   590    ;--------- EEPROM SUBROUTINES -----------------
+                           A   591    
+0105A6                     A   592    write_eeprom_page
+                           A   593    
+0105A6 7A                  A   594    				ld a,d
+0105A7 32 21 0D 01         A   595    				ld (page_hi),a
+0105AB 7B                  A   596    				ld a,e
+0105AC 32 22 0D 01         A   597    				ld (page_med),a
+                           A   598    
+0105B0 3E88                A   599    				ld a,088h						Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  17
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+0105B2 CD 1A 08 01         A   600    				call send_byte_to_pic
+0105B6 3E98                A   601    				ld a,098h
+0105B8 CD 1A 08 01         A   602    				call send_byte_to_pic
+0105BC 3E00                A   603    				ld a,000h			
+0105BE CD 1A 08 01         A   604    				call send_byte_to_pic			0105C2 3A 22 0D 01         A   605    				ld a,(page_med)	
+0105C6 CD 1A 08 01         A   606    				call send_byte_to_pic			0105CA 3A 21 0D 01         A   607    				ld a,(page_hi)
+0105CE CD 1A 08 01         A   608    				call send_byte_to_pic			                           A   609    
+0105D2 0640                A   610    				ld b,64							0105D4 7E                  A   611    wdplp1			ld a,(hl)
+0105D5 CD 1A 08 01         A   612    				call send_byte_to_pic
+0105D9 23                  A   613    				inc hl
+0105DA 10 F8               A   614    				djnz wdplp1
+0105DC CD F9 07 01         A   615    				call get_byte_from_pic			0105E0 D8                  A   616    				ret c
+0105E1 B7                  A   617    				or a
+0105E2 C0                  A   618    				ret nz
+                           A   619    
+0105E3 3E88                A   620    				ld a,088h						0105E5 CD 1A 08 01         A   621    				call send_byte_to_pic
+0105E9 3E98                A   622    				ld a,098h
+0105EB CD 1A 08 01         A   623    				call send_byte_to_pic
+0105EF 3E40                A   624    				ld a,040h			
+0105F1 CD 1A 08 01         A   625    				call send_byte_to_pic			0105F5 3A 22 0D 01         A   626    				ld a,(page_med)	
+0105F9 CD 1A 08 01         A   627    				call send_byte_to_pic			0105FD 3A 21 0D 01         A   628    				ld a,(page_hi)
+010601 CD 1A 08 01         A   629    				call send_byte_to_pic			                           A   630     
+010605 0640                A   631    				ld b,64							010607 7E                  A   632    wdplp2			ld a,(hl)
+010608 CD 1A 08 01         A   633    				call send_byte_to_pic
+01060C 23                  A   634    				inc hl
+01060D 10 F8               A   635    				djnz wdplp2
+01060F CD F9 07 01         A   636    				call get_byte_from_pic			010613 D8                  A   637    				ret c
+010614 B7                  A   638    				or a
+010615 C0                  A   639    				ret nz
+                           A   640    
+010616 3E88                A   641    				ld a,088h						010618 CD 1A 08 01         A   642    				call send_byte_to_pic
+01061C 3E98                A   643    				ld a,098h
+01061E CD 1A 08 01         A   644    				call send_byte_to_pic	
+010622 3E80                A   645    				ld a,080h			
+010624 CD 1A 08 01         A   646    				call send_byte_to_pic			010628 3A 22 0D 01         A   647    				ld a,(page_med)	
+01062C CD 1A 08 01         A   648    				call send_byte_to_pic			010630 3A 21 0D 01         A   649    				ld a,(page_hi)
+010634 CD 1A 08 01         A   650    				call send_byte_to_pic			                           A   651    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  18
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010638 0640                A   652    				ld b,64							01063A 7E                  A   653    wdplp3			ld a,(hl)
+01063B CD 1A 08 01         A   654    				call send_byte_to_pic
+01063F 23                  A   655    				inc hl
+010640 10 F8               A   656    				djnz wdplp3
+010642 CD F9 07 01         A   657    				call get_byte_from_pic			010646 D8                  A   658    				ret c
+010647 B7                  A   659    				or a
+010648 C0                  A   660    				ret nz
+                           A   661    
+010649 3E88                A   662    				ld a,088h						01064B CD 1A 08 01         A   663    				call send_byte_to_pic
+01064F 3E98                A   664    				ld a,098h
+010651 CD 1A 08 01         A   665    				call send_byte_to_pic
+010655 3EC0                A   666    				ld a,0c0h			
+010657 CD 1A 08 01         A   667    				call send_byte_to_pic			01065B 3A 22 0D 01         A   668    				ld a,(page_med)	
+01065F CD 1A 08 01         A   669    				call send_byte_to_pic			010663 3A 21 0D 01         A   670    				ld a,(page_hi)
+010667 CD 1A 08 01         A   671    				call send_byte_to_pic			                           A   672    
+01066B 0640                A   673    				ld b,64							01066D 7E                  A   674    wdplp4			ld a,(hl)
+01066E CD 1A 08 01         A   675    				call send_byte_to_pic
+010672 23                  A   676    				inc hl
+010673 10 F8               A   677    				djnz wdplp4
+010675 CD F9 07 01         A   678    				call get_byte_from_pic			010679 C9                  A   679    				ret
+                           A   680    				
+                           A   681    ;----------------------------------------------
+                           A   682    
+01067A                     A   683    new_write_eeprom_page
+                           A   684    
+01067A 7A                  A   685    				ld a,d
+01067B 32 21 0D 01         A   686    				ld (page_hi),a
+01067F 7B                  A   687    				ld a,e
+010680 32 22 0D 01         A   688    				ld (page_med),a
+                           A   689    
+010684 3E88                A   690    				ld a,088h						010686 CD 1A 08 01         A   691    				call send_byte_to_pic
+01068A 3E99                A   692    				ld a,099h
+01068C CD 1A 08 01         A   693    				call send_byte_to_pic
+010690 3E00                A   694    				ld a,000h			
+010692 CD 1A 08 01         A   695    				call send_byte_to_pic			010696 3A 22 0D 01         A   696    				ld a,(page_med)	
+01069A CD 1A 08 01         A   697    				call send_byte_to_pic			01069E 3A 21 0D 01         A   698    				ld a,(page_hi)
+0106A2 CD 1A 08 01         A   699    				call send_byte_to_pic			0106A6 3E80                A   700    				ld a,128
+0106A8 CD 1A 08 01         A   701    				call send_byte_to_pic			                           A   702    
+0106AC 0680                A   703    				ld b,128						Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  19
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+0106AE 7E                  A   704    nwdplp1			ld a,(hl)
+0106AF CD 1A 08 01         A   705    				call send_byte_to_pic
+0106B3 23                  A   706    				inc hl
+0106B4 10 F8               A   707    				djnz nwdplp1
+0106B6 CD F9 07 01         A   708    				call get_byte_from_pic			0106BA D8                  A   709    				ret c
+0106BB B7                  A   710    				or a
+0106BC C0                  A   711    				ret nz
+                           A   712    
+0106BD 3E88                A   713    				ld a,088h						0106BF CD 1A 08 01         A   714    				call send_byte_to_pic
+0106C3 3E99                A   715    				ld a,099h
+0106C5 CD 1A 08 01         A   716    				call send_byte_to_pic
+0106C9 3E80                A   717    				ld a,080h			
+0106CB CD 1A 08 01         A   718    				call send_byte_to_pic			0106CF 3A 22 0D 01         A   719    				ld a,(page_med)	
+0106D3 CD 1A 08 01         A   720    				call send_byte_to_pic			0106D7 3A 21 0D 01         A   721    				ld a,(page_hi)
+0106DB CD 1A 08 01         A   722    				call send_byte_to_pic			0106DF 3E80                A   723    				ld a,128
+0106E1 CD 1A 08 01         A   724    				call send_byte_to_pic			                           A   725    
+0106E5 0680                A   726    				ld b,128						0106E7 7E                  A   727    nwdplp2			ld a,(hl)
+0106E8 CD 1A 08 01         A   728    				call send_byte_to_pic
+0106EC 23                  A   729    				inc hl
+0106ED 10 F8               A   730    				djnz nwdplp2
+0106EF CD F9 07 01         A   731    				call get_byte_from_pic			0106F3 C9                  A   732    				ret 
+                           A   733    
+                           A   734    
+                           A   735    ;----------------------------------------------
+                           A   736    
+0106F4                     A   737    read_eeprom_page
+                           A   738    
+0106F4 E5                  A   739    				push hl							0106F5 D5                  A   740    				push de
+0106F6 C5                  A   741    				push bc
+                           A   742    	
+0106F7 7A                  A   743    				ld a,d
+0106F8 32 21 0D 01         A   744    				ld (page_hi),a
+0106FC 7B                  A   745    				ld a,e
+0106FD 32 22 0D 01         A   746    				ld (page_med),a
+                           A   747    		
+010701 3E88                A   748    				ld a,88h						010703 CD 1A 08 01         A   749    				call send_byte_to_pic
+010707 3ED4                A   750    				ld a,0d4h
+010709 CD 1A 08 01         A   751    				call send_byte_to_pic
+01070D 3E00                A   752    				ld a,0			
+01070F CD 1A 08 01         A   753    				call send_byte_to_pic			010713 3A 22 0D 01         A   754    				ld a,(page_med)	
+010717 CD 1A 08 01         A   755    				call send_byte_to_pic			Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  20
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+01071B 3A 21 0D 01         A   756    				ld a,(page_hi)
+01071F CD 1A 08 01         A   757    				call send_byte_to_pic			010723 CD F9 07 01         A   758    				call get_byte_from_pic			010727 38 6E               A   759    				jr c,t_o
+010729 FE00                A   760    				cp 0
+01072B 20 65               A   761    				jr nz,bpr
+                           A   762    		
+01072D 3E88                A   763    				ld a,88h						01072F CD 1A 08 01         A   764    				call send_byte_to_pic
+010733 3EE2                A   765    				ld a,0e2h
+010735 CD 1A 08 01         A   766    				call send_byte_to_pic
+010739 3E00                A   767    				ld a,00			
+01073B CD 1A 08 01         A   768    				call send_byte_to_pic			01073F 3E01                A   769    				ld a,01		
+010741 CD 1A 08 01         A   770    				call send_byte_to_pic			010745 3E00                A   771    				ld a,00
+010747 CD 1A 08 01         A   772    				call send_byte_to_pic			01074B CD F9 07 01         A   773    				call get_byte_from_pic			01074F 38 46               A   774    				jr c,t_o
+010751 FE00                A   775    				cp 0
+010753 20 3D               A   776    				jr nz,bpr
+                           A   777    
+                           A   778    			
+010755 3E88                A   779    				ld a,88h						010757 CD 1A 08 01         A   780    				call send_byte_to_pic
+01075B 3EC0                A   781    				ld a,0c0h
+01075D CD 1A 08 01         A   782    				call send_byte_to_pic
+010761 CD F9 07 01         A   783    				call get_byte_from_pic			010765 38 30               A   784    				jr c,t_o
+010767 FE00                A   785    				cp 0
+010769 20 27               A   786    				jr nz,bpr
+                           A   787    
+                           A   788    			
+01076B 21 4E 10 01         A   789    				ld hl,buffer
+01076F 0680                A   790    				ld b,128
+010771 3E01                A   791    rplp2			ld a,01h
+010773 ED3901              A   792    				out0 (port_pic_ctrl),a			010776 CD F9 07 01         A   793    				call get_byte_from_pic
+01077A 38 1B               A   794    				jr c,t_o
+01077C 77                  A   795    				ld (hl),a
+01077D 23                  A   796    				inc hl
+01077E 3E00                A   797    				ld a,00h
+010780 ED3901              A   798    				out0 (port_pic_ctrl),a			010783 CD F9 07 01         A   799    				call get_byte_from_pic
+010787 38 0E               A   800    				jr c,t_o
+010789 77                  A   801    				ld (hl),a
+01078A 23                  A   802    				inc hl
+01078B 10 E4               A   803    				djnz rplp2
+                           A   804    
+01078D AF                  A   805    				xor a
+01078E C1                  A   806    				pop bc
+01078F D1                  A   807    				pop de
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  21
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010790 E1                  A   808    				pop hl
+010791 C9                  A   809    				ret
+                           A   810    
+010792 37                  A   811    bpr				scf
+010793 C1                  A   812    				pop bc
+010794 D1                  A   813    				pop de
+010795 E1                  A   814    				pop hl
+010796 C9                  A   815    				ret
+                           A   816    
+010797 AF                  A   817    t_o				xor a
+010798 37                  A   818    				scf
+010799 C1                  A   819    				pop bc
+01079A D1                  A   820    				pop de
+01079B E1                  A   821    				pop hl
+01079C C9                  A   822    				ret	
+                           A   823    ;----------------------------------------------
+                           A   824    
+01079D                     A   825    comms_error	
+01079D 21 62 0C 01         A   826    				ld hl,com_error
+0107A1 CD 7B 08 01         A   827    				call print_string
+                           A   828    
+0107A5 CD 8C 08 01         A   829    				call pause
+                           A   830    				
+0107A9 3E1D                A   831    				ld a,kr_wait_key
+0107AB 5BCD200A 00         A   832    				call.lil prose_kernal
+0107B0 C3 49 00 01         A   833    				jp begin_app
+                           A   834    
+0107B4                     A   835    load_error	
+0107B4 21 2F 10 01         A   836    				ld hl,load_error_txt
+0107B8 CD 7B 08 01         A   837    				call print_string
+                           A   838    
+0107BC CD 8C 08 01         A   839    				call pause
+                           A   840    				
+0107C0 3E1D                A   841    				ld a,kr_wait_key
+0107C2 5BCD200A 00         A   842    				call.lil prose_kernal
+0107C7 C3 49 00 01         A   843    				jp begin_app
+                           A   844    				
+                           A   845    ;----------------------------------------------
+                           A   846    
+0107CB                     A   847    enable_pic_writes
+                           A   848    
+                           A   849    ;				ld hl,enable_wr					                           A   850    ;				call print_string
+                           A   851    
+0107CB 3E88                A   852    				ld a,088h						0107CD CD 1A 08 01         A   853    				call send_byte_to_pic
+0107D1 3E25                A   854    				ld a,025h
+0107D3 CD 1A 08 01         A   855    				call send_byte_to_pic
+0107D7 3EFA                A   856    				ld a,0fah
+0107D9 CD 1A 08 01         A   857    				call send_byte_to_pic
+0107DD 3E99                A   858    				ld a,099h
+0107DF CD 1A 08 01         A   859    				call send_byte_to_pic
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  22
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+                           A   860    
+0107E3 CD F9 07 01         A   861    				call get_byte_from_pic			0107E7 C9                  A   862    				ret
+                           A   863    
+                           A   864    ;----------------------------------------------
+                           A   865    
+0107E8                     A   866    disable_pic_writes
+                           A   867    
+                           A   868    ;				ld hl,disable_wr				                           A   869    ;				call print_string
+                           A   870    
+0107E8 3E88                A   871    				ld a,088h						0107EA CD 1A 08 01         A   872    				call send_byte_to_pic
+0107EE 3E1F                A   873    				ld a,01fh
+0107F0 CD 1A 08 01         A   874    				call send_byte_to_pic
+                           A   875    
+0107F4 CD F9 07 01         A   876    				call get_byte_from_pic			0107F8 C9                  A   877    				ret
+                           A   878    				
+                           A   879    ;----------------------------------------------
+                           A   880    	
+0107F9                     A   881    get_byte_from_pic
+                           A   882    
+                           A   883    ; Returns byte in A. If carry set, wait timed o
+                           A   884    
+0107F9 D5                  A   885    				push de
+0107FA C5                  A   886    				push bc
+0107FB 0620                A   887    				ld b,32
+0107FD 11000000            A   888    				ld de,0
+010801 ED3801              A   889    pcwbib			in0 a,(port_hw_flags)
+010804 E601                A   890    				and 1							010806 20 0B               A   891    				jr nz,pcbib
+010808 1B                  A   892    				dec de
+010809 7A                  A   893    				ld a,d
+01080A B3                  A   894    				or e
+01080B 20 F4               A   895    				jr nz,pcwbib
+01080D 10 F2               A   896    				djnz pcwbib
+01080F C1                  A   897    				pop bc
+010810 D1                  A   898    				pop de
+010811 37                  A   899    				scf								010812 C9                  A   900    				ret
+                           A   901    
+010813 ED3800              A   902    pcbib			in0 a,(port_pic_data)			010816 B7                  A   903    				or a							010817 C1                  A   904    				pop bc
+010818 D1                  A   905    				pop de
+010819 C9                  A   906    				ret
+                           A   907    
+                           A   908    ;----------------------------------------------
+                           A   909    
+01081A                     A   910    send_byte_to_pic
+                           A   911    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  23
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+                           A   912    ; put byte to send in A
+                           A   913    						
+                           A   914    												01081A F5                  A   915    				push af
+01081B AF                  A   916    				xor a
+01081C ED3901              A   917    				out0 (port_pic_ctrl),a			                           A   918    
+01081F ED3801              A   919    wpbusy			in0 a,(port_hw_flags)			010822 E604                A   920    				and 4
+010824 20 F9               A   921    				jr nz,wpbusy
+                           A   922    
+010826 F1                  A   923    				pop af
+010827 ED3900              A   924    				out0 (port_pic_data),a
+01082A C9                  A   925    				ret
+                           A   926    
+                           A   927    
+                           A   928    ;				ld b,0							                           A   929    ;pdswlp			djnz pdswlp						                           A   930    ;				pop bc							                           A   931    ;				ret
+                           A   932    
+                           A   933    
+                           A   934    ;----------------------------------------------
+                           A   935    
+01082B                     A   936    show_mem	
+                           A   937    
+                           A   938    ; set hl to address to show
+                           A   939    
+01082B 0610                A   940    				ld b,16
+01082D 22 24 0D 01         A   941    shmlp			ld (show_addr),hl
+010831 C5                  A   942    				push bc
+010832 CD 43 08 01         A   943    				call show_mline
+010836 C1                  A   944    				pop bc
+010837 2A 24 0D 01         A   945    				ld hl,(show_addr)
+01083B 11100000            A   946    				ld de,16
+01083F 19                  A   947    				add hl,de
+010840 10 EB               A   948    				djnz shmlp
+010842 C9                  A   949    				ret
+                           A   950    
+                           A   951    
+010843 3A 26 0D 01         A   952    show_mline		ld a,(show_addr+2)
+010847 21 2A 0D 01         A   953    				ld hl,mem_line
+01084B CD 83 08 01         A   954    				call hex_byte_to_ascii
+01084F 3A 25 0D 01         A   955    				ld a,(show_addr+1)
+010853 CD 83 08 01         A   956    				call hex_byte_to_ascii
+010857 3A 24 0D 01         A   957    				ld a,(show_addr)
+01085B CD 83 08 01         A   958    				call hex_byte_to_ascii
+01085F 23                  A   959    				inc hl
+010860 ED5B 24 0D 01       A   960    				ld de,(show_addr)
+010865 0610                A   961    				ld b,16
+010867 1A                  A   962    smlp			ld a,(de)
+010868 D5                  A   963    				push de
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  24
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010869 CD 83 08 01         A   964    				call hex_byte_to_ascii
+01086D D1                  A   965    				pop de
+01086E 23                  A   966    				inc hl
+01086F 13                  A   967    				inc de
+010870 10 F5               A   968    				djnz smlp
+                           A   969    
+010872 21 2A 0D 01         A   970    				ld hl,mem_line
+010876 CD 7B 08 01         A   971    				call print_string
+01087A C9                  A   972    				ret
+                           A   973    
+                           A   974    ;----------------------------------------------
+                           A   975    
+01087B 3E25                A   976    print_string	ld a,kr_print_string
+01087D 5BCD200A 00         A   977    				call.lil prose_kernal
+010882 C9                  A   978    				ret
+                           A   979    
+                           A   980    
+010883                     A   981    hex_byte_to_ascii
+                           A   982    
+010883 5F                  A   983    				ld e,a
+010884 3E3B                A   984    				ld a,kr_hex_byte_to_ascii
+010886 5BCD200A 00         A   985    				call.lil prose_kernal
+01088B C9                  A   986    				ret
+                           A   987    
+                           A   988    ;----------------------------------------------
+                           A   989    	
+01088C 11008000            A   990    pause			ld de,32768						010890 3E39                A   991    				ld a,kr_time_delay
+010892 5BCD200A 00         A   992    				call.lil prose_kernal
+010897 C9                  A   993    				ret
+                           A   994    				
+010898 11002000            A   995    short_pause		ld de,8192						01089C 3E39                A   996    				ld a,kr_time_delay
+01089E 5BCD200A 00         A   997    				call.lil prose_kernal
+0108A3 C9                  A   998    				ret	
+                           A   999    				
+                           A  1000    ;----------------------------------------------
+                           A  1001    	
+0108A4 3E00                A  1002    show_slots		ld a,0
+0108A6 32 BF 0E 01         A  1003    id_loop			ld (working_slot),a
+0108AA 5F                  A  1004    				ld e,a
+0108AB 21 D0 0E 01         A  1005    				ld hl,slot_hex+1
+0108AF 3E3B                A  1006    				ld a,kr_hex_byte_to_ascii
+0108B1 5BCD200A 00         A  1007    				call.lil prose_kernal
+0108B6 21 CF 0E 01         A  1008    				ld hl,slot_hex
+0108BA CD 7B 08 01         A  1009    				call print_string
+                           A  1010    				
+0108BE 21000000            A  1011    				ld hl,0
+0108C2 3A BF 0E 01         A  1012    				ld a,(working_slot)			;re
+0108C6 67                  A  1013    				ld h,a
+0108C7 29                  A  1014    				add hl,hl
+0108C8 11FF0100            A  1015    				ld de,01ffh
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  25
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+0108CC 19                  A  1016    				add hl,de
+0108CD EB                  A  1017    				ex de,hl
+0108CE CD F4 06 01         A  1018    				call read_eeprom_page
+0108D2 38 37               A  1019    				jr c,pic_error
+                           A  1020    				
+0108D4 21 DE 10 01         A  1021    				ld hl,buffer+090h			;lo
+0108D8 7E                  A  1022    				ld a,(hl)
+0108D9 B7                  A  1023    				or a
+0108DA 28 04               A  1024    				jr z,unk_id
+0108DC CB7F                A  1025    				bit 7,a
+0108DE 28 0C               A  1026    				jr z,id_ok
+0108E0 21 D6 0E 01         A  1027    unk_id			ld hl,unknown_txt
+0108E4 CD 7B 08 01         A  1028    				call print_string
+0108E8 0E00                A  1029    				ld c,0
+0108EA 18 06               A  1030    				jr nxtslot
+0108EC CD 7B 08 01         A  1031    id_ok			call print_string
+0108F0 0E01                A  1032    				ld c,1
+                           A  1033    				
+0108F2 3A BF 0E 01         A  1034    nxtslot			ld a,(working_slot)
+0108F6 11000000            A  1035    				ld de,0
+0108FA 5F                  A  1036    				ld e,a
+0108FB 21 FF 0F 01         A  1037    				ld hl,slots_valid
+0108FF 19                  A  1038    				add hl,de
+010900 71                  A  1039    				ld (hl),c
+                           A  1040    				
+010901 21 BE 0E 01         A  1041    				ld hl,slot_count
+010905 3C                  A  1042    				inc a
+010906 BE                  A  1043    				cp (hl)
+010907 20 9D               A  1044    				jr nz,id_loop
+010909 AF                  A  1045    				xor a
+01090A C9                  A  1046    				ret
+                           A  1047    
+                           A  1048    	
+01090B E5                  A  1049    pic_error		push hl
+01090C D5                  A  1050    				push de
+01090D C5                  A  1051    				push bc
+01090E 21 40 0F 01         A  1052    				ld hl,picerr_txt
+010912 5F                  A  1053    				ld e,a
+010913 3E3B                A  1054    				ld a,kr_hex_byte_to_ascii
+010915 5BCD200A 00         A  1055    				call.lil prose_kernal
+01091A 21 40 0F 01         A  1056    				ld hl,picerr_txt
+01091E CD 7B 08 01         A  1057    				call print_string
+010922 C1                  A  1058    				pop bc
+010923 D1                  A  1059    				pop de
+010924 E1                  A  1060    				pop hl
+010925 0E00                A  1061    				ld c,0
+010927 18 C9               A  1062    				jr nxtslot
+                           A  1063    				
+                           A  1064    
+                           A  1065    ;----------------------------------------------
+                           A  1066    
+010929                     A  1067    get_slot_count
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  26
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+                           A  1068    	
+010929 3E88                A  1069    				ld a,088h						01092B CD 1A 08 01         A  1070    				call send_byte_to_pic
+01092F 3E53                A  1071    				ld a,53h
+010931 CD 1A 08 01         A  1072    				call send_byte_to_pic
+010935 CD F9 07 01         A  1073    				call get_byte_from_pic			010939 32 8D 0F 01         A  1074    				ld (eeprom_id),a
+01093D D8                  A  1075    				ret c
+01093E D610                A  1076    				sub a,10h						010940 3C                  A  1077    				inc a
+010941 47                  A  1078    				ld b,a
+010942 3E01                A  1079    				ld a,1
+010944 05                  A  1080    scloop			dec b
+010945 28 04               A  1081    				jr z,gotsc
+010947 CB27                A  1082    				sla a
+010949 18 F9               A  1083    				jr scloop
+01094B 32 BE 0E 01         A  1084    gotsc			ld (slot_count),a
+01094F C9                  A  1085    				ret
+                           A  1086    
+                           A  1087    ;----------------------------------------------
+                           A  1088    
+010950                     A  1089    get_boot_slot				
+010950 3E88                A  1090    				ld a,088h						010952 CD 1A 08 01         A  1091    				call send_byte_to_pic
+010956 3E76                A  1092    				ld a,76h
+010958 CD 1A 08 01         A  1093    				call send_byte_to_pic
+01095C CD F9 07 01         A  1094    				call get_byte_from_pic			010960 C9                  A  1095    				ret
+                           A  1096    
+                           A  1097    
+                           A  1098    ;----------------------------------------------
+                           A  1099    
+010961                     A  1100    get_sr				
+010961 3E88                A  1101    				ld a,088h						010963 CD 1A 08 01         A  1102    				call send_byte_to_pic
+010967 3E06                A  1103    				ld a,06h
+010969 CD 1A 08 01         A  1104    				call send_byte_to_pic
+01096D CD F9 07 01         A  1105    				call get_byte_from_pic			010971 C9                  A  1106    				ret				
+                           A  1107    
+                           A  1108    ;----------------------------------------------
+                           A  1109    
+010972 21 9E 0B 01         A  1110    erase_slot		ld hl,erase						010976 CD 7B 08 01         A  1111    				call print_string
+                           A  1112    
+01097A CD CB 07 01         A  1113    				call enable_pic_writes
+01097E D8                  A  1114    				ret c
+01097F FE00                A  1115    				cp 0
+010981 C0                  A  1116    				ret nz
+                           A  1117    				
+010982 3E88                A  1118    				ld a,088h						010984 CD 1A 08 01         A  1119    				call send_byte_to_pic
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  27
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010988 3EF5                A  1120    				ld a,0f5h
+01098A CD 1A 08 01         A  1121    				call send_byte_to_pic
+01098E 3E00                A  1122    				ld a,000h		
+010990 CD 1A 08 01         A  1123    				call send_byte_to_pic			010994 3E00                A  1124    				ld a,000h		
+010996 CD 1A 08 01         A  1125    				call send_byte_to_pic			01099A 3A 89 0D 01         A  1126    				ld a,(target_slot)
+01099E CB27                A  1127    				sla a
+0109A0 CD 1A 08 01         A  1128    				call send_byte_to_pic			0109A4 CD F9 07 01         A  1129    				call get_byte_from_pic			0109A8 D8                  A  1130    				ret c
+0109A9 FE00                A  1131    				cp 0
+0109AB C0                  A  1132    				ret nz
+                           A  1133    
+0109AC 3E88                A  1134    				ld a,088h						0109AE CD 1A 08 01         A  1135    				call send_byte_to_pic
+0109B2 3EF5                A  1136    				ld a,0f5h
+0109B4 CD 1A 08 01         A  1137    				call send_byte_to_pic
+0109B8 3E00                A  1138    				ld a,000h			
+0109BA CD 1A 08 01         A  1139    				call send_byte_to_pic			0109BE 3E00                A  1140    				ld a,000h		
+0109C0 CD 1A 08 01         A  1141    				call send_byte_to_pic			0109C4 3A 89 0D 01         A  1142    				ld a,(target_slot)
+0109C8 CB27                A  1143    				sla a
+0109CA F601                A  1144    				or 1
+0109CC CD 1A 08 01         A  1145    				call send_byte_to_pic			0109D0 CD F9 07 01         A  1146    				call get_byte_from_pic			0109D4 D8                  A  1147    				ret c 
+0109D5 FE00                A  1148    				cp 0
+0109D7 C0                  A  1149    				ret nz
+                           A  1150    
+0109D8 CD E8 07 01         A  1151    				call disable_pic_writes
+0109DC C9                  A  1152    				ret
+                           A  1153    				
+                           A  1154    ;----------------------------------------------
+                           A  1155    
+0109DD                     A  1156    check_erasure
+                           A  1157    
+0109DD 21 AE 0B 01         A  1158    				ld hl,chkerase					0109E1 CD 7B 08 01         A  1159    				call print_string
+                           A  1160    
+0109E5 3E88                A  1161    				ld a,088h						0109E7 CD 1A 08 01         A  1162    				call send_byte_to_pic
+0109EB 3ED4                A  1163    				ld a,0d4h
+0109ED CD 1A 08 01         A  1164    				call send_byte_to_pic
+0109F1 3E00                A  1165    				ld a,000h			
+0109F3 CD 1A 08 01         A  1166    				call send_byte_to_pic			0109F7 3E00                A  1167    				ld a,000h	
+0109F9 CD 1A 08 01         A  1168    				call send_byte_to_pic			0109FD 3A 89 0D 01         A  1169    				ld a,(target_slot)
+010A01 CB27                A  1170    				sla a
+010A03 CD 1A 08 01         A  1171    				call send_byte_to_pic			Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  28
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+                           A  1172    
+010A07 CD F9 07 01         A  1173    				call get_byte_from_pic			010A0B D8                  A  1174    				ret c
+010A0C FE00                A  1175    				cp 0
+010A0E C0                  A  1176    				ret nz
+                           A  1177    
+010A0F 3E88                A  1178    				ld a,088h						010A11 CD 1A 08 01         A  1179    				call send_byte_to_pic
+010A15 3EE2                A  1180    				ld a,0e2h
+010A17 CD 1A 08 01         A  1181    				call send_byte_to_pic
+010A1B 3E00                A  1182    				ld a,00h			
+010A1D CD 1A 08 01         A  1183    				call send_byte_to_pic			010A21 3E00                A  1184    				ld a,00h	
+010A23 CD 1A 08 01         A  1185    				call send_byte_to_pic			010A27 3E02                A  1186    				ld a,02h
+010A29 CD 1A 08 01         A  1187    				call send_byte_to_pic			                           A  1188    	
+010A2D CD F9 07 01         A  1189    				call get_byte_from_pic			010A31 D8                  A  1190    				ret c
+010A32 FE00                A  1191    				cp 0
+010A34 C0                  A  1192    				ret nz
+                           A  1193    
+                           A  1194    
+010A35 3E88                A  1195    				ld a,088h						010A37 CD 1A 08 01         A  1196    				call send_byte_to_pic
+010A3B 3EC0                A  1197    				ld a,0c0h
+010A3D CD 1A 08 01         A  1198    				call send_byte_to_pic
+010A41 CD F9 07 01         A  1199    				call get_byte_from_pic			010A45 D8                  A  1200    				ret c
+010A46 FE00                A  1201    				cp 0
+010A48 C0                  A  1202    				ret nz
+                           A  1203    
+010A49 11000000            A  1204    				ld de,0
+010A4D 3E01                A  1205    lpve			ld a,01h
+010A4F 01010000            A  1206    				ld bc,port_pic_ctrl
+010A53 ED79                A  1207    				out (bc),a						010A55 CD F9 07 01         A  1208    				call get_byte_from_pic
+010A59 D8                  A  1209    				ret c
+010A5A FEFF                A  1210    				cp 0ffh
+010A5C C0                  A  1211    				ret nz
+                           A  1212    
+010A5D 3E00                A  1213    				ld a,00h
+010A5F 01010000            A  1214    				ld bc,port_pic_ctrl
+010A63 ED79                A  1215    				out (bc),a						010A65 CD F9 07 01         A  1216    				call get_byte_from_pic
+010A69 D8                  A  1217    				ret c
+010A6A FEFF                A  1218    				cp 0ffh
+010A6C C0                  A  1219    				ret nz
+                           A  1220    
+010A6D 1B                  A  1221    				dec de
+010A6E 7A                  A  1222    				ld a,d
+010A6F B3                  A  1223    				or e
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  29
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010A70 20 DB               A  1224    				jr nz,lpve
+010A72 AF                  A  1225    				xor a
+010A73 C9                  A  1226    				ret
+                           A  1227    
+                           A  1228    ;----------------------------------------------
+                           A  1229    
+010A74                     A  1230    show_fw
+010A74 3E88                A  1231    				ld a,088h						010A76 CD 1A 08 01         A  1232    				call send_byte_to_pic
+010A7A 3E4E                A  1233    				ld a,04eh
+010A7C CD 1A 08 01         A  1234    				call send_byte_to_pic
+010A80 CD F9 07 01         A  1235    				call get_byte_from_pic			010A84 C9                  A  1236    				ret
+                           A  1237    				
+                           A  1238    ;----------------------------------------------
+                           A  1239    
+                           A  1240    
+                           A  1241    			
+010A85 0B2A2A2A 2A2A2A2A   A  1242    app_msg			db 11,'************************
+010A8D 2A2A2A2A 2A2A2A2A 
+010A95 2A2A2A2A 2A2A2A2A 
+010A9D 2A2A2A2A 2A2A2A2A 
+010AA5 2A2A0B 
+010AA8 2A2A2043 6F6E6669   A  1243    				db    '** Config EEPROM Updater
+010AB0 67204545 50524F4D 
+010AB8 20557064 61746572 
+010AC0 2056302E 3036202A 
+010AC8 2A0B 
+010ACA 2A2A2A2A 2A2A2A2A   A  1244    				db    '************************
+010AD2 2A2A2A2A 2A2A2A2A 
+010ADA 2A2A2A2A 2A2A2A2A 
+010AE2 2A2A2A2A 2A2A2A2A 
+010AEA 2A0B0B00 
+                           A  1245    
+010AEE 0B2A2A2A 20537461   A  1246    go				db 11,"*** Start! ***",11,11,0
+010AF6 72742120 2A2A2A0B 
+010AFE 0B00 
+                           A  1247    
+010B00 456E7465 72204669   A  1248    write_cfg		db 'Enter Filename or Press ENT
+010B08 6C656E61 6D65206F 
+010B10 72205072 65737320 
+010B18 454E5445 5220746F 
+010B20 20646F77 6E6C6F61 
+010B28 6420636F 6E666967 
+010B30 2066696C 653A0B0B 
+010B38 00 
+010B39 57616974 696E6720   A  1249    download		db "Waiting for config file.. [
+010B41 666F7220 636F6E66 
+010B49 69672066 696C652E 
+010B51 2E205B45 73632074 
+010B59 6F207175 69745D0B 
+010B61 00 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  30
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010B62 52656365 6976696E   A  1250    receiving		db "Receiving file..",11,0
+010B6A 67206669 6C652E2E 
+010B72 0B00 
+010B74 46696C65 20726563   A  1251    received		db "File received.",11,0
+010B7C 65697665 642E0B00 
+010B84 456E6162 6C696E67   A  1252    enable_wr		db "Enabling EEPROM writes..",1
+010B8C 20454550 524F4D20 
+010B94 77726974 65732E2E 
+010B9C 0B00 
+010B9E 45726173 696E6720   A  1253    erase			db "Erasing Slot..",11,0
+010BA6 536C6F74 2E2E0B00 
+010BAE 43686563 6B696E67   A  1254    chkerase		db "Checking Erasure..",11,0
+010BB6 20457261 73757265 
+010BBE 2E2E0B00 
+010BC2 57726974 696E6720   A  1255    writing   	  	db "Writing data to EEPROM..",1
+010BCA 64617461 20746F20 
+010BD2 45455052 4F4D2E2E 
+010BDA 0B00 
+010BDC 44697361 626C696E   A  1256    disable_wr		db "Disabling EEPROM writes..",
+010BE4 67204545 50524F4D 
+010BEC 20777269 7465732E 
+010BF4 2E0B00 
+010BF7 53657420 64617461   A  1257    dbaddr			db "Set databurst address..",11
+010BFF 62757273 74206164 
+010C07 64726573 732E2E0B 
+010C0F 00 
+010C10 53657420 64617461   A  1258    dblen			db "Set databurst length..",11,
+010C18 62757273 74206C65 
+010C20 6E677468 2E2E0B00 
+010C28 496E6974 69617469   A  1259    databurst		db "Initiating Databurst..",11,
+010C30 6E672044 61746162 
+010C38 75727374 2E2E0B00 
+010C40 56657269 6679696E   A  1260    verifying		db "Verifying data..",11,0
+010C48 67206461 74612E2E 
+010C50 0B00 
+010C52 436F6D70 6C657465   A  1261    completed		db "Completed OK..",11,0
+010C5A 64204F4B 2E2E0B00 
+010C62 436F6D6D 73206572   A  1262    com_error		db "Comms error! Serial Buffer:
+010C6A 726F7221 20536572 
+010C72 69616C20 42756666 
+010C7A 65723A0B 00 
+                           A  1263    
+010C7F 0B2A2A2A 2A2A2A2A   A  1264    ver_fail		db 11,"******* Verify failed! *
+010C87 20566572 69667920 
+010C8F 6661696C 65642120 
+010C97 2A2A2A2A 2A2A2A0B 
+010C9F 0B00 
+                           A  1265    
+010CA1 50494320 72657370   A  1266    pic_ok			db "PIC responds: $00 - OK.",11
+010CA9 6F6E6473 3A202430 
+010CB1 30202D20 4F4B2E0B 
+010CB9 00 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  31
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010CBA 436F6E66 69726D65   A  1267    erase_ok_txt	db "Confirmed: Erased OK.",11,0
+010CC2 643A2045 72617365 
+010CCA 64204F4B 2E0B00 
+010CD1 4572726F 723A2045   A  1268    erase_bad_txt	db "Error: Erase failed.",11,0
+010CD9 72617365 20666169 
+010CE1 6C65642E 0B00 
+                           A  1269    
+010CE7 0B457272 6F72202D   A  1270    report_byte		db 11,"Error - Received byte $"
+010CEF 20526563 65697665 
+010CF7 64206279 74652024 
+010CFF 78780B00            A  1271    ascii_hex		db "xx",11,0
+010D03 50494320 4669726D   A  1272    firmware		db "PIC Firmware   : ",0
+010D0B 77617265 2020203A 
+010D13 2000 
+010D15 54696D65 64206F75   A  1273    timeout_msg 	db "Timed out.",11,0
+010D1D 742E0B00 
+                           A  1274    
+010D21 00                  A  1275    page_hi			db 0
+010D22 00                  A  1276    page_med		db 0
+010D23 00                  A  1277    page_lo			db 0
+                           A  1278    
+010D24 000000              A  1279    show_addr		db 0,0,0
+010D27 000000              A  1280    bad_addr		db 0,0,0
+010D2A 78787979 7A7A2030   A  1281    mem_line		db "xxyyzz 00 00 00 00 00 00 00
+010D32 30203030 20303020 
+010D3A 30302030 30203030 
+010D42 20303020 30302030 
+010D4A 30203030 20303020 
+010D52 30302030 30203030 
+010D5A 20303020 3030200B 
+010D62 00 
+                           A  1282    
+010D63 426F6F74 20757020   A  1283    boot_slot_txt	db 'Boot up slot   : ',0
+010D6B 736C6F74 2020203A 
+010D73 2000 
+010D75 0B0B5461 72676574   A  1284    target_slot_txt	db 11,11,'Target slot    : ',0
+010D7D 20736C6F 74202020 
+010D85 203A2000 
+010D89 00                  A  1285    target_slot		db 0
+010D8A 456E7465 72207461   A  1286    select_slot_txt	db 'Enter target slot number..'
+010D92 72676574 20736C6F 
+010D9A 74206E75 6D626572 
+010DA2 2E2E00 
+                           A  1287    
+010DA5 0B53656C 6563743A   A  1288    menu_txt		db 11,'Select:',11
+010DAD 0B 
+010DAE 2D2D2D2D 2D2D2D0B   A  1289    				db    '-------',11,11
+010DB6 0B 
+010DB7 5B435D20 2D204368   A  1290    				db '[C] - Change target slot',1
+010DBF 616E6765 20746172 
+010DC7 67657420 736C6F74 
+010DCF 0B 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  32
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010DD0 5B525D20 2D205265   A  1291    				db '[R] - Restart from target s
+010DD8 73746172 74206672 
+010DE0 6F6D2074 61726765 
+010DE8 7420736C 6F740B 
+010DEF 5B4D5D20 2D204D61   A  1292    				db '[M] - Make target slot the 
+010DF7 6B652074 61726765 
+010DFF 7420736C 6F742074 
+010E07 68652064 65666175 
+010E0F 6C742062 6F6F7420 
+010E17 736C6F74 0B 
+010E1C 5B575D20 2D205772   A  1293    				db '[W] - Write config file to 
+010E24 69746520 636F6E66 
+010E2C 69672066 696C6520 
+010E34 746F2074 61726765 
+010E3C 7420736C 6F740B 
+010E43 5B455D20 2D204572   A  1294    				db '[E] - Erase target slot',11
+010E4B 61736520 74617267 
+010E53 65742073 6C6F740B 
+010E5B 5B535D20 2D205365   A  1295    				db '[S] - Set EEPROM Status Reg
+010E63 74204545 50524F4D 
+010E6B 20537461 74757320 
+010E73 52656769 73746572 
+010E7B 20285072 6F746563 
+010E83 74696F6E 20626974 
+010E8B 73290B 
+010E8E 0B455343 202D2051   A  1296    				db 11,'ESC - Quit',11,11,0
+010E96 7569740B 0B00 
+                           A  1297    
+010E9C 0B00                A  1298    cr_txt			db 11,0
+                           A  1299    
+010E9E 2A00                A  1300    filename		db '*',0
+                           A  1301    
+010EA0 44617461 20777269   A  1302    written			db 'Data written:',11,0
+010EA8 7474656E 3A0B00 
+010EAF 44617461 20726561   A  1303    readback		db 'Data read in:',11,0
+010EB7 6420696E 3A0B00 
+                           A  1304    
+010EBE 01                  A  1305    slot_count		db 1
+010EBF 00                  A  1306    working_slot	db 0
+010EC0 536C6F74 733A0B     A  1307    slots_txt		db 'Slots:',11
+010EC7 2D2D2D2D 2D2D0B00   A  1308    				db '------',11,0
+010ECF 0B787820 2D2000     A  1309    slot_hex		db 11,'xx - ',0
+010ED6 556E6B6E 6F776E20   A  1310    unknown_txt		db 'Unknown / Blank',0
+010EDE 2F20426C 616E6B00 
+                           A  1311    
+010EE6 000000              A  1312    fn_addr			dw24 0
+                           A  1313    
+010EE9 4F4B2C20 626F6F74   A  1314    bs_done			db 'OK, boot slot changed..',0
+010EF1 20736C6F 74206368 
+010EF9 616E6765 642E2E00 
+010F01 00                  A  1315    boot_slot		db 0
+010F02 0B0B5375 72652079   A  1316    bs_conf_txt		db 11,11,'Sure you want the tar
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  33
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+010F0A 6F752077 616E7420 
+010F12 74686520 74617267 
+010F1A 65742074 6F206265 
+010F22 20746865 20637572 
+010F2A 72656E74 20626F6F 
+010F32 7420736C 6F743F20 
+010F3A 28792F6E 2900 
+                           A  1317    
+010F40 7878203C 2D504943   A  1318    picerr_txt		db 'xx <-PIC ERROR CODE',11,0
+010F48 20455252 4F522043 
+010F50 4F44450B 00 
+                           A  1319    
+010F55 0B576172 6E696E67   A  1320    noconf_txt		db 11,'Warning! Unknown data in
+010F5D 2120556E 6B6E6F77 
+010F65 6E206461 74612069 
+010F6D 6E207468 69732073 
+010F75 6C6F742E 20436F6E 
+010F7D 74696E75 65202879 
+010F85 2F6E2920 3F0B0B00 
+                           A  1321    
+010F8D 00                  A  1322    eeprom_id		db 0
+                           A  1323    
+010F8E 456E7465 72206E65   A  1324    enter_sr_txt	db 'Enter new hex value for Sta
+010F96 77206865 78207661 
+010F9E 6C756520 666F7220 
+010FA6 53746174 75732052 
+010FAE 65676973 74657220 
+010FB6 2850726F 74656374 
+010FBE 696F6E20 62697473 
+010FC6 293A2000 
+010FCA 0B0B4F4B 2E205374   A  1325    sr_set_txt		db 11,11,'OK. Status Register u
+010FD2 61747573 20526567 
+010FDA 69737465 72207570 
+010FE2 64617465 642E2E00 
+010FEA 00                  A  1326    new_sr			db 0
+                           A  1327    
+010FEB 00                  A  1328    current_sr		db 0
+010FEC 0B537461 74757320   A  1329    sr_txt			db 11,'Status Register: ',0
+010FF4 52656769 73746572 
+010FFC 3A2000 
+                           A  1330    
+010FFF 00 00 00 00 00 00   A  1331    slots_valid		blkb 32,0
+011005 00 00 00 00 00 00 
+01100B 00 00 00 00 00 00 
+011011 00 00 00 00 00 00 
+011017 00 00 00 00 00 00 
+01101D 00 00 
+                           A  1332    
+01101F 00 00 00 00 00 00   A  1333    input_string	blkb 16,0
+011025 00 00 00 00 00 00 
+01102B 00 00 00 00 
+                           A  1334    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)31-Mar-11     20:45:30     page:  34
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\EEPROM\src\eeprom.asm
+01102F 0B0B4C6F 61642045   A  1335    load_error_txt	db 11,11,'Load Error.. File not
+011037 72726F72 2E2E2046 
+01103F 696C6520 6E6F7420 
+011047 666F756E 643F00 
+                           A  1336    
+                           A  1337    ;----------------------------------------------
+01104E 00                  A  1338    buffer			db 0			; dont put anyt
+                           A  1339    ;----------------------------------------------
+                           A  1340    
+
+
+Errors: 0
+Warnings: 0
+Lines Assembled: 1574

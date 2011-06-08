@@ -1,0 +1,2468 @@
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   1
+
+
+PC     Object              I  Line    Source 
+                           A     1    ; Test Z80-mode Protracker Player, 50Hz.
+                           A     2    ; Need to preload samples to $c00000
+                           A     3    ; and pattern to $16000
+                           A     4    
+                           A     5    ;----------------------------------------------
+                           A     6    ; Set these two values to suit user program
+                           A     7    ;----------------------------------------------
+                           A     8    
+       00000000            A     9    ADL_mode		equ 0				; 0 if user
+       00010000            A    10    load_location	equ 10000h			; anywhere 
+                           A    11    
+                           B     0    				include	'PROSE_header.asm'
+                           B     1    ;--- EZ80 Internal CPU Ports ------------------
+                           B     2    
+       0000009A            B     3    PB_DR			equ 09ah
+       0000009B            B     4    PB_DDR			equ 09bh
+       0000009C            B     5    PB_ALT1			equ 09ch
+       0000009D            B     6    PB_ALT2			equ 09dh
+                           B     7    
+       0000009E            B     8    PC_DR			equ 09eh
+       0000009F            B     9    PC_DDR			equ 09fh
+       000000A0            B    10    PC_ALT1			equ 0a0h
+       000000A1            B    11    PC_ALT2			equ 0a1h
+                           B    12    
+       000000A2            B    13    PD_DR			equ 0a2h
+       000000A3            B    14    PD_DDR			equ 0a3h
+       000000A4            B    15    PD_ALT1			equ 0a4h
+       000000A5            B    16    PD_ALT2			equ 0a5h
+                           B    17    
+       000000C0            B    18    UART0_RBR		equ 0c0h
+       000000C0            B    19    UART0_THR		equ 0c0h
+       000000C0            B    20    UART0_BRG_L		equ 0c0h
+       000000C1            B    21    UART0_BRG_H		equ 0c1h
+       000000C1            B    22    UART0_IER		equ 0c1h
+       000000C2            B    23    UART0_FCTL		equ 0c2h
+       000000C3            B    24    UART0_LCTL		equ 0c3h
+       000000C4            B    25    UART0_MCTL		equ 0c4h
+       000000C5            B    26    UART0_LSR		equ 0c5h
+                           B    27    
+       000000A8            B    28    CS0_LBR			equ 0a8h			;eZ80 wait 
+       000000A9            B    29    CS0_UBR			equ 0a9h
+       000000AA            B    30    CS0_CTL			equ 0aah			
+       000000AB            B    31    CS1_LBR			equ 0abh			;eZ80 wait 
+       000000AC            B    32    CS1_UBR			equ 0ach
+       000000AD            B    33    CS1_CTL			equ 0adh
+       000000AE            B    34    CS2_LBR			equ 0aeh			;eZ80 wait 
+       000000AF            B    35    CS2_UBR			equ 0afh
+       000000B0            B    36    CS2_CTL			equ 0b0h
+       000000B1            B    37    CS3_LBR			equ 0b1h			;eZ80 wait 
+       000000B2            B    38    CS3_UBR			equ 0b2h
+       000000B3            B    39    CS3_CTL			equ 0b3h
+                           B    40    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   2
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+       00000080            B    41    TMR0_CTL		equ 080h			;timer 0 eq
+       00000081            B    42    TMR0_DR_L		equ 081h
+       00000081            B    43    TMR0_RR_L		equ 081h
+       00000082            B    44    TMR0_DR_H		equ 082h
+       00000082            B    45    TMR0_RR_H		equ 082h
+       00000092            B    46    TMR_ISS			equ 092h
+                           B    47    
+       000000ED            B    48    RTC_CTRL		equ 0edh			;RTC equate
+       000000EC            B    49    RTC_ACTRL		equ 0ech
+       000000E0            B    50    RTC_SEC			equ 0e0h
+       000000E1            B    51    RTC_MIN			equ 0e1h
+       000000E2            B    52    RTC_HRS			equ 0e2h
+       000000E3            B    53    RTC_DOW			equ 0e3h
+       000000E4            B    54    RTC_DOM			equ 0e4h
+       000000E5            B    55    RTC_MON			equ 0e5h
+       000000E6            B    56    RTC_YR			equ 0e6h
+       000000E7            B    57    RTC_CEN			equ 0e7h
+                           B    58    
+                           B    59    ;-- EZ80P Hardware equates --------------------
+                           B    60    
+       00000000            B    61    port_pic_data  			equ 000h
+       00000001            B    62    port_pic_ctrl			equ 001h
+       00000001            B    63    port_hw_flags			equ 001h
+       00000002            B    64    port_sdc_ctrl			equ 002h	; this is a
+       00000002            B    65    port_keyboard_data		equ 002h
+       00000003            B    66    port_sdc_data		 	equ 003h	
+       00000004            B    67    port_memory_paging		equ 004h
+       00000005            B    68    port_irq_ctrl			equ 005h
+       00000006            B    69    port_nmi_ack			equ 006h
+       00000007            B    70    port_ps2_ctrl			equ 007h
+       00000008            B    71    port_selector			equ 008h
+       00000006            B    72    port_mouse_data			equ 006h
+       00000009            B    73    port_clear_flags		equ 009h
+                           B    74    
+       00000040            B    75    port_video_mode			equ 040h
+                           B    76    
+                           B    77    
+       00000000            B    78    sdc_power				equ 0		;(port_sd_c
+       00000001            B    79    sdc_cs					equ 1		;(port_sd_c
+       00000002            B    80    sdc_speed				equ 2 		;(port_sd_c
+                           B    81    
+       00000004            B    82    sdc_serializer_busy		equ 4 		;(port_hw_f
+       00000005            B    83    vrt						equ 5		;(port_hw_f
+                           B    84    
+                           B    85    
+                           B    86    ;-- Memory locations --------------------------
+                           B    87    
+       00800000            B    88    hw_vram_a			equ 0800000h
+       00C00000            B    89    hw_vram_b			equ 0c00000h
+       00F00000            B    90    hw_palette			equ 0f00000h
+       00F80000            B    91    hw_audio_registers 	equ 0f80000h
+                           B    92    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   3
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+                           B    93    ;----------------------------------------------
+                           B    94    
+                           B    95    
+       00000A00            B    96    os_start 	equ 0a00h
+                           B    97    
+       00000A14            B    98    prose_return equ os_start+14h
+       00000A20            B    99    prose_kernal equ os_start+20h
+                           B   100    
+                           B   101    ;----------------------------------------------
+                           B   102    ; Kernal Jump Table values for mode PROSE
+                           B   103    ;----------------------------------------------
+                           B   104    		
+       00000000            B   105    kr_mount_volumes				equ 00h	
+       00000001            B   106    kr_get_device_info				equ 01h	
+       00000002            B   107    kr_check_volume_format			equ 02h	
+       00000003            B   108    kr_change_volume				equ 03h	
+       00000004            B   109    kr_get_volume_info				equ 04h	
+       00000005            B   110    kr_format_device				equ 05h	
+       00000006            B   111    kr_make_dir						equ 06h
+                           B   112    
+       00000007            B   113    kr_change_dir					equ 07h	
+       00000008            B   114    kr_parent_dir					equ 08h	
+       00000009            B   115    kr_root_dir						equ 09h
+       0000000A            B   116    kr_delete_dir					equ 0ah
+       0000000B            B   117    kr_find_file					equ 0bh
+       0000000C            B   118    kr_set_file_pointer				equ 0ch
+       0000000D            B   119    kr_set_load_length				equ 0dh
+       0000000E            B   120    kr_read_file					equ 0eh
+                           B   121    
+       0000000F            B   122    kr_erase_file					equ 0fh
+       00000010            B   123    kr_rename_file					equ 10h
+       00000011            B   124    kr_create_file					equ 11h
+       00000012            B   125    kr_write_file					equ 12h
+       00000013            B   126    kr_get_total_sectors			equ 13h
+       00000014            B   127    kr_dir_list_first_entry			equ 14h
+       00000015            B   128    kr_dir_list_get_entry			equ 15h
+       00000016            B   129    kr_dir_list_next_entry			equ 16h
+                           B   130    
+       00000017            B   131    kr_read_sector					equ 17h
+       00000018            B   132    kr_write_sector					equ 18h
+       00000019            B   133    kr_file_sector_list				equ 19h
+       0000001A            B   134    kr_get_dir_cluster				equ 1ah
+       0000001B            B   135    kr_set_dir_cluster				equ 1bh
+       0000001C            B   136    kr_get_dir_name					equ 1ch
+       0000001D            B   137    kr_wait_key						equ 1dh
+       0000001E            B   138    kr_get_key						equ 1eh
+                           B   139    
+       0000001F            B   140    kr_get_key_mod_flags			equ 1fh
+       00000020            B   141    kr_serial_receive_header		equ 20h
+       00000021            B   142    kr_serial_receive_file			equ 21h
+       00000022            B   143    kr_serial_send_file				equ 22h
+       00000023            B   144    kr_serial_tx_byte				equ 23h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   4
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+       00000024            B   145    kr_serial_rx_byte				equ 24h
+                           B   146    
+       00000025            B   147    kr_print_string					equ 25h
+       00000026            B   148    kr_clear_screen					equ 26h
+       00000027            B   149    kr_wait_vrt						equ 27h
+       00000028            B   150    kr_set_cursor_position			equ 28h
+       00000029            B   151    kr_plot_char					equ 29h
+       0000002A            B   152    kr_set_pen						equ 2ah
+       0000002B            B   153    kr_background_colours			equ 2bh
+       0000002C            B   154    kr_draw_cursor					equ 2ch
+       0000002D            B   155    kr_get_pen						equ 2dh
+       0000002E            B   156    kr_scroll_up					equ 2eh
+       0000002F            B   157    kr_os_display					equ 2fh
+       00000030            B   158    kr_get_display_size				equ 30h
+       00000031            B   159    kr_get_charmap_addr_xy			equ 31h
+       00000032            B   160    kr_get_cursor_position			equ 32h
+                           B   161    
+       00000033            B   162    kr_set_envar					equ 33h
+       00000034            B   163    kr_get_envar					equ 34h
+       00000035            B   164    kr_delete_envar					equ 35h
+                           B   165    
+       00000036            B   166    kr_enable_mouse					equ 36h
+       00000037            B   167    kr_get_mouse_position			equ 37h
+       00000038            B   168    kr_get_mouse_disp				equ 38h
+                           B   169    
+       00000039            B   170    kr_time_delay					equ 39h
+       0000003A            B   171    kr_compare_strings				equ 3ah
+       0000003B            B   172    kr_hex_byte_to_ascii			equ 3bh
+       0000003C            B   173    kr_ascii_to_hex_word			equ 3ch
+       0000003D            B   174    kr_get_string					equ 3dh
+                           B   175    
+       0000003E            B   176    kr_get_version					equ 3eh
+       0000003F            B   177    kr_dont_store_registers			equ 3fh
+       00000040            B   178    kr_os_video_settings			equ 40h
+       00000041            B   179    kr_read_rtc						equ 41h
+       00000042            B   180    kr_write_rtc					equ 42h
+                           B   181    
+                           B   182    ;----------------------------------------------
+                           B   183    ; Standard PROSE executable header
+                           B   184    ;----------------------------------------------
+                           B   185    
+                           B   186    
+                           B   187    	IF ADL_mode = 0
+000000                     B   188    		org load_location&0ffffh	; if Z80 mo
+                           B   189    	ELSE
+                           B   190    		org load_location			; otherwise
+                           B   191    	ENDIF
+                           B   192    	
+                           B   193    		.assume ADL = 1				; All PROSE
+                           B   194    
+000000 18 0E               B   195    		jr skip_header				; $0 - Jump
+000002 50524F              B   196    		db 'PRO'					; $2 - ASCI
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   5
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+000005 000001              B   197    mb_loc	dw24 load_location			; $5 - Desi
+000008 000000              B   198    		dw24 0						; $8 - If >
+00000B 0000                B   199    		dw 0						; $B - If >
+00000D 0000                B   200    		dw 0						; $D - If >
+00000F 00                  B   201    		db ADL_mode					; $F - Z80 
+                           B   202    
+000010                     B   203    skip_header
+                           B   204    	
+                           B   205    	IF ADL_mode = 0 
+                           B   206    		
+       00010000            B   207    mbase_offset equ load_location & 0ff0000h
+                           B   208    
+000010 3E01                B   209    		ld a,load_location/65536	; Additiona
+000012 ED6D                B   210    		ld MB,a						; Set MBASE
+000014 40C3 18 00          B   211    		jp.sis go_z80_mode			; switches 
+                           B   212    
+000018                     B   213    go_z80_mode
+                           B   214    
+                           B   215    		.assume ADL = 0
+                           B   216    
+                           B   217    	ENDIF
+                           B   218    	
+                           B   219    ;----------------------------------------------
+                           B   220    	
+                           A    13    
+                           A    14    ;----------------------------------------------
+                           A    15    ; Z80-mode user program follows..
+                           A    16    ;----------------------------------------------
+                           A    17    
+                           A    18    		
+000018 3100FF              A    19    			ld sp,0ff00h
+                           A    20    
+00001B CD 96 00            A    21    			call init_tracker
+                           A    22    
+00001E 21 79 00            A    23    			ld hl,message_txt					000021 CD 69 00            A    24    			call print_string
+                           A    25    			
+                           A    26    ;----------------------------------------------
+                           A    27    
+000024 118F02              A    28    			ld de,655							000027 7B                  A    29    			ld a,e							
+000028 ED3981              A    30    			out0 (TMR0_RR_L),a					00002B 7A                  A    31    			ld a,d
+00002C ED3982              A    32    			out0 (TMR0_RR_H),a					00002F 3E13                A    33    			ld a,00010011b						000031 ED3980              A    34    			out0 (TMR0_CTL),a					                           A    35    
+000034 ED3880              A    36    wait_50hz	in0 a,(TMR0_CTL)					000037 CB7F                A    37    			bit 7,a
+000039 C4 54 00            A    38    			call nz,do_tracker_update			                           A    39    		
+00003C 3E1E                A    40    			ld a,kr_get_key						Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   6
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\stereo_play.asm
+00003E 5BCD200A 00         A    41    			call.lil prose_kernal
+000043 FE76                A    42    			cp 076h
+000045 20 ED               A    43    			jr nz,wait_50hz
+                           A    44    
+000047 3E00                A    45    			ld a,0
+000049 5B320300 F8         A    46    			ld.lil (hw_audio_registers+3),a		00004E AF                  A    47    			xor a
+00004F 5BC3140A 00         A    48    			jp.lil prose_return					                           A    49    
+                           A    50    ;----------------------------------------------
+                           A    51    
+000054                     A    52    do_tracker_update
+                           A    53    
+                           A    54    ; call this routine every 50 Hz
+                           A    55    
+000054 3E08                A    56    			ld a,08h							000056 5B320100 F0         A    57    			ld.lil (hw_palette+1),a				                           A    58    			
+00005B CD 11 01            A    59    			call play_tracker					                           A    60    			
+00005E 3E00                A    61    			ld a,00h							000060 5B320100 F0         A    62    			ld.lil (hw_palette+1),a				                           A    63    			
+000065 CD 64 11            A    64    			call update_audio_hardware			000068 C9                  A    65    			ret
+                           A    66    			
+                           A    67    ;----------------------------------------------
+                           A    68    
+000069                     A    69    print_string
+                           A    70    
+000069 3E25                A    71    			ld a,kr_print_string			 
+00006B 5BCD200A 00         A    72    			call.lil prose_kernal			 
+000070 C9                  A    73    			ret
+                           A    74    
+                           A    75    
+000071 3E1D                A    76    waitkey		ld a,kr_wait_key
+000073 5BCD200A 00         A    77    			call.lil prose_kernal
+000078 C9                  A    78    			ret
+                           A    79    
+                           A    80    
+                           A    81    ;----------------------------------------------
+                           A    82    		
+000079                     A    83    message_txt
+                           A    84    
+000079 496E6974 69616C69   A    85    			db 'Initialized song. Playing..',11
+000081 7A656420 736F6E67 
+000089 2E20506C 6179696E 
+000091 672E2E0B 00 
+                           A    86    
+                           A    87    ;----------------------------------------------
+                           A    88    		
+                           B     0    			include "50Hz_Z80_Protracker_Player
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   7
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+                           B     1    ;----------------------------------------------
+                           B     2    ; Z80 Protracker Music Player - V5.05
+                           B     3    ; By Phil Ruston 2011
+                           B     4    ; http://www.retroleum.co.uk
+                           B     5    ;
+                           B     6    ; SYNTAX CONVERTED TO ZDSII STANDARD (Z80 mode,
+                           B     7    ; NOT OPTIMIZED AT ALL 
+                           B     8    ;----------------------------------------------
+                           B     9    ;
+                           B    10    ;
+                           B    11    ; Z80 Code to play standard 31 instrument Protr
+                           B    12    ;
+                           B    13    ; The code has been designed so that is hardwar
+                           B    14    ; does not write to any hardware registers. It 
+                           B    15    ; Amiga hardware registers but still uses the A
+                           B    16    ; to them. Therefore it is up to a seperate "up
+                           B    17    ; variables and adapt/convert the values therei
+                           B    18    ; output the sound. (A routine to do this for m
+                           B    19    ;
+                           B    20    ;
+                           B    21    ; Equates (must be defined in external code)
+                           B    22    ; -------
+                           B    23    ;
+                           B    24    ; "music_module" = location of protracker modul
+                           B    25    ; at a word address boundary.
+                           B    26    ;
+                           B    27    ;
+                           B    28    ; Routines:
+                           B    29    ; ---------
+                           B    30    ;
+                           B    31    ; call "init_tracker" to initialize/reset tune
+                           B    32    ; call "play_tracker" every frame to update the
+                           B    33    ;
+                           B    34    ; (Obviously you need a routine to read the Ami
+                           B    35    ; that this code updates,  convert the values a
+                           B    36    ;
+                           B    37    ;
+                           B    38    ; Variables:
+                           B    39    ; ----------
+                           B    40    ;
+                           B    41    ; "force_sample_base" (WORD) - write the WORD l
+                           B    42    ; (ie: not Z80 address space) here  prior to in
+                           B    43    ; been seperated from the module (eg: written t
+                           B    44    ; ignore it (or write $FFFF).
+                           B    45    ;
+                           B    46    ; "filter_on_off" (BYTE) reads ONE if player ha
+                           B    47    ; zero if not. (Whether or not this is of any u
+                           B    48    ;
+                           B    49    ; Replacing the Amiga hardware registers is a b
+                           B    50    ; These begin at "channel_data". There are 33 b
+                           B    51    ; within each block are:
+                           B    52    ;
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   8
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+                           B    53    ; samp_loc_lo (WORD address **)	
+                           B    54    ; samp_loc_hi (WORD address **)	
+                           B    55    ; samp_len_lo 	
+                           B    56    ; samp_len_hi 	
+                           B    57    ; samp_loop_offset_lo (IN WORDS **)
+                           B    58    ; samp_loop_offset_hi (IN WORDS **)	
+                           B    59    ; samp_loop_len_lo	
+                           B    60    ; samp_loop_len_hi	
+                           B    61    ; samp_offset_lo	
+                           B    62    ; samp_offset_hi	
+                           B    63    ; period_lo
+                           B    64    ; period_hi
+                           B    65    ; volume
+                           B    66    ; control_bits
+                           B    67    ;
+                           B    68    ; Variable names should be self-explanitory.
+                           B    69    ; "control_bits" replaces the Amiga's DMA sound
+                           B    70    ; When bit 0 of each channel's control_bits var
+                           B    71    ; hardware conversion routine knows to trigger 
+                           B    72    ; loopstart/looplength). The conversion routine
+                           B    73    ; after triggering a sample.
+                           B    74    ;
+                           B    75    ; ** These are WORD locations, the Amiga hardwa
+                           B    76    ; samples to begin on odd-byte addresses. There
+                           B    77    ; to address word locations allows a sample add
+                           B    78    ; of 64KB. This is relevent - despite the Z80's
+                           B    79    ; hardware may have its own sample RAM . Simply
+                           B    80    ; byte addresses.
+                           B    81    ;
+                           B    82    ; Limitations:
+                           B    83    ; ------------
+                           B    84    ; The Z80's 64KB address space limits the size 
+                           B    85    ; played. However, as mentioned, the samples ca
+                           B    86    ; and loaded into seperate dedicated Audio RAM 
+                           B    87    ;
+                           B    88    ; Revisions:
+                           B    89    ; ----------
+                           B    90    ;
+                           B    91    ; V5.05 - If a pattern note entry is blank, cle
+                           B    92    ;
+                           B    93    ; V5.04 - Fixed note triggering -  a bug in the
+                           B    94    ;         was masking the incorrect retrigging 
+                           B    95    ;         period is specified)
+                           B    96    ; 
+                           B    97    ; Known issues:
+                           B    98    ; -------------
+                           B    99    ; $EF - invert loop is not implemented (rarely 
+                           B   100    ;
+                           B   101    ;
+                           B   102    ;==============================================
+                           B   103    ; Start of hardware-agnostic specific Z80 Protr
+                           B   104    ;==============================================
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:   9
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+                           B   105    
+                           B   106    .assume ADL = 0
+                           B   107    
+000096                     B   108    init_tracker
+                           B   109    
+000096 3E06                B   110    				ld a,6						; d
+000098 32 D9 10            B   111    				ld (songspeed),a
+00009B AF                  B   112    				xor a						; c
+00009C 32 D6 10            B   113    				ld (ticker),a
+00009F 32 D7 10            B   114    				ld (songpos),a
+0000A2 32 D8 10            B   115    				ld (patindex),a
+0000A5 32 DA 10            B   116    				ld (arpeggio_counter),a
+0000A8 32 DB 10            B   117    				ld (pattloop_pos),a
+0000AB 32 DC 10            B   118    				ld (pattloop_count),a
+0000AE 32 DD 10            B   119    				ld (pattdelay_count),a	
+0000B1 32 DE 10            B   120    				ld (pattdelay_flag),a	
+0000B4 21 E0 10            B   121    				ld hl,channel_data
+0000B7 06 84               B   122    				ld b,vars_per_channel*4
+0000B9 77                  B   123    clchdlp			ld (hl),a
+0000BA 23                  B   124    				inc hl
+0000BB 10 FC               B   125    				djnz clchdlp
+                           B   126    
+0000BD 21 B8 63            B   127    				ld hl,music_module+952		; f
+0000C0 0680                B   128    				ld b,128					; t
+0000C2 0E00                B   129    				ld c,0
+0000C4 7E                  B   130    ptfhplp			ld a,(hl)	
+0000C5 B9                  B   131    				cp c
+0000C6 38 01               B   132    				jr c,patlower
+0000C8 4F                  B   133    				ld c,a
+0000C9 23                  B   134    patlower		inc hl
+0000CA 10 F8               B   135    				djnz ptfhplp
+0000CC 0C                  B   136    				inc c
+0000CD CB21                B   137    				sla c
+0000CF CB21                B   138    				sla c
+0000D1 61                  B   139    				ld h,c
+0000D2 2E00                B   140    				ld l,0
+0000D4 01 3C 64            B   141    				ld bc,music_module+1084			0000D7 09                  B   142    				add hl,bc						0000D8 CB3C                B   143    				srl h							0000DA CB1D                B   144    				rr l							0000DC 22 94 10            B   145    				ld (sample_base),hl
+                           B   146    
+0000DF ED5B 96 10          B   147    				ld de,(force_sample_base)		0000E3 13                  B   148    				inc de							0000E4 7A                  B   149    				ld a,d							0000E5 B3                  B   150    				or e
+0000E6 28 03               B   151    				jr z,usenormsb
+0000E8 2A 96 10            B   152    				ld hl,(force_sample_base)	
+                           B   153    
+0000EB DD21 98 10          B   154    usenormsb		ld ix,sample_location_list		0000EF FD21 2A 60          B   155    				ld iy,music_module+42
+0000F3 061F                B   156    				ld b,31
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  10
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0000F5 DD7500              B   157    bsstlp			ld (ix),l						0000F8 DD7401              B   158    				ld (ix+1),h						0000FB DD23                B   159    				inc ix
+0000FD DD23                B   160    				inc ix
+0000FF FD7E01              B   161    				ld a,(iy+1)						000102 85                  B   162    				add a,l							000103 6F                  B   163    				ld l,a
+000104 FD7E00              B   164    				ld a,(iy)						000107 8C                  B   165    				adc a,h							000108 67                  B   166    				ld h,a	
+000109 111E00              B   167    				ld de,30			
+00010C FD19                B   168    				add iy,de						00010E 10 E5               B   169    				djnz bsstlp
+000110 C9                  B   170    				ret
+                           B   171    
+                           B   172    ;----------------------------------------------
+                           B   173    
+000111                     B   174    play_tracker
+                           B   175    
+000111 3A D6 10            B   176    				ld a,(ticker)
+000114 B7                  B   177    				or a			
+000115 C2 BC 02            B   178    				jp nz,not_new_line
+                           B   179    
+000118 3A D7 10            B   180    				ld a,(songpos)					00011B 0600                B   181    				ld b,0
+00011D 4F                  B   182    				ld c,a
+00011E 21 B8 63            B   183    				ld hl,music_module+952			000121 09                  B   184    				add hl,bc						000122 46                  B   185    				ld b,(hl)			
+000123 0E00                B   186    				ld c,0
+000125 CB20                B   187    				sla b
+000127 CB20                B   188    				sla b							                           B   189    				
+000129 3A D8 10            B   190    				ld a,(patindex)					00012C 61                  B   191    				ld h,c							00012D 6F                  B   192    				ld l,a
+00012E 29                  B   193    				add hl,hl
+00012F 29                  B   194    				add hl,hl
+000130 29                  B   195    				add hl,hl
+000131 29                  B   196    				add hl,hl						000132 09                  B   197    				add hl,bc						000133 EB                  B   198    				ex de,hl
+                           B   199    				
+000134 FD21 E0 10          B   200    				ld iy,channel_data	
+000138 DD21 3C 64          B   201    				ld ix,music_module+1084			00013C DD19                B   202    				add ix,de						00013E 0604                B   203    				ld b,4							000140 C5                  B   204    chan_loop		push bc
+000141 DD7E00              B   205    				ld a,(ix)						000144 DDB601              B   206    				or (ix+1)
+000147 DDB602              B   207    				or (ix+2)
+00014A DDB603              B   208    				or (ix+3)
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  11
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00014D 20 06               B   209    				jr nz,parse_dat
+00014F FD36 04 FF          B   210    				ld (iy+fx_number),0ffh			000153 18 03               B   211    				jr skipchan	
+000155 CD 68 01            B   212    parse_dat		call new_note_data	
+000158 01 21 00            B   213    skipchan		ld bc,vars_per_channel		
+00015B FD09                B   214    				add iy,bc						00015D 010400              B   215    				ld bc,4
+000160 DD09                B   216    				add ix,bc						000162 C1                  B   217    				pop bc
+000163 10 DB               B   218    				djnz chan_loop
+000165 C3 CE 02            B   219    				jp tick_advance
+                           B   220    
+                           B   221    
+                           B   222    ;----- New note routines ----------------------
+                           B   223    
+000168                     B   224    new_note_data
+                           B   225    				
+000168 FD36 12 00          B   226    				ld (iy+instrument_waiting),0
+00016C DD7E00              B   227    				ld a,(ix)						00016F E6F0                B   228    				and 0f0h
+000171 DD4602              B   229    				ld b,(ix+2)
+000174 CB38                B   230    				srl b
+000176 CB38                B   231    				srl b
+000178 CB38                B   232    				srl b
+00017A CB38                B   233    				srl b
+00017C B0                  B   234    				or b			
+00017D 28 54               B   235    				jr z,no_new_instrument			                           B   236    
+00017F FD77 12             B   237    				ld (iy+instrument_waiting),a
+000182 3D                  B   238    				dec a
+000183 CB27                B   239    				sla a
+000185 4F                  B   240    				ld c,a
+000186 0600                B   241    				ld b,0
+000188 21 98 10            B   242    				ld hl,sample_location_list		00018B 09                  B   243    				add hl,bc
+00018C 7E                  B   244    				ld a,(hl)
+00018D FD77 17             B   245    				ld (iy+samp_loc_lo),a			000190 23                  B   246    				inc hl
+000191 7E                  B   247    				ld a,(hl)
+000192 FD77 18             B   248    				ld (iy+samp_loc_hi),a			                           B   249    				
+000195 21 54 10            B   250    				ld hl,multiply_30_table			000198 09                  B   251    				add hl,bc
+000199 7E                  B   252    				ld a,(hl)
+00019A 23                  B   253    				inc hl
+00019B 66                  B   254    				ld h,(hl)
+00019C 6F                  B   255    				ld l,a
+00019D 01 2A 60            B   256    				ld bc,music_module+42	
+0001A0 09                  B   257    				add hl,bc						0001A1 7E                  B   258    				ld a,(hl)
+0001A2 FD77 1A             B   259    				ld (iy+samp_len_hi),a			0001A5 23                  B   260    				inc hl
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  12
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0001A6 7E                  B   261    				ld a,(hl)
+0001A7 FD77 19             B   262    				ld (iy+samp_len_lo),a			0001AA 23                  B   263    				inc hl	
+0001AB 7E                  B   264    				ld a,(hl)			
+0001AC E60F                B   265    				and 0fh
+0001AE FD77 14             B   266    				ld (iy+finetune),a				0001B1 23                  B   267    				inc hl
+0001B2 7E                  B   268    				ld a,(hl)
+0001B3 FD77 13             B   269    				ld (iy+volume_waiting),a		0001B6 23                  B   270    				inc hl
+0001B7 46                  B   271    				ld b,(hl)						0001B8 23                  B   272    				inc hl
+0001B9 4E                  B   273    				ld c,(hl)						0001BA E5                  B   274    				push hl
+0001BB FD66 18             B   275    				ld h,(iy+samp_loc_hi)
+0001BE FD6E 17             B   276    				ld l,(iy+samp_loc_lo)
+0001C1 09                  B   277    				add hl,bc
+0001C2 FD74 1C             B   278    				ld (iy+samp_loop_loc_hi),h		0001C5 FD75 1B             B   279    				ld (iy+samp_loop_loc_lo),l		0001C8 E1                  B   280    				pop hl	
+0001C9 23                  B   281    				inc hl
+0001CA 7E                  B   282    				ld a,(hl)
+0001CB FD77 1E             B   283    				ld (iy+samp_loop_len_hi),a		0001CE 23                  B   284    				inc hl
+0001CF 7E                  B   285    				ld a,(hl)
+0001D0 FD77 1D             B   286    				ld (iy+samp_loop_len_lo),a		                           B   287    				
+                           B   288    				
+                           B   289    				
+0001D3                     B   290    no_new_instrument	
+                           B   291    
+0001D3 DD7E00              B   292    				ld a,(ix)						0001D6 E60F                B   293    				and 0fh
+0001D8 47                  B   294    				ld b,a
+0001D9 DD4E01              B   295    				ld c,(ix+1)						                           B   296    					
+0001DC DD7E03              B   297    				ld a,(ix+3)						0001DF FD77 05             B   298    				ld (iy+fx_args),a				0001E2 DD7E02              B   299    				ld a,(ix+2)						0001E5 E60F                B   300    				and 0fh							0001E7 FD77 04             B   301    				ld (iy+fx_number),a
+                           B   302    
+0001EA FE03                B   303    				cp 3							0001EC CA 72 02            B   304    				jp z,set_portadest				0001EF FE05                B   305    				cp 5 			
+0001F1 28 7F               B   306    				jr z,set_portadest
+                           B   307    
+0001F3 FE0E                B   308    				cp 0eh							0001F5 20 11               B   309    				jr nz,no_ftoveride
+0001F7 FD7E 05             B   310    				ld a,(iy+fx_args)
+0001FA E6F0                B   311    				and 0f0h
+0001FC FE50                B   312    				cp 050h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  13
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0001FE 20 08               B   313    				jr nz,no_ftoveride
+000200 FD7E 05             B   314    				ld a,(iy+fx_args)
+000203 E60F                B   315    				and 0fh
+000205 FD77 14             B   316    				ld (iy+finetune),a				                           B   317    
+000208                     B   318    no_ftoveride
+                           B   319    
+000208 FDCB 0F 9E          B   320    				res 3,(iy+control_bits)			00020C 78                  B   321    				ld a,b							00020D B1                  B   322    				or c							00020E 28 15               B   323    				jr z,nonewp1
+                           B   324    
+000210 FDCB 0F DE          B   325    				set 3,(iy+control_bits)			000214 C5                  B   326    				push bc
+000215 FD71 15             B   327    				ld (iy+arp_base_period_lo),c	000218 FD70 16             B   328    				ld (iy+arp_base_period_hi),b	00021B CD 9A 02            B   329    				call finetune_bc_period
+00021E FD71 06             B   330    				ld (iy+period_for_fx_lo),c		000221 FD70 07             B   331    				ld (iy+period_for_fx_hi),b
+000224 C1                  B   332    				pop bc
+                           B   333    				
+000225 FD7E 04             B   334    nonewp1			ld a,(iy+fx_number)
+000228 FE0E                B   335    				cp 0eh							00022A 20 0A               B   336    				jr nz,not_ed		 
+00022C FD7E 05             B   337    				ld a,(iy+fx_args)
+00022F E6F0                B   338    				and 0f0h
+000231 FED0                B   339    				cp 0d0h
+000233 CA 49 03            B   340    				jp z,check_more_fx
+                           B   341    				
+000236 78                  B   342    not_ed			ld a,b							000237 B1                  B   343    				or c			
+000238 28 19               B   344    				jr z,nonewp2
+00023A FD4E 06             B   345    				ld c,(iy+period_for_fx_lo)		00023D FD46 07             B   346    				ld b,(iy+period_for_fx_hi)
+000240 FD71 01             B   347    				ld (iy+period_lo),c
+000243 FD70 02             B   348    				ld (iy+period_hi),b
+000246 FDCB 0F C6          B   349    				set 0,(iy+control_bits)			00024A FD7E 12             B   350    				ld a,(iy+instrument_waiting)	00024D B7                  B   351    				or a
+00024E CA 49 03            B   352    				jp z,check_more_fx
+000251 18 10               B   353    				jr do_vol						                           B   354    				
+000253 FD7E 12             B   355    nonewp2			ld a,(iy+instrument_waiting)	000256 B7                  B   356    				or a							000257 CA 49 03            B   357    				jp z,check_more_fx
+00025A FDBE 00             B   358    				cp (iy+instrument)			
+00025D 28 04               B   359    				jr z,do_vol
+00025F FDCB 0F C6          B   360    				set 0,(iy+control_bits)
+                           B   361    
+000263 FD77 00             B   362    do_vol			ld (iy+instrument),a
+000266 FD7E 13             B   363    				ld a,(iy+volume_waiting)		000269 FD77 03             B   364    				ld (iy+volume),a	
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  14
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00026C FD77 08             B   365    				ld (iy+volume_for_fx),a			00026F C3 49 03            B   366    				jp check_more_fx
+                           B   367    				
+                           B   368    
+000272                     B   369    set_portadest
+                           B   370    
+000272 78                  B   371    				ld a,b							000273 B1                  B   372    				or c			
+000274 28 09               B   373    				jr z,spd_same			
+000276 CD 9A 02            B   374    				call finetune_bc_period
+000279 FD71 10             B   375    				ld (iy+portamento_dest_lo),c	00027C FD70 11             B   376    				ld (iy+portamento_dest_hi),b
+                           B   377    				
+00027F FD7E 12             B   378    spd_same		ld a,(iy+instrument_waiting)	000282 B7                  B   379    				or a			
+000283 C8                  B   380    				ret z
+000284 FDBE 00             B   381    				cp (iy+instrument)				000287 28 07               B   382    				jr z,skiptrig
+000289 FDCB 0F C6          B   383    				set 0,(iy+control_bits)			00028D FD77 00             B   384    				ld (iy+instrument),a
+000290 FD7E 13             B   385    skiptrig		ld a,(iy+volume_waiting)
+000293 FD77 03             B   386    				ld (iy+volume),a	
+000296 FD77 08             B   387    				ld (iy+volume_for_fx),a	
+000299 C9                  B   388    				ret
+                           B   389    				
+                           B   390    
+                           B   391    
+00029A                     B   392    finetune_bc_period
+                           B   393    
+00029A FD7E 14             B   394    				ld a,(iy+finetune)				00029D B7                  B   395    				or a
+00029E C8                  B   396    				ret z
+00029F CB27                B   397    				sla a
+0002A1 21 94 0B            B   398    				ld hl,tuning_table_list	
+0002A4 5F                  B   399    				ld e,a			
+0002A5 1600                B   400    				ld d,0
+0002A7 19                  B   401    				add hl,de
+0002A8 5E                  B   402    				ld e,(hl)
+0002A9 23                  B   403    				inc hl	
+0002AA 56                  B   404    				ld d,(hl)						0002AB 21 33 08            B   405    				ld hl,period_lookup_table-113
+0002AE 09                  B   406    				add hl,bc
+0002AF 7E                  B   407    				ld a,(hl)						0002B0 CB27                B   408    				sla a
+0002B2 83                  B   409    				add a,e
+0002B3 30 01               B   410    				jr nc,ttmok
+0002B5 14                  B   411    				inc d
+0002B6 5F                  B   412    ttmok			ld e,a			
+0002B7 EB                  B   413    				ex de,hl						0002B8 4E                  B   414    				ld c,(hl)
+0002B9 23                  B   415    				inc hl
+0002BA 46                  B   416    				ld b,(hl)						Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  15
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0002BB C9                  B   417    				ret
+                           B   418    				
+                           B   419    				
+                           B   420    ;-------- "FX during line" routines -----------
+                           B   421    
+                           B   422    
+0002BC                     B   423    not_new_line
+                           B   424    
+0002BC FD21 E0 10          B   425    				ld iy,channel_data				0002C0 0604                B   426    				ld b,4							0002C2 C5                  B   427    chanfxlp		push bc							0002C3 CD 14 03            B   428    				call check_fx		
+0002C6 01 21 00            B   429    				ld bc,vars_per_channel
+0002C9 FD09                B   430    				add iy,bc
+0002CB C1                  B   431    				pop bc
+0002CC 10 F4               B   432    				djnz chanfxlp
+                           B   433    				
+0002CE                     B   434    tick_advance
+                           B   435    
+0002CE 21 DA 10            B   436    				ld hl,arpeggio_counter			0002D1 34                  B   437    				inc (hl)
+0002D2 7E                  B   438    				ld a,(hl)
+0002D3 FE03                B   439    				cp 3
+0002D5 20 02               B   440    				jr nz,arp_ok
+0002D7 3600                B   441    				ld (hl),0
+0002D9 21 D6 10            B   442    arp_ok			ld hl,ticker					0002DC 34                  B   443    				inc (hl)
+0002DD 3A D9 10            B   444    				ld a,(songspeed)	
+0002E0 BE                  B   445    				cp (hl)							0002E1 20 30               B   446    				jr nz,nspwrap
+0002E3 AF                  B   447    				xor a
+0002E4 77                  B   448    				ld (hl),a						0002E5 32 DA 10            B   449    				ld (arpeggio_counter),a			0002E8 21 DD 10            B   450    				ld hl,pattdelay_count			0002EB B6                  B   451    				or (hl)
+0002EC 28 04               B   452    				jr z,nopatdel
+0002EE 35                  B   453    				dec (hl)						0002EF C3 13 03            B   454    				jp nspwrap
+0002F2 AF                  B   455    nopatdel		xor a
+0002F3 32 DE 10            B   456    				ld (pattdelay_flag),a
+0002F6 21 D8 10            B   457    				ld hl,patindex
+0002F9 34                  B   458    				inc (hl)						0002FA 7E                  B   459    				ld a,(hl)
+0002FB FE40                B   460    				cp 64							0002FD 20 14               B   461    				jr nz,nspwrap
+0002FF AF                  B   462    				xor a
+000300 77                  B   463    				ld (hl),a
+000301 32 DB 10            B   464    				ld (pattloop_pos),a				000304 32 DC 10            B   465    				ld (pattloop_count),a			000307 21 D7 10            B   466    				ld hl,songpos		
+00030A 34                  B   467    				inc (hl)						00030B 3A B6 63            B   468    				ld a,(music_module+950)
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  16
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00030E BE                  B   469    				cp (hl)							00030F 20 02               B   470    				jr nz,nspwrap
+000311 3600                B   471    				ld (hl),0
+000313 C9                  B   472    nspwrap			ret
+                           B   473    
+                           B   474    
+                           B   475    ;----------------------------------------------
+                           B   476    				
+000314 FD7E 04             B   477    check_fx		ld a,(iy+fx_number)	
+000317 B7                  B   478    				or a							000318 CA 6B 03            B   479    				jp z,arpeggio					00031B FE01                B   480    				cp 1
+00031D CA B2 03            B   481    				jp z,portamento_up
+000320 FE02                B   482    				cp 2
+000322 CA DA 03            B   483    				jp z,portamento_down
+000325 FE03                B   484    				cp 3
+000327 CA 02 04            B   485    				jp z,tone_portamento
+00032A FE04                B   486    				cp 4
+00032C CA D0 04            B   487    				jp z,vibrato
+00032F FE05                B   488    				cp 5
+000331 CA 88 05            B   489    				jp z,tone_portamento_volslide
+000334 FE06                B   490    				cp 6
+000336 CA 8E 05            B   491    				jp z,vibrato_volslide
+000339 FE07                B   492    				cp 7
+00033B CA 94 05            B   493    				jp z,tremolo
+00033E FE0A                B   494    				cp 0ah
+000340 CA 92 06            B   495    				jp z,volslide
+000343 FE0E                B   496    				cp 0eh
+000345 CA FC 06            B   497    				jp z,extended_fx
+000348 C9                  B   498    				ret
+                           B   499    
+                           B   500    
+000349                     B   501    check_more_fx
+                           B   502    
+000349 FD7E 04             B   503    				ld a,(iy+fx_number)				00034C FE09                B   504    				cp 9
+00034E CA 4F 06            B   505    				jp z,sample_offset
+000351 FE0B                B   506    				cp 0bh			
+000353 CA B7 06            B   507    				jp z,position_jump
+000356 FE0D                B   508    				cp 0dh
+000358 CA D3 06            B   509    				jp z,pattern_break
+00035B FE0E                B   510    				cp 0eh
+00035D CA FC 06            B   511    				jp z,extended_fx
+000360 FE0F                B   512    				cp 0fh
+000362 CA 9D 08            B   513    				jp z,set_speed
+000365 FE0C                B   514    				cp 0ch
+000367 CA C3 06            B   515    				jp z,set_volume
+00036A C9                  B   516    				ret
+                           B   517    					
+                           B   518    
+                           B   519    ;------- FX $00 -------------------------------
+                           B   520    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  17
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00036B FD7E 05             B   521    arpeggio		ld a,(iy+fx_args)				00036E B7                  B   522    				or a
+00036F C8                  B   523    				ret z
+000370 FD4E 15             B   524    				ld c,(iy+arp_base_period_lo)	000373 FD46 16             B   525    				ld b,(iy+arp_base_period_hi)
+000376 3A DA 10            B   526    				ld a,(arpeggio_counter)	
+000379 1E00                B   527    				ld e,0
+00037B B7                  B   528    				or a	
+00037C 28 17               B   529    				jr z,doarp		
+00037E FE02                B   530    				cp 2
+000380 28 0D               B   531    				jr z,arptwo
+000382 FD5E 05             B   532    arpone			ld e,(iy+fx_args)
+000385 CB3B                B   533    				srl e
+000387 CB3B                B   534    				srl e
+000389 CB3B                B   535    				srl e
+00038B CB3B                B   536    				srl e							00038D 18 06               B   537    				jr doarp
+00038F FD7E 05             B   538    arptwo			ld a,(iy+fx_args)
+000392 E60F                B   539    				and 15
+000394 5F                  B   540    				ld e,a							000395 21 33 08            B   541    doarp			ld hl,period_lookup_table-113
+000398 09                  B   542    				add hl,bc
+000399 7E                  B   543    				ld a,(hl)						00039A 83                  B   544    				add a,e							00039B CB27                B   545    				sla a
+00039D 21 B4 0B            B   546    				ld hl,period_table_p0
+0003A0 85                  B   547    				add a,l
+0003A1 30 01               B   548    				jr nc,alumok
+0003A3 24                  B   549    				inc h
+0003A4 6F                  B   550    alumok			ld l,a
+0003A5 4E                  B   551    				ld c,(hl)
+0003A6 23                  B   552    				inc hl
+0003A7 46                  B   553    				ld b,(hl)
+0003A8 CD 9A 02            B   554    				call finetune_bc_period
+0003AB FD71 01             B   555    				ld (iy+period_lo),c
+0003AE FD70 02             B   556    				ld (iy+period_hi),b
+0003B1 C9                  B   557    				ret
+                           B   558    
+                           B   559    
+                           B   560    ;-------- FX $01 ------------------------------
+                           B   561    
+0003B2                     B   562    portamento_up
+                           B   563    
+0003B2 0600                B   564    				ld b,0							0003B4 FD4E 05             B   565    				ld c,(iy+fx_args)				0003B7 FD6E 06             B   566    				ld l,(iy+period_for_fx_lo)
+0003BA FD66 07             B   567    				ld h,(iy+period_for_fx_hi)
+0003BD AF                  B   568    				xor a
+0003BE ED42                B   569    				sbc hl,bc
+0003C0 38 08               B   570    				jr c,portumin
+0003C2 B4                  B   571    				or h
+0003C3 20 08               B   572    				jr nz,portugnp
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  18
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0003C5 7D                  B   573    				ld a,l
+0003C6 FE71                B   574    				cp 113
+0003C8 30 03               B   575    				jr nc,portugnp
+0003CA 217100              B   576    portumin		ld hl,113
+0003CD FD75 06             B   577    portugnp		ld (iy+period_for_fx_lo),l
+0003D0 FD74 07             B   578    				ld (iy+period_for_fx_hi),h
+0003D3 FD75 01             B   579    				ld (iy+period_lo),l
+0003D6 FD74 02             B   580    				ld (iy+period_hi),h
+0003D9 C9                  B   581    				ret
+                           B   582    
+                           B   583    				
+                           B   584    ;--------- FX $02 -----------------------------
+                           B   585    
+0003DA                     B   586    portamento_down			
+                           B   587    
+0003DA 0600                B   588    				ld b,0							0003DC FD4E 05             B   589    				ld c,(iy+fx_args)				0003DF FD6E 06             B   590    				ld l,(iy+period_for_fx_lo)
+0003E2 FD66 07             B   591    				ld h,(iy+period_for_fx_hi)
+0003E5 09                  B   592    				add hl,bc
+0003E6 7C                  B   593    				ld a,h
+0003E7 FE03                B   594    				cp 3
+0003E9 38 0A               B   595    				jr c,portdgnp
+0003EB 20 05               B   596    				jr nz,portdmax
+0003ED 7D                  B   597    				ld a,l
+0003EE FE8B                B   598    				cp 139
+0003F0 38 03               B   599    				jr c,portdgnp
+0003F2 215803              B   600    portdmax		ld hl,856
+0003F5 FD75 06             B   601    portdgnp		ld (iy+period_for_fx_lo),l
+0003F8 FD74 07             B   602    				ld (iy+period_for_fx_hi),h
+0003FB FD75 01             B   603    				ld (iy+period_lo),l
+0003FE FD74 02             B   604    				ld (iy+period_hi),h
+000401 C9                  B   605    				ret
+                           B   606    
+                           B   607    
+                           B   608    ;--------- FX $03 -----------------------------
+                           B   609    
+000402                     B   610    tone_portamento
+                           B   611    
+000402 FD4E 09             B   612    				ld c,(iy+portamento_rate)		000405 FD7E 05             B   613    				ld a,(iy+fx_args)
+000408 B7                  B   614    				or a
+000409 28 0B               B   615    				jr z,uexistpr
+00040B 4F                  B   616    				ld c,a
+00040C FD7E 04             B   617    				ld a,(iy+fx_number)
+00040F FE03                B   618    				cp 3							000411 20 03               B   619    				jr nz,uexistpr
+000413 FD71 09             B   620    				ld (iy+portamento_rate),c	
+000416 FD5E 10             B   621    uexistpr		ld e,(iy+portamento_dest_lo)	000419 FD56 11             B   622    				ld d,(iy+portamento_dest_hi)
+00041C FD6E 06             B   623    				ld l,(iy+period_for_fx_lo)		00041F FD66 07             B   624    				ld h,(iy+period_for_fx_hi)
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  19
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000422 AF                  B   625    				xor a
+000423 ED52                B   626    				sbc hl,de						000425 C8                  B   627    				ret z							000426 38 1B               B   628    				jr c,tp_peru					                           B   629    
+000428 FD6E 06             B   630    tp_perd			ld l,(iy+period_for_fx_lo)		00042B FD66 07             B   631    				ld h,(iy+period_for_fx_hi)
+00042E 0600                B   632    				ld b,0
+000430 AF                  B   633    				xor a
+000431 ED42                B   634    				sbc hl,bc						000433 30 03               B   635    				jr nc,tp_dnw					000435 210000              B   636    				ld hl,0
+000438 4D                  B   637    tp_dnw			ld c,l							000439 44                  B   638    				ld b,h
+00043A AF                  B   639    				xor a
+00043B ED52                B   640    				sbc hl,de						00043D 30 18               B   641    				jr nc,chk_gliss
+00043F 4B                  B   642    				ld c,e
+000440 42                  B   643    				ld b,d
+000441 18 1A               B   644    				jr tp_end						                           B   645    
+000443 FD6E 06             B   646    tp_peru			ld l,(iy+period_for_fx_lo)		000446 FD66 07             B   647    				ld h,(iy+period_for_fx_hi)
+000449 0600                B   648    				ld b,0
+00044B 09                  B   649    				add hl,bc
+00044C 4D                  B   650    				ld c,l							00044D 44                  B   651    				ld b,h
+00044E AF                  B   652    				xor a
+00044F ED52                B   653    				sbc hl,de		
+000451 38 04               B   654    				jr c,chk_gliss
+000453 4B                  B   655    				ld c,e							000454 42                  B   656    				ld b,d
+000455 18 06               B   657    				jr tp_end	
+                           B   658    
+000457 FDCB 0F 4E          B   659    chk_gliss		bit 1,(iy+control_bits)			00045B 20 0D               B   660    				jr nz,do_gliss		
+                           B   661    				
+00045D FD71 06             B   662    tp_end			ld (iy+period_for_fx_lo),c
+000460 FD70 07             B   663    				ld (iy+period_for_fx_hi),b
+000463 FD71 01             B   664    				ld (iy+period_lo),c	
+000466 FD70 02             B   665    				ld (iy+period_hi),b
+000469 C9                  B   666    				ret	
+                           B   667    				
+00046A FD71 06             B   668    do_gliss		ld (iy+period_for_fx_lo),c		00046D FD70 07             B   669    				ld (iy+period_for_fx_hi),b
+000470 FD7E 14             B   670    				ld a,(iy+finetune)	
+000473 CB27                B   671    				sla a
+000475 21 94 0B            B   672    				ld hl,tuning_table_list	
+000478 5F                  B   673    				ld e,a			
+000479 1600                B   674    				ld d,0
+00047B 19                  B   675    				add hl,de
+00047C 5E                  B   676    				ld e,(hl)
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  20
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00047D 23                  B   677    				inc hl	
+00047E 56                  B   678    				ld d,(hl)						                           B   679    
+00047F DDE5                B   680    				push ix
+000481 D5                  B   681    				push de
+000482 DDE1                B   682    				pop ix
+000484 AF                  B   683    				xor a
+000485 110000              B   684    				ld de,0							000488 DD6E16              B   685    				ld l,(ix+22)					00048B DD6617              B   686    				ld h,(ix+23)
+00048E ED42                B   687    				sbc hl,bc
+000490 28 2B               B   688    				jr z,tp_glend
+000492 38 12               B   689    				jr c,gltest
+000494 111800              B   690    				ld de,24
+000497 DD6E2E              B   691    				ld l,(ix+46)
+00049A DD662F              B   692    				ld h,(ix+47)
+00049D ED42                B   693    				sbc hl,bc
+00049F 28 1C               B   694    				jr z,tp_glend
+0004A1 38 03               B   695    				jr c,gltest
+0004A3 113000              B   696    				ld de,48
+                           B   697    
+0004A6 DD19                B   698    gltest			add ix,de
+0004A8 50                  B   699    				ld d,b
+0004A9 59                  B   700    				ld e,c
+0004AA AF                  B   701    				xor a
+0004AB 060C                B   702    				ld b,12
+0004AD DD6E00              B   703    glissfper		ld l,(ix)						0004B0 DD6601              B   704    				ld h,(ix+1)
+0004B3 ED52                B   705    				sbc hl,de
+0004B5 30 0F               B   706    				jr nc,nggliss
+0004B7 DD4E00              B   707    				ld c,(ix)
+0004BA DD4601              B   708    				ld b,(ix+1)
+0004BD FD71 01             B   709    tp_glend		ld (iy+period_lo),c	
+0004C0 FD70 02             B   710    				ld (iy+period_hi),b
+0004C3 DDE1                B   711    				pop ix
+0004C5 C9                  B   712    				ret
+                           B   713    
+0004C6 DD23                B   714    nggliss			inc ix
+0004C8 DD23                B   715    				inc ix
+0004CA 10 E1               B   716    				djnz glissfper
+0004CC 42                  B   717    				ld b,d
+0004CD 4B                  B   718    				ld c,e
+0004CE 18 ED               B   719    				jr tp_glend
+                           B   720    
+                           B   721    
+                           B   722    ;--------- FX $04 -----------------------------
+                           B   723    
+0004D0 FD46 0A             B   724    vibrato			ld b,(iy+vibrato_args)			0004D3 FD7E 04             B   725    				ld a,(iy+fx_number)
+0004D6 FE04                B   726    				cp 4
+0004D8 20 1C               B   727    				jr nz,vibrsame					0004DA FD7E 05             B   728    				ld a,(iy+fx_args)
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  21
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0004DD B7                  B   729    				or a
+0004DE 28 16               B   730    				jr z,vibrsame					0004E0 4F                  B   731    				ld c,a
+0004E1 E60F                B   732    				and 15
+0004E3 28 06               B   733    				jr z,vibdsame					0004E5 57                  B   734    				ld d,a
+0004E6 78                  B   735    				ld a,b
+0004E7 E6F0                B   736    				and 0f0h
+0004E9 B2                  B   737    				or d
+0004EA 47                  B   738    				ld b,a							0004EB 79                  B   739    vibdsame		ld a,c
+0004EC E6F0                B   740    				and 0f0h
+0004EE 28 06               B   741    				jr z,vibrsame					0004F0 4F                  B   742    				ld c,a
+0004F1 78                  B   743    				ld a,b
+0004F2 E60F                B   744    				and 0fh
+0004F4 B1                  B   745    				or c							0004F5 47                  B   746    				ld b,a			
+0004F6 FD70 0A             B   747    vibrsame		ld (iy+vibrato_args),b			                           B   748    				
+0004F9 FD4E 0B             B   749    				ld c,(iy+vibrato_pos)
+0004FC CB39                B   750    				srl c
+0004FE CB39                B   751    				srl c
+000500 79                  B   752    				ld a,c
+000501 E61F                B   753    				and 1fh
+000503 4F                  B   754    				ld c,a							000504 FD7E 0E             B   755    				ld a,(iy+wave_type)	
+000507 E60F                B   756    				and 0fh
+000509 B7                  B   757    				or a							00050A 28 1D               B   758    				jr z,vib_sine					00050C CB21                B   759    				sla c		
+00050E CB21                B   760    				sla c
+000510 CB21                B   761    				sla c							000512 FE01                B   762    				cp 1
+000514 28 04               B   763    				jr z,vib_ramp					000516 1EFF                B   764    				ld e,255			
+000518 18 16               B   765    				jr vib_gotd						                           B   766    
+00051A FDCB 0B 7E          B   767    vib_ramp		bit 7,(iy+vibrato_pos)			00051E 28 06               B   768    				jr z,vibr2
+000520 3EFF                B   769    				ld a,255
+000522 91                  B   770    				sub c
+000523 5F                  B   771    				ld e,a
+000524 18 0A               B   772    				jr vib_gotd
+000526 59                  B   773    vibr2			ld e,c
+000527 18 07               B   774    				jr vib_gotd
+                           B   775    
+000529 21 34 10            B   776    vib_sine		ld hl,vibrato_table				00052C 0600                B   777    				ld b,0
+00052E 09                  B   778    				add hl,bc
+00052F 5E                  B   779    				ld e,(hl)			
+                           B   780    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  22
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000530 DDE5                B   781    vib_gotd		push ix
+000532 FD7E 0A             B   782    				ld a,(iy+vibrato_args)	
+000535 2F                  B   783    				cpl
+000536 E60F                B   784    				and 0fh			
+000538 4F                  B   785    				ld c,a							000539 0600                B   786    				ld b,0			
+00053B 50                  B   787    				ld d,b
+00053C 21 47 05            B   788    				ld hl,vmul15
+00053F 09                  B   789    				add hl,bc
+000540 E5                  B   790    				push hl
+000541 DDE1                B   791    				pop ix
+000543 60                  B   792    				ld h,b
+000544 68                  B   793    				ld l,b
+000545 DDE9                B   794    				jp (ix)							000547 19                  B   795    vmul15			add hl,de						000548 19                  B   796    vmul14			add hl,de						000549 19                  B   797    vmul13			add hl,de						00054A 19                  B   798    vmul12			add hl,de						00054B 19                  B   799    vmul11			add hl,de						00054C 19                  B   800    vmul10			add hl,de						00054D 19                  B   801    vmul9			add hl,de						00054E 19                  B   802    vmul8			add hl,de						00054F 19                  B   803    vmul7			add hl,de						000550 19                  B   804    vmul6			add hl,de						000551 19                  B   805    vmul5			add hl,de						000552 19                  B   806    vmul4			add hl,de						000553 19                  B   807    vmul3			add hl,de						000554 19                  B   808    vmul2			add hl,de						000555 19                  B   809    vmul1			add hl,de						000556 CB25                B   810    vmul0			sla l							000558 CB14                B   811    				rl h
+00055A 5C                  B   812    				ld e,h
+00055B 1600                B   813    				ld d,0
+00055D DDE1                B   814    				pop ix
+                           B   815    				
+00055F FD6E 06             B   816    				ld l,(iy+period_for_fx_lo)		000562 FD66 07             B   817    				ld h,(iy+period_for_fx_hi)
+000565 FDCB 0B 7E          B   818    				bit 7,(iy+vibrato_pos)
+000569 20 03               B   819    				jr nz,vib_sub	
+00056B 19                  B   820    				add hl,de						00056C 18 03               B   821    				jr vib_pdone
+00056E AF                  B   822    vib_sub			xor a
+00056F ED52                B   823    				sbc hl,de						000571 FD75 01             B   824    vib_pdone		ld (iy+period_lo),l
+000574 FD74 02             B   825    				ld (iy+period_hi),h
+                           B   826    
+000577 FD46 0B             B   827    				ld b,(iy+vibrato_pos)			00057A FD7E 0A             B   828    				ld a,(iy+vibrato_args)
+00057D CB3F                B   829    				srl a
+00057F CB3F                B   830    				srl a
+000581 E63C                B   831    				and 3ch							000583 80                  B   832    				add a,b
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  23
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000584 FD77 0B             B   833    				ld (iy+vibrato_pos),a			000587 C9                  B   834    				ret
+                           B   835    
+                           B   836    
+                           B   837    ;-------- FX $05 ------------------------------
+                           B   838    				
+000588                     B   839    tone_portamento_volslide
+                           B   840    
+000588 CD 02 04            B   841    				call tone_portamento
+00058B C3 92 06            B   842    				jp volslide
+                           B   843    
+                           B   844    			
+                           B   845    ;-------- FX $06 ------------------------------
+                           B   846    				
+00058E                     B   847    vibrato_volslide	
+                           B   848    				
+00058E CD D0 04            B   849    				call vibrato
+000591 C3 92 06            B   850    				jp volslide
+                           B   851    				
+                           B   852    				
+                           B   853    ;-------- FX $07 ------------------------------
+                           B   854    
+000594 FD46 0C             B   855    tremolo			ld b,(iy+tremolo_args)			000597 FD7E 05             B   856    				ld a,(iy+fx_args)
+00059A B7                  B   857    				or a
+00059B 28 16               B   858    				jr z,trersame					00059D 4F                  B   859    				ld c,a
+00059E E60F                B   860    				and 15
+0005A0 28 06               B   861    				jr z,tredsame					0005A2 57                  B   862    				ld d,a
+0005A3 78                  B   863    				ld a,b
+0005A4 E6F0                B   864    				and 0f0h
+0005A6 B2                  B   865    				or d
+0005A7 47                  B   866    				ld b,a							0005A8 79                  B   867    tredsame		ld a,c
+0005A9 E6F0                B   868    				and 0f0h
+0005AB 28 06               B   869    				jr z,trersame					0005AD 4F                  B   870    				ld c,a
+0005AE 78                  B   871    				ld a,b
+0005AF E60F                B   872    				and 0fh
+0005B1 B1                  B   873    				or c							0005B2 47                  B   874    				ld b,a			
+0005B3 FD70 0C             B   875    trersame		ld (iy+tremolo_args),b			                           B   876    				
+0005B6 FD4E 0D             B   877    				ld c,(iy+tremolo_pos)
+0005B9 CB39                B   878    				srl c
+0005BB CB39                B   879    				srl c
+0005BD 79                  B   880    				ld a,c
+0005BE E61F                B   881    				and 1fh
+0005C0 4F                  B   882    				ld c,a							0005C1 FD7E 0E             B   883    				ld a,(iy+wave_type)				0005C4 CB3F                B   884    				srl a
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  24
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0005C6 CB3F                B   885    				srl a
+0005C8 CB3F                B   886    				srl a
+0005CA CB3F                B   887    				srl a
+0005CC E60F                B   888    				and 0fh							0005CE 28 1D               B   889    				jr z,tre_sine					0005D0 CB21                B   890    				sla c		
+0005D2 CB21                B   891    				sla c
+0005D4 CB21                B   892    				sla c							0005D6 FE01                B   893    				cp 1
+0005D8 28 04               B   894    				jr z,tre_ramp					0005DA 1EFF                B   895    				ld e,255			
+0005DC 18 16               B   896    				jr tre_gotd						                           B   897    
+0005DE FDCB 0D 7E          B   898    tre_ramp		bit 7,(iy+tremolo_pos)			0005E2 28 06               B   899    				jr z,trer2
+0005E4 3EFF                B   900    				ld a,255
+0005E6 91                  B   901    				sub c
+0005E7 5F                  B   902    				ld e,a
+0005E8 18 0A               B   903    				jr tre_gotd
+0005EA 59                  B   904    trer2			ld e,c
+0005EB 18 07               B   905    				jr tre_gotd
+                           B   906    
+0005ED 21 34 10            B   907    tre_sine		ld hl,vibrato_table				0005F0 0600                B   908    				ld b,0
+0005F2 09                  B   909    				add hl,bc
+0005F3 5E                  B   910    				ld e,(hl)			
+                           B   911    
+0005F4 DDE5                B   912    tre_gotd		push ix
+0005F6 FD7E 0C             B   913    				ld a,(iy+tremolo_args)	
+0005F9 2F                  B   914    				cpl
+0005FA E60F                B   915    				and 0fh			
+0005FC 4F                  B   916    				ld c,a							0005FD 0600                B   917    				ld b,0			
+0005FF 50                  B   918    				ld d,b
+000600 21 0B 06            B   919    				ld hl,tmul15
+000603 09                  B   920    				add hl,bc
+000604 E5                  B   921    				push hl
+000605 DDE1                B   922    				pop ix
+000607 60                  B   923    				ld h,b
+000608 68                  B   924    				ld l,b
+000609 DDE9                B   925    				jp (ix)							00060B 19                  B   926    tmul15			add hl,de						00060C 19                  B   927    tmul14			add hl,de						00060D 19                  B   928    tmul13			add hl,de						00060E 19                  B   929    tmul12			add hl,de						00060F 19                  B   930    tmul11			add hl,de						000610 19                  B   931    tmul10			add hl,de						000611 19                  B   932    tmul9			add hl,de						000612 19                  B   933    tmul8			add hl,de						000613 19                  B   934    tmul7			add hl,de						000614 19                  B   935    tmul6			add hl,de						000615 19                  B   936    tmul5			add hl,de						Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  25
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000616 19                  B   937    tmul4			add hl,de						000617 19                  B   938    tmul3			add hl,de						000618 19                  B   939    tmul2			add hl,de						000619 19                  B   940    tmul1			add hl,de						00061A CB25                B   941    tmul0			sla l							00061C CB14                B   942    				rl h
+00061E CB25                B   943    				sla l
+000620 CB14                B   944    				rl h
+000622 6C                  B   945    				ld l,h
+000623 DDE1                B   946    				pop ix
+                           B   947    				
+000625 FD7E 08             B   948    tshftl			ld a,(iy+volume_for_fx)			000628 FDCB 0D 7E          B   949    				bit 7,(iy+tremolo_pos)
+00062C 20 09               B   950    				jr nz,tre_sub	
+00062E 85                  B   951    				add a,l							00062F FE40                B   952    				cp 64
+000631 38 08               B   953    				jr c,tre_done
+000633 3E40                B   954    				ld a,64
+000635 18 04               B   955    				jr tre_done
+000637 95                  B   956    tre_sub			sub l							000638 30 01               B   957    				jr nc,tre_done
+00063A AF                  B   958    				xor a
+00063B FD77 03             B   959    tre_done		ld (iy+volume),a
+                           B   960    				
+00063E FD46 0D             B   961    				ld b,(iy+tremolo_pos)			000641 FD7E 0C             B   962    				ld a,(iy+tremolo_args)
+000644 CB3F                B   963    				srl a
+000646 CB3F                B   964    				srl a
+000648 E63C                B   965    				and 3ch							00064A 80                  B   966    				add a,b
+00064B FD77 0D             B   967    				ld (iy+tremolo_pos),a			00064E C9                  B   968    				ret
+                           B   969    
+                           B   970    ;-------- FX $09 ------------------------------
+                           B   971    
+00064F                     B   972    sample_offset
+                           B   973    
+00064F FD7E 05             B   974    				ld a,(iy+fx_args)		
+000652 B7                  B   975    				or a
+000653 28 0D               B   976    				jr z,usexoffs					000655 47                  B   977    				ld b,a
+000656 0E00                B   978    				ld c,0
+000658 CB38                B   979    				srl b
+00065A CB19                B   980    				rr c							00065C FD71 1F             B   981    				ld (iy+samp_offset_lo),c
+00065F FD70 20             B   982    				ld (iy+samp_offset_hi),b
+                           B   983    				
+000662 FD4E 1F             B   984    usexoffs		ld c,(iy+samp_offset_lo)		000665 FD46 20             B   985    				ld b,(iy+samp_offset_hi)
+000668 FD6E 19             B   986    				ld l,(iy+samp_len_lo)
+00066B FD66 1A             B   987    				ld h,(iy+samp_len_hi)
+00066E AF                  B   988    				xor a
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  26
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00066F ED42                B   989    				sbc hl,bc
+000671 28 16               B   990    				jr z,soffbad
+000673 38 14               B   991    				jr c,soffbad
+000675 FD75 19             B   992    				ld (iy+samp_len_lo),l			000678 FD74 1A             B   993    				ld (iy+samp_len_hi),h
+00067B FD6E 17             B   994    				ld l,(iy+samp_loc_lo)
+00067E FD66 18             B   995    				ld h,(iy+samp_loc_hi)
+000681 09                  B   996    				add hl,bc
+000682 FD75 17             B   997    				ld (iy+samp_loc_lo),l			000685 FD74 18             B   998    				ld (iy+samp_loc_hi),h
+000688 C9                  B   999    				ret
+                           B  1000    
+000689 FD36 19 01          B  1001    soffbad			ld (iy+samp_len_lo),1			00068D FD36 1A 00          B  1002    				ld (iy+samp_len_hi),0			000691 C9                  B  1003    				ret
+                           B  1004    				
+                           B  1005    
+                           B  1006    ;-------- FX $0A ------------------------------
+                           B  1007    
+                           B  1008    
+000692 FD7E 05             B  1009    volslide		ld a,(iy+fx_args)				000695 47                  B  1010    				ld b,a
+000696 E60F                B  1011    				and 15			
+000698 28 0B               B  1012    				jr z,volup
+00069A FD7E 03             B  1013    				ld a,(iy+volume)
+00069D 90                  B  1014    				sub b
+00069E 30 01               B  1015    				jr nc,voldok
+0006A0 AF                  B  1016    				xor a
+0006A1 FD77 03             B  1017    voldok			ld (iy+volume),a
+0006A4 C9                  B  1018    				ret
+                           B  1019    
+0006A5 78                  B  1020    volup			ld a,b							0006A6 0F                  B  1021    				rrca
+0006A7 0F                  B  1022    				rrca
+0006A8 0F                  B  1023    				rrca
+0006A9 0F                  B  1024    				rrca
+0006AA FD86 03             B  1025    				add a,(iy+volume)
+0006AD FE40                B  1026    				cp 64
+0006AF 38 02               B  1027    				jr c,voluok
+0006B1 3E40                B  1028    				ld a,64
+0006B3 FD77 03             B  1029    voluok			ld (iy+volume),a
+0006B6 C9                  B  1030    				ret
+                           B  1031    
+                           B  1032    
+                           B  1033    ;-------- FX $0B ------------------------------
+                           B  1034    
+0006B7                     B  1035    position_jump
+                           B  1036    
+0006B7 FD7E 05             B  1037    				ld a,(iy+fx_args)
+0006BA 32 D7 10            B  1038    				ld (songpos),a
+0006BD 3EFF                B  1039    				ld a,255
+0006BF 32 D8 10            B  1040    				ld (patindex),a
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  27
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0006C2 C9                  B  1041    				ret
+                           B  1042    
+                           B  1043    
+                           B  1044    ;-------- FX $0C ------------------------------
+                           B  1045    
+0006C3                     B  1046    set_volume
+                           B  1047    				
+0006C3 FD7E 05             B  1048    				ld a,(iy+fx_args)
+0006C6 FE40                B  1049    				cp 40h
+0006C8 38 02               B  1050    				jr c,vsetok
+0006CA 3E40                B  1051    				ld a,40h
+0006CC FD77 03             B  1052    vsetok			ld (iy+volume),a
+0006CF FD77 13             B  1053    				ld (iy+volume_waiting),a
+0006D2 C9                  B  1054    				ret
+                           B  1055    
+                           B  1056    
+                           B  1057    ;-------- FX $0D ------------------------------
+                           B  1058    
+0006D3                     B  1059    pattern_break
+                           B  1060    				
+0006D3 FD7E 05             B  1061    				ld a,(iy+fx_args)
+0006D6 47                  B  1062    				ld b,a
+0006D7 CB3F                B  1063    				srl a
+0006D9 CB3F                B  1064    				srl a
+0006DB CB3F                B  1065    				srl a
+0006DD CB3F                B  1066    				srl a
+0006DF 4F                  B  1067    				ld c,a
+0006E0 81                  B  1068    				add a,c
+0006E1 81                  B  1069    				add a,c
+0006E2 81                  B  1070    				add a,c
+0006E3 81                  B  1071    				add a,c
+0006E4 CB27                B  1072    				sla a
+0006E6 4F                  B  1073    				ld c,a
+0006E7 78                  B  1074    				ld a,b
+0006E8 E60F                B  1075    				and 0fh
+0006EA 81                  B  1076    				add a,c
+0006EB 3D                  B  1077    				dec a
+0006EC 32 D8 10            B  1078    				ld (patindex),a
+0006EF 21 D7 10            B  1079    				ld hl,songpos
+0006F2 34                  B  1080    				inc (hl)
+0006F3 3A B6 63            B  1081    				ld a,(music_module+950)
+0006F6 BE                  B  1082    				cp (hl)							0006F7 20 02               B  1083    				jr nz,nspw_pb
+0006F9 3600                B  1084    				ld (hl),0
+0006FB C9                  B  1085    nspw_pb			ret
+                           B  1086    
+                           B  1087    				
+                           B  1088    ;-------- FX $0E ------------------------------
+                           B  1089    
+                           B  1090    
+0006FC                     B  1091    extended_fx
+                           B  1092    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  28
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0006FC FD7E 05             B  1093    				ld a,(iy+fx_args)
+0006FF 47                  B  1094    				ld b,a
+000700 E6F0                B  1095    				and 0f0h
+000702 FE00                B  1096    				cp 0h
+000704 28 40               B  1097    				jr z,e0_filter
+000706 FE10                B  1098    				cp 10h
+000708 28 43               B  1099    				jr z,e1_fineport_up
+00070A FE20                B  1100    				cp 20h
+00070C 28 69               B  1101    				jr z,e2_fineport_down
+00070E FE30                B  1102    				cp 30h
+000710 CA A1 07            B  1103    				jp z,e3_glissando_control
+000713 FE40                B  1104    				cp 40h
+000715 CA AE 07            B  1105    				jp z,e4_vibrato_control
+000718 FE50                B  1106    				cp 50h
+00071A CA BC 07            B  1107    				jp z,e5_finetune_control
+00071D FE60                B  1108    				cp 60h
+00071F CA C3 07            B  1109    				jp z,e6_pattern_loop
+000722 FE70                B  1110    				cp 70h
+000724 CA E8 07            B  1111    				jp z,e7_tremolo_control
+000727 FE90                B  1112    				cp 90h
+000729 CA FE 07            B  1113    				jp z,e9_retrigger_note
+00072C FEA0                B  1114    				cp 0a0h
+00072E CA 14 08            B  1115    				jp z,ea_finevol_up
+000731 FEB0                B  1116    				cp 0b0h
+000733 CA 29 08            B  1117    				jp z,eb_finevol_down
+000736 FEC0                B  1118    				cp 0c0h
+000738 CA 3D 08            B  1119    				jp z,ec_cutnote
+00073B FED0                B  1120    				cp 0d0h
+00073D CA 4B 08            B  1121    				jp z,ed_delayedtrig
+000740 FEE0                B  1122    				cp 0e0h
+000742 CA 8C 08            B  1123    				jp z,ee_pattdelay
+000745 C9                  B  1124    				ret
+                           B  1125    
+000746                     B  1126    e0_filter
+                           B  1127    
+000746 78                  B  1128    				ld a,b							000747 E601                B  1129    				and 01h			
+000749 32 DF 10            B  1130    				ld (filter_on_off),a
+00074C C9                  B  1131    				ret
+                           B  1132    				
+                           B  1133    
+00074D                     B  1134    e1_fineport_up
+                           B  1135    
+00074D 3A D6 10            B  1136    				ld a,(ticker)
+000750 B7                  B  1137    				or a
+000751 C0                  B  1138    				ret nz
+000752 0600                B  1139    				ld b,0							000754 FD7E 05             B  1140    				ld a,(iy+fx_args)		
+000757 E60F                B  1141    				and 0fh
+000759 4F                  B  1142    				ld c,a
+00075A FD6E 01             B  1143    				ld l,(iy+period_lo)
+00075D FD66 02             B  1144    				ld h,(iy+period_hi)
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  29
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000760 AF                  B  1145    				xor a
+000761 ED42                B  1146    				sbc hl,bc
+000763 38 08               B  1147    				jr c,fportumin
+000765 B4                  B  1148    				or h
+000766 20 08               B  1149    				jr nz,fportugnp
+000768 7D                  B  1150    				ld a,l
+000769 FE71                B  1151    				cp 113
+00076B 30 03               B  1152    				jr nc,fportugnp
+00076D 217100              B  1153    fportumin		ld hl,113						000770 FD75 01             B  1154    fportugnp		ld (iy+period_lo),l
+000773 FD74 02             B  1155    				ld (iy+period_hi),h
+000776 C9                  B  1156    				ret
+                           B  1157    
+                           B  1158    
+000777                     B  1159    e2_fineport_down
+                           B  1160    				
+000777 3A D6 10            B  1161    				ld a,(ticker)
+00077A B7                  B  1162    				or a
+00077B C0                  B  1163    				ret nz
+00077C 0600                B  1164    				ld b,0							00077E FD7E 05             B  1165    				ld a,(iy+fx_args)		
+000781 E60F                B  1166    				and 0fh
+000783 4F                  B  1167    				ld c,a
+000784 FD6E 01             B  1168    				ld l,(iy+period_lo)
+000787 FD66 02             B  1169    				ld h,(iy+period_hi)
+00078A 09                  B  1170    				add hl,bc
+00078B 7C                  B  1171    				ld a,h
+00078C FE03                B  1172    				cp 3
+00078E 38 0A               B  1173    				jr c,fportdgnp
+000790 20 05               B  1174    				jr nz,fportdmax
+000792 7D                  B  1175    				ld a,l
+000793 FE58                B  1176    				cp 88
+000795 38 03               B  1177    				jr c,fportdgnp
+000797 215803              B  1178    fportdmax		ld hl,856						00079A FD75 01             B  1179    fportdgnp		ld (iy+period_lo),l
+00079D FD74 02             B  1180    				ld (iy+period_hi),h
+0007A0 C9                  B  1181    				ret
+                           B  1182    
+                           B  1183    
+0007A1                     B  1184    e3_glissando_control
+                           B  1185    
+0007A1 FDCB 0F 8E          B  1186    				res 1,(iy+control_bits)
+0007A5 78                  B  1187    				ld a,b
+0007A6 E601                B  1188    				and 01h
+0007A8 C8                  B  1189    				ret z
+0007A9 FDCB 0F CE          B  1190    				set 1,(iy+control_bits)
+0007AD C9                  B  1191    				ret
+                           B  1192    
+                           B  1193    
+0007AE                     B  1194    e4_vibrato_control
+                           B  1195    				
+0007AE 78                  B  1196    				ld a,b
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  30
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0007AF E607                B  1197    				and 07h
+0007B1 47                  B  1198    				ld b,a
+0007B2 FD7E 0E             B  1199    				ld a,(iy+wave_type)
+0007B5 E6F0                B  1200    				and 0f0h
+0007B7 B0                  B  1201    				or b
+0007B8 FD77 0E             B  1202    				ld (iy+wave_type),a
+0007BB C9                  B  1203    				ret
+                           B  1204    
+                           B  1205    
+0007BC                     B  1206    e5_finetune_control
+                           B  1207    				
+0007BC 78                  B  1208    				ld a,b							0007BD E60F                B  1209    				and 0fh			
+0007BF FD77 14             B  1210    				ld (iy+finetune),a
+0007C2 C9                  B  1211    				ret
+                           B  1212    
+                           B  1213    
+0007C3                     B  1214    e6_pattern_loop
+                           B  1215    
+0007C3 3A D6 10            B  1216    				ld a,(ticker)
+0007C6 B7                  B  1217    				or a
+0007C7 C0                  B  1218    				ret nz
+0007C8 78                  B  1219    				ld a,b
+0007C9 E60F                B  1220    				and 0fh
+0007CB 28 14               B  1221    				jr z,setplp
+0007CD 21 DC 10            B  1222    				ld hl,pattloop_count
+0007D0 34                  B  1223    				inc (hl)
+0007D1 BE                  B  1224    				cp (hl)
+0007D2 38 08               B  1225    				jr c,plp_end
+0007D4 3A DB 10            B  1226    				ld a,(pattloop_pos)				0007D7 3D                  B  1227    				dec a							0007D8 32 D8 10            B  1228    				ld (patindex),a
+0007DB C9                  B  1229    				ret
+0007DC AF                  B  1230    plp_end			xor a			
+0007DD 32 DC 10            B  1231    				ld (pattloop_count),a			0007E0 C9                  B  1232    				ret
+0007E1 3A D8 10            B  1233    setplp			ld a,(patindex)					0007E4 32 DB 10            B  1234    				ld (pattloop_pos),a
+0007E7 C9                  B  1235    				ret
+                           B  1236    				
+                           B  1237    
+0007E8                     B  1238    e7_tremolo_control
+                           B  1239    				
+0007E8 78                  B  1240    				ld a,b
+0007E9 E607                B  1241    				and 07h
+0007EB 47                  B  1242    				ld b,a
+0007EC CB20                B  1243    				sla b
+0007EE CB20                B  1244    				sla b
+0007F0 CB20                B  1245    				sla b
+0007F2 CB20                B  1246    				sla b
+0007F4 FD7E 0E             B  1247    				ld a,(iy+wave_type)
+0007F7 E60F                B  1248    				and 0fh
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  31
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+0007F9 B0                  B  1249    				or b
+0007FA FD77 0E             B  1250    				ld (iy+wave_type),a
+0007FD C9                  B  1251    				ret
+                           B  1252    				
+                           B  1253    
+0007FE                     B  1254    e9_retrigger_note
+                           B  1255    
+0007FE 78                  B  1256    				ld a,b
+0007FF E60F                B  1257    				and 0fh
+000801 C8                  B  1258    				ret z
+000802 47                  B  1259    				ld b,a
+000803 3A D6 10            B  1260    				ld a,(ticker)
+000806 B7                  B  1261    				or a
+000807 28 06               B  1262    				jr z,retrigit
+000809 90                  B  1263    rtloop			sub b
+00080A 28 03               B  1264    				jr z,retrigit
+00080C 30 FB               B  1265    				jr nc,rtloop
+00080E C9                  B  1266    				ret
+00080F FDCB 0F C6          B  1267    retrigit		set 0,(iy+control_bits)
+000813 C9                  B  1268    				ret
+                           B  1269    				
+                           B  1270    
+                           B  1271    
+000814                     B  1272    ea_finevol_up
+                           B  1273    
+000814 3A D6 10            B  1274    				ld a,(ticker)
+000817 B7                  B  1275    				or a
+000818 C0                  B  1276    				ret nz
+000819 78                  B  1277    				ld a,b
+00081A E60F                B  1278    				and 0fh
+00081C FD86 03             B  1279    				add a,(iy+volume)
+00081F FE40                B  1280    				cp 64
+000821 38 02               B  1281    				jr c,eavolok
+000823 3E40                B  1282    				ld a,64
+000825 FD77 03             B  1283    eavolok			ld (iy+volume),a
+000828 C9                  B  1284    				ret
+                           B  1285    				
+                           B  1286    
+000829                     B  1287    eb_finevol_down
+                           B  1288    					
+000829 3A D6 10            B  1289    				ld a,(ticker)
+00082C B7                  B  1290    				or a
+00082D C0                  B  1291    				ret nz
+00082E 78                  B  1292    				ld a,b
+00082F E60F                B  1293    				and 0fh
+000831 47                  B  1294    				ld b,a
+000832 FD7E 03             B  1295    				ld a,(iy+volume)
+000835 90                  B  1296    				sub b
+000836 30 01               B  1297    				jr nc,ebvolok
+000838 AF                  B  1298    				xor a
+000839 FD77 03             B  1299    ebvolok			ld (iy+volume),a
+00083C C9                  B  1300    				ret
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  32
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+                           B  1301    
+                           B  1302    
+00083D                     B  1303    ec_cutnote
+                           B  1304    
+00083D 78                  B  1305    				ld a,b
+00083E E60F                B  1306    				and 0fh
+000840 47                  B  1307    				ld b,a
+000841 3A D6 10            B  1308    				ld a,(ticker)
+000844 B8                  B  1309    				cp b
+000845 C0                  B  1310    				ret nz
+000846 AF                  B  1311    				xor a
+000847 FD77 03             B  1312    				ld (iy+volume),a
+00084A C9                  B  1313    				ret
+                           B  1314    				
+                           B  1315    
+                           B  1316    
+                           B  1317    				
+00084B                     B  1318    ed_delayedtrig	
+                           B  1319    				
+00084B 78                  B  1320    				ld a,b
+00084C E60F                B  1321    				and 0fh
+00084E 47                  B  1322    				ld b,a
+00084F 3A D6 10            B  1323    				ld a,(ticker)
+000852 B8                  B  1324    				cp b
+000853 C0                  B  1325    				ret nz
+                           B  1326    				
+000854 FDCB 0F 5E          B  1327    				bit 3,(iy+control_bits)			000858 28 17               B  1328    				jr z,ed_nonewp2
+00085A FD4E 06             B  1329    				ld c,(iy+period_for_fx_lo)		00085D FD46 07             B  1330    				ld b,(iy+period_for_fx_hi)
+000860 FD71 01             B  1331    				ld (iy+period_lo),c
+000863 FD70 02             B  1332    				ld (iy+period_hi),b
+000866 FDCB 0F C6          B  1333    				set 0,(iy+control_bits)			00086A FD7E 12             B  1334    				ld a,(iy+instrument_waiting)	00086D B7                  B  1335    				or a
+00086E C8                  B  1336    				ret z
+00086F 18 0E               B  1337    				jr ed_do_vol					                           B  1338    				
+000871                     B  1339    ed_nonewp2
+                           B  1340    
+000871 FD7E 12             B  1341    				ld a,(iy+instrument_waiting)	000874 B7                  B  1342    				or a							000875 C8                  B  1343    				ret z
+000876 FDBE 00             B  1344    				cp (iy+instrument)			
+000879 28 04               B  1345    				jr z,ed_do_vol
+00087B FDCB 0F C6          B  1346    				set 0,(iy+control_bits)
+                           B  1347    
+00087F FD77 00             B  1348    ed_do_vol		ld (iy+instrument),a
+000882 FD7E 13             B  1349    				ld a,(iy+volume_waiting)		000885 FD77 03             B  1350    				ld (iy+volume),a	
+000888 FD77 08             B  1351    				ld (iy+volume_for_fx),a			00088B C9                  B  1352    				ret
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  33
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+                           B  1353    
+                           B  1354    
+                           B  1355    
+                           B  1356    				
+                           B  1357    				
+00088C                     B  1358    ee_pattdelay
+                           B  1359    
+00088C 3A DE 10            B  1360    				ld a,(pattdelay_flag)			00088F B7                  B  1361    				or a
+000890 C0                  B  1362    				ret nz
+000891 78                  B  1363    				ld a,b
+000892 E60F                B  1364    				and 0fh
+000894 32 DD 10            B  1365    				ld (pattdelay_count),a
+000897 3E01                B  1366    				ld a,1
+000899 32 DE 10            B  1367    				ld (pattdelay_flag),a
+00089C C9                  B  1368    				ret
+                           B  1369    				
+                           B  1370    
+                           B  1371    
+                           B  1372    ;-------- FX $0F ------------------------------
+                           B  1373    
+00089D                     B  1374    set_speed
+00089D FD7E 05             B  1375    				ld a,(iy+fx_args)
+0008A0 32 D9 10            B  1376    				ld (songspeed),a
+0008A3 C9                  B  1377    				ret
+                           B  1378    
+                           B  1379    
+                           B  1380    ;---- Amiga Period List -----------------------
+                           B  1381    
+0008A4                     B  1382    period_lookup_table	
+                           B  1383    
+0008A4 23000000 00000022   B  1384    					DB 35,0,0,0,0,0,0,34,0,0,0,
+0008AC 00000000 00002100 
+0008B4 00000000 00002000   B  1385    					DB 0,0,0,0,0,0,32,0,0,0,0,0
+0008BC 00000000 00001F00 
+0008C4 00000000 00001E00   B  1386    					DB 0,0,0,0,0,0,30,0,0,0,0,0
+0008CC 00000000 0000001D 
+0008D4 00000000 00000000   B  1387    					DB 0,0,0,0,0,0,0,0,0,28,0,0
+0008DC 001C0000 00000000 
+0008E4 0000001B 00000000   B  1388    					DB 0,0,0,27,0,0,0,0,0,0,0,0
+0008EC 00000000 001A0000 
+0008F4 00000000 00000000   B  1389    					DB 0,0,0,0,0,0,0,0,0,25,0,0
+0008FC 00190000 00000000 
+000904 00000000 00180000   B  1390    					DB 0,0,0,0,0,24,0,0,0,0,0,0
+00090C 00000000 00000000 
+000914 00170000 00000000   B  1391    					DB 0,23,0,0,0,0,0,0,0,0,0,0
+00091C 00000000 00000016 
+000924 00000000 00000000   B  1392    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+00092C 00000000 00150000 
+000934 00000000 00000000   B  1393    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+00093C 00000000 14000000 
+000944 00000000 00000000   B  1394    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  34
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00094C 00000000 13000000 
+000954 00000000 00000000   B  1395    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+00095C 00000000 00120000 
+000964 00000000 00000000   B  1396    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+00096C 00000000 00000011 
+000974 00000000 00000000   B  1397    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+00097C 00000000 00000000 
+000984 00001000 00000000   B  1398    					DB 0,0,16,0,0,0,0,0,0,0,0,0
+00098C 00000000 00000000 
+000994 00000000 0000000F   B  1399    					DB 0,0,0,0,0,0,0,15,0,0,0,0
+00099C 00000000 00000000 
+0009A4 00000000 00000000   B  1400    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+0009AC 00000000 0E000000 
+0009B4 00000000 00000000   B  1401    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+0009BC 00000000 00000000 
+0009C4 0000000D 00000000   B  1402    					DB 0,0,0,13,0,0,0,0,0,0,0,0
+0009CC 00000000 00000000 
+0009D4 00000000 00000000   B  1403    					DB 0,0,0,0,0,0,0,0,0,0,0,12
+0009DC 0000000C 00000000 
+0009E4 00000000 00000000   B  1404    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+0009EC 00000000 00000000 
+0009F4 00000000 0B000000   B  1405    					DB 0,0,0,0,11,0,0,0,0,0,0,0
+0009FC 00000000 00000000 
+000A04 00000000 00000000   B  1406    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000A0C 00000000 0000000A 
+000A14 00000000 00000000   B  1407    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000A1C 00000000 00000000 
+000A24 00000000 00000000   B  1408    					DB 0,0,0,0,0,0,0,0,0,0,0,9,
+000A2C 00000009 00000000 
+000A34 00000000 00000000   B  1409    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000A3C 00000000 00000000 
+000A44 00000000 00000000   B  1410    					DB 0,0,0,0,0,0,0,0,0,8,0,0,
+000A4C 00080000 00000000 
+000A54 00000000 00000000   B  1411    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000A5C 00000000 00000000 
+000A64 00000000 00000000   B  1412    					DB 0,0,0,0,0,0,0,0,0,7,0,0,
+000A6C 00070000 00000000 
+000A74 00000000 00000000   B  1413    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000A7C 00000000 00000000 
+000A84 00000000 00000000   B  1414    					DB 0,0,0,0,0,0,0,0,0,0,0,6,
+000A8C 00000006 00000000 
+000A94 00000000 00000000   B  1415    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000A9C 00000000 00000000 
+000AA4 00000000 00000000   B  1416    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000AAC 00000000 00000005 
+000AB4 00000000 00000000   B  1417    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000ABC 00000000 00000000 
+000AC4 00000000 00000000   B  1418    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000ACC 00000000 00000000 
+000AD4 00000000 00040000   B  1419    					DB 0,0,0,0,0,4,0,0,0,0,0,0,
+000ADC 00000000 00000000 
+000AE4 00000000 00000000   B  1420    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  35
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000AEC 00000000 00000000 
+000AF4 00000000 00000000   B  1421    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000AFC 00000000 00000003 
+000B04 00000000 00000000   B  1422    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000B0C 00000000 00000000 
+000B14 00000000 00000000   B  1423    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000B1C 00000000 00000000 
+000B24 00000000 00000000   B  1424    					DB 0,0,0,0,0,0,0,0,0,2,0,0,
+000B2C 00020000 00000000 
+000B34 00000000 00000000   B  1425    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000B3C 00000000 00000000 
+000B44 00000000 00000000   B  1426    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000B4C 00000000 00000000 
+000B54 00000000 00000001   B  1427    					DB 0,0,0,0,0,0,0,1,0,0,0,0,
+000B5C 00000000 00000000 
+000B64 00000000 00000000   B  1428    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000B6C 00000000 00000000 
+000B74 00000000 00000000   B  1429    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000B7C 00000000 00000000 
+000B84 00000000 00000000   B  1430    					DB 0,0,0,0,0,0,0,0,0,0,0,0,
+000B8C 00000000 00000000 
+                           B  1431    
+                           B  1432    
+000B94 B40B                B  1433    tuning_table_list	dw period_table_p0
+000B96 FC0B                B  1434    					dw period_table_p1
+000B98 440C                B  1435    					dw period_table_p2
+000B9A 8C0C                B  1436    					dw period_table_p3
+000B9C D40C                B  1437    					dw period_table_p4
+000B9E 1C0D                B  1438    					dw period_table_p5
+000BA0 640D                B  1439    					dw period_table_p6
+000BA2 AC0D                B  1440    					dw period_table_p7
+000BA4 F40D                B  1441    					dw period_table_m8
+000BA6 3C0E                B  1442    					dw period_table_m7
+000BA8 840E                B  1443    					dw period_table_m6
+000BAA CC0E                B  1444    					dw period_table_m5
+000BAC 140F                B  1445    					dw period_table_m4
+000BAE 5C0F                B  1446    					dw period_table_m3
+000BB0 A40F                B  1447    					dw period_table_m2
+000BB2 EC0F                B  1448    					dw period_table_m1
+                           B  1449    		
+                           B  1450    
+000BB4 58032803 FA02D002   B  1451    period_table_p0	dw 856,808,762,720,678,640,604,
+000BBC A6028002 5C023A02 
+000BC4 1A02FC01 E001C501 
+000BCC AC019401 7D016801   B  1452    				dw 428,404,381,360,339,320,302,
+000BD4 53014001 2E011D01 
+000BDC 0D01FE00 F000E200 
+000BE4 D600CA00 BE00B400   B  1453    				dw 214,202,190,180,170,160,151,
+000BEC AA00A000 97008F00 
+000BF4 87007F00 78007100 
+                           B  1454    
+000BFC 52032203 F502CB02   B  1455    period_table_p1	dw 850,802,757,715,674,637,601,
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  36
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000C04 A2027D02 59023702 
+000C0C 1702F901 DD01C201 
+000C14 A9019101 7B016501   B  1456    				dw 425,401,379,357,337,318,300,
+000C1C 51013E01 2C011C01 
+000C24 0C01FD00 EF00E100 
+000C2C D500C900 BD00B300   B  1457    				dw 213,201,189,179,169,159,150,
+000C34 A9009F00 96008E00 
+000C3C 86007E00 77007100 
+                           B  1458    
+000C44 4C031C03 F002C502   B  1459    period_table_p2	dw 844,796,752,709,670,632,597,
+000C4C 9E027802 55023302 
+000C54 1402F601 DA01BF01 
+000C5C A6018E01 78016301   B  1460    				dw 422,398,376,355,335,316,298,
+000C64 4F013C01 2A011A01 
+000C6C 0A01FB00 ED00E000 
+000C74 D300C700 BC00B100   B  1461    				dw 211,199,188,177,167,158,149,
+000C7C A7009E00 95008D00 
+000C84 85007D00 76007000 
+                           B  1462    
+000C8C 46031703 EA02C002   B  1463    period_table_p3	dw 838,791,746,704,665,628,592,
+000C94 99027402 50022F02 
+000C9C 1002F201 D601BC01 
+000CA4 A3018B01 75016001   B  1464    				dw 419,395,373,352,332,314,296,
+000CAC 4C013A01 28011801 
+000CB4 0801F900 EB00DE00 
+000CBC D100C600 BB00B000   B  1465    				dw 209,198,187,176,166,157,148,
+000CC4 A6009D00 94008C00 
+000CCC 84007D00 76006F00 
+                           B  1466    
+000CD4 40031103 E502BB02   B  1467    period_table_p4	dw 832,785,741,699,660,623,588,
+000CDC 94026F02 4C022B02 
+000CE4 0C02EF01 D301B901 
+000CEC A0018801 72015E01   B  1468    				dw 416,392,370,350,330,312,294,
+000CF4 4A013801 26011601 
+000CFC 0601F700 E900DC00 
+000D04 D000C400 B900AF00   B  1469    				dw 208,196,185,175,165,156,147,
+000D0C A5009C00 93008B00 
+000D14 83007C00 75006E00 
+                           B  1470    
+000D1C 3A030B03 E002B602   B  1471    period_table_p5	dw 826,779,736,694,655,619,584,
+000D24 8F026B02 48022702 
+000D2C 0802EB01 CF01B501 
+000D34 9D018601 70015B01   B  1472    				dw 413,390,368,347,328,309,292,
+000D3C 48013501 24011401 
+000D44 0401F500 E800DB00 
+000D4C CE00C300 B800AE00   B  1473    				dw 206,195,184,174,164,155,146,
+000D54 A4009B00 92008A00 
+000D5C 82007B00 74006D00 
+                           B  1474    
+000D64 34030603 DA02B102   B  1475    period_table_p6	dw 820,774,730,689,651,614,580,
+000D6C 8B026602 44022302 
+000D74 0402E701 CC01B201 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  37
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000D7C 9A018301 6D015901   B  1476    				dw 410,387,365,345,325,307,290,
+000D84 45013301 22011201 
+000D8C 0201F400 E600D900 
+000D94 CD00C100 B700AC00   B  1477    				dw 205,193,183,172,163,154,145,
+000D9C A3009A00 91008900 
+000DA4 81007A00 73006D00 
+                           B  1478    
+000DAC 2E030003 D502AC02   B  1479    period_table_p7	dw 814,768,725,684,646,610,575,
+000DB4 86026202 3F021F02 
+000DBC 0102E401 C901AF01 
+000DC4 97018001 6B015601   B  1480    				dw 407,384,363,342,323,305,288,
+000DCC 43013101 20011001 
+000DD4 0001F200 E400D800 
+000DDC CC00C000 B500AB00   B  1481    				dw 204,192,181,171,161,152,144,
+000DE4 A1009800 90008800 
+000DEC 80007900 72006C00 
+                           B  1482    
+000DF4 8B035803 2803FA02   B  1483    period_table_m8	dw 907,856,808,762,720,678,640,
+000DFC D002A602 80025C02 
+000E04 3A021A02 FC01E001 
+000E0C C501AC01 94017D01   B  1484    				dw 453,428,404,381,360,339,320,
+000E14 68015301 40012E01 
+000E1C 1D010D01 FE00F000 
+000E24 E200D600 CA00BE00   B  1485    				dw 226,214,202,190,180,170,160,
+000E2C B400AA00 A0009700 
+000E34 8F008700 7F007800 
+                           B  1486    
+000E3C 84035203 2203F502   B  1487    period_table_m7	dw 900,850,802,757,715,675,636,
+000E44 CB02A302 7C025902 
+000E4C 37021702 F901DD01 
+000E54 C201A901 91017B01   B  1488    				dw 450,425,401,379,357,337,318,
+000E5C 65015101 3E012C01 
+000E64 1C010C01 FD00EE00 
+000E6C E100D400 C800BD00   B  1489    				dw 225,212,200,189,179,169,159,
+000E74 B300A900 9F009600 
+000E7C 8E008600 7E007700 
+                           B  1490    
+000E84 7E034C03 1C03F002   B  1491    period_table_m6	dw 894,844,796,752,709,670,632,
+000E8C C5029E02 78025502 
+000E94 33021402 F601DA01 
+000E9C BF01A601 8E017801   B  1492    				dw 447,422,398,376,355,335,316,
+000EA4 63014F01 3C012A01 
+000EAC 1A010A01 FB00ED00 
+000EB4 DF00D300 C700BC00   B  1493    				dw 223,211,199,188,177,167,158,
+000EBC B100A700 9E009500 
+000EC4 8D008500 7D007600 
+                           B  1494    
+000ECC 77034603 1703EA02   B  1495    period_table_m5	dw 887,838,791,746,704,665,628,
+000ED4 C0029902 74025002 
+000EDC 2F021002 F201D601 
+000EE4 BC01A301 8B017501   B  1496    				dw 444,419,395,373,352,332,314,
+000EEC 60014C01 3A012801 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  38
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+000EF4 18010801 F900EB00 
+000EFC DE00D100 C600BB00   B  1497    				dw 222,209,198,187,176,166,157,
+000F04 B000A600 9D009400 
+000F0C 8C008400 7D007600 
+                           B  1498    
+000F14 71034003 1103E502   B  1499    period_table_m4	dw 881,832,785,741,699,660,623,
+000F1C BB029402 6F024C02 
+000F24 2B020C02 EE01D301 
+000F2C B901A001 88017201   B  1500    				dw 441,416,392,370,350,330,312,
+000F34 5E014A01 38012601 
+000F3C 16010601 F700E900 
+000F44 DC00D000 C400B900   B  1501    				dw 220,208,196,185,175,165,156,
+000F4C AF00A500 9C009300 
+000F54 8B008300 7B007500 
+                           B  1502    
+000F5C 6B033A03 0B03E002   B  1503    period_table_m3	dw 875,826,779,736,694,655,619,
+000F64 B6028F02 6B024802 
+000F6C 27020802 EB01CF01 
+000F74 B5019D01 86017001   B  1504    				dw 437,413,390,368,347,328,309,
+000F7C 5B014801 35012401 
+000F84 14010401 F500E800 
+000F8C DB00CE00 C300B800   B  1505    				dw 219,206,195,184,174,164,155,
+000F94 AE00A400 9B009200 
+000F9C 8A008200 7B007400 
+                           B  1506    
+000FA4 64033403 0603DA02   B  1507    period_table_m2	dw 868,820,774,730,689,651,614,
+000FAC B1028B02 66024402 
+000FB4 23020402 E701CC01 
+000FBC B2019A01 83016D01   B  1508    				dw 434,410,387,365,345,325,307,
+000FC4 59014501 33012201 
+000FCC 12010201 F400E600 
+000FD4 D900CD00 C100B700   B  1509    				dw 217,205,193,183,172,163,154,
+000FDC AC00A300 9A009100 
+000FE4 89008100 7A007300 
+                           B  1510    
+000FEC 5E032E03 0003D502   B  1511    period_table_m1	dw 862,814,768,725,684,646,610,
+000FF4 AC028602 62023F02 
+000FFC 1F020102 E401C901 
+001004 AF019701 80016B01   B  1512    				dw 431,407,384,363,342,323,305,
+00100C 56014301 31012001 
+001014 10010001 F200E400 
+00101C D800CB00 C000B500   B  1513    				dw 216,203,192,181,171,161,152,
+001024 AB00A100 98009000 
+00102C 88008000 79007200 
+                           B  1514    
+                           B  1515    ;----- Vibrato sine wave ----------------------
+                           B  1516    
+001034 0018314A 61788DA1   B  1517    vibrato_table		db 000,024,049,074,097,120,
+00103C B4C5D4E0 EBF4FAFD   B  1518    					db 180,197,212,224,235,244,
+001044 FFFDFAF4 EBE0D4C5   B  1519    					db 255,253,250,244,235,224,
+00104C B4A18D78 614A3118   B  1520    					db 180,161,141,120,097,074,
+                           B  1521    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  39
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+                           B  1522    ;----------------------------------------------
+                           B  1523    
+001054 00001E00 3C005A00   B  1524    multiply_30_table	dw 000,030,060,090,120,150,
+00105C 78009600 B400D200 
+001064 F0000E01 2C014A01   B  1525    					dw 240,270,300,330,360,390,
+00106C 68018601 A401C201 
+001074 E001FE01 1C023A02   B  1526    					dw 480,510,540,570,600,630,
+00107C 58027602 9402B202 
+001084 D002EE02 0C032A03   B  1527    					dw 720,750,780,810,840,870,
+00108C 48036603 8403A203 
+                           B  1528    
+                           B  1529    ;----------------------------------------------
+                           B  1530    
+001094 0000                B  1531    sample_base				dw 0			; "init
+001096 0000                B  1532    force_sample_base		dw 0			; set t
+                           B  1533    
+001098 00 00 00 00 00 00   B  1534    sample_location_list	blkb 62,0		; for 3
+00109E 00 00 00 00 00 00 
+0010A4 00 00 00 00 00 00 
+0010AA 00 00 00 00 00 00 
+0010B0 00 00 00 00 00 00 
+0010B6 00 00 00 00 00 00 
+0010BC 00 00 00 00 00 00 
+0010C2 00 00 00 00 00 00 
+0010C8 00 00 00 00 00 00 
+0010CE 00 00 00 00 00 00 
+0010D4 00 00 
+                           B  1535    
+                           B  1536    ;----------------------------------------------
+                           B  1537    
+0010D6 00                  B  1538    ticker				db 0
+0010D7 00                  B  1539    songpos				db 0
+0010D8 00                  B  1540    patindex			db 0
+0010D9 00                  B  1541    songspeed			db 0
+0010DA 00                  B  1542    arpeggio_counter	db 0
+0010DB 00                  B  1543    pattloop_pos		db 0
+0010DC 00                  B  1544    pattloop_count		db 0
+0010DD 00                  B  1545    pattdelay_count		db 0
+0010DE 00                  B  1546    pattdelay_flag		db 0
+0010DF 00                  B  1547    filter_on_off		db 0
+                           B  1548    
+                           B  1549    ;----------------------------------------------
+                           B  1550    
+       00000021            B  1551    vars_per_channel	equ 33
+                           B  1552    
+0010E0 00 00 00 00 00 00   B  1553    channel_data		blkb vars_per_channel*4,0
+0010E6 00 00 00 00 00 00 
+0010EC 00 00 00 00 00 00 
+0010F2 00 00 00 00 00 00 
+0010F8 00 00 00 00 00 00 
+0010FE 00 00 00 00 00 00 
+001104 00 00 00 00 00 00 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  40
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+00110A 00 00 00 00 00 00 
+001110 00 00 00 00 00 00 
+001116 00 00 00 00 00 00 
+00111C 00 00 00 00 00 00 
+001122 00 00 00 00 00 00 
+001128 00 00 00 00 00 00 
+00112E 00 00 00 00 00 00 
+001134 00 00 00 00 00 00 
+00113A 00 00 00 00 00 00 
+001140 00 00 00 00 00 00 
+001146 00 00 00 00 00 00 
+00114C 00 00 00 00 00 00 
+001152 00 00 00 00 00 00 
+001158 00 00 00 00 00 00 
+00115E 00 00 00 00 00 00 
+                           B  1554    	
+       00000000            B  1555    instrument			equ 0
+       00000001            B  1556    period_lo			equ 1
+       00000002            B  1557    period_hi			equ 2
+       00000003            B  1558    volume				equ 3
+       00000004            B  1559    fx_number			equ 4
+       00000005            B  1560    fx_args				equ 5
+       00000006            B  1561    period_for_fx_lo	equ 6
+       00000007            B  1562    period_for_fx_hi	equ 7
+       00000008            B  1563    volume_for_fx		equ 8
+       00000009            B  1564    portamento_rate		equ 9
+       0000000A            B  1565    vibrato_args		equ 10
+       0000000B            B  1566    vibrato_pos			equ 11
+       0000000C            B  1567    tremolo_args		equ 12
+       0000000D            B  1568    tremolo_pos			equ 13
+       0000000E            B  1569    wave_type 			equ 14		;bits 7:4 = tre
+       0000000F            B  1570    control_bits		equ 15		;bit 0 = note t
+       00000010            B  1571    portamento_dest_lo	equ 16		;bit 2 = channe
+       00000011            B  1572    portamento_dest_hi	equ 17
+       00000012            B  1573    instrument_waiting	equ 18
+       00000013            B  1574    volume_waiting		equ 19
+       00000014            B  1575    finetune			equ 20
+       00000015            B  1576    arp_base_period_lo  equ 21
+       00000016            B  1577    arp_base_period_hi	equ 22
+                           B  1578    
+       00000017            B  1579    samp_loc_lo			equ 23
+       00000018            B  1580    samp_loc_hi			equ 24
+       00000019            B  1581    samp_len_lo			equ 25
+       0000001A            B  1582    samp_len_hi			equ 26
+       0000001B            B  1583    samp_loop_loc_lo	equ 27
+       0000001C            B  1584    samp_loop_loc_hi	equ 28
+       0000001D            B  1585    samp_loop_len_lo	equ 29
+       0000001E            B  1586    samp_loop_len_hi	equ 30
+       0000001F            B  1587    samp_offset_lo		equ 31
+       00000020            B  1588    samp_offset_hi		equ 32
+                           B  1589    
+                           B  1590    ;==============================================
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  41
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\50Hz_Z80_Protracker_Player_v505.asm
+                           B  1591    ; End of non-hardware specific Z80 Protracker c
+                           B  1592    ;==============================================
+                           B  1593    
+                           A    90    	
+                           B     0    			include "Amiga_to_EZ80P_audio_stere
+                           B     1    ;----------------------------------------------
+                           B     2    ; Convert Amiga hardware values from Z80 Protra
+                           B     3    ; and writes to hardware registers
+                           B     4    ;----------------------------------------------
+                           B     5    ;
+                           B     6    ; V1.02 - Z80 mode (non-ADL code) for HW v0037
+                           B     7    ; Writes tracker channel 0 to HW01
+                           B     8    ;    					 1 to HW23
+                           B     9    ;                        2 to HW45
+                           B    10    ;                        3 to HW67
+                           B    11    ;----------------------------------------------
+                           B    12    
+                           B    13    .assume ADL = 0
+                           B    14    
+       000010E1            B    15    firstchan_period	equ channel_data+period_lo
+       000010E3            B    16    firstchan_volume	equ channel_data+volume
+       000010F7            B    17    firstchan_location	equ channel_data+samp_loc_l
+       000010F9            B    18    firstchan_length	equ channel_data+samp_len_l
+       000010EF            B    19    firstchan_control	equ channel_data+control_bi
+       000010FB            B    20    firstchan_loop_loc	equ channel_data+samp_loop_
+       000010FD            B    21    firstchan_loop_len	equ channel_data+samp_loop_
+                           B    22    
+       00001102            B    23    secondchan_period	equ channel_data+vars_per_c
+       00001104            B    24    secondchan_volume	equ channel_data+vars_per_c
+       00001118            B    25    secondchan_location	equ channel_data+vars_per_c
+       0000111A            B    26    secondchan_length	equ channel_data+vars_per_c
+       00001110            B    27    secondchan_control	equ channel_data+vars_per_c
+       0000111C            B    28    secondchan_loop_loc	equ channel_data+vars_per_c
+       0000111E            B    29    secondchan_loop_len	equ channel_data+vars_per_c
+                           B    30    
+       00001123            B    31    thirdchan_period	equ channel_data+(vars_per_
+       00001125            B    32    thirdchan_volume	equ channel_data+(vars_per_
+       00001139            B    33    thirdchan_location	equ channel_data+(vars_per_
+       0000113B            B    34    thirdchan_length	equ channel_data+(vars_per_
+       00001131            B    35    thirdchan_control	equ channel_data+(vars_per_
+       0000113D            B    36    thirdchan_loop_loc	equ channel_data+(vars_per_
+       0000113F            B    37    thirdchan_loop_len	equ channel_data+(vars_per_
+                           B    38    
+       00001144            B    39    fourthchan_period	equ channel_data+(vars_per_
+       00001146            B    40    fourthchan_volume	equ channel_data+(vars_per_
+       0000115A            B    41    fourthchan_location	equ channel_data+(vars_per_
+       0000115C            B    42    fourthchan_length	equ channel_data+(vars_per_
+       00001152            B    43    fourthchan_control	equ channel_data+(vars_per_
+       0000115E            B    44    fourthchan_loop_loc	equ channel_data+(vars_per_
+       00001160            B    45    fourthchan_loop_len	equ channel_data+(vars_per_
+                           B    46    
+                           B    47    ;----------------------------------------------
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  42
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+                           B    48    ; EZ80P specific code
+                           B    49    ;----------------------------------------------
+                           B    50    
+001164                     B    51    update_audio_hardware
+                           B    52    
+001164 3E01                B    53    				ld a,1
+001166 5B320300 F8         B    54    				ld.lil (hw_audio_registers+3),a
+00116B 0E01                B    55    				ld c,port_hw_flags
+00116D ED7440              B    56    wait_audreg		tstio 40h						001170 28 FB               B    57    				jr z,wait_audreg
+                           B    58    				
+001172 3EFF                B    59    				ld a,0ffh						001174 5B320000 F0         B    60    				ld.lil (hw_palette),a			                           B    61    				
+                           B    62    ;----------------------------------------------
+                           B    63    ; Write Period Constants - must be done in max 
+                           B    64    ;----------------------------------------------
+                           B    65    								
+001179 5BDD2100 00F8       B    66    				ld.lil ix,hw_audio_registers	00117F 5BFD2180 00F8       B    67    				ld.lil iy,hw_audio_registers+80
+                           B    68    				
+001185 11 89 12            B    69    				ld de,period_conv_table-200		001188 2A E1 10            B    70    				ld hl,(firstchan_period)	  	00118B 29                  B    71    				add hl,hl
+00118C 19                  B    72    				add hl,de
+00118D 5E                  B    73    				ld e,(hl)
+00118E 23                  B    74    				inc hl
+00118F 56                  B    75    				ld d,(hl)
+001190 5BDD1F08            B    76    				ld.lil (ix+08h),de				001194 5BDD1F28            B    77    				ld.lil (ix+28h),de				                           B    78    				
+001198 11 89 12            B    79    				ld de,period_conv_table-200		00119B 2A 02 11            B    80    				ld hl,(secondchan_period)	  	00119E 29                  B    81    				add hl,hl
+00119F 19                  B    82    				add hl,de
+0011A0 5E                  B    83    				ld e,(hl)
+0011A1 23                  B    84    				inc hl
+0011A2 56                  B    85    				ld d,(hl)
+0011A3 5BDD1F48            B    86    				ld.lil (ix+48h),de				0011A7 5BDD1F68            B    87    				ld.lil (ix+68h),de				                           B    88    		
+0011AB 11 89 12            B    89    				ld de,period_conv_table-200		0011AE 2A 23 11            B    90    				ld hl,(thirdchan_period)	  	0011B1 29                  B    91    				add hl,hl
+0011B2 19                  B    92    				add hl,de
+0011B3 5E                  B    93    				ld e,(hl)
+0011B4 23                  B    94    				inc hl
+0011B5 56                  B    95    				ld d,(hl)
+0011B6 5BFD1F08            B    96    				ld.lil (iy+08h),de				0011BA 5BFD1F28            B    97    				ld.lil (iy+28h),de				                           B    98    
+0011BE 11 89 12            B    99    				ld de,period_conv_table-200		Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  43
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+0011C1 2A 44 11            B   100    				ld hl,(fourthchan_period)	  	0011C4 29                  B   101    				add hl,hl
+0011C5 19                  B   102    				add hl,de
+0011C6 5E                  B   103    				ld e,(hl)
+0011C7 23                  B   104    				inc hl
+0011C8 56                  B   105    				ld d,(hl)
+0011C9 5BFD1F48            B   106    				ld.lil (iy+48h),de				0011CD 5BFD1F68            B   107    				ld.lil (iy+68h),de				                           B   108    
+                           B   109    ;----------------------------------------------
+                           B   110    ; Write Volume
+                           B   111    ;----------------------------------------------
+                           B   112    
+                           B   113    
+0011D1 3A E3 10            B   114    				ld a,(firstchan_volume)			0011D4 5F                  B   115    				ld e,a
+0011D5 5BDD1F0C            B   116    				ld.lil (ix+0ch),de				0011D9 5F                  B   117    				ld e,a
+0011DA 5BDD1F2C            B   118    				ld.lil (ix+2ch),de				                           B   119    				
+0011DE 3A 04 11            B   120    				ld a,(secondchan_volume)
+0011E1 5F                  B   121    				ld e,a
+0011E2 5BDD1F4C            B   122    				ld.lil (ix+4ch),de				0011E6 5F                  B   123    				ld e,a
+0011E7 5BDD1F6C            B   124    				ld.lil (ix+6ch),de
+                           B   125    				
+0011EB 3A 25 11            B   126    				ld a,(thirdchan_volume)
+0011EE 5F                  B   127    				ld e,a
+0011EF 5BFD1F0C            B   128    				ld.lil (iy+0ch),de				0011F3 5F                  B   129    				ld e,a
+0011F4 5BFD1F2C            B   130    				ld.lil (iy+2ch),de
+                           B   131    				
+0011F8 3A 46 11            B   132    				ld a,(fourthchan_volume)
+0011FB 5F                  B   133    				ld e,a
+0011FC 5BFD1F4C            B   134    				ld.lil (iy+4ch),de				001200 5F                  B   135    				ld e,a
+001201 5BFD1F6C            B   136    				ld.lil (iy+6ch),de
+                           B   137    
+                           B   138    ;----------------------------------------------
+                           B   139    ; Write Loc and Len of triggered channels
+                           B   140    ;----------------------------------------------
+                           B   141    
+001205 21 EF 10            B   142    				ld hl,firstchan_control			001208 CB46                B   143    				bit 0,(hl)						00120A 28 4A               B   144    				jr z,no_rt_ch0					00120C CB86                B   145    				res 0,(hl)
+00120E 5B210000 00         B   146    				ld.lil hl,0
+001213 2A F7 10            B   147    				ld hl,(firstchan_location)
+001216 4929                B   148    				add.l hl,hl
+001218 5BDD2F00            B   149    				ld.lil (ix),hl					00121C 5BDD2F20            B   150    				ld.lil (ix+20h),hl				001220 5B210000 00         B   151    				ld.lil hl,0
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  44
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+001225 2A FB 10            B   152    				ld hl,(firstchan_loop_loc)
+001228 4929                B   153    				add.l hl,hl
+00122A 5BDD2F10            B   154    				ld.lil (ix+10h),hl				00122E 5BDD2F30            B   155    				ld.lil (ix+30h),hl				001232 5B210000 00         B   156    				ld.lil hl,0
+001237 2A F9 10            B   157    				ld hl,(firstchan_length)
+00123A 4929                B   158    				add.l hl,hl
+00123C 5BDD2F04            B   159    				ld.lil (ix+04h),hl				001240 5BDD2F24            B   160    				ld.lil (ix+24h),hl				001244 5B210000 00         B   161    				ld.lil hl,0
+001249 2A FD 10            B   162    				ld hl,(firstchan_loop_len)
+00124C 4929                B   163    				add.l hl,hl
+00124E 5BDD2F14            B   164    				ld.lil (ix+14h),hl				001252 5BDD2F34            B   165    				ld.lil (ix+34h),hl				001256                     B   166    no_rt_ch0
+001256 21 10 11            B   167    				ld hl,secondchan_control
+001259 CB46                B   168    				bit 0,(hl)
+00125B 28 4A               B   169    				jr z,no_rt_ch1
+00125D CB86                B   170    				res 0,(hl)
+00125F 5B210000 00         B   171    				ld.lil hl,0
+001264 2A 18 11            B   172    				ld hl,(secondchan_location)
+001267 4929                B   173    				add.l hl,hl
+001269 5BDD2F40            B   174    				ld.lil (ix+40h),hl				00126D 5BDD2F60            B   175    				ld.lil (ix+60h),hl				001271 5B210000 00         B   176    				ld.lil hl,0
+001276 2A 1C 11            B   177    				ld hl,(secondchan_loop_loc)
+001279 4929                B   178    				add.l hl,hl
+00127B 5BDD2F50            B   179    				ld.lil (ix+50h),hl				00127F 5BDD2F70            B   180    				ld.lil (ix+70h),hl				001283 5B210000 00         B   181    				ld.lil hl,0
+001288 2A 1A 11            B   182    				ld hl,(secondchan_length)
+00128B 4929                B   183    				add.l hl,hl
+00128D 5BDD2F44            B   184    				ld.lil (ix+44h),hl				001291 5BDD2F64            B   185    				ld.lil (ix+64h),hl				001295 5B210000 00         B   186    				ld.lil hl,0
+00129A 2A 1E 11            B   187    				ld hl,(secondchan_loop_len)		00129D 4929                B   188    				add.l hl,hl
+00129F 5BDD2F54            B   189    				ld.lil (ix+54h),hl				0012A3 5BDD2F74            B   190    				ld.lil (ix+74h),hl
+                           B   191    
+0012A7                     B   192    no_rt_ch1
+                           B   193    								
+0012A7 21 31 11            B   194    				ld hl,thirdchan_control
+0012AA CB46                B   195    				bit 0,(hl)
+0012AC 28 4A               B   196    				jr z,no_rt_ch2
+0012AE CB86                B   197    				res 0,(hl)
+0012B0 5B210000 00         B   198    				ld.lil hl,0
+0012B5 2A 39 11            B   199    				ld hl,(thirdchan_location)
+0012B8 4929                B   200    				add.l hl,hl
+0012BA 5BFD2F00            B   201    				ld.lil (iy),hl		
+0012BE 5BFD2F20            B   202    				ld.lil (iy+20h),hl
+0012C2 5B210000 00         B   203    				ld.lil hl,0
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  45
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+0012C7 2A 3D 11            B   204    				ld hl,(thirdchan_loop_loc)
+0012CA 4929                B   205    				add.l hl,hl
+0012CC 5BFD2F10            B   206    				ld.lil (iy+10h),hl		
+0012D0 5BFD2F30            B   207    				ld.lil (iy+30h),hl	
+0012D4 5B210000 00         B   208    				ld.lil hl,0				
+0012D9 2A 3B 11            B   209    				ld hl,(thirdchan_length)
+0012DC 4929                B   210    				add.l hl,hl
+0012DE 5BFD2F04            B   211    				ld.lil (iy+04h),hl	
+0012E2 5BFD2F24            B   212    				ld.lil (iy+24h),hl	
+0012E6 5B210000 00         B   213    				ld.lil hl,0
+0012EB 2A 3F 11            B   214    				ld hl,(thirdchan_loop_len)
+0012EE 4929                B   215    				add.l hl,hl
+0012F0 5BFD2F14            B   216    				ld.lil (iy+14h),hl		
+0012F4 5BFD2F34            B   217    				ld.lil (iy+34h),hl	
+0012F8                     B   218    no_rt_ch2
+                           B   219    
+0012F8 21 52 11            B   220    				ld hl,fourthchan_control
+0012FB CB46                B   221    				bit 0,(hl)
+0012FD 28 4A               B   222    				jr z,no_rt_ch3
+0012FF CB86                B   223    				res 0,(hl)
+001301 5B210000 00         B   224    				ld.lil hl,0
+001306 2A 5A 11            B   225    				ld hl,(fourthchan_location)
+001309 4929                B   226    				add.l hl,hl
+00130B 5BFD2F40            B   227    				ld.lil (iy+40h),hl		
+00130F 5BFD2F60            B   228    				ld.lil (iy+60h),hl	
+001313 5B210000 00         B   229    				ld.lil hl,0
+001318 2A 5E 11            B   230    				ld hl,(fourthchan_loop_loc)
+00131B 4929                B   231    				add.l hl,hl
+00131D 5BFD2F50            B   232    				ld.lil (iy+50h),hl	
+001321 5BFD2F70            B   233    				ld.lil (iy+70h),hl	
+001325 5B210000 00         B   234    				ld.lil hl,0
+00132A 2A 5C 11            B   235    				ld hl,(fourthchan_length)
+00132D 4929                B   236    				add.l hl,hl
+00132F 5BFD2F44            B   237    				ld.lil (iy+44h),hl		
+001333 5BFD2F64            B   238    				ld.lil (iy+64h),hl	
+001337 5B210000 00         B   239    				ld.lil hl,0
+00133C 2A 60 11            B   240    				ld hl,(fourthchan_loop_len)
+00133F 4929                B   241    				add.l hl,hl
+001341 5BFD2F54            B   242    				ld.lil (iy+54h),hl		
+001345 5BFD2F74            B   243    				ld.lil (iy+74h),hl	
+001349                     B   244    no_rt_ch3
+                           B   245    
+001349 3E00                B   246    				ld a,0h							00134B 5B320000 F0         B   247    				ld.lil (hw_palette),a			                           B   248    
+001350 C9                  B   249    				ret
+                           B   250    	
+                           B   251    ;----------------------------------------------
+                           B   252    ; Table for equivalent EZ80P constants to Amiga
+                           B   253    ;----------------------------------------------
+                           B   254    ;
+                           B   255    ; Formula: (1/48828) / ((1/3579545) * period) *
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  46
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+                           B   256    ;
+                           B   257    ; Starts at Amiga period 100, one 16-bit consta
+                           B   258    
+001351                     B   259    period_conv_table:
+                           B   260    
+001351 ABBBD0B9 FDB734B6   B   261                    db 0ABh,0BBh,0D0h,0B9h,0FDh,0B7
+001359 74B4BCB2 0CB164AF 
+001361 C5AD2DAC 9CAA12A9   B   262                    db 0C5h,0ADh,02Dh,0ACh,09Ch,0AA
+001369 90A714A6 9FA431A3 
+001371 C9A167A0 0B9FB59D   B   263                    db 0C9h,0A1h,067h,0A0h,00Bh,09F
+001379 649C199B D4999498 
+001381 59972396 F294C593   B   264                    db 059h,097h,023h,096h,0F2h,094
+001389 9E927B91 5C90428F 
+001391 2C8E1B8D 0D8C048B   B   265                    db 02Ch,08Eh,01Bh,08Dh,00Dh,08C
+001399 FE89FC88 FE870487 
+0013A1 0D861985 29843D83   B   266                    db 00Dh,086h,019h,085h,029h,084
+0013A9 53826D81 8A80AA7F 
+0013B1 CE7EF47D 1D7D497C   B   267                    db 0CEh,07Eh,0F4h,07Dh,01Dh,07D
+0013B9 777BA97A DD791479 
+0013C1 4D788977 C7760876   B   268                    db 04Dh,078h,089h,077h,0C7h,076
+0013C9 4B759074 D8732273 
+0013D1 6F72BD71 0E716070   B   269                    db 06Fh,072h,0BDh,071h,00Eh,071
+0013D9 B56F0C6F 656EBF6D 
+0013E1 1C6D7B6C DB6B3D6B   B   270                    db 01Ch,06Dh,07Bh,06Ch,0DBh,06B
+0013E9 A16A076A 6E69D868 
+0013F1 4368AF67 1D678D66   B   271                    db 043h,068h,0AFh,067h,01Dh,067
+0013F9 FE657165 E6645B64 
+001401 D3634C63 C6624162   B   272                    db 0D3h,063h,04Ch,063h,0C6h,062
+001409 BE613D61 BC603D60 
+001411 C05F435F C85E4E5E   B   273                    db 0C0h,05Fh,043h,05Fh,0C8h,05E
+001419 D55D5E5D E85C725C 
+001421 FE5B8C5B 1A5BA95A   B   274                    db 0FEh,05Bh,08Ch,05Bh,01Ah,05B
+001429 3A5ACB59 5E59F158 
+001431 86581B58 B2574A57   B   275                    db 086h,058h,01Bh,058h,0B2h,057
+001439 E2567C56 1656B155 
+001441 4E55EB54 89542854   B   276                    db 04Eh,055h,0EBh,054h,089h,054
+001449 C8536853 0A53AC52 
+001451 4F52F351 98513E51   B   277                    db 04Fh,052h,0F3h,051h,098h,051
+001459 E4508B50 3350DC4F 
+001461 854F2F4F DA4E864E   B   278                    db 085h,04Fh,02Fh,04Fh,0DAh,04E
+001469 324EDF4D 8C4D3B4D 
+001471 EA4C994C 4A4CFA4B   B   279                    db 0EAh,04Ch,099h,04Ch,04Ah,04C
+001479 AC4B5E4B 114BC54A 
+001481 794A2D4A E2499849   B   280                    db 079h,04Ah,02Dh,04Ah,0E2h,049
+001489 4F490649 BD487548 
+001491 2E48E747 A1475B47   B   281                    db 02Eh,048h,0E7h,047h,0A1h,047
+001499 1647D146 8D464946 
+0014A1 0646C445 82454045   B   282                    db 006h,046h,0C4h,045h,082h,045
+0014A9 FF44BE44 7E443E44 
+0014B1 FF43C043 82434443   B   283                    db 0FFh,043h,0C0h,043h,082h,043
+0014B9 0643C942 8C425042 
+0014C1 1442D941 9E416441   B   284                    db 014h,042h,0D9h,041h,09Eh,041
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  47
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+0014C9 2941F040 B6407D40 
+0014D1 45400D40 D53F9E3F   B   285                    db 045h,040h,00Dh,040h,0D5h,03F
+0014D9 673F303F FA3EC43E 
+0014E1 8E3E593E 243EF03D   B   286                    db 08Eh,03Eh,059h,03Eh,024h,03E
+0014E9 BB3D883D 543D213D 
+0014F1 EE3CBC3C 8A3C583C   B   287                    db 0EEh,03Ch,0BCh,03Ch,08Ah,03C
+0014F9 263CF53B C43B943B 
+001501 633B333B 043BD43A   B   288                    db 063h,03Bh,033h,03Bh,004h,03B
+001509 A53A763A 483A1A3A 
+001511 EC39BE39 91396439   B   289                    db 0ECh,039h,0BEh,039h,091h,039
+001519 37390B39 DE38B238 
+001521 87385B38 30380538   B   290                    db 087h,038h,05Bh,038h,030h,038
+001529 DA37B037 86375C37 
+001531 32370937 DF36B636   B   291                    db 032h,037h,009h,037h,0DFh,036
+001539 8E366536 3D361536 
+001541 ED35C635 9E357735   B   292                    db 0EDh,035h,0C6h,035h,09Eh,035
+001549 50352A35 0335DD34 
+001551 B7349134 6C344634   B   293                    db 0B7h,034h,091h,034h,06Ch,034
+001559 2134FC33 D733B333 
+001561 8E336A33 46332233   B   294                    db 08Eh,033h,06Ah,033h,046h,033
+001569 FF32DC32 B8329532 
+001571 73325032 2D320B32   B   295                    db 073h,032h,050h,032h,02Dh,032
+001579 E931C731 A6318431 
+001581 63314131 20310031   B   296                    db 063h,031h,041h,031h,020h,031
+001589 DF30BE30 9E307E30 
+001591 5E303E30 1E30FF2F   B   297                    db 05Eh,030h,03Eh,030h,01Eh,030
+001599 E02FC02F A12F832F 
+0015A1 642F452F 272F092F   B   298                    db 064h,02Fh,045h,02Fh,027h,02F
+0015A9 EA2ECD2E AF2E912E 
+0015B1 742E562E 392E1C2E   B   299                    db 074h,02Eh,056h,02Eh,039h,02E
+0015B9 FF2DE22D C62DA92D 
+0015C1 8D2D702D 542D382D   B   300                    db 08Dh,02Dh,070h,02Dh,054h,02D
+0015C9 1D2D012D E52CCA2C 
+0015D1 AF2C932C 782C5D2C   B   301                    db 0AFh,02Ch,093h,02Ch,078h,02C
+0015D9 432C282C 0D2CF32B 
+0015E1 D92BBF2B A52B8B2B   B   302                    db 0D9h,02Bh,0BFh,02Bh,0A5h,02B
+0015E9 712B572B 3E2B242B 
+0015F1 0B2BF22A D82ABF2A   B   303                    db 00Bh,02Bh,0F2h,02Ah,0D8h,02A
+0015F9 A72A8E2A 752A5D2A 
+001601 442A2C2A 142AFC29   B   304                    db 044h,02Ah,02Ch,02Ah,014h,02A
+001609 E429CC29 B4299C29 
+001611 85296D29 56293F29   B   305                    db 085h,029h,06Dh,029h,056h,029
+001619 27291029 F928E328 
+001621 CC28B528 9F288828   B   306                    db 0CCh,028h,0B5h,028h,09Fh,028
+001629 72285C28 45282F28 
+001631 19280328 EE27D827   B   307                    db 019h,028h,003h,028h,0EEh,027
+001639 C227AD27 97278227 
+001641 6D275827 43272E27   B   308                    db 06Dh,027h,058h,027h,043h,027
+001649 19270427 EF26DA26 
+001651 C626B126 9D268926   B   309                    db 0C6h,026h,0B1h,026h,09Dh,026
+001659 75266026 4C263826 
+001661 25261126 FD25E925   B   310                    db 025h,026h,011h,026h,0FDh,025
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  48
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+001669 D625C225 AF259C25 
+001671 88257525 62254F25   B   311                    db 088h,025h,075h,025h,062h,025
+001679 3C252925 16250425 
+001681 F124DE24 CC24B924   B   312                    db 0F1h,024h,0DEh,024h,0CCh,024
+001689 A7249524 83247024 
+001691 5E244C24 3A242924   B   313                    db 05Eh,024h,04Ch,024h,03Ah,024
+001699 17240524 F323E223 
+0016A1 D023BF23 AD239C23   B   314                    db 0D0h,023h,0BFh,023h,0ADh,023
+0016A9 8B237A23 68235723 
+0016B1 46233523 24231423   B   315                    db 046h,023h,035h,023h,024h,023
+0016B9 0323F222 E222D122 
+0016C1 C122B022 A0228F22   B   316                    db 0C1h,022h,0B0h,022h,0A0h,022
+0016C9 7F226F22 5F224F22 
+0016D1 3F222F22 1F220F22   B   317                    db 03Fh,022h,02Fh,022h,01Fh,022
+0016D9 FF21EF21 E021D021 
+0016E1 C121B121 A2219221   B   318                    db 0C1h,021h,0B1h,021h,0A2h,021
+0016E9 83217321 64215521 
+0016F1 46213721 28211921   B   319                    db 046h,021h,037h,021h,028h,021
+0016F9 0A21FB20 EC20DE20 
+001701 CF20C020 B220A320   B   320                    db 0CFh,020h,0C0h,020h,0B2h,020
+001709 94208620 78206920 
+001711 5B204D20 3E203020   B   321                    db 05Bh,020h,04Dh,020h,03Eh,020
+001719 22201420 0620F81F 
+001721 EA1FDC1F CF1FC11F   B   322                    db 0EAh,01Fh,0DCh,01Fh,0CFh,01F
+001729 B31FA51F 981F8A1F 
+001731 7D1F6F1F 621F541F   B   323                    db 07Dh,01Fh,06Fh,01Fh,062h,01F
+001739 471F3A1F 2C1F1F1F 
+001741 121F051F F81EEA1E   B   324                    db 012h,01Fh,005h,01Fh,0F8h,01E
+001749 DD1ED01E C41EB71E 
+001751 AA1E9D1E 901E841E   B   325                    db 0AAh,01Eh,09Dh,01Eh,090h,01E
+001759 771E6A1E 5E1E511E 
+001761 451E381E 2C1E1F1E   B   326                    db 045h,01Eh,038h,01Eh,02Ch,01E
+001769 131E071E FA1DEE1D 
+001771 E21DD61D CA1DBD1D   B   327                    db 0E2h,01Dh,0D6h,01Dh,0CAh,01D
+001779 B11DA51D 991D8D1D 
+001781 821D761D 6A1D5E1D   B   328                    db 082h,01Dh,076h,01Dh,06Ah,01D
+001789 521D471D 3B1D2F1D 
+001791 241D181D 0D1D011D   B   329                    db 024h,01Dh,018h,01Dh,00Dh,01D
+001799 F61CEA1C DF1CD41C 
+0017A1 C81CBD1C B21CA61C   B   330                    db 0C8h,01Ch,0BDh,01Ch,0B2h,01C
+0017A9 9B1C901C 851C7A1C 
+0017B1 6F1C641C 591C4E1C   B   331                    db 06Fh,01Ch,064h,01Ch,059h,01C
+0017B9 431C381C 2D1C221C 
+0017C1 181C0D1C 021CF81B   B   332                    db 018h,01Ch,00Dh,01Ch,002h,01C
+0017C9 ED1BE21B D81BCD1B 
+0017D1 C31BB81B AE1BA31B   B   333                    db 0C3h,01Bh,0B8h,01Bh,0AEh,01B
+0017D9 991B8E1B 841B7A1B 
+0017E1 6F1B651B 5B1B511B   B   334                    db 06Fh,01Bh,065h,01Bh,05Bh,01B
+0017E9 471B3C1B 321B281B 
+0017F1 1E1B141B 0A1B001B   B   335                    db 01Eh,01Bh,014h,01Bh,00Ah,01B
+0017F9 F61AEC1A E31AD91A 
+001801 CF1AC51A BB1AB21A   B   336                    db 0CFh,01Ah,0C5h,01Ah,0BBh,01A
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  49
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+001809 A81A9E1A 951A8B1A 
+001811 811A781A 6E1A651A   B   337                    db 081h,01Ah,078h,01Ah,06Eh,01A
+001819 5B1A521A 481A3F1A 
+001821 361A2C1A 231A1A1A   B   338                    db 036h,01Ah,02Ch,01Ah,023h,01A
+001829 101A071A FE19F519 
+001831 EB19E219 D919D019   B   339                    db 0EBh,019h,0E2h,019h,0D9h,019
+001839 C719BE19 B519AC19 
+001841 A3199A19 91198819   B   340                    db 0A3h,019h,09Ah,019h,091h,019
+001849 7F197619 6E196519 
+001851 5C195319 4A194219   B   341                    db 05Ch,019h,053h,019h,04Ah,019
+001859 39193019 28191F19 
+001861 16190E19 0519FD18   B   342                    db 016h,019h,00Eh,019h,005h,019
+001869 F418EC18 E318DB18 
+001871 D318CA18 C218B918   B   343                    db 0D3h,018h,0CAh,018h,0C2h,018
+001879 B118A918 A0189818 
+001881 90188818 80187718   B   344                    db 090h,018h,088h,018h,080h,018
+001889 6F186718 5F185718 
+001891 4F184718 3F183718   B   345                    db 04Fh,018h,047h,018h,03Fh,018
+001899 2F182718 1F181718 
+0018A1 0F180718 FF17F717   B   346                    db 00Fh,018h,007h,018h,0FFh,017
+0018A9 F017E817 E017D817 
+0018B1 D017C917 C117B917   B   347                    db 0D0h,017h,0C9h,017h,0C1h,017
+0018B9 B217AA17 A2179B17 
+0018C1 93178C17 84177D17   B   348                    db 093h,017h,08Ch,017h,084h,017
+0018C9 75176D17 66175F17 
+0018D1 57175017 48174117   B   349                    db 057h,017h,050h,017h,048h,017
+0018D9 3A173217 2B172417 
+0018E1 1C171517 0E170617   B   350                    db 01Ch,017h,015h,017h,00Eh,017
+0018E9 FF16F816 F116EA16 
+0018F1 E316DB16 D416CD16   B   351                    db 0E3h,016h,0DBh,016h,0D4h,016
+0018F9 C616BF16 B816B116 
+001901 AA16A316 9C169516   B   352                    db 0AAh,016h,0A3h,016h,09Ch,016
+001909 8E168716 80167916 
+001911 72166C16 65165E16   B   353                    db 072h,016h,06Ch,016h,065h,016
+001919 57165016 49164316 
+001921 3C163516 2E162816   B   354                    db 03Ch,016h,035h,016h,02Eh,016
+001929 21161A16 14160D16 
+001931 06160016 F915F315   B   355                    db 006h,016h,000h,016h,0F9h,015
+001939 EC15E615 DF15D915 
+001941 D215CC15 C515BF15   B   356                    db 0D2h,015h,0CCh,015h,0C5h,015
+001949 B815B215 AB15A515 
+001951 9F159815 92158B15   B   357                    db 09Fh,015h,098h,015h,092h,015
+001959 85157F15 79157215 
+001961 6C156615 5F155915   B   358                    db 06Ch,015h,066h,015h,05Fh,015
+001969 53154D15 47154015 
+001971 3A153415 2E152815   B   359                    db 03Ah,015h,034h,015h,02Eh,015
+001979 22151C15 16151015 
+001981 0A150415 FE14F814   B   360                    db 00Ah,015h,004h,015h,0FEh,014
+001989 F214EC14 E614E014 
+001991 DA14D414 CE14C814   B   361                    db 0DAh,014h,0D4h,014h,0CEh,014
+001999 C214BC14 B614B114 
+0019A1 AB14A514 9F149914   B   362                    db 0ABh,014h,0A5h,014h,09Fh,014
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)25-Feb-11     15:29:22     page:  50
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_EZ80P_audio_stereo.asm
+0019A9 93148E14 88148214 
+0019B1 7C147714 71146B14   B   363                    db 07Ch,014h,077h,014h,071h,014
+0019B9 66146014 5A145514 
+0019C1 4F144914 44143E14   B   364                    db 04Fh,014h,049h,014h,044h,014
+0019C9 39143314 2E142814 
+0019D1 22141D14 17141214   B   365                    db 022h,014h,01Dh,014h,017h,014
+0019D9 0C140714 0114FC13 
+0019E1 F713F113 EC13E613   B   366                    db 0F7h,013h,0F1h,013h,0ECh,013
+0019E9 E113DC13 D613D113 
+0019F1 CB13C613 C113       B   367                    db 0CBh,013h,0C6h,013h,0C1h,013
+                           B   368    				
+                           B   369    				
+                           B   370    ;----------------------------------------------
+                           B   371    ; EZ80P specific code ends
+                           B   372    ;----------------------------------------------
+                           B   373    
+                           A    92    
+                           A    93    ;----------------------------------------------
+                           A    94    
+       00006000            A    95    music_module equ 06000h
+                           A    96    
+                           A    97    ;----------------------------------------------
+                           A    98    
+                           A    99    		
+
+
+Errors: 0
+Warnings: 0
+Lines Assembled: 2286

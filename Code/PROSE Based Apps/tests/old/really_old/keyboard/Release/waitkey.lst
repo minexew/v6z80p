@@ -1,0 +1,213 @@
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)16-Dec-10     15:27:10     page:   1
+
+
+PC     Object              I  Line    Source 
+                           A     1    ; Test keyboard input routine
+                           A     2    
+                           A     3    ;----------------------------------------------
+                           A     4    
+       00000001            A     5    ADL_mode		equ 1				; 0 if user
+       00010000            A     6    load_location	equ 10000h			; anywhere 
+                           A     7    
+                           B     0    				include	'PROSE_header.asm'
+                           B     1    
+                           B     2    ;-- EZ80P Hardware equates --------------------
+                           B     3    
+       00000000            B     4    port_pic_data  			equ 0000h
+       00000001            B     5    port_pic_control		equ 0001h
+       00000001            B     6    port_hw_flags			equ 0001h
+       00000002            B     7    port_sdc_ctrl			equ 0002h	; this is a
+       00000002            B     8    port_keyboard_data		equ 0002h
+       00000003            B     9    port_sdc_data		 	equ 0003h	
+       00000004            B    10    port_memory_paging		equ 0004h
+       00000005            B    11    port_irq_ctrl			equ 0005h
+       00000006            B    12    port_nmi_ack			equ 0006h
+       00000007            B    13    port_selector			equ 0007h
+                           B    14    
+       00000000            B    15    sdc_power				equ 0		;(port_sd_c
+       00000001            B    16    sdc_cs					equ 1		;(port_sd_c
+       00000002            B    17    sdc_speed				equ 2 		;(port_sd_c
+                           B    18    
+       00000004            B    19    sdc_serializer_busy		equ 4 		;(port_hw_f
+       00000005            B    20    vrt						equ 5		;(port_hw_f
+                           B    21    
+                           B    22    ;-- Memory locations --------------------------
+                           B    23    
+       00800000            B    24    hw_vram_a		equ 0800000h
+       00F00000            B    25    hw_palette	equ 0f00000h
+                           B    26    
+                           B    27    ;----------------------------------------------
+                           B    28    
+                           B    29    
+       00000800            B    30    os_start equ 800h
+                           B    31    
+       00000804            B    32    prose_return equ os_start+4
+       00000808            B    33    prose_kernal equ os_start+8
+                           B    34    
+                           B    35    ;----------------------------------------------
+                           B    36    ; Kernal Jump Table values for mode PROSE
+                           B    37    ;----------------------------------------------
+                           B    38    		
+       00000000            B    39    kr_mount_volumes				equ 00h	
+       00000001            B    40    kr_get_device_info				equ 01h	
+       00000002            B    41    kr_check_volume_format			equ 02h	
+       00000003            B    42    kr_change_volume				equ 03h	
+       00000004            B    43    kr_get_volume_info				equ 04h	
+       00000005            B    44    kr_format_device				equ 05h	
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)16-Dec-10     15:27:10     page:   2
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+       00000006            B    45    kr_make_dir						equ 06h
+                           B    46    
+       00000007            B    47    kr_change_dir					equ 07h	
+       00000008            B    48    kr_parent_dir					equ 08h	
+       00000009            B    49    kr_root_dir						equ 09h
+       0000000A            B    50    kr_delete_dir					equ 0ah
+       0000000B            B    51    kr_find_file					equ 0bh
+       0000000C            B    52    kr_set_file_pointer				equ 0ch
+       0000000D            B    53    kr_set_load_length				equ 0dh
+       0000000E            B    54    kr_read_file					equ 0eh
+                           B    55    
+       0000000F            B    56    kr_erase_file					equ 0fh
+       00000010            B    57    kr_rename_file					equ 10h
+       00000011            B    58    kr_create_file					equ 11h
+       00000012            B    59    kr_write_file					equ 12h
+       00000013            B    60    kr_get_total_sectors			equ 13h
+       00000014            B    61    kr_dir_list_first_entry			equ 14h
+       00000015            B    62    kr_dir_list_get_entry			equ 15h
+       00000016            B    63    kr_dir_list_next_entry			equ 16h
+                           B    64    
+       00000017            B    65    kr_read_sector					equ 17h
+       00000018            B    66    kr_write_sector					equ 18h
+       00000019            B    67    kr_file_sector_list				equ 19h
+       0000001A            B    68    kr_get_dir_cluster				equ 1ah
+       0000001B            B    69    kr_set_dir_cluster				equ 1bh
+       0000001C            B    70    kr_get_dir_name					equ 1ch
+       0000001D            B    71    kr_wait_key_press				equ 1dh
+       0000001E            B    72    kr_get_key						equ 1eh
+                           B    73    
+       0000001F            B    74    kr_get_key_mod_flags			equ 1fh
+       00000020            B    75    kr_serial_receive_header		equ 20h
+       00000021            B    76    kr_serial_receive_file			equ 21h
+       00000022            B    77    kr_serial_send_file				equ 22h
+       00000023            B    78    kr_serial_tx_byte				equ 23h
+       00000024            B    79    kr_serial_rx_byte				equ 24h
+                           B    80    
+       00000025            B    81    kr_print_string					equ 25h
+       00000026            B    82    kr_clear_screen					equ 26h
+       00000027            B    83    kr_wait_vrt						equ 27h
+       00000028            B    84    kr_set_cursor_position			equ 28h
+       00000029            B    85    kr_plot_char					equ 29h
+       0000002A            B    86    kr_set_pen						equ 2ah
+       0000002B            B    87    kr_background_colours			equ 2bh
+       0000002C            B    88    kr_draw_cursor					equ 2ch
+       0000002D            B    89    kr_get_pen						equ 2dh
+       0000002E            B    90    kr_scroll_up					equ 2eh
+       0000002F            B    91    kr_os_display					equ 2fh
+       00000030            B    92    kr_get_display_size				equ 30h
+       00000031            B    93    kr_get_charmap_addr_xy			equ 31h
+       00000032            B    94    kr_get_cursor_position			equ 32h
+                           B    95    
+       00000033            B    96    kr_set_envar					equ 33h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)16-Dec-10     15:27:10     page:   3
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+       00000034            B    97    kr_get_envar					equ 34h
+       00000035            B    98    kr_delete_envar					equ 35h
+                           B    99    
+       00000036            B   100    kr_enable_mouse					equ 36h
+       00000037            B   101    kr_get_mouse_position			equ 37h
+       00000038            B   102    kr_get_mouse_disp				equ 38h
+                           B   103    
+       00000039            B   104    kr_timer_wait					equ 39h
+       0000003A            B   105    kr_compare_strings				equ 3ah
+       0000003B            B   106    kr_hex_byte_to_ascii			equ 3bh
+       0000003C            B   107    kr_ascii_to_hex_word			equ 3ch
+       0000003D            B   108    kr_wait_for_typed_string		equ 3dh
+                           B   109    
+       0000003E            B   110    kr_get_version					equ 3eh
+       0000003F            B   111    kr_dont_store_registers			equ 3fh
+                           B   112    
+                           B   113    ;----------------------------------------------
+                           B   114    ; Standard PROSE executable header
+                           B   115    ;----------------------------------------------
+                           B   116    
+                           B   117    
+                           B   118    	IF ADL_mode = 0
+                           B   119    		org load_location&0ffffh	; if Z80 mo
+                           B   120    	ELSE
+010000                     B   121    		org load_location			; otherwise
+                           B   122    	ENDIF
+                           B   123    	
+                           B   124    		.assume ADL = 1				; All PROSE
+                           B   125    
+010000 18 0E               B   126    		jr skip_header				; $0 - Jump
+010002 50524F              B   127    		db 'PRO'					; $2 - ASCI
+010005 000001              B   128    mb_loc	dw24 load_location			; $5 - Desi
+010008 000000              B   129    		dw24 0						; $8 - If >
+01000B 0000                B   130    		dw 0						; $B - If >
+01000D 0000                B   131    		dw 0						; $D - If >
+01000F 01                  B   132    		db ADL_mode					; $F - Z80 
+                           B   133    
+010010                     B   134    skip_header
+                           B   135    	
+                           B   136    	IF ADL_mode = 0 
+                           B   137    		
+                           B   138    mbase_offset equ load_location & 0ff0000h
+                           B   139    
+                           B   140    		ld a,load_location/65536	; Additiona
+                           B   141    		ld MB,a						; Set MBASE
+                           B   142    		jp.sis go_z80_mode			; switches 
+                           B   143    
+                           B   144    go_z80_mode
+                           B   145    
+                           B   146    		.assume ADL = 0
+                           B   147    
+                           B   148    	ENDIF
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)16-Dec-10     15:27:10     page:   4
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+                           B   149    	
+                           B   150    ;----------------------------------------------
+                           B   151    	
+                           A     9    
+                           A    10    ;----------------------------------------------
+                           A    11    ; ADL-mode user program follows..
+                           A    12    ;----------------------------------------------
+                           A    13    
+010010 21 3A 00 01         A    14    		ld hl,message_txt				; ADL m
+010014 3E25                A    15    		ld a,kr_print_string			; desir
+010016 5BCD0808 00         A    16    		call.lil prose_kernal			; call 
+                           A    17    
+01001B 3E1D                A    18    myloop	ld a,kr_wait_key_press
+01001D 5BCD0808 00         A    19    		call.lil prose_kernal
+010022 FE76                A    20    		cp 76h
+010024 28 0E               A    21    		jr z,endit
+010026 21 48 00 01         A    22    		ld hl,char
+01002A 70                  A    23    		ld (hl),b
+01002B 3E25                A    24    		ld a,kr_print_string
+01002D 5BCD0808 00         A    25    		call.lil prose_kernal
+010032 18 E7               A    26    		jr myloop
+                           A    27    		
+010034 AF                  A    28    endit	xor a
+010035 5BC30408 00         A    29    		jp.lil prose_return				; back 
+                           A    30    
+                           A    31    ;----------------------------------------------
+                           A    32    
+01003A                     A    33    message_txt
+                           A    34    
+01003A 54797065 20737475   A    35    		db 'Type stuff! ',11,0
+010042 66662120 0B00 
+                           A    36    
+010048 0000                A    37    char	db 0,0
+                           A    38    ;----------------------------------------------
+                           A    39    		
+                           A    40    		
+
+
+Errors: 0
+Warnings: 0
+Lines Assembled: 192
