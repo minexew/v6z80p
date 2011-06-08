@@ -1,0 +1,489 @@
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   1
+
+
+PC     Object              I  Line    Source 
+                           A     1    ;----------------------------------------------
+                           A     2    ; Convert Amiga hardware values from Z80 Protra
+                           A     3    ; and writes to hardware registers
+                           A     4    ;----------------------------------------------
+                           A     5    ;
+                           A     6    ; V1.02 - Z80 mode (non-ADL code) for HW v0037
+                           A     7    ; Writes tracker channel 0 to HW01
+                           A     8    ;    					 1 to HW23
+                           A     9    ;                        2 to HW45
+                           A    10    ;                        3 to HW67
+                           A    11    ;----------------------------------------------
+                           A    12    
+                           A    13    .assume ADL = 0
+                           A    14    
+       00000000            A    15    firstchan_period	equ channel_data+period_lo
+-----ERROR (405) Label "channel_data" not defined
+-----ERROR (405) Label "period_lo" not defined
+       00000000            A    16    firstchan_volume	equ channel_data+volume
+-----ERROR (405) Label "volume" not defined
+       00000000            A    17    firstchan_location	equ channel_data+samp_loc_l
+-----ERROR (405) Label "samp_loc_lo" not defined
+       00000000            A    18    firstchan_length	equ channel_data+samp_len_l
+-----ERROR (405) Label "samp_len_lo" not defined
+       00000000            A    19    firstchan_control	equ channel_data+control_bi
+-----ERROR (405) Label "control_bits" not defined
+       00000000            A    20    firstchan_loop_loc	equ channel_data+samp_loop_
+-----ERROR (405) Label "samp_loop_loc_lo" not defined
+       00000000            A    21    firstchan_loop_len	equ channel_data+samp_loop_
+-----ERROR (405) Label "samp_loop_len_lo" not defined
+                           A    22    
+       00000000            A    23    secondchan_period	equ channel_data+vars_per_c
+-----ERROR (405) Label "vars_per_channel" not defined
+       00000000            A    24    secondchan_volume	equ channel_data+vars_per_c
+       00000000            A    25    secondchan_location	equ channel_data+vars_per_c
+       00000000            A    26    secondchan_length	equ channel_data+vars_per_c
+       00000000            A    27    secondchan_control	equ channel_data+vars_per_c
+       00000000            A    28    secondchan_loop_loc	equ channel_data+vars_per_c
+       00000000            A    29    secondchan_loop_len	equ channel_data+vars_per_c
+                           A    30    
+       00000000            A    31    thirdchan_period	equ channel_data+(vars_per_
+       00000000            A    32    thirdchan_volume	equ channel_data+(vars_per_
+       00000000            A    33    thirdchan_location	equ channel_data+(vars_per_
+       00000000            A    34    thirdchan_length	equ channel_data+(vars_per_
+       00000000            A    35    thirdchan_control	equ channel_data+(vars_per_
+       00000000            A    36    thirdchan_loop_loc	equ channel_data+(vars_per_
+       00000000            A    37    thirdchan_loop_len	equ channel_data+(vars_per_
+                           A    38    
+       00000000            A    39    fourthchan_period	equ channel_data+(vars_per_
+       00000000            A    40    fourthchan_volume	equ channel_data+(vars_per_
+       00000000            A    41    fourthchan_location	equ channel_data+(vars_per_
+       00000000            A    42    fourthchan_length	equ channel_data+(vars_per_
+       00000000            A    43    fourthchan_control	equ channel_data+(vars_per_
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   2
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+       00000000            A    44    fourthchan_loop_loc	equ channel_data+(vars_per_
+       00000000            A    45    fourthchan_loop_len	equ channel_data+(vars_per_
+                           A    46    
+                           A    47    ;----------------------------------------------
+                           A    48    ; EZ80P specific code
+                           A    49    ;----------------------------------------------
+                           A    50    
+000000                     A    51    update_audio_hardware
+                           A    52    
+000000 3E01                A    53    				ld a,1
+000002 5B32 03 00 00       A    54    				ld.lil (hw_audio_registers+3),a
+-----ERROR (405) Label "hw_audio_registers" not defined
+000007 0E 00               A    55    				ld c,port_hw_flags
+-----ERROR (405) Label "port_hw_flags" not defined
+000009 ED7440              A    56    wait_audreg		tstio 40h						00000C 28 FB               A    57    				jr z,wait_audreg
+                           A    58    				
+00000E 3EFF                A    59    				ld a,0ffh						000010 5B32 00 00 00       A    60    				ld.lil (hw_palette),a			-----ERROR (405) Label "hw_palette" not defined
+                           A    61    				
+                           A    62    ;----------------------------------------------
+                           A    63    ; Write Period Constants - must be done in max 
+                           A    64    ;----------------------------------------------
+                           A    65    								
+000015 5BDD21 00 00 00     A    66    				ld.lil ix,hw_audio_registers	00001B 5BFD21 80 00 00     A    67    				ld.lil iy,hw_audio_registers+80
+                           A    68    				
+000021 11 2B 01            A    69    				ld de,period_conv_table-200		000024 2A 00 00            A    70    				ld hl,(firstchan_period)	  	000027 29                  A    71    				add hl,hl
+000028 19                  A    72    				add hl,de
+000029 5E                  A    73    				ld e,(hl)
+00002A 23                  A    74    				inc hl
+00002B 56                  A    75    				ld d,(hl)
+00002C 5BDD1F08            A    76    				ld.lil (ix+08h),de				000030 5BDD1F28            A    77    				ld.lil (ix+28h),de				                           A    78    				
+000034 11 2B 01            A    79    				ld de,period_conv_table-200		000037 2A 00 00            A    80    				ld hl,(secondchan_period)	  	00003A 29                  A    81    				add hl,hl
+00003B 19                  A    82    				add hl,de
+00003C 5E                  A    83    				ld e,(hl)
+00003D 23                  A    84    				inc hl
+00003E 56                  A    85    				ld d,(hl)
+00003F 5BDD1F48            A    86    				ld.lil (ix+48h),de				000043 5BDD1F68            A    87    				ld.lil (ix+68h),de				                           A    88    		
+000047 11 2B 01            A    89    				ld de,period_conv_table-200		00004A 2A 00 00            A    90    				ld hl,(thirdchan_period)	  	00004D 29                  A    91    				add hl,hl
+00004E 19                  A    92    				add hl,de
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   3
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+00004F 5E                  A    93    				ld e,(hl)
+000050 23                  A    94    				inc hl
+000051 56                  A    95    				ld d,(hl)
+000052 5BFD1F08            A    96    				ld.lil (iy+08h),de				000056 5BFD1F28            A    97    				ld.lil (iy+28h),de				                           A    98    
+00005A 11 2B 01            A    99    				ld de,period_conv_table-200		00005D 2A 00 00            A   100    				ld hl,(fourthchan_period)	  	000060 29                  A   101    				add hl,hl
+000061 19                  A   102    				add hl,de
+000062 5E                  A   103    				ld e,(hl)
+000063 23                  A   104    				inc hl
+000064 56                  A   105    				ld d,(hl)
+000065 5BFD1F48            A   106    				ld.lil (iy+48h),de				000069 5BFD1F68            A   107    				ld.lil (iy+68h),de				                           A   108    
+                           A   109    ;----------------------------------------------
+                           A   110    ; Write Volume
+                           A   111    ;----------------------------------------------
+                           A   112    
+                           A   113    
+00006D 3A 00 00            A   114    				ld a,(firstchan_volume)			000070 1E00                A   115    				ld e,0
+000072 5BDD1F0C            A   116    				ld.lil (ix+0ch),de				000076 1E00                A   117    				ld e,0
+000078 5BDD1F2C            A   118    				ld.lil (ix+2ch),de				                           A   119    				
+00007C 3A 00 00            A   120    				ld a,(secondchan_volume)
+00007F 1E00                A   121    				ld e,0
+000081 5BDD1F4C            A   122    				ld.lil (ix+4ch),de				000085 1E00                A   123    				ld e,0
+000087 5BDD1F6C            A   124    				ld.lil (ix+6ch),de
+                           A   125    				
+00008B 3A 00 00            A   126    				ld a,(thirdchan_volume)
+00008E 1E00                A   127    				ld e,0
+000090 5BFD1F0C            A   128    				ld.lil (iy+0ch),de				000094 1E00                A   129    				ld e,0
+000096 5BFD1F2C            A   130    				ld.lil (iy+2ch),de
+                           A   131    				
+00009A 3A 00 00            A   132    				ld a,(fourthchan_volume)
+00009D 5F                  A   133    				ld e,a
+00009E 5BFD1F4C            A   134    				ld.lil (iy+4ch),de				0000A2 5F                  A   135    				ld e,a
+0000A3 5BFD1F6C            A   136    				ld.lil (iy+6ch),de
+                           A   137    
+                           A   138    ;----------------------------------------------
+                           A   139    ; Write Loc and Len of triggered channels
+                           A   140    ;----------------------------------------------
+                           A   141    
+0000A7 21 00 00            A   142    				ld hl,firstchan_control			0000AA CB46                A   143    				bit 0,(hl)						0000AC 28 4A               A   144    				jr z,no_rt_ch0					Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   4
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+0000AE CB86                A   145    				res 0,(hl)
+0000B0 5B210000 00         A   146    				ld.lil hl,0
+0000B5 2A 00 00            A   147    				ld hl,(firstchan_location)
+0000B8 4929                A   148    				add.l hl,hl
+0000BA 5BDD2F00            A   149    				ld.lil (ix),hl					0000BE 5BDD2F20            A   150    				ld.lil (ix+20h),hl				0000C2 5B210000 00         A   151    				ld.lil hl,0
+0000C7 2A 00 00            A   152    				ld hl,(firstchan_loop_loc)
+0000CA 4929                A   153    				add.l hl,hl
+0000CC 5BDD2F10            A   154    				ld.lil (ix+10h),hl				0000D0 5BDD2F30            A   155    				ld.lil (ix+30h),hl				0000D4 5B210000 00         A   156    				ld.lil hl,0
+0000D9 2A 00 00            A   157    				ld hl,(firstchan_length)
+0000DC 4929                A   158    				add.l hl,hl
+0000DE 5BDD2F04            A   159    				ld.lil (ix+04h),hl				0000E2 5BDD2F24            A   160    				ld.lil (ix+24h),hl				0000E6 5B210000 00         A   161    				ld.lil hl,0
+0000EB 2A 00 00            A   162    				ld hl,(firstchan_loop_len)
+0000EE 4929                A   163    				add.l hl,hl
+0000F0 5BDD2F14            A   164    				ld.lil (ix+14h),hl				0000F4 5BDD2F34            A   165    				ld.lil (ix+34h),hl				0000F8                     A   166    no_rt_ch0
+0000F8 21 00 00            A   167    				ld hl,secondchan_control
+0000FB CB46                A   168    				bit 0,(hl)
+0000FD 28 4A               A   169    				jr z,no_rt_ch1
+0000FF CB86                A   170    				res 0,(hl)
+000101 5B210000 00         A   171    				ld.lil hl,0
+000106 2A 00 00            A   172    				ld hl,(secondchan_location)
+000109 4929                A   173    				add.l hl,hl
+00010B 5BDD2F40            A   174    				ld.lil (ix+40h),hl				00010F 5BDD2F60            A   175    				ld.lil (ix+60h),hl				000113 5B210000 00         A   176    				ld.lil hl,0
+000118 2A 00 00            A   177    				ld hl,(secondchan_loop_loc)
+00011B 4929                A   178    				add.l hl,hl
+00011D 5BDD2F50            A   179    				ld.lil (ix+50h),hl				000121 5BDD2F70            A   180    				ld.lil (ix+70h),hl				000125 5B210000 00         A   181    				ld.lil hl,0
+00012A 2A 00 00            A   182    				ld hl,(secondchan_length)
+00012D 4929                A   183    				add.l hl,hl
+00012F 5BDD2F44            A   184    				ld.lil (ix+44h),hl				000133 5BDD2F64            A   185    				ld.lil (ix+64h),hl				000137 5B210000 00         A   186    				ld.lil hl,0
+00013C 2A 00 00            A   187    				ld hl,(secondchan_loop_len)		00013F 4929                A   188    				add.l hl,hl
+000141 5BDD2F54            A   189    				ld.lil (ix+54h),hl				000145 5BDD2F74            A   190    				ld.lil (ix+74h),hl
+                           A   191    
+000149                     A   192    no_rt_ch1
+                           A   193    								
+000149 21 00 00            A   194    				ld hl,thirdchan_control
+00014C CB46                A   195    				bit 0,(hl)
+00014E 28 4A               A   196    				jr z,no_rt_ch2
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   5
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+000150 CB86                A   197    				res 0,(hl)
+000152 5B210000 00         A   198    				ld.lil hl,0
+000157 2A 00 00            A   199    				ld hl,(thirdchan_location)
+00015A 4929                A   200    				add.l hl,hl
+00015C 5BFD2F00            A   201    				ld.lil (iy),hl		
+000160 5BFD2F20            A   202    				ld.lil (iy+20h),hl
+000164 5B210000 00         A   203    				ld.lil hl,0
+000169 2A 00 00            A   204    				ld hl,(thirdchan_loop_loc)
+00016C 4929                A   205    				add.l hl,hl
+00016E 5BFD2F10            A   206    				ld.lil (iy+10h),hl		
+000172 5BFD2F30            A   207    				ld.lil (iy+30h),hl	
+000176 5B210000 00         A   208    				ld.lil hl,0				
+00017B 2A 00 00            A   209    				ld hl,(thirdchan_length)
+00017E 4929                A   210    				add.l hl,hl
+000180 5BFD2F04            A   211    				ld.lil (iy+04h),hl	
+000184 5BFD2F24            A   212    				ld.lil (iy+24h),hl	
+000188 5B210000 00         A   213    				ld.lil hl,0
+00018D 2A 00 00            A   214    				ld hl,(thirdchan_loop_len)
+000190 4929                A   215    				add.l hl,hl
+000192 5BFD2F14            A   216    				ld.lil (iy+14h),hl		
+000196 5BFD2F34            A   217    				ld.lil (iy+34h),hl	
+00019A                     A   218    no_rt_ch2
+                           A   219    
+00019A 21 00 00            A   220    				ld hl,fourthchan_control
+00019D CB46                A   221    				bit 0,(hl)
+00019F 28 4A               A   222    				jr z,no_rt_ch3
+0001A1 CB86                A   223    				res 0,(hl)
+0001A3 5B210000 00         A   224    				ld.lil hl,0
+0001A8 2A 00 00            A   225    				ld hl,(fourthchan_location)
+0001AB 4929                A   226    				add.l hl,hl
+0001AD 5BFD2F40            A   227    				ld.lil (iy+40h),hl		
+0001B1 5BFD2F60            A   228    				ld.lil (iy+60h),hl	
+0001B5 5B210000 00         A   229    				ld.lil hl,0
+0001BA 2A 00 00            A   230    				ld hl,(fourthchan_loop_loc)
+0001BD 4929                A   231    				add.l hl,hl
+0001BF 5BFD2F50            A   232    				ld.lil (iy+50h),hl	
+0001C3 5BFD2F70            A   233    				ld.lil (iy+70h),hl	
+0001C7 5B210000 00         A   234    				ld.lil hl,0
+0001CC 2A 00 00            A   235    				ld hl,(fourthchan_length)
+0001CF 4929                A   236    				add.l hl,hl
+0001D1 5BFD2F44            A   237    				ld.lil (iy+44h),hl		
+0001D5 5BFD2F64            A   238    				ld.lil (iy+64h),hl	
+0001D9 5B210000 00         A   239    				ld.lil hl,0
+0001DE 2A 00 00            A   240    				ld hl,(fourthchan_loop_len)
+0001E1 4929                A   241    				add.l hl,hl
+0001E3 5BFD2F54            A   242    				ld.lil (iy+54h),hl		
+0001E7 5BFD2F74            A   243    				ld.lil (iy+74h),hl	
+0001EB                     A   244    no_rt_ch3
+                           A   245    
+0001EB 3E00                A   246    				ld a,0h							0001ED 5B32 00 00 00       A   247    				ld.lil (hw_palette),a			                           A   248    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   6
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+0001F2 C9                  A   249    				ret
+                           A   250    	
+                           A   251    ;----------------------------------------------
+                           A   252    ; Table for equivalent EZ80P constants to Amiga
+                           A   253    ;----------------------------------------------
+                           A   254    ;
+                           A   255    ; Formula: (1/48828) / ((1/3579545) * period) *
+                           A   256    ;
+                           A   257    ; Starts at Amiga period 100, one 16-bit consta
+                           A   258    
+0001F3                     A   259    period_conv_table:
+                           A   260    
+0001F3 ABBBD0B9 FDB734B6   A   261                    db 0ABh,0BBh,0D0h,0B9h,0FDh,0B7
+0001FB 74B4BCB2 0CB164AF 
+000203 C5AD2DAC 9CAA12A9   A   262                    db 0C5h,0ADh,02Dh,0ACh,09Ch,0AA
+00020B 90A714A6 9FA431A3 
+000213 C9A167A0 0B9FB59D   A   263                    db 0C9h,0A1h,067h,0A0h,00Bh,09F
+00021B 649C199B D4999498 
+000223 59972396 F294C593   A   264                    db 059h,097h,023h,096h,0F2h,094
+00022B 9E927B91 5C90428F 
+000233 2C8E1B8D 0D8C048B   A   265                    db 02Ch,08Eh,01Bh,08Dh,00Dh,08C
+00023B FE89FC88 FE870487 
+000243 0D861985 29843D83   A   266                    db 00Dh,086h,019h,085h,029h,084
+00024B 53826D81 8A80AA7F 
+000253 CE7EF47D 1D7D497C   A   267                    db 0CEh,07Eh,0F4h,07Dh,01Dh,07D
+00025B 777BA97A DD791479 
+000263 4D788977 C7760876   A   268                    db 04Dh,078h,089h,077h,0C7h,076
+00026B 4B759074 D8732273 
+000273 6F72BD71 0E716070   A   269                    db 06Fh,072h,0BDh,071h,00Eh,071
+00027B B56F0C6F 656EBF6D 
+000283 1C6D7B6C DB6B3D6B   A   270                    db 01Ch,06Dh,07Bh,06Ch,0DBh,06B
+00028B A16A076A 6E69D868 
+000293 4368AF67 1D678D66   A   271                    db 043h,068h,0AFh,067h,01Dh,067
+00029B FE657165 E6645B64 
+0002A3 D3634C63 C6624162   A   272                    db 0D3h,063h,04Ch,063h,0C6h,062
+0002AB BE613D61 BC603D60 
+0002B3 C05F435F C85E4E5E   A   273                    db 0C0h,05Fh,043h,05Fh,0C8h,05E
+0002BB D55D5E5D E85C725C 
+0002C3 FE5B8C5B 1A5BA95A   A   274                    db 0FEh,05Bh,08Ch,05Bh,01Ah,05B
+0002CB 3A5ACB59 5E59F158 
+0002D3 86581B58 B2574A57   A   275                    db 086h,058h,01Bh,058h,0B2h,057
+0002DB E2567C56 1656B155 
+0002E3 4E55EB54 89542854   A   276                    db 04Eh,055h,0EBh,054h,089h,054
+0002EB C8536853 0A53AC52 
+0002F3 4F52F351 98513E51   A   277                    db 04Fh,052h,0F3h,051h,098h,051
+0002FB E4508B50 3350DC4F 
+000303 854F2F4F DA4E864E   A   278                    db 085h,04Fh,02Fh,04Fh,0DAh,04E
+00030B 324EDF4D 8C4D3B4D 
+000313 EA4C994C 4A4CFA4B   A   279                    db 0EAh,04Ch,099h,04Ch,04Ah,04C
+00031B AC4B5E4B 114BC54A 
+000323 794A2D4A E2499849   A   280                    db 079h,04Ah,02Dh,04Ah,0E2h,049
+00032B 4F490649 BD487548 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   7
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+000333 2E48E747 A1475B47   A   281                    db 02Eh,048h,0E7h,047h,0A1h,047
+00033B 1647D146 8D464946 
+000343 0646C445 82454045   A   282                    db 006h,046h,0C4h,045h,082h,045
+00034B FF44BE44 7E443E44 
+000353 FF43C043 82434443   A   283                    db 0FFh,043h,0C0h,043h,082h,043
+00035B 0643C942 8C425042 
+000363 1442D941 9E416441   A   284                    db 014h,042h,0D9h,041h,09Eh,041
+00036B 2941F040 B6407D40 
+000373 45400D40 D53F9E3F   A   285                    db 045h,040h,00Dh,040h,0D5h,03F
+00037B 673F303F FA3EC43E 
+000383 8E3E593E 243EF03D   A   286                    db 08Eh,03Eh,059h,03Eh,024h,03E
+00038B BB3D883D 543D213D 
+000393 EE3CBC3C 8A3C583C   A   287                    db 0EEh,03Ch,0BCh,03Ch,08Ah,03C
+00039B 263CF53B C43B943B 
+0003A3 633B333B 043BD43A   A   288                    db 063h,03Bh,033h,03Bh,004h,03B
+0003AB A53A763A 483A1A3A 
+0003B3 EC39BE39 91396439   A   289                    db 0ECh,039h,0BEh,039h,091h,039
+0003BB 37390B39 DE38B238 
+0003C3 87385B38 30380538   A   290                    db 087h,038h,05Bh,038h,030h,038
+0003CB DA37B037 86375C37 
+0003D3 32370937 DF36B636   A   291                    db 032h,037h,009h,037h,0DFh,036
+0003DB 8E366536 3D361536 
+0003E3 ED35C635 9E357735   A   292                    db 0EDh,035h,0C6h,035h,09Eh,035
+0003EB 50352A35 0335DD34 
+0003F3 B7349134 6C344634   A   293                    db 0B7h,034h,091h,034h,06Ch,034
+0003FB 2134FC33 D733B333 
+000403 8E336A33 46332233   A   294                    db 08Eh,033h,06Ah,033h,046h,033
+00040B FF32DC32 B8329532 
+000413 73325032 2D320B32   A   295                    db 073h,032h,050h,032h,02Dh,032
+00041B E931C731 A6318431 
+000423 63314131 20310031   A   296                    db 063h,031h,041h,031h,020h,031
+00042B DF30BE30 9E307E30 
+000433 5E303E30 1E30FF2F   A   297                    db 05Eh,030h,03Eh,030h,01Eh,030
+00043B E02FC02F A12F832F 
+000443 642F452F 272F092F   A   298                    db 064h,02Fh,045h,02Fh,027h,02F
+00044B EA2ECD2E AF2E912E 
+000453 742E562E 392E1C2E   A   299                    db 074h,02Eh,056h,02Eh,039h,02E
+00045B FF2DE22D C62DA92D 
+000463 8D2D702D 542D382D   A   300                    db 08Dh,02Dh,070h,02Dh,054h,02D
+00046B 1D2D012D E52CCA2C 
+000473 AF2C932C 782C5D2C   A   301                    db 0AFh,02Ch,093h,02Ch,078h,02C
+00047B 432C282C 0D2CF32B 
+000483 D92BBF2B A52B8B2B   A   302                    db 0D9h,02Bh,0BFh,02Bh,0A5h,02B
+00048B 712B572B 3E2B242B 
+000493 0B2BF22A D82ABF2A   A   303                    db 00Bh,02Bh,0F2h,02Ah,0D8h,02A
+00049B A72A8E2A 752A5D2A 
+0004A3 442A2C2A 142AFC29   A   304                    db 044h,02Ah,02Ch,02Ah,014h,02A
+0004AB E429CC29 B4299C29 
+0004B3 85296D29 56293F29   A   305                    db 085h,029h,06Dh,029h,056h,029
+0004BB 27291029 F928E328 
+0004C3 CC28B528 9F288828   A   306                    db 0CCh,028h,0B5h,028h,09Fh,028
+0004CB 72285C28 45282F28 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   8
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+0004D3 19280328 EE27D827   A   307                    db 019h,028h,003h,028h,0EEh,027
+0004DB C227AD27 97278227 
+0004E3 6D275827 43272E27   A   308                    db 06Dh,027h,058h,027h,043h,027
+0004EB 19270427 EF26DA26 
+0004F3 C626B126 9D268926   A   309                    db 0C6h,026h,0B1h,026h,09Dh,026
+0004FB 75266026 4C263826 
+000503 25261126 FD25E925   A   310                    db 025h,026h,011h,026h,0FDh,025
+00050B D625C225 AF259C25 
+000513 88257525 62254F25   A   311                    db 088h,025h,075h,025h,062h,025
+00051B 3C252925 16250425 
+000523 F124DE24 CC24B924   A   312                    db 0F1h,024h,0DEh,024h,0CCh,024
+00052B A7249524 83247024 
+000533 5E244C24 3A242924   A   313                    db 05Eh,024h,04Ch,024h,03Ah,024
+00053B 17240524 F323E223 
+000543 D023BF23 AD239C23   A   314                    db 0D0h,023h,0BFh,023h,0ADh,023
+00054B 8B237A23 68235723 
+000553 46233523 24231423   A   315                    db 046h,023h,035h,023h,024h,023
+00055B 0323F222 E222D122 
+000563 C122B022 A0228F22   A   316                    db 0C1h,022h,0B0h,022h,0A0h,022
+00056B 7F226F22 5F224F22 
+000573 3F222F22 1F220F22   A   317                    db 03Fh,022h,02Fh,022h,01Fh,022
+00057B FF21EF21 E021D021 
+000583 C121B121 A2219221   A   318                    db 0C1h,021h,0B1h,021h,0A2h,021
+00058B 83217321 64215521 
+000593 46213721 28211921   A   319                    db 046h,021h,037h,021h,028h,021
+00059B 0A21FB20 EC20DE20 
+0005A3 CF20C020 B220A320   A   320                    db 0CFh,020h,0C0h,020h,0B2h,020
+0005AB 94208620 78206920 
+0005B3 5B204D20 3E203020   A   321                    db 05Bh,020h,04Dh,020h,03Eh,020
+0005BB 22201420 0620F81F 
+0005C3 EA1FDC1F CF1FC11F   A   322                    db 0EAh,01Fh,0DCh,01Fh,0CFh,01F
+0005CB B31FA51F 981F8A1F 
+0005D3 7D1F6F1F 621F541F   A   323                    db 07Dh,01Fh,06Fh,01Fh,062h,01F
+0005DB 471F3A1F 2C1F1F1F 
+0005E3 121F051F F81EEA1E   A   324                    db 012h,01Fh,005h,01Fh,0F8h,01E
+0005EB DD1ED01E C41EB71E 
+0005F3 AA1E9D1E 901E841E   A   325                    db 0AAh,01Eh,09Dh,01Eh,090h,01E
+0005FB 771E6A1E 5E1E511E 
+000603 451E381E 2C1E1F1E   A   326                    db 045h,01Eh,038h,01Eh,02Ch,01E
+00060B 131E071E FA1DEE1D 
+000613 E21DD61D CA1DBD1D   A   327                    db 0E2h,01Dh,0D6h,01Dh,0CAh,01D
+00061B B11DA51D 991D8D1D 
+000623 821D761D 6A1D5E1D   A   328                    db 082h,01Dh,076h,01Dh,06Ah,01D
+00062B 521D471D 3B1D2F1D 
+000633 241D181D 0D1D011D   A   329                    db 024h,01Dh,018h,01Dh,00Dh,01D
+00063B F61CEA1C DF1CD41C 
+000643 C81CBD1C B21CA61C   A   330                    db 0C8h,01Ch,0BDh,01Ch,0B2h,01C
+00064B 9B1C901C 851C7A1C 
+000653 6F1C641C 591C4E1C   A   331                    db 06Fh,01Ch,064h,01Ch,059h,01C
+00065B 431C381C 2D1C221C 
+000663 181C0D1C 021CF81B   A   332                    db 018h,01Ch,00Dh,01Ch,002h,01C
+00066B ED1BE21B D81BCD1B 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:   9
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+000673 C31BB81B AE1BA31B   A   333                    db 0C3h,01Bh,0B8h,01Bh,0AEh,01B
+00067B 991B8E1B 841B7A1B 
+000683 6F1B651B 5B1B511B   A   334                    db 06Fh,01Bh,065h,01Bh,05Bh,01B
+00068B 471B3C1B 321B281B 
+000693 1E1B141B 0A1B001B   A   335                    db 01Eh,01Bh,014h,01Bh,00Ah,01B
+00069B F61AEC1A E31AD91A 
+0006A3 CF1AC51A BB1AB21A   A   336                    db 0CFh,01Ah,0C5h,01Ah,0BBh,01A
+0006AB A81A9E1A 951A8B1A 
+0006B3 811A781A 6E1A651A   A   337                    db 081h,01Ah,078h,01Ah,06Eh,01A
+0006BB 5B1A521A 481A3F1A 
+0006C3 361A2C1A 231A1A1A   A   338                    db 036h,01Ah,02Ch,01Ah,023h,01A
+0006CB 101A071A FE19F519 
+0006D3 EB19E219 D919D019   A   339                    db 0EBh,019h,0E2h,019h,0D9h,019
+0006DB C719BE19 B519AC19 
+0006E3 A3199A19 91198819   A   340                    db 0A3h,019h,09Ah,019h,091h,019
+0006EB 7F197619 6E196519 
+0006F3 5C195319 4A194219   A   341                    db 05Ch,019h,053h,019h,04Ah,019
+0006FB 39193019 28191F19 
+000703 16190E19 0519FD18   A   342                    db 016h,019h,00Eh,019h,005h,019
+00070B F418EC18 E318DB18 
+000713 D318CA18 C218B918   A   343                    db 0D3h,018h,0CAh,018h,0C2h,018
+00071B B118A918 A0189818 
+000723 90188818 80187718   A   344                    db 090h,018h,088h,018h,080h,018
+00072B 6F186718 5F185718 
+000733 4F184718 3F183718   A   345                    db 04Fh,018h,047h,018h,03Fh,018
+00073B 2F182718 1F181718 
+000743 0F180718 FF17F717   A   346                    db 00Fh,018h,007h,018h,0FFh,017
+00074B F017E817 E017D817 
+000753 D017C917 C117B917   A   347                    db 0D0h,017h,0C9h,017h,0C1h,017
+00075B B217AA17 A2179B17 
+000763 93178C17 84177D17   A   348                    db 093h,017h,08Ch,017h,084h,017
+00076B 75176D17 66175F17 
+000773 57175017 48174117   A   349                    db 057h,017h,050h,017h,048h,017
+00077B 3A173217 2B172417 
+000783 1C171517 0E170617   A   350                    db 01Ch,017h,015h,017h,00Eh,017
+00078B FF16F816 F116EA16 
+000793 E316DB16 D416CD16   A   351                    db 0E3h,016h,0DBh,016h,0D4h,016
+00079B C616BF16 B816B116 
+0007A3 AA16A316 9C169516   A   352                    db 0AAh,016h,0A3h,016h,09Ch,016
+0007AB 8E168716 80167916 
+0007B3 72166C16 65165E16   A   353                    db 072h,016h,06Ch,016h,065h,016
+0007BB 57165016 49164316 
+0007C3 3C163516 2E162816   A   354                    db 03Ch,016h,035h,016h,02Eh,016
+0007CB 21161A16 14160D16 
+0007D3 06160016 F915F315   A   355                    db 006h,016h,000h,016h,0F9h,015
+0007DB EC15E615 DF15D915 
+0007E3 D215CC15 C515BF15   A   356                    db 0D2h,015h,0CCh,015h,0C5h,015
+0007EB B815B215 AB15A515 
+0007F3 9F159815 92158B15   A   357                    db 09Fh,015h,098h,015h,092h,015
+0007FB 85157F15 79157215 
+000803 6C156615 5F155915   A   358                    db 06Ch,015h,066h,015h,05Fh,015
+00080B 53154D15 47154015 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)02-Feb-11     23:10:02     page:  10
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\PROTRA~3\src\Amiga_to_ez80p_audio_stereo.asm
+000813 3A153415 2E152815   A   359                    db 03Ah,015h,034h,015h,02Eh,015
+00081B 22151C15 16151015 
+000823 0A150415 FE14F814   A   360                    db 00Ah,015h,004h,015h,0FEh,014
+00082B F214EC14 E614E014 
+000833 DA14D414 CE14C814   A   361                    db 0DAh,014h,0D4h,014h,0CEh,014
+00083B C214BC14 B614B114 
+000843 AB14A514 9F149914   A   362                    db 0ABh,014h,0A5h,014h,09Fh,014
+00084B 93148E14 88148214 
+000853 7C147714 71146B14   A   363                    db 07Ch,014h,077h,014h,071h,014
+00085B 66146014 5A145514 
+000863 4F144914 44143E14   A   364                    db 04Fh,014h,049h,014h,044h,014
+00086B 39143314 2E142814 
+000873 22141D14 17141214   A   365                    db 022h,014h,01Dh,014h,017h,014
+00087B 0C140714 0114FC13 
+000883 F713F113 EC13E613   A   366                    db 0F7h,013h,0F1h,013h,0ECh,013
+00088B E113DC13 D613D113 
+000893 CB13C613 C113       A   367                    db 0CBh,013h,0C6h,013h,0C1h,013
+                           A   368    				
+                           A   369    				
+                           A   370    ;----------------------------------------------
+                           A   371    ; EZ80P specific code ends
+                           A   372    ;----------------------------------------------
+                           A   373    
+
+
+Errors: 12
+Warnings: 0
+Lines Assembled: 374

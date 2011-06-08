@@ -1,0 +1,707 @@
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   1
+
+
+PC     Object              I  Line    Source 
+                           A     1    ; test sprites
+                           A     2    
+                           A     3    ;----------------------------------------------
+                           A     4    
+       00000001            A     5    ADL_mode		equ 1				; 0 if user
+       00010000            A     6    load_location	equ 10000h			; anywhere 
+                           A     7    
+                           B     0    				include	'PROSE_header.asm'
+                           B     1    ;--- EZ80 Internal CPU Ports ------------------
+                           B     2    
+       0000009A            B     3    PB_DR			equ 09ah
+       0000009B            B     4    PB_DDR			equ 09bh
+       0000009C            B     5    PB_ALT1			equ 09ch
+       0000009D            B     6    PB_ALT2			equ 09dh
+                           B     7    
+       0000009E            B     8    PC_DR			equ 09eh
+       0000009F            B     9    PC_DDR			equ 09fh
+       000000A0            B    10    PC_ALT1			equ 0a0h
+       000000A1            B    11    PC_ALT2			equ 0a1h
+                           B    12    
+       000000A2            B    13    PD_DR			equ 0a2h
+       000000A3            B    14    PD_DDR			equ 0a3h
+       000000A4            B    15    PD_ALT1			equ 0a4h
+       000000A5            B    16    PD_ALT2			equ 0a5h
+                           B    17    
+       000000C0            B    18    UART0_RBR		equ 0c0h
+       000000C0            B    19    UART0_THR		equ 0c0h
+       000000C0            B    20    UART0_BRG_L		equ 0c0h
+       000000C1            B    21    UART0_BRG_H		equ 0c1h
+       000000C1            B    22    UART0_IER		equ 0c1h
+       000000C2            B    23    UART0_FCTL		equ 0c2h
+       000000C3            B    24    UART0_LCTL		equ 0c3h
+       000000C4            B    25    UART0_MCTL		equ 0c4h
+       000000C5            B    26    UART0_LSR		equ 0c5h
+                           B    27    
+       000000A8            B    28    CS0_LBR			equ 0a8h			;eZ80 wait 
+       000000A9            B    29    CS0_UBR			equ 0a9h
+       000000AA            B    30    CS0_CTL			equ 0aah			
+       000000AB            B    31    CS1_LBR			equ 0abh			;eZ80 wait 
+       000000AC            B    32    CS1_UBR			equ 0ach
+       000000AD            B    33    CS1_CTL			equ 0adh
+       000000AE            B    34    CS2_LBR			equ 0aeh			;eZ80 wait 
+       000000AF            B    35    CS2_UBR			equ 0afh
+       000000B0            B    36    CS2_CTL			equ 0b0h
+       000000B1            B    37    CS3_LBR			equ 0b1h			;eZ80 wait 
+       000000B2            B    38    CS3_UBR			equ 0b2h
+       000000B3            B    39    CS3_CTL			equ 0b3h
+                           B    40    
+       00000080            B    41    TMR0_CTL		equ 080h			;timer 0 eq
+       00000081            B    42    TMR0_DR_L		equ 081h
+       00000081            B    43    TMR0_RR_L		equ 081h
+       00000082            B    44    TMR0_DR_H		equ 082h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   2
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+       00000082            B    45    TMR0_RR_H		equ 082h
+       00000092            B    46    TMR_ISS			equ 092h
+                           B    47    
+       000000ED            B    48    RTC_CTRL		equ 0edh			;RTC equate
+       000000EC            B    49    RTC_ACTRL		equ 0ech
+       000000E0            B    50    RTC_SEC			equ 0e0h
+       000000E1            B    51    RTC_MIN			equ 0e1h
+       000000E2            B    52    RTC_HRS			equ 0e2h
+       000000E3            B    53    RTC_DOW			equ 0e3h
+       000000E4            B    54    RTC_DOM			equ 0e4h
+       000000E5            B    55    RTC_MON			equ 0e5h
+       000000E6            B    56    RTC_YR			equ 0e6h
+       000000E7            B    57    RTC_CEN			equ 0e7h
+                           B    58    
+                           B    59    ;-- EZ80P Hardware equates --------------------
+                           B    60    
+       00000000            B    61    port_pic_data  			equ 000h
+       00000001            B    62    port_pic_ctrl			equ 001h
+       00000001            B    63    port_hw_flags			equ 001h
+       00000002            B    64    port_sdc_ctrl			equ 002h	; this is a
+       00000002            B    65    port_keyboard_data		equ 002h
+       00000003            B    66    port_sdc_data		 	equ 003h	
+       00000004            B    67    port_memory_paging		equ 004h
+       00000005            B    68    port_irq_ctrl			equ 005h
+       00000006            B    69    port_nmi_ack			equ 006h
+       00000007            B    70    port_ps2_ctrl			equ 007h
+       00000008            B    71    port_selector			equ 008h
+       00000006            B    72    port_mouse_data			equ 006h
+                           B    73    
+                           B    74    
+       00000040            B    75    port_video_mode			equ 040h
+                           B    76    
+                           B    77    
+       00000000            B    78    sdc_power				equ 0		;(port_sd_c
+       00000001            B    79    sdc_cs					equ 1		;(port_sd_c
+       00000002            B    80    sdc_speed				equ 2 		;(port_sd_c
+                           B    81    
+       00000004            B    82    sdc_serializer_busy		equ 4 		;(port_hw_f
+       00000005            B    83    vrt						equ 5		;(port_hw_f
+                           B    84    
+                           B    85    
+                           B    86    ;-- Memory locations --------------------------
+                           B    87    
+       00800000            B    88    hw_vram_a			equ 0800000h
+       00F00000            B    89    hw_palette			equ 0f00000h
+       00F80000            B    90    hw_audio_registers 	equ 0f80000h
+                           B    91    
+                           B    92    ;----------------------------------------------
+                           B    93    
+                           B    94    
+       00000A00            B    95    os_start 	equ 0a00h
+                           B    96    
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   3
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+       00000A14            B    97    prose_return equ os_start+14h
+       00000A20            B    98    prose_kernal equ os_start+20h
+                           B    99    
+                           B   100    ;----------------------------------------------
+                           B   101    ; Kernal Jump Table values for mode PROSE
+                           B   102    ;----------------------------------------------
+                           B   103    		
+       00000000            B   104    kr_mount_volumes				equ 00h	
+       00000001            B   105    kr_get_device_info				equ 01h	
+       00000002            B   106    kr_check_volume_format			equ 02h	
+       00000003            B   107    kr_change_volume				equ 03h	
+       00000004            B   108    kr_get_volume_info				equ 04h	
+       00000005            B   109    kr_format_device				equ 05h	
+       00000006            B   110    kr_make_dir						equ 06h
+                           B   111    
+       00000007            B   112    kr_change_dir					equ 07h	
+       00000008            B   113    kr_parent_dir					equ 08h	
+       00000009            B   114    kr_root_dir						equ 09h
+       0000000A            B   115    kr_delete_dir					equ 0ah
+       0000000B            B   116    kr_find_file					equ 0bh
+       0000000C            B   117    kr_set_file_pointer				equ 0ch
+       0000000D            B   118    kr_set_load_length				equ 0dh
+       0000000E            B   119    kr_read_file					equ 0eh
+                           B   120    
+       0000000F            B   121    kr_erase_file					equ 0fh
+       00000010            B   122    kr_rename_file					equ 10h
+       00000011            B   123    kr_create_file					equ 11h
+       00000012            B   124    kr_write_file					equ 12h
+       00000013            B   125    kr_get_total_sectors			equ 13h
+       00000014            B   126    kr_dir_list_first_entry			equ 14h
+       00000015            B   127    kr_dir_list_get_entry			equ 15h
+       00000016            B   128    kr_dir_list_next_entry			equ 16h
+                           B   129    
+       00000017            B   130    kr_read_sector					equ 17h
+       00000018            B   131    kr_write_sector					equ 18h
+       00000019            B   132    kr_file_sector_list				equ 19h
+       0000001A            B   133    kr_get_dir_cluster				equ 1ah
+       0000001B            B   134    kr_set_dir_cluster				equ 1bh
+       0000001C            B   135    kr_get_dir_name					equ 1ch
+       0000001D            B   136    kr_wait_key						equ 1dh
+       0000001E            B   137    kr_get_key						equ 1eh
+                           B   138    
+       0000001F            B   139    kr_get_key_mod_flags			equ 1fh
+       00000020            B   140    kr_serial_receive_header		equ 20h
+       00000021            B   141    kr_serial_receive_file			equ 21h
+       00000022            B   142    kr_serial_send_file				equ 22h
+       00000023            B   143    kr_serial_tx_byte				equ 23h
+       00000024            B   144    kr_serial_rx_byte				equ 24h
+                           B   145    
+       00000025            B   146    kr_print_string					equ 25h
+       00000026            B   147    kr_clear_screen					equ 26h
+       00000027            B   148    kr_wait_vrt						equ 27h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   4
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+       00000028            B   149    kr_set_cursor_position			equ 28h
+       00000029            B   150    kr_plot_char					equ 29h
+       0000002A            B   151    kr_set_pen						equ 2ah
+       0000002B            B   152    kr_background_colours			equ 2bh
+       0000002C            B   153    kr_draw_cursor					equ 2ch
+       0000002D            B   154    kr_get_pen						equ 2dh
+       0000002E            B   155    kr_scroll_up					equ 2eh
+       0000002F            B   156    kr_os_display					equ 2fh
+       00000030            B   157    kr_get_display_size				equ 30h
+       00000031            B   158    kr_get_charmap_addr_xy			equ 31h
+       00000032            B   159    kr_get_cursor_position			equ 32h
+                           B   160    
+       00000033            B   161    kr_set_envar					equ 33h
+       00000034            B   162    kr_get_envar					equ 34h
+       00000035            B   163    kr_delete_envar					equ 35h
+                           B   164    
+       00000036            B   165    kr_enable_mouse					equ 36h
+       00000037            B   166    kr_get_mouse_position			equ 37h
+       00000038            B   167    kr_get_mouse_disp				equ 38h
+                           B   168    
+       00000039            B   169    kr_time_delay					equ 39h
+       0000003A            B   170    kr_compare_strings				equ 3ah
+       0000003B            B   171    kr_hex_byte_to_ascii			equ 3bh
+       0000003C            B   172    kr_ascii_to_hex_word			equ 3ch
+       0000003D            B   173    kr_get_string					equ 3dh
+                           B   174    
+       0000003E            B   175    kr_get_version					equ 3eh
+       0000003F            B   176    kr_dont_store_registers			equ 3fh
+       00000040            B   177    kr_os_video_settings			equ 40h
+       00000041            B   178    kr_read_rtc						equ 41h
+       00000042            B   179    kr_write_rtc					equ 42h
+                           B   180    
+                           B   181    ;----------------------------------------------
+                           B   182    ; Standard PROSE executable header
+                           B   183    ;----------------------------------------------
+                           B   184    
+                           B   185    
+                           B   186    	IF ADL_mode = 0
+                           B   187    		org load_location&0ffffh	; if Z80 mo
+                           B   188    	ELSE
+010000                     B   189    		org load_location			; otherwise
+                           B   190    	ENDIF
+                           B   191    	
+                           B   192    		.assume ADL = 1				; All PROSE
+                           B   193    
+010000 18 0E               B   194    		jr skip_header				; $0 - Jump
+010002 50524F              B   195    		db 'PRO'					; $2 - ASCI
+010005 000001              B   196    mb_loc	dw24 load_location			; $5 - Desi
+010008 000000              B   197    		dw24 0						; $8 - If >
+01000B 0000                B   198    		dw 0						; $B - If >
+01000D 0000                B   199    		dw 0						; $D - If >
+01000F 01                  B   200    		db ADL_mode					; $F - Z80 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   5
+
+
+PC     Object              I  Line    Source ..\..\includes\PROSE_header.asm
+                           B   201    
+010010                     B   202    skip_header
+                           B   203    	
+                           B   204    	IF ADL_mode = 0 
+                           B   205    		
+                           B   206    mbase_offset equ load_location & 0ff0000h
+                           B   207    
+                           B   208    		ld a,load_location/65536	; Additiona
+                           B   209    		ld MB,a						; Set MBASE
+                           B   210    		jp.sis go_z80_mode			; switches 
+                           B   211    
+                           B   212    go_z80_mode
+                           B   213    
+                           B   214    		.assume ADL = 0
+                           B   215    
+                           B   216    	ENDIF
+                           B   217    	
+                           B   218    ;----------------------------------------------
+                           B   219    	
+                           A     9    
+                           A    10    ;----------------------------------------------
+                           A    11    ; ADL-mode user program follows..
+                           A    12    ;----------------------------------------------
+                           A    13    
+010010 21 68 05 01         A    14    			ld hl,message_txt				; A
+010014 3E25                A    15    			ld a,kr_print_string			; d
+010016 5BCD200A 00         A    16    			call.lil prose_kernal			; c
+                           A    17    			
+01001B CD 2A 00 01         A    18    			call test_code
+                           A    19    
+01001F 3E01                A    20    			ld a,1
+010021 ED3940              A    21    			out0 (port_video_mode),a		; e
+010024 AF                  A    22    			xor a
+010025 5BC3140A 00         A    23    			jp.lil prose_return				; b
+                           A    24    
+                           A    25    ;----------------------------------------------
+                           A    26    ; Test code
+                           A    27    ;----------------------------------------------
+                           A    28    
+       00F40000            A    29    sprite_registers	equ 0f40000h
+                           A    30    
+01002A                     A    31    test_code
+                           A    32    			
+01002A 21 E8 04 01         A    33    			ld hl,colours
+01002E 112000F0            A    34    			ld de,hw_palette+(16*2)
+010032 01800000            A    35    			ld bc,64*2
+010036 EDB0                A    36    			ldir
+                           A    37    
+010038 3E03                A    38    			ld a,3
+01003A ED3940              A    39    			out0 (port_video_mode),a		; e
+                           A    40    
+                           A    41    ;----------------------------------------------
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   6
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+                           A    42    
+01003D ED3801              A    43    waitvrt1	in0 a,(port_hw_flags)
+010040 CB6F                A    44    			bit 5,a
+010042 28 F9               A    45    			jr z,waitvrt1
+010044 ED3801              A    46    waitvrt2	in0 a,(port_hw_flags)
+010047 CB6F                A    47    			bit 5,a
+010049 20 F9               A    48    			jr nz,waitvrt2
+                           A    49    
+                           A    50    ;----------------------------------------------
+                           A    51    			
+01004B 3A E2 02 01         A    52    			ld a,(sine)
+01004F 57                  A    53    			ld d,a
+010050 3A E3 02 01         A    54    			ld a,(cosine)
+010054 5F                  A    55    			ld e,a
+                           A    56    
+010055 3E07                A    57    			ld a,7
+010057 DD21 AA 02 01       A    58    			ld ix,xcoord1
+                           A    59    			
+01005C 21000000            A    60    makecoords	ld hl,0
+010060 6A                  A    61    			ld l,d
+010061 29                  A    62    			add hl,hl
+010062 01 E8 02 01         A    63    			ld bc,sine_table
+010066 09                  A    64    			add hl,bc
+010067 ED27                A    65    			ld hl,(hl)
+010069 01900100            A    66    			ld bc,400
+01006D 09                  A    67    			add hl,bc
+01006E DD7500              A    68    			ld (ix),l
+010071 DD7401              A    69    			ld (ix+1),h
+                           A    70    			
+010074 21000000            A    71    			ld hl,0
+010078 6B                  A    72    			ld l,e
+010079 29                  A    73    			add hl,hl
+01007A 01 E8 02 01         A    74    			ld bc,sine_table
+01007E 09                  A    75    			add hl,bc
+01007F ED27                A    76    			ld hl,(hl)
+010081 01F00000            A    77    			ld bc,240
+010085 09                  A    78    			add hl,bc
+010086 DD7502              A    79    			ld (ix+2),l
+010089 DD7403              A    80    			ld (ix+3),h
+                           A    81    			
+01008C F5                  A    82    			push af
+01008D 7B                  A    83    			ld a,e
+01008E C60F                A    84    			add a,15
+010090 5F                  A    85    			ld e,a
+010091 7A                  A    86    			ld a,d
+010092 C614                A    87    			add a,20
+010094 57                  A    88    			ld d,a
+010095 ED3208              A    89    			lea ix,ix+8
+                           A    90    
+010098 F1                  A    91    			pop af
+010099 3D                  A    92    			dec a
+01009A 20 C0               A    93    			jr nz,makecoords
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   7
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+                           A    94    
+01009C 3A E2 02 01         A    95    			ld a,(sine)
+0100A0 C602                A    96    			add a,2
+0100A2 32 E2 02 01         A    97    			ld (sine),a
+0100A6 3A E3 02 01         A    98    			ld a,(cosine)
+0100AA D601                A    99    			sub a,1
+0100AC 32 E3 02 01         A   100    			ld (cosine),a
+                           A   101    			
+0100B0 2A E5 02 01         A   102    			ld hl,(frame_base)
+0100B4 11400200            A   103    			ld de,96*6
+0100B8 19                  A   104    			add hl,de
+0100B9 E5                  A   105    			push hl
+0100BA 11C00F00            A   106    			ld de,96*6*7
+0100BE AF                  A   107    			xor a
+0100BF ED52                A   108    			sbc hl,de
+0100C1 E1                  A   109    			pop hl
+0100C2 20 04               A   110    			jr nz,noanlp
+0100C4 21000000            A   111    			ld hl,0
+0100C8 22 E5 02 01         A   112    noanlp		ld (frame_base),hl
+0100CC DD21 AE 02 01       A   113    			ld ix,def1
+0100D1 0607                A   114    			ld b,7
+0100D3 DD7500              A   115    anim1		ld (ix),l
+0100D6 DD7401              A   116    			ld (ix+1),h
+0100D9 ED3208              A   117    			lea ix,ix+8
+0100DC 10 F5               A   118    			djnz anim1
+                           A   119    			
+                           A   120    			
+                           A   121    ;----------------------------------------------
+                           A   122    		
+0100DE DD210000 F4         A   123    			ld ix,sprite_registers
+0100E3 3E06                A   124    			ld a,6
+0100E5 2A AA 02 01         A   125    			ld hl,(xcoord1)
+0100E9 ED5B AE 02 01       A   126    			ld de,(def1)
+0100EE DD7500              A   127    boing1lp	ld (ix),l
+0100F1 DD7401              A   128    			ld (ix+1),h
+0100F4 ED4B AC 02 01       A   129    			ld bc,(ycoord1)
+0100F9 DD7102              A   130    			ld (ix+2),c
+0100FC DD7003              A   131    			ld (ix+3),b
+0100FF ED4B B0 02 01       A   132    			ld bc,(height_ctrl1)
+010104 DD7104              A   133    			ld (ix+4),c
+010107 DD7005              A   134    			ld (ix+5),b
+01010A DD7306              A   135    			ld (ix+6),e
+01010D DD7207              A   136    			ld (ix+7),d
+010110 ED3208              A   137    			lea ix,ix+8
+010113 01100000            A   138    			ld bc,16
+010117 09                  A   139    			add hl,bc
+010118 01600000            A   140    			ld bc,96
+01011C EB                  A   141    			ex de,hl
+01011D 09                  A   142    			add hl,bc
+01011E EB                  A   143    			ex de,hl
+01011F 3D                  A   144    			dec a
+010120 20 CC               A   145    			jr nz,boing1lp
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   8
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+                           A   146    
+010122 3E06                A   147    			ld a,6
+010124 2A B2 02 01         A   148    			ld hl,(xcoord2)
+010128 ED5B B6 02 01       A   149    			ld de,(def2)
+01012D DD7500              A   150    boing2lp	ld (ix),l
+010130 DD7401              A   151    			ld (ix+1),h
+010133 ED4B B4 02 01       A   152    			ld bc,(ycoord2)
+010138 DD7102              A   153    			ld (ix+2),c
+01013B DD7003              A   154    			ld (ix+3),b
+01013E ED4B B8 02 01       A   155    			ld bc,(height_ctrl2)
+010143 DD7104              A   156    			ld (ix+4),c
+010146 DD7005              A   157    			ld (ix+5),b
+010149 DD7306              A   158    			ld (ix+6),e
+01014C DD7207              A   159    			ld (ix+7),d
+01014F ED3208              A   160    			lea ix,ix+8
+010152 01100000            A   161    			ld bc,16
+010156 09                  A   162    			add hl,bc
+010157 01600000            A   163    			ld bc,96
+01015B EB                  A   164    			ex de,hl
+01015C 09                  A   165    			add hl,bc
+01015D EB                  A   166    			ex de,hl
+01015E 3D                  A   167    			dec a
+01015F 20 CC               A   168    			jr nz,boing2lp
+                           A   169    			
+010161 3E06                A   170    			ld a,6
+010163 2A BA 02 01         A   171    			ld hl,(xcoord3)
+010167 ED5B BE 02 01       A   172    			ld de,(def3)
+01016C DD7500              A   173    boing3lp	ld (ix),l
+01016F DD7401              A   174    			ld (ix+1),h
+010172 ED4B BC 02 01       A   175    			ld bc,(ycoord3)
+010177 DD7102              A   176    			ld (ix+2),c
+01017A DD7003              A   177    			ld (ix+3),b
+01017D ED4B C0 02 01       A   178    			ld bc,(height_ctrl3)
+010182 DD7104              A   179    			ld (ix+4),c
+010185 DD7005              A   180    			ld (ix+5),b
+010188 DD7306              A   181    			ld (ix+6),e
+01018B DD7207              A   182    			ld (ix+7),d
+01018E ED3208              A   183    			lea ix,ix+8
+010191 01100000            A   184    			ld bc,16
+010195 09                  A   185    			add hl,bc
+010196 01600000            A   186    			ld bc,96
+01019A EB                  A   187    			ex de,hl
+01019B 09                  A   188    			add hl,bc
+01019C EB                  A   189    			ex de,hl
+01019D 3D                  A   190    			dec a
+01019E 20 CC               A   191    			jr nz,boing3lp		
+                           A   192    			
+0101A0 3E06                A   193    			ld a,6
+0101A2 2A C2 02 01         A   194    			ld hl,(xcoord4)
+0101A6 ED5B C6 02 01       A   195    			ld de,(def4)
+0101AB DD7500              A   196    boing4lp	ld (ix),l
+0101AE DD7401              A   197    			ld (ix+1),h
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:   9
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+0101B1 ED4B C4 02 01       A   198    			ld bc,(ycoord4)
+0101B6 DD7102              A   199    			ld (ix+2),c
+0101B9 DD7003              A   200    			ld (ix+3),b
+0101BC ED4B C8 02 01       A   201    			ld bc,(height_ctrl4)
+0101C1 DD7104              A   202    			ld (ix+4),c
+0101C4 DD7005              A   203    			ld (ix+5),b
+0101C7 DD7306              A   204    			ld (ix+6),e
+0101CA DD7207              A   205    			ld (ix+7),d
+0101CD ED3208              A   206    			lea ix,ix+8
+0101D0 01100000            A   207    			ld bc,16
+0101D4 09                  A   208    			add hl,bc
+0101D5 01600000            A   209    			ld bc,96
+0101D9 EB                  A   210    			ex de,hl
+0101DA 09                  A   211    			add hl,bc
+0101DB EB                  A   212    			ex de,hl
+0101DC 3D                  A   213    			dec a
+0101DD 20 CC               A   214    			jr nz,boing4lp			
+                           A   215    			
+0101DF 3E06                A   216    			ld a,6
+0101E1 2A CA 02 01         A   217    			ld hl,(xcoord5)
+0101E5 ED5B CE 02 01       A   218    			ld de,(def5)
+0101EA DD7500              A   219    boing5lp	ld (ix),l
+0101ED DD7401              A   220    			ld (ix+1),h
+0101F0 ED4B CC 02 01       A   221    			ld bc,(ycoord5)
+0101F5 DD7102              A   222    			ld (ix+2),c
+0101F8 DD7003              A   223    			ld (ix+3),b
+0101FB ED4B D0 02 01       A   224    			ld bc,(height_ctrl5)
+010200 DD7104              A   225    			ld (ix+4),c
+010203 DD7005              A   226    			ld (ix+5),b
+010206 DD7306              A   227    			ld (ix+6),e
+010209 DD7207              A   228    			ld (ix+7),d
+01020C ED3208              A   229    			lea ix,ix+8
+01020F 01100000            A   230    			ld bc,16
+010213 09                  A   231    			add hl,bc
+010214 01600000            A   232    			ld bc,96
+010218 EB                  A   233    			ex de,hl
+010219 09                  A   234    			add hl,bc
+01021A EB                  A   235    			ex de,hl
+01021B 3D                  A   236    			dec a
+01021C 20 CC               A   237    			jr nz,boing5lp			
+                           A   238    			
+01021E 3E06                A   239    			ld a,6
+010220 2A D2 02 01         A   240    			ld hl,(xcoord6)
+010224 ED5B D6 02 01       A   241    			ld de,(def6)
+010229 DD7500              A   242    boing6lp	ld (ix),l
+01022C DD7401              A   243    			ld (ix+1),h
+01022F ED4B D4 02 01       A   244    			ld bc,(ycoord6)
+010234 DD7102              A   245    			ld (ix+2),c
+010237 DD7003              A   246    			ld (ix+3),b
+01023A ED4B D8 02 01       A   247    			ld bc,(height_ctrl6)
+01023F DD7104              A   248    			ld (ix+4),c
+010242 DD7005              A   249    			ld (ix+5),b
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:  10
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+010245 DD7306              A   250    			ld (ix+6),e
+010248 DD7207              A   251    			ld (ix+7),d
+01024B ED3208              A   252    			lea ix,ix+8
+01024E 01100000            A   253    			ld bc,16
+010252 09                  A   254    			add hl,bc
+010253 01600000            A   255    			ld bc,96
+010257 EB                  A   256    			ex de,hl
+010258 09                  A   257    			add hl,bc
+010259 EB                  A   258    			ex de,hl
+01025A 3D                  A   259    			dec a
+01025B 20 CC               A   260    			jr nz,boing6lp			
+                           A   261    			
+                           A   262    			
+01025D 3E06                A   263    			ld a,6
+01025F 2A DA 02 01         A   264    			ld hl,(xcoord7)
+010263 ED5B DE 02 01       A   265    			ld de,(def7)
+010268 DD7500              A   266    boing7lp	ld (ix),l
+01026B DD7401              A   267    			ld (ix+1),h
+01026E ED4B DC 02 01       A   268    			ld bc,(ycoord7)
+010273 DD7102              A   269    			ld (ix+2),c
+010276 DD7003              A   270    			ld (ix+3),b
+010279 ED4B E0 02 01       A   271    			ld bc,(height_ctrl7)
+01027E DD7104              A   272    			ld (ix+4),c
+010281 DD7005              A   273    			ld (ix+5),b
+010284 DD7306              A   274    			ld (ix+6),e
+010287 DD7207              A   275    			ld (ix+7),d
+01028A ED3208              A   276    			lea ix,ix+8
+01028D 01100000            A   277    			ld bc,16
+010291 09                  A   278    			add hl,bc
+010292 01600000            A   279    			ld bc,96
+010296 EB                  A   280    			ex de,hl
+010297 09                  A   281    			add hl,bc
+010298 EB                  A   282    			ex de,hl
+010299 3D                  A   283    			dec a
+01029A 20 CC               A   284    			jr nz,boing7lp
+                           A   285    
+01029C 3E1E                A   286    			ld a,kr_get_key
+01029E 5BCD200A 00         A   287    			call.lil prose_kernal
+0102A3 FE76                A   288    			cp 76h
+0102A5 C2 3D 00 01         A   289    			jp nz,waitvrt1
+0102A9 C9                  A   290    			ret
+                           A   291    
+                           A   292    ;----------------------------------------------
+                           A   293    			
+                           A   294    		
+0102AA 0000                A   295    xcoord1			dw 0
+0102AC 0000                A   296    ycoord1			dw 0
+0102AE 0000                A   297    def1			dw 0
+0102B0 6000                A   298    height_ctrl1	dw 96
+                           A   299    
+0102B2 0000                A   300    xcoord2			dw 0
+0102B4 0000                A   301    ycoord2			dw 0
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:  11
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+0102B6 0000                A   302    def2			dw 0
+0102B8 6000                A   303    height_ctrl2	dw 96
+                           A   304    
+0102BA 0000                A   305    xcoord3			dw 0
+0102BC 0000                A   306    ycoord3			dw 0
+0102BE 0000                A   307    def3			dw 0
+0102C0 6000                A   308    height_ctrl3	dw 96
+                           A   309    
+0102C2 0000                A   310    xcoord4			dw 0
+0102C4 0000                A   311    ycoord4			dw 0
+0102C6 0000                A   312    def4			dw 0
+0102C8 6000                A   313    height_ctrl4	dw 96
+                           A   314    
+0102CA 0000                A   315    xcoord5			dw 0
+0102CC 0000                A   316    ycoord5			dw 0
+0102CE 0000                A   317    def5			dw 0
+0102D0 6000                A   318    height_ctrl5	dw 96
+                           A   319    
+0102D2 0000                A   320    xcoord6			dw 0
+0102D4 0000                A   321    ycoord6			dw 0
+0102D6 0000                A   322    def6			dw 0
+0102D8 6000                A   323    height_ctrl6	dw 96
+                           A   324    
+0102DA 0000                A   325    xcoord7			dw 0
+0102DC 0000                A   326    ycoord7			dw 0
+0102DE 0000                A   327    def7			dw 0
+0102E0 6000                A   328    height_ctrl7	dw 96
+                           A   329    
+0102E2 00                  A   330    sine			db 0
+0102E3 00                  A   331    cosine			db 0
+                           A   332    
+0102E4 00                  A   333    frame_count		db 0
+0102E5 000000              A   334    frame_base		dw24 0
+                           A   335    
+0102E8                     A   336    sine_table:
+0102E8 00000500 0A000F00   A   337                    db 000h,000h,005h,000h,00Ah,000
+0102F0 14001800 1D002200 
+0102F8 27002C00 31003500   A   338                    db 027h,000h,02Ch,000h,031h,000
+010300 3A003F00 43004800 
+010308 4D005100 56005A00   A   339                    db 04Dh,000h,051h,000h,056h,000
+010310 5E006300 67006B00 
+010318 6F007300 77007B00   A   340                    db 06Fh,000h,073h,000h,077h,000
+010320 7F008300 86008A00 
+010328 8D009100 94009700   A   341                    db 08Dh,000h,091h,000h,094h,000
+010330 9B009E00 A100A400 
+010338 A600A900 AC00AE00   A   342                    db 0A6h,000h,0A9h,000h,0ACh,000
+010340 B000B300 B500B700 
+010348 B900BB00 BC00BE00   A   343                    db 0B9h,000h,0BBh,000h,0BCh,000
+010350 BF00C100 C200C300 
+010358 C400C500 C600C600   A   344                    db 0C4h,000h,0C5h,000h,0C6h,000
+010360 C700C700 C800C800 
+010368 C800C800 C800C700   A   345                    db 0C8h,000h,0C8h,000h,0C8h,000
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:  12
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+010370 C700C600 C600C500 
+010378 C400C300 C200C100   A   346                    db 0C4h,000h,0C3h,000h,0C2h,000
+010380 BF00BE00 BC00BB00 
+010388 B900B700 B500B300   A   347                    db 0B9h,000h,0B7h,000h,0B5h,000
+010390 B000AE00 AC00A900 
+010398 A600A400 A1009E00   A   348                    db 0A6h,000h,0A4h,000h,0A1h,000
+0103A0 9B009700 94009100 
+0103A8 8D008A00 86008300   A   349                    db 08Dh,000h,08Ah,000h,086h,000
+0103B0 7F007B00 77007300 
+0103B8 6F006B00 67006300   A   350                    db 06Fh,000h,06Bh,000h,067h,000
+0103C0 5E005A00 56005100 
+0103C8 4D004800 43003F00   A   351                    db 04Dh,000h,048h,000h,043h,000
+0103D0 3A003500 31002C00 
+0103D8 27002200 1D001800   A   352                    db 027h,000h,022h,000h,01Dh,000
+0103E0 14000F00 0A000500 
+0103E8 0000FBFF F6FFF1FF   A   353                    db 000h,000h,0FBh,0FFh,0F6h,0FF
+0103F0 ECFFE8FF E3FFDEFF 
+0103F8 D9FFD4FF CFFFCBFF   A   354                    db 0D9h,0FFh,0D4h,0FFh,0CFh,0FF
+010400 C6FFC1FF BDFFB8FF 
+010408 B3FFAFFF AAFFA6FF   A   355                    db 0B3h,0FFh,0AFh,0FFh,0AAh,0FF
+010410 A2FF9DFF 99FF95FF 
+010418 91FF8DFF 89FF85FF   A   356                    db 091h,0FFh,08Dh,0FFh,089h,0FF
+010420 81FF7DFF 7AFF76FF 
+010428 73FF6FFF 6CFF69FF   A   357                    db 073h,0FFh,06Fh,0FFh,06Ch,0FF
+010430 65FF62FF 5FFF5CFF 
+010438 5AFF57FF 54FF52FF   A   358                    db 05Ah,0FFh,057h,0FFh,054h,0FF
+010440 50FF4DFF 4BFF49FF 
+010448 47FF45FF 44FF42FF   A   359                    db 047h,0FFh,045h,0FFh,044h,0FF
+010450 41FF3FFF 3EFF3DFF 
+010458 3CFF3BFF 3AFF3AFF   A   360                    db 03Ch,0FFh,03Bh,0FFh,03Ah,0FF
+010460 39FF39FF 38FF38FF 
+010468 38FF38FF 38FF39FF   A   361                    db 038h,0FFh,038h,0FFh,038h,0FF
+010470 39FF3AFF 3AFF3BFF 
+010478 3CFF3DFF 3EFF3FFF   A   362                    db 03Ch,0FFh,03Dh,0FFh,03Eh,0FF
+010480 41FF42FF 44FF45FF 
+010488 47FF49FF 4BFF4DFF   A   363                    db 047h,0FFh,049h,0FFh,04Bh,0FF
+010490 50FF52FF 54FF57FF 
+010498 5AFF5CFF 5FFF62FF   A   364                    db 05Ah,0FFh,05Ch,0FFh,05Fh,0FF
+0104A0 65FF69FF 6CFF6FFF 
+0104A8 73FF76FF 7AFF7DFF   A   365                    db 073h,0FFh,076h,0FFh,07Ah,0FF
+0104B0 81FF85FF 89FF8DFF 
+0104B8 91FF95FF 99FF9DFF   A   366                    db 091h,0FFh,095h,0FFh,099h,0FF
+0104C0 A2FFA6FF AAFFAFFF 
+0104C8 B3FFB8FF BDFFC1FF   A   367                    db 0B3h,0FFh,0B8h,0FFh,0BDh,0FF
+0104D0 C6FFCBFF CFFFD4FF 
+0104D8 D9FFDEFF E3FFE8FF   A   368                    db 0D9h,0FFh,0DEh,0FFh,0E3h,0FF
+0104E0 ECFFF1FF F6FFFBFF 
+0104E8                     A   369    colours:
+0104E8 0F0B000E 000C000F   A   370                    db 00Fh,00Bh,000h,00Eh,000h,00C
+0104F0 110F110F 220F0003 
+0104F8 1108330F 220A440E   A   371                    db 011h,008h,033h,00Fh,022h,00A
+010500 440C660E 4407770C 
+Zilog eZ80 Macro Assembler Version 4.1 (10060805)12-Feb-11     21:47:20     page:  13
+
+
+PC     Object              I  Line    Source E:\MY_OWN~1\Coding\EZ80PR~1\Code\PROSEA~1\Sprites\src\test2.asm
+010508 990F0007 00040002   A   372                    db 099h,00Fh,000h,007h,000h,004
+010510 00021104 2206DD0F 
+010518 00030005 12041102   A   373                    db 000h,003h,000h,005h,012h,004
+010520 7708CC0C EE0E0000 
+010528 2204DD0E 33045506   A   374                    db 022h,004h,0DDh,00Eh,033h,004
+010530 01019909 AA0BEE0F 
+010538 22023404 DD0D8E06   A   375                    db 022h,002h,034h,004h,0DDh,00D
+010540 000AFF0F FF0FFF0F 
+010548 EE0EFF0F EE0F000F   A   376                    db 0EEh,00Eh,0FFh,00Fh,0EEh,00F
+010550 000F0003 110E220D 
+010558 770F5509 0000BB0F   A   377                    db 077h,00Fh,055h,009h,000h,000
+010560 CC0FEE0F FF0FFF0F 
+                           A   378    
+                           A   379    ;----------------------------------------------
+                           A   380    	
+010568                     A   381    message_txt
+                           A   382    
+010568 284C6F61 64207370   A   383    		db '(Load sprites to $c00000..)',11,0
+010570 72697465 7320746F 
+010578 20246330 30303030 
+010580 2E2E290B 00 
+                           A   384    
+                           A   385    
+                           A   386    ;----------------------------------------------
+                           A   387    		
+                           A   388    		
+
+
+Errors: 0
+Warnings: 0
+Lines Assembled: 608
