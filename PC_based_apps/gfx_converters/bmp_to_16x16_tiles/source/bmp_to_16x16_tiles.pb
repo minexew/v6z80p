@@ -1,14 +1,55 @@
+; This script can work in two modes.
+; If no args in command line - GUI mode.
+;
+; If 4 args in command line - command line mode.
+; Command line args:
+; - input BMP file
+; - output BIN file
+; - output PAL file
+; - format of output palette (for PAL file) '12' or '24'
+
+
+Global isGUI_Mode = 1;      ; default mode is GUI (not command line mode)
+
+; ------------------------------------------------------------
+; DoMessage Procedure
+; ------------------------------------------------------------
+  Procedure DoMessage(str1$, str2$, num)
+    If isGUI_Mode
+      ProcedureReturn MessageRequester(str1$, str2$, num)
+    Else
+      ConsoleError (str1$)
+      str2$ = ReplaceString(str2$, Chr(13),  Chr(13) + Chr(10))   ; replace 13 with 10,13 (console wants 10,13 as newline sequence)
+      ConsoleError (str2$)
+    EndIf  
+  EndProcedure
+  
+; ------------------------------------------------------------
+; Check, if we are executed in command line mode
+; ------------------------------------------------------------
+  countParams = CountProgramParameters()
+  If countParams >= 4
+    isGUI_Mode = 0
+    OpenConsole()
+  EndIf 
+      
 ; ------------------------------------------------------------
 ; Phil's Template
 ; ------------------------------------------------------------
 
-  MessageRequester("Phil's Utils..","Converts 256 Colour Windows .BMP File to linear sequence of 16x16 pixel tiles" + Chr(13) , 0)
+ DoMessage("Phil's Utils..","Converts 256 Colour Windows .BMP File to linear sequence of 16x16 pixel tiles" + Chr(13) , 0)
+
   
 ;-------------------------------------------------------------------------------------
 ; Get the source file
 ;-------------------------------------------------------------------------------------
+  If isGUI_Mode
+    srcfile$ = OpenFileRequester("Select a file","","BMP files (.bmp)|*.bmp|All Files(*.*)|*.*",0)  
+  Else
+    srcfile$ = ProgramParameter(0);    
+  EndIf
+  
 
-  srcfile$ = OpenFileRequester("Select a file","","BMP files (.bmp)|*.bmp|All Files(*.*)|*.*",0)
     
      If ReadFile(0,srcfile$) 
       sourcesize = Lof(0)                                 ; get the length of opened file
@@ -16,7 +57,7 @@
       If *SourceBuffer
        ReadData(0,*SourceBuffer, sourcesize)                ; read all data into the memory block
       Else
-       MessageRequester("BMP converter","File error" + Chr(13) , 0)
+       DoMessage("BMP converter","File error" + Chr(13) , 0)
        End
       EndIf
       CloseFile(0)
@@ -37,15 +78,15 @@
  If *SourceBuffer
 
 If PeekW(*sourcebuffer+0) <> $4d42
- MessageRequester("BMP sprite converter","Error! Not a .BMP format file" + Chr(13) , 0)
+ DoMessage("BMP sprite converter","Error! Not a .BMP format file" + Chr(13) , 0)
  End
 EndIf
 If PeekW(*sourcebuffer+28) <> 8
- MessageRequester("BMP sprite converter","Error! Must be 256 colour pic!" + Chr(13) , 0)
+ DoMessage("BMP sprite converter","Error! Must be 256 colour pic!" + Chr(13) , 0)
  End
 EndIf
 If PeekW(*sourcebuffer+30) <> 0
- MessageRequester("BMP sprite converter","Error! Pic must have no compression!" + Chr(13) , 0)
+ DoMessage("BMP sprite converter","Error! Pic must have no compression!" + Chr(13) , 0)
  End
 EndIf
 
@@ -54,7 +95,7 @@ imhei.w = PeekW(*SourceBuffer+22)
 pixelstartoffset.w = PeekW(*SourceBuffer+10)
    
 If (imwid.w & 15) <> 0 Or (imhei.w & 15) <> 0 
- MessageRequester ("BMP sprite converter","Error! Image cannot be divided evenly into 16x16 blocks"+ Chr(13) , 0)
+ DoMessage ("BMP sprite converter","Error! Image cannot be divided evenly into 16x16 blocks"+ Chr(13) , 0)
  End
 EndIf
 
@@ -76,7 +117,7 @@ srcindex.l = 0
      Next xpos
     Next ypos 
    Else
-   MessageRequester("BMP Converter","Cant create work buffer!" + Chr(13) , 0)
+   DoMessage("BMP Converter","Cant create work buffer!" + Chr(13) , 0)
    End
   EndIf
 
@@ -101,26 +142,30 @@ srcindex.l = 0
    Next blockrow
       
    Else
-   MessageRequester("BMP converter","Cant create destination buffer!" + Chr(13) , 0)
+   DoMessage("BMP converter","Cant create destination buffer!" + Chr(13) , 0)
    End
   EndIf
 
 Else
- MessageRequester("BMP converter","No Source File Selected" + Chr(13) , 0)
+ DoMessage("BMP converter","No Source File Selected" + Chr(13) , 0)
  End
 EndIf
  
  ;------------------------------------------------------------------------------------------
  ; Save the image data 
  ;------------------------------------------------------------------------------------------
-   
-  dstfile$ = SaveFileRequester("Save Tile Data As..",FileName$+"_tiles.bin","Binary (.bin)|*.bin|All files (*.*)|*.*",0)
+  If isGUI_Mode       
+    dstfile$ = SaveFileRequester("Save Tile Data As..",FileName$+"_tiles.bin","Binary (.bin)|*.bin|All files (*.*)|*.*",0)
+  Else
+    dstfile$ = ProgramParameter(1);
+  EndIf
+  
     
   If CreateFile(0,dstfile$)                      ; we create a new text file...
    WriteData(0,*DestBuffer,counter)                ; write data from the memory block into the file
    CloseFile(0)                                  ; close the previously opened file and so store the written data 
   Else
-   MessageRequester("BMP converter","Can't create file" + Chr(13) , 0)
+   DoMessage("BMP converter","Can't create file" + Chr(13) , 0)
   End
   EndIf
 
@@ -129,8 +174,13 @@ EndIf
  ;------------------------------------------------------------------------------------------
 
 pal_size.l = 0
-   
-  pal_depth$ = InputRequester("BMP converter", "12 bit ($0RGB..) or 24 bit ($RR,$GG,$BB..) palette", "12")
+
+  If isGUI_Mode    
+    pal_depth$ = InputRequester("BMP converter", "12 bit ($0RGB..) or 24 bit ($RR,$GG,$BB..) palette", "12")
+  Else
+    pal_depth$ = ProgramParameter(3);
+  EndIf
+  
  
   If pal_depth$ = "12"
    offset = 54
@@ -165,14 +215,18 @@ pal_size.l = 0
  ;------------------------------------------------------------------------------------------
  ; Save the palette
  ;------------------------------------------------------------------------------------------
-   
-  dstfile$ = SaveFileRequester("Save Palette Data As..",FileName$+"_"+pal_depth$+"bit_"+"palette.bin","Binary (.bin)|*.bin|All files (*.*)|*.*",0)
+  If isGUI_Mode
+    dstfile$ = SaveFileRequester("Save Palette Data As..",FileName$+"_"+pal_depth$+"bit_"+"palette.bin","Binary (.bin)|*.bin|All files (*.*)|*.*",0)
+  Else
+    dstfile$ = ProgramParameter(2);
+  EndIf   
+  
     
   If CreateFile(0,dstfile$)                      ; create a new file...
    WriteData(0,*DestBuffer,pal_size)              ; write data from the memory block into the file
    CloseFile(0)                                  ; close the previously opened file and so store the written data 
   Else
-   MessageRequester("BMP converter","Can't create file" + Chr(13) , 0)
+   DoMessage("BMP converter","Can't create file" + Chr(13) , 0)
   End
   EndIf
 
@@ -180,13 +234,15 @@ pal_size.l = 0
 ;Finish up
 ;----------------------------------------------------------------------------------------------
 
-MessageRequester("Phil's Utils..", "Done!" + Chr(13), 0)
+DoMessage("Phil's Utils..", "Done!" + Chr(13), 0)
 
 End 
 
-; IDE Options = PureBasic 4.30 (Windows - x86)
-; CursorPosition = 131
-; FirstLine = 111
+
+  
+; IDE Options = PureBasic 4.51 (Windows - x86)
+; ExecutableFormat = Console
+; CursorPosition = 21
 ; Folding = -
 ; EnableAsm
-; Executable = ..\..\..\V3_Z80_PROJECT\PC-Side_Tools\bmp-to-sprites\bmp-to-sprites.exe
+; Executable = ..\..\..\V3_Z80_PROJECT\PC-Side_Tools\bmp-to-sprites\bmp_to_16x16_tiles.exe
