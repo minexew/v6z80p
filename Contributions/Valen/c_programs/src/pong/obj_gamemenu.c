@@ -11,6 +11,7 @@ void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y)
     this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Move);
     this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Draw);
 
+    GameObjGameMenu_AllocateAnimObjects(this);
 }
 
 void GameObjGameMenu_Move(GameObjGameMenu* this)
@@ -58,3 +59,50 @@ void GameObjGameMenu_Draw(GameObjGameMenu* this)
     this;
 }
 
+// -----------------------------------------
+// temp quick func
+//void foo_DisplayMenuText(void)
+//{
+//}
+
+void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this)
+{
+    GameObjAnim* obj;
+    int x = 100, y = 100;
+    //byte i;
+    this;
+        
+    //x = this->gobj.x;
+    //y = this->gobj.y;
+    obj = PoolGameObj_AllocateGameObjAnim();
+    if(obj) {
+        GameObjAnim_Init(obj, x,  y);
+        obj->spr_count          = 6;
+        obj->spr_height         = 2;
+        obj->spr_def_start      = SPRITE_DEF_NUM_YOUWIN;
+        obj->spr_def_pitch      = 1;
+        GameObjAnim_ShowOnlyFirstFrame(obj);
+
+    }
+/*
+    // emerlads
+    for(i=0; i<NUM_EMERLADS; i++) {
+        obj = PoolGameObj_AllocateGameObjAnim();
+        if(obj) {
+            GameObjAnim_Init(obj, x + i*32,  y);
+            obj->spr_count          = 2;
+            obj->spr_height         = 1;
+            obj->spr_def_start      = SPRITE_DEF_NUM_EMERALD;
+            obj->spr_def_pitch      = 7;
+            //GameObjAnim_ShowOnlyFirstFrame(obj);
+            obj->spr_anim_time      = 250;
+            obj->spr_anim_frames    = 7;
+            GameObjAnim_EnableAnimation(obj, TRUE);
+
+            obj->spr_anim_def_offset = i * 256U;
+
+            this->emerlads[i] = obj;
+        }
+    }
+*/
+}
