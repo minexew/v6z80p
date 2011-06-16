@@ -13,3 +13,5 @@ void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y);
 void GameObjGameMenu_Move(GameObjGameMenu* this);
 void GameObjGameMenu_Draw(GameObjGameMenu* this);
 
+
+void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this);

@@ -1,7 +1,7 @@
 
-Logic banks:
-15 banks for v6z80p
-0 - 14
+System memory banks:
+15 logic banks for v6z80p
+(0 - 14)
 
 Used system memory buffer:
 ---------
@@ -11,7 +11,7 @@ background.c
 #define BUF_FOR_LOADING_BACKGROUND_4KB          0xXXXX
 
 
-There are 2 sytsem memory banks used:
+There are 2 sytsem memory banks (32KB+32KB) used:
 - one is main bank for code/data
 - one for music player and MOD pattern data
 
@@ -26,5 +26,5 @@ While developing Pong, my point was to:
 
 Warning!
 --------
-SDCC doesnt set all globals to zero ! (this is violation of ANSI C rulez)
-you must manualy set them 
+SDCC doesnt set all globals vars to zero ! (this is violation of ANSI C rulez)
+you must manualy set them, somewhere in C code.
