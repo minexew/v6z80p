@@ -33,6 +33,7 @@
 // vreg_sprctrl bits
 #define SPRITE_ENABLE                           1
 #define DOUBLE_BUFFER_SPRITE_REGISTER_MODE      8
+#define MATTE_MODE_ENABLE                       0x20
 
 // blit_misc bits
 #define BLITTER_MISC_ASCENDING_MODE             0x40

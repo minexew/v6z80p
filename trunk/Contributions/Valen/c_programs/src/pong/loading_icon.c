@@ -36,9 +36,9 @@ void LoadingIcon_Enable(BOOL isEnable)
 
         clear_sprite_regs();
         // show diskette icon (3 sprites)
-        set_sprite_regs(SPRITE_NUM_DISKETTE   , x,    y, 3, SPRITE_DEF_NUM_DISKETTE  , FALSE);
-        set_sprite_regs(SPRITE_NUM_DISKETTE+1 , x+16, y, 3, SPRITE_DEF_NUM_DISKETTE+3, FALSE);
-        set_sprite_regs(SPRITE_NUM_DISKETTE+2 , x+32, y, 3, SPRITE_DEF_NUM_DISKETTE+6, FALSE);
+        set_sprite_regs(SPRITE_NUM_DISKETTE   , x,    y, 3, SPRITE_DEF_NUM_DISKETTE  , FALSE, FALSE);
+        set_sprite_regs(SPRITE_NUM_DISKETTE+1 , x+16, y, 3, SPRITE_DEF_NUM_DISKETTE+3, FALSE, FALSE);
+        set_sprite_regs(SPRITE_NUM_DISKETTE+2 , x+32, y, 3, SPRITE_DEF_NUM_DISKETTE+6, FALSE, FALSE);
 
         memcpy((byte*)PALETTE, (byte*)loadingIcon.palette, 0x200);
     } else {

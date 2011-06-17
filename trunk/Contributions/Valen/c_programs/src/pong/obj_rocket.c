@@ -47,7 +47,7 @@ void GameObjRocket_Init(GameObjRocket* this, int x, int y)
 void GameObjRocket_Move(GameObjRocket* /*restrict*/ this)
 {
     char xo, xo1;   //, xo2;
-    int cur_x, cur_y, width;
+    int cur_x, /*cur_y,*/ width;
     char speed;
 
 

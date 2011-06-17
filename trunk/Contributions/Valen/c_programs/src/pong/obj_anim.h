@@ -20,6 +20,7 @@ typedef struct {
     FIXED88 spr_anim_def_offset;
     BOOL    isAnimEnabled;
     BOOL    isLoopAnim;
+    BOOL    isEnableMatteMode;
 
 } GameObjAnim;
 
@@ -27,6 +28,7 @@ typedef struct {
 // prototypes
 void GameObjAnim_Move(GameObjAnim* this);
 void GameObjAnim_Draw(GameObjAnim* this);
+void GameObjAnim_EnableMatteMode(GameObjAnim* this, BOOL isEnable);
 // private
 void GameObjAnim_init_animation(GameObjAnim* this);
 
