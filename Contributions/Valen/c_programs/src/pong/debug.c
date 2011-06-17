@@ -45,7 +45,7 @@ void Debug_Draw(void)
             // BUG: when spr num 61
             set_sprite_regs(SPRITE_NUM_DEBUG_POINT1, x, y, 1,
                             /*SPRITE_DEF_NUM_DEBUG_POINT1*/ SPRITE_DEF_NUM_DIGIT,
-                            FALSE);
+                            FALSE, FALSE);
             return;
         }
     }

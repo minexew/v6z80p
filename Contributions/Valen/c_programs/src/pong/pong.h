@@ -66,6 +66,11 @@ typedef struct {
     byte shadow_sprite_register_bank;
 //    byte max_score_per_round;
     word global_time;       // frames counter - (50Hz)
+
+    struct {
+        BYTE    mm__vreg_sprctrl;
+    } regsdata;
+
 } game_t;
 
 
@@ -94,6 +99,8 @@ void Game_Movebat(char input);
 BOOL Game_LoadSinTable(void);
 
 void Game_MarkFrameTime(ushort color);
+void Game_SetReg_SprCtrl(BYTE r);
+BYTE Game_ReadReg_SprCtrl(void);
 
 
 #endif /* PONG_H */

@@ -20,8 +20,6 @@ void initgraph(void)
 
     clear_sprite_regs();
 
-    // Enable sprites
-    mm__vreg_sprctrl = SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE;
 
     // reset to zero , vertical scroll value (for both playfields)
     mm__vreg_yhws_bplcount = 0;         //pf A
@@ -32,6 +30,15 @@ void initgraph(void)
     game.isFLOSVideoMode = FALSE;
 
 }
+
+/*
+void Sprites_EnableSprites(BYTE flags1)
+{
+    // Enable sprites
+    mm__vreg_sprctrl = flags1 | SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE | MATTE_MODE_ENABLE;
+}
+*/
+
 
 void clear_sprite_regs(void)
 {
@@ -86,7 +93,7 @@ void DrawBat(int x1,int y1,int x2,int y2)
         y1 = SPRITE_Y_OFFSCREEN;
 
     spr_height = 2;
-    set_sprite_regs(num_bat, x1-4,  y1, spr_height, spr_def, x_flip);
+    set_sprite_regs(num_bat, x1-4,  y1, spr_height, spr_def, x_flip, FALSE);
 
 }
 
@@ -105,7 +112,7 @@ void DrawBall(int x_center,int y_center)
     if(ball1.state == DIE)
         y_center = SPRITE_Y_OFFSCREEN;
 
-    set_sprite_regs(SPRITE_NUM_BALL, x_center,  y_center, spr_height, spr_def, FALSE);
+    set_sprite_regs(SPRITE_NUM_BALL, x_center,  y_center, spr_height, spr_def, FALSE, FALSE);
 
 }
 
@@ -132,7 +139,7 @@ void DrawBall(int x_center,int y_center)
 }
 
 
-void set_sprite_regs(byte sprite_number, int x, int y, byte height, word sprite_definition_number, BOOL x_flip)
+void set_sprite_regs(byte sprite_number, int x, int y, byte height, word sprite_definition_number, BOOL x_flip, BOOL isEnableMatteMode)
 {
     byte reg_misc = 0;
 
@@ -150,6 +157,7 @@ void set_sprite_regs(byte sprite_number, int x, int y, byte height, word sprite_
                ((x_flip&1) << 3)                                    |
                (height << 4)
                ;
+    if(isEnableMatteMode) reg_misc |= 0x40;
     set_sprite_regs_hw(sprite_number,
                              (byte)x,
                              reg_misc,

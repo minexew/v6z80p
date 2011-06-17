@@ -55,7 +55,7 @@
 #define BUF_FOR_LOADING_SPRITES_4KB          0xF000
 
 // bank is 0 or 1
-#define SET_LIVE_SPRITE_REGISTER_BANK(b)     mm__vreg_sprctrl = SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE|((b)<<2);
+#define SET_LIVE_SPRITE_REGISTER_BANK(b)     Game_SetReg_SprCtrl( Game_ReadReg_SprCtrl() & (~4) | ((b)<<2) );
 
 
 
@@ -64,11 +64,12 @@
 //#define GET_WORD_9TH_BIT(v) ( ((word)v>>8) & 1 )
 
 void initgraph(void);
+//void Sprites_EnableSprites(BYTE flags1);
 void clear_sprite_regs(void);
 void DrawBat(int x1,int y1,int x2,int y2);
 void DrawBall(int x_center,int y_center);
 
-void set_sprite_regs(byte sprite_number, int x, int y, byte height, word sprite_definition_number, BOOL x_flip);
+void set_sprite_regs(byte sprite_number, int x, int y, byte height, word sprite_definition_number, BOOL x_flip, BOOL isEnableMatteMode);
 void set_sprite_regs_hw(byte sprite_number, byte x, byte misc, byte y, byte sprite_definition_number);
 
 BOOL load_sprites(void);

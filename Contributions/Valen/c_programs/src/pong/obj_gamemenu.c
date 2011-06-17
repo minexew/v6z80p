@@ -52,6 +52,8 @@ void GameObjGameMenu_Move(GameObjGameMenu* this)
             Game_RequestSetState(MENU);
         }
     }
+
+    GameObjGameMenu_MoveAnimObjects(this);
 }
 
 void GameObjGameMenu_Draw(GameObjGameMenu* this)
@@ -61,16 +63,14 @@ void GameObjGameMenu_Draw(GameObjGameMenu* this)
 
 // -----------------------------------------
 // temp quick func
-//void foo_DisplayMenuText(void)
-//{
-//}
-
+GameObjAnim* menuTxt1;
 void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this)
 {
     GameObjAnim* obj;
     int x = 100, y = 100;
     //byte i;
     this;
+
         
     //x = this->gobj.x;
     //y = this->gobj.y;
@@ -84,25 +84,23 @@ void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this)
         GameObjAnim_ShowOnlyFirstFrame(obj);
 
     }
-/*
-    // emerlads
-    for(i=0; i<NUM_EMERLADS; i++) {
-        obj = PoolGameObj_AllocateGameObjAnim();
-        if(obj) {
-            GameObjAnim_Init(obj, x + i*32,  y);
-            obj->spr_count          = 2;
-            obj->spr_height         = 1;
-            obj->spr_def_start      = SPRITE_DEF_NUM_EMERALD;
-            obj->spr_def_pitch      = 7;
-            //GameObjAnim_ShowOnlyFirstFrame(obj);
-            obj->spr_anim_time      = 250;
-            obj->spr_anim_frames    = 7;
-            GameObjAnim_EnableAnimation(obj, TRUE);
 
-            obj->spr_anim_def_offset = i * 256U;
+    menuTxt1 = obj;
 
-            this->emerlads[i] = obj;
-        }
-    }
-*/
+}
+
+void GameObjGameMenu_MoveAnimObjects(GameObjGameMenu* this)
+{
+
+    WORD* pColor;
+    this;
+    //menuTxt1->gobj.y = 0;
+
+
+    GameObjAnim_EnableMatteMode(menuTxt1, TRUE);
+
+    pColor = (WORD*)(PALETTE + 127*2);
+    (*pColor)++;
+    pColor = (WORD*)(PALETTE + 255*2);
+    (*pColor)++;
 }

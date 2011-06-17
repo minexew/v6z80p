@@ -78,7 +78,7 @@ void GameObjScore_draw_score(GameObjScore* this)
 
 //    set sprite data
     spr_height = 1;
-    set_sprite_regs(this->sprite_num  , x,      y, spr_height, spr1_def, FALSE);
+    set_sprite_regs(this->sprite_num  , x,      y, spr_height, spr1_def, FALSE, FALSE);
 /*
     if(spr2_def == 0xff)
         y = 256;        // put sprite off-screen
@@ -86,7 +86,7 @@ void GameObjScore_draw_score(GameObjScore* this)
 */
 
     if(spr2_def != 0xff)
-        set_sprite_regs(this->sprite_num+1, x+16,   y, spr_height, spr2_def, FALSE);
+        set_sprite_regs(this->sprite_num+1, x+16,   y, spr_height, spr2_def, FALSE, FALSE);
 
 
 }
@@ -157,5 +157,5 @@ void GameObjScore_Draw_PlayerRocketsIndicator(GameObjScore* this)
     for(i=0; i<this->num_rockets; i++)
         set_sprite_regs(this->sprite_num_RocketsIndicator + i,
                         this->gobj.x + i*8, this->gobj.y + 16, spr_height,
-                        SPRITE_DEF_NUM_ROCKET_VERTICAL, FALSE);
+                        SPRITE_DEF_NUM_ROCKET_VERTICAL, FALSE, FALSE);
 }

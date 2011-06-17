@@ -383,9 +383,11 @@ int main (void)
 
 
     if(!Debug_CheckCurrentBank())
-        return NO_REBOOT;
+        return NO_REBOOT; 
 
     initgraph();
+    //Sprites_EnableSprites(0);
+    Game_SetReg_SprCtrl(SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE | MATTE_MODE_ENABLE);
     Game_SetState(STARTUP);
 
     if(!LoadingIcon_Load())
@@ -612,3 +614,17 @@ void Game_MarkFrameTime(ushort color)
         MarkFrameTime(color);
 }
 // ----
+
+void Game_SetReg_SprCtrl(BYTE r)
+{
+    mm__vreg_sprctrl = r;
+    // make a copy of reg value, for later use
+    game.regsdata.mm__vreg_sprctrl = r;
+}
+
+BYTE Game_ReadReg_SprCtrl(void)
+{
+    // we cannot read video reg (they are write only),
+    // but we have a copy of reg in memory
+    return game.regsdata.mm__vreg_sprctrl;
+}

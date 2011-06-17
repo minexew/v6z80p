@@ -11,6 +11,7 @@ void GameObjAnim_Init(GameObjAnim* this, int x, int y/*, byte offset*/)
     this->is_Xflip = FALSE;
     this->isLoopAnim = TRUE;
     //this->isDisplayOneFrame = FALSE;
+    this->isEnableMatteMode = FALSE;
 
     this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjAnim_Move);
     this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjAnim_Draw);
@@ -42,12 +43,14 @@ void GameObjAnim_Draw(GameObjAnim* this)
 
     //if(this->spr_anim_time > this->spr_anim_frames) {
         // draw anim sprites
-        for(i=0;i<this->spr_count;i++)  {
+        for(i=0;i<this->spr_count;i++)  {            
+
             def = ((this->spr_anim_def_offset/256U) * this->spr_height)  + def_pitch;
             set_sprite_regs(allocatedSpriteNumbers[i], this->gobj.x + i*16,  this->gobj.y,
                             this->spr_height,
                             this->spr_def_start + def,
-                            /*FALSE*/this->is_Xflip);
+                            /*FALSE*/this->is_Xflip,
+                                     this->isEnableMatteMode);
 
 /*
             spr_reg.sprite_number   = 50+i;
@@ -112,3 +115,8 @@ void GameObjAnim_Free(GameObjAnim* this)
     PoolGameObj_FreeGameObj( (GameObj*)this );
 }
 
+void GameObjAnim_EnableMatteMode(GameObjAnim* this, BOOL isEnable)
+{
+    //this;
+    this->isEnableMatteMode = isEnable;
+}
