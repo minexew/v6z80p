@@ -79,8 +79,8 @@ void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this)
         GameObjAnim_Init(obj, x,  y);
         obj->spr_count          = 6;
         obj->spr_height         = 2;
-        obj->spr_def_start      = SPRITE_DEF_NUM_YOUWIN;
-        obj->spr_def_pitch      = 1;
+        obj->spr_def_start      = 0;
+        obj->spr_def_pitch      = 2;
         GameObjAnim_ShowOnlyFirstFrame(obj);
 
     }
@@ -93,14 +93,19 @@ void GameObjGameMenu_MoveAnimObjects(GameObjGameMenu* this)
 {
 
     WORD* pColor;
+    WORD* pColor1;
+    WORD* pColor2;
     this;
     //menuTxt1->gobj.y = 0;
 
 
     GameObjAnim_EnableMatteMode(menuTxt1, TRUE);
 
-    pColor = (WORD*)(PALETTE + 127*2);
-    (*pColor)++;
-    pColor = (WORD*)(PALETTE + 255*2);
-    (*pColor)++;
+    pColor  = (WORD*)(PALETTE + ((BYTE)game.global_time>>2) * 2);
+    pColor1 = (WORD*)(PALETTE + 127*2);
+    pColor2 = (WORD*)(PALETTE + 255*2);
+    *pColor1 = *pColor;
+    *pColor2 = *pColor;
+
+
 }

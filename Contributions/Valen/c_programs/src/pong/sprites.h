@@ -72,7 +72,7 @@ void DrawBall(int x_center,int y_center);
 void set_sprite_regs(byte sprite_number, int x, int y, byte height, word sprite_definition_number, BOOL x_flip, BOOL isEnableMatteMode);
 void set_sprite_regs_hw(byte sprite_number, byte x, byte misc, byte y, byte sprite_definition_number);
 
-BOOL load_sprites(void);
+BOOL Sprites_LoadSprites(const char *pFilename, DWORD destSpriteMem);
 
 
 
