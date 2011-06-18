@@ -219,16 +219,16 @@ void set_sprite_regs_optimized(void)
 
 // ------
 
-BOOL load_sprites(void)
+// destSpriteMem - destination linear address (0 - 128KB)  of sprite RAM
+//                 (must be on 4KB bound, just to simplify function implementation)
+BOOL Sprites_LoadSprites(const char *pFilename, DWORD destSpriteMem)
 {
 
-    const char *pFilename = SPRITES_FILENAME;
-//    FLOS_FILE myFile;
-    byte sprite_page = 0;
+    byte sprite_page = destSpriteMem/0x1000;
 
 
     // load by 4KB chunks (using chunk loader)
-    ChunkLoader_Init(pFilename, /*&myFile,*/ (byte*)BUF_FOR_LOADING_SPRITES_4KB, PONG_BANK);
+    ChunkLoader_Init(pFilename, (byte*)BUF_FOR_LOADING_SPRITES_4KB, PONG_BANK);
 
     while(!ChunkLoader_IsDone()) {
         if(!ChunkLoader_LoadChunk())

@@ -385,8 +385,7 @@ int main (void)
     if(!Debug_CheckCurrentBank())
         return NO_REBOOT; 
 
-    initgraph();
-    //Sprites_EnableSprites(0);
+    initgraph();   
     Game_SetReg_SprCtrl(SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE | MATTE_MODE_ENABLE);
     Game_SetState(STARTUP);
 
@@ -408,8 +407,8 @@ int main (void)
 
 
 
-    if(!load_sprites())
-      return REBOOT;
+    //if(!Sprites_LoadSprites(SPRITES_FILENAME, 0))
+    //  return REBOOT;
 
     Keyboard_Init();
     install_irq_handler();
@@ -437,6 +436,14 @@ BOOL Game_LoadStateData(GameState state, GameState prev_state)
                 const char* pFilenameTiles;
                 word  vramAddrTiles;            // in 100h chunks
         } LoadTilesDescription;
+        // struct for generic file loading
+        typedef struct {
+                const char* pFilename;
+                DWORD dw1;
+
+                BYTE  typeOfFile;           // 1 - sprites
+        } LoadFileDescription;
+
         static LoadTilesDescription tilesMenu[] = {
             {TILES_MENU_FILENAME, 0}, {TILES_CREDITS_FILENAME, TILES_CREDITS_VRAM_ADDR/0x100},
             {NULL, 0}
@@ -444,20 +451,29 @@ BOOL Game_LoadStateData(GameState state, GameState prev_state)
         static LoadTilesDescription tilesLevel[] = {
             {TILES_LVL_FILENAME, 0}, {NULL, 0}
         };
-
+        // srpites menu
+        static LoadFileDescription spritesMenu[] = {
+            {SPRITES_FILENAME_MENUTXT, 0, 1}, {NULL, 0, 0}
+        };
+        // srpites level
+        static LoadFileDescription spritesLevel[] = {
+            {SPRITES_FILENAME, 0, 1}, {NULL, 0, 0}
+        };
 
         static struct {
             GameState s;                    // to   which gamestate
             GameState prev_s;               // from which gamestate
             LoadTilesDescription *tiles;
+            LoadFileDescription  *file;
+
             const char* pFilenameMusic;
             const char* pFilenamePalette;
         } gameStateData[] = {
-            { MENU, STARTUP, tilesMenu,  MUSIC_MENU_FILENAME, PALETTE_MENU_FILENAME },
-            { MENU, LEVEL,   tilesMenu,  MUSIC_MENU_FILENAME, PALETTE_MENU_FILENAME },
+            { MENU, STARTUP, tilesMenu,  spritesMenu,  MUSIC_MENU_FILENAME, PALETTE_MENU_FILENAME },
+            { MENU, LEVEL,   tilesMenu,  spritesMenu,  MUSIC_MENU_FILENAME, PALETTE_MENU_FILENAME },
             /*{ MENU, CREDITS, tilesMenu,  NULL,                PALETTE_MENU_FILENAME },*/
 
-            { LEVEL, MENU,   tilesLevel, MUSIC_YOUWIN_FILENAME, PALETTE_LVL_FILENAME },
+            { LEVEL, MENU,   tilesLevel, spritesLevel, MUSIC_YOUWIN_FILENAME, PALETTE_LVL_FILENAME },
             /*{CREDITS, MENU, {TILES_CREDITS_FILENAME, 0},  NULL,               PALETTE_MENU_FILENAME},*/
 
                             };
@@ -465,6 +481,7 @@ BOOL Game_LoadStateData(GameState state, GameState prev_state)
         byte num;
         const char* pFilename;
         LoadTilesDescription *pTilesDesc;
+        LoadFileDescription  *pFileDesc;
 
         num = sizeof(gameStateData)/sizeof(gameStateData[0]);
         for(i=0 ;i<num; i++)
@@ -481,6 +498,14 @@ BOOL Game_LoadStateData(GameState state, GameState prev_state)
             if(!Background_LoadTiles(pTilesDesc->pFilenameTiles, pTilesDesc->vramAddrTiles))
                 return FALSE;
             pTilesDesc++;
+        }
+
+        // load sprites
+        pFileDesc = gameStateData[i].file;
+        while(pFileDesc->pFilename != NULL && pFileDesc->typeOfFile == 1) {
+            if(!Sprites_LoadSprites(pFileDesc->pFilename, pFileDesc->dw1))
+                return FALSE;
+            pFileDesc++;
         }
 
 
