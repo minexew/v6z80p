@@ -1,9 +1,10 @@
 ;=======================================================================================
 ;
-; SERIAL COPY V2.1 - Receives multiple files from serial port, writes to current disk directory
+; SERIAL COPY V2.2 - Receives multiple files from serial port, writes to current disk directory
 ;
 ; v2.1 - Prompts to overwrite duplicate file
 ;      - Loads to $78000 in sys RAM
+; v2.2 - Check serial filename for "exit command". Exit to FLOS if command is founded. (Valen)
 ;
 ;=======================================================================================
 
@@ -175,6 +176,13 @@ s_ffhswz	xor a
 	inc de
 	djnz s_ffhswz	
 
+	ld hl,serial_filename		; filename
+        call is_command_exit            ; check filename for command 
+        jr nc,not_a_exit_command        ; if CF=1, quit (exit command is present in filename)
+        call s_badack                   ; drop serial connection
+        ret
+
+not_a_exit_command
 	ld hl,receiving_text		; say "Receiving [filename]"
 	call kjt_print_string
 	ld hl,serial_filename
@@ -373,10 +381,63 @@ s_waitack	ld a,"W"				; send "wait ack" to pause file
 	call kjt_serial_tx_byte	
 	ret
 
+
+; Search exit command in string and set CF if command was found.
+; Input:
+; HL - string to search command (e.g. filename)
+; Output: 
+; CF=1, exit command is found in string
+; CF=0, not found
+is_command_exit            
+        push de
+        push bc
+        ld de,internal_command_exit
+        ld b,8+1+3+1                    ; e.g. "12345678.EXT",0
+        call compare_strings 
+
+        pop bc
+        pop de
+        ret
+
+
+compare_strings 
+; (copy'n'paste from FLOSxxx.asm)
+;
+; both strings should be zero terminated.
+; compare will fail if string lengths are different
+; unless count (b) is reached
+; carry flag set on return if same
+
+	push hl			;set de = source string
+	push de			;set hl = compare string
+ocslp	ld a,(de)			;b = max chars to compare
+	or a
+	jr z,ocsbt
+	cp (hl)
+	jr nz,ocs_diff
+	inc de
+	inc hl
+	djnz ocslp
+	jr ocs_same
+ocsbt	ld a,(de)			;check both strings at termination point
+	or (hl)
+	jr nz,ocs_diff
+ocs_same	pop de
+	pop hl
+	scf			; carry flag set if same		
+	ret
+ocs_diff	pop de
+	pop hl
+	xor a			; carry flag zero if different	
+	ret
+
+
 ;----------------------------------------------------------------------------------
+internal_command_exit    
+                db "EXIT.---",0         ; command, to exit sercopy
 
 start_text	db 11," *************************************",11
-		db    " *          Serial copy v2.1         *",11
+		db    " *          Serial copy v2.2         *",11
 		db    " * Copies multiple files from serial *",11
 		db    " * link to disk.    ESC key to quit. *",11 
 		db    " *************************************",11,11,0
