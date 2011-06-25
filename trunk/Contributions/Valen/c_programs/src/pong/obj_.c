@@ -1,3 +1,19 @@
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+#include <set_stack.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+
+#include "obj_.h"
+#include "math.h"
+
+
 void GameObj_Init(GameObj* this)
 {
     this->extra_field1 = 0;

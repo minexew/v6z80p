@@ -1,6 +1,11 @@
 # Project specific vars
 prjname    = pong
-prjobjects = obj/pong.rel  obj/low_memory_container.rel 
+prjobjects = obj/pong.rel \
+             obj/util.rel obj/sprites.rel obj/disk_io.rel  obj/loading_icon.rel \
+             obj/obj_.rel \
+             obj/obj_anim.rel obj/obj_score.rel obj/obj_rocket.rel obj/obj_bat.rel \
+             obj/obj_ball.rel obj/obj_youwin.rel \
+             obj/low_memory_container.rel 
 prjbinaries = sound_fx/sfx_proxy.asm.bin
 linkopt    = -Wl-b_LOW_MEM_CODE=0x6A80    --code-loc 0x8000  --data-loc 0xE000   
 # -Wl-b_SOUND_FX_CODE=0x6A80
@@ -11,8 +16,28 @@ stack      = 0x6A80
 include ../../Makefile_inc
 
 # Project specific rules
-obj/pong.rel : pong.h v6assert.h util.h sprites.h disk_io.h loading_icon.h obj_.h obj_anim.h obj_score.h obj_rocket.h obj_bat.h obj_ball.h obj_youwin.h obj_gamemenu.h sound_fx/sound_fx.h low_memory_container.h pong.c v6assert.c math.c sprites.c background.c keyboard.c joystick.c ai.c disk_io.c loading_icon.c util.c obj_.c obj_anim.c obj_score.c obj_rocket.c obj_ball.c obj_youwin.c obj_bat.c obj_gamemenu.c pool_gameobj.c pool_sprites.c sound_fx/sound_fx.c debug.c low_memory_container.c
-	sdcc  -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) --verbose pong.c 
+#obj/pong.rel : pong.h v6assert.h util.h sprites.h disk_io.h loading_icon.h obj_.h obj_anim.h \
+#               obj_score.h obj_rocket.h obj_bat.h obj_ball.h obj_youwin.h obj_gamemenu.h \
+#               sound_fx/sound_fx.h low_memory_container.h pong.c v6assert.c math.c sprites.c \
+#               background.c keyboard.c joystick.c ai.c disk_io.c loading_icon.c util.c \
+#               obj_.c obj_anim.c obj_score.c obj_rocket.c obj_ball.c obj_youwin.c \
+#               obj_bat.c obj_gamemenu.c pool_gameobj.c pool_sprites.c sound_fx/sound_fx.c \
+#               debug.c low_memory_container.c
+#	sdcc  -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) --verbose pong.c 
+
+obj/pong.rel            : pong.c pong.h
+obj/util.rel            : util.c util.h
+obj/sprites.rel         : sprites.c sprites.h
+obj/disk_io.rel         : disk_io.c disk_io.h
+obj/loading_icon.rel    : loading_icon.c loading_icon.h
+obj/obj_.rel            : obj_.c obj_.h
+obj/obj_anim.rel        : obj_anim.c obj_anim.h
+obj/obj_score.rel       : obj_score.c obj_score.h
+obj/obj_rocket.rel      : obj_rocket.c obj_rocket.h
+obj/obj_bat.rel         : obj_bat.c obj_bat.h
+obj/obj_ball.rel        : obj_ball.c obj_ball.h
+obj/obj_youwin.rel      : obj_youwin.c obj_youwin.h
+
 
 
 obj/low_memory_container.rel : low_memory_container.c low_memory_container.h sound_fx/sound_fx.h pong.h
@@ -30,3 +55,8 @@ sound_fx/sfx_proxy.asm.bin : sound_fx/sfx_proxy.asm sound_fx/inc/sfx_routine.asm
 # this line is for copy to my z: disk, you can remove this line
 	copy sound_fx\sfx_proxy.asm.bin z:\\
 # <--- End Sound FX
+
+
+
+obj/%.rel : %.c
+	sdcc  -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) --verbose $< 

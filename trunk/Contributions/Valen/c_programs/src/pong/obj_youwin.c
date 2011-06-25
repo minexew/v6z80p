@@ -1,3 +1,18 @@
+#include <v6z80p_types.h>
+
+//#include <stdlib.h>
+
+#include "obj_youwin.h"
+//#include "obj_score.h"
+//#include "obj_bat.h"
+//#include "low_memory_container.h"
+#include "pool_gameobj.h"
+#include "sprites.h"
+#include "pong.h"
+#include "math.h"
+#include "keyboard.h"
+
+
 void GameObjYouWin_Init(GameObjYouWin* this, int x, int y)
 {
     // init parent obj

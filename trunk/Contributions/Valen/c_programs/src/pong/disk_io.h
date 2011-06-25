@@ -11,4 +11,8 @@ void DiskIO_BeginDiskOperation(void);
 void DiskIO_EndDiskOperation(BOOL isOperationOk);
 void DiskIO_VisualizeDiskError(void);
 
+void ChunkLoader_Init(const char* pFilename, byte* buf, byte bank);
+BOOL ChunkLoader_LoadChunk(void);
+BOOL ChunkLoader_IsDone(void);
+
 #endif /* DISK_IO_H */

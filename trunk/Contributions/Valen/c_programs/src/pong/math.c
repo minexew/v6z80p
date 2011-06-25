@@ -1,7 +1,5 @@
-typedef struct {
-    int x, y;
-    int width, height;
-} RECT;
+#include "math.h"
+
 
 /*
 BOOL Math_IsPointHitBox(int px, int py, int box_x, int box_y, int box_width, int box_height)
@@ -40,25 +38,5 @@ BOOL Math_IsBoxHitBox(const RECT* p1, const RECT* p2)
     return(TRUE);
 
 
-}
-
-static inline word HW_MATH_MUL(word n1, word n2)
-{
-    word a;
-    mm__mult_table = n1;
-    mm__mult_index = 0;
-    mm__mult_write = n2;
-
-    a = mm__mult_read;
-    mm__mult_table = 0;     // restore sin table first entry
-    return a;
-    //return mm__mult_read;
-}
-
-static inline word HW_SIN_MUL(byte angle, word n2)
-{
-    mm__mult_index = angle;
-    mm__mult_write = n2;
-    return mm__mult_read;
 }
 

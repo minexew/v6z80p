@@ -24,7 +24,7 @@ INC=-I$(basedir)/inc
 
 # Output redirection to stdout (instead of stderr), for Windows shell.
 # Also QtCreator IDE want redirection to stderr.
-# use_stdout = "--use-stdout"
+use_stdout = "--use-stdout"
 
      
 v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)

@@ -1,9 +1,3 @@
-// ---------- Pool of game objects ---------------------
-
-#define POOL_OBJ__MAX_OBJECTS           32
-// define, how many objects will be reserverd in "pool of game objects" (a number for each object type)
-#define POOL_OBJ__TOTAL_GAME_OBJ_ANIM       15
-#define POOL_OBJ__TOTAL_GAME_OBJ_ROCKET     2
 
 typedef struct  {
   // pool of game objects
@@ -16,15 +10,6 @@ typedef struct  {
 } PoolGameObj;
 PoolGameObj pool_game_obj;
 
-// prototypes
-void PoolGameObj_Init(void);
-GameObj*     PoolGameObj_AllocateGameObj(GameObj* pPool, word poolSize, byte objSize);
-GameObjAnim* PoolGameObj_AllocateGameObjAnim();
-
-BOOL PoolGameObj_AddObjToActiveObjects(GameObj* obj);
-BOOL PoolGameObj_RemoveObjFromActiveObjects(GameObj* obj);
-void PoolGameObj_ApplyFuncMoveToObjects();
-void PoolGameObj_ApplyFuncDrawToObjects();
 
 
 void PoolGameObj_Init(void)

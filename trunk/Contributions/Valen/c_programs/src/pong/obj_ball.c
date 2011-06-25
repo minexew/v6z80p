@@ -1,9 +1,14 @@
-void GameObjBall_Init(GameObjBall* this);
-void GameObjBall_SetState(GameObjBall* this, ObjState state);
+#include <v6z80p_types.h>
 
-void GameObjBall_Move(GameObjBall* this);
-void GameObjBall_CheckCollision(GameObjBall* this);
-void GameObjBall_Draw(GameObjBall* this);
+#include <stdlib.h>
+
+#include "obj_ball.h"
+#include "obj_score.h"
+#include "obj_bat.h"
+#include "low_memory_container.h"
+#include "sprites.h"
+#include "pong.h"
+#include "util.h"
 
 
 
