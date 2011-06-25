@@ -8,4 +8,8 @@ typedef struct {
 
 LoadingIcon loadingIcon;
 
+BOOL LoadingIcon_LoadSprites(void);
+void LoadingIcon_Enable(BOOL isEnable);
+BOOL LoadingIcon_Load(void);
+
 #endif /* LOADING_ICON_H */

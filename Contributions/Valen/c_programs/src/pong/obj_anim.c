@@ -1,9 +1,26 @@
+//#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+
+//#include <OSCA_hardware_equates.h>
+//#include <scan_codes.h>
+//#include <macros.h>
+//#include <macros_specific.h>
+//#include <set_stack.h>
+
+//#include <os_interface_for_c/i_flos.h>
+
+#include "obj_anim.h"
+#include "pong.h"
+#include "pool_sprites.h"
+#include "pool_gameobj.h"
+#include "sprites.h"
+
 // GameObjAnim -----------------------------------------
 //
 
 
 
-void GameObjAnim_Init(GameObjAnim* this, int x, int y/*, byte offset*/)
+void GameObjAnim_Init(GameObjAnim* this, int x, int y)
 {
     this->gobj.x = x;
     this->gobj.y = y;

@@ -1,6 +1,11 @@
 #ifndef PONG_H
 #define PONG_H
 
+#ifndef EXTERN_PONG
+    #define EXTERN_PONG extern
+#endif
+
+
 #define PONG_BANK                     0     // main PONG bank (Logical! Not physical.)
 
 #define SCREEN_WIDTH                  368
@@ -37,6 +42,8 @@
 
 #define TILES_CREDITS_VRAM_ADDR     0x16000         // must be div by 0x1000 without reminder
 
+#include "obj_score.h"
+
 
 
 typedef enum {
@@ -45,6 +52,7 @@ typedef enum {
     CREDITS,
     STARTUP,
 } GameState;
+
 
 typedef struct {
     GameState game_state;
@@ -81,6 +89,13 @@ typedef struct  {
     BOOL isShowFrameTime;
 } debug_t;
 
+
+EXTERN_PONG game_t game;
+EXTERN_PONG debug_t debug;
+
+
+EXTERN_PONG byte buffer[32+1];
+EXTERN_PONG BOOL request_exit;              // exit program request flag
 
 /*static inline void myinline(BOOL b)
 {

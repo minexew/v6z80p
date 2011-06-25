@@ -1,3 +1,15 @@
+#include <v6z80p_types.h>
+
+#include <stdlib.h>
+
+#include "obj_bat.h"
+#include "obj_rocket.h"
+#include "pool_gameobj.h"
+#include "low_memory_container.h"
+#include "sprites.h"
+#include "pong.h"
+
+
 void GameObjBat_Init(GameObjBat* this, int x, int y)
 {
     // init parent obj

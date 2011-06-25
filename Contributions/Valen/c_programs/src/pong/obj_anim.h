@@ -1,3 +1,8 @@
+#ifndef OBJ_ANIM_H
+#define OBJ_ANIM_H
+
+#include "obj_.h"
+
 // Game object: Animation - do sprite animation
 typedef struct {
     GameObj gobj;   // <-- this must be a FIRST member of struct !! (to allow pointer cast to parent type)
@@ -26,11 +31,16 @@ typedef struct {
 
 
 // prototypes
+void GameObjAnim_Init(GameObjAnim* this, int x, int y);
 void GameObjAnim_Move(GameObjAnim* this);
 void GameObjAnim_Draw(GameObjAnim* this);
+void GameObjAnim_EnableAnimation(GameObjAnim* this, BOOL isEnable);
 void GameObjAnim_EnableMatteMode(GameObjAnim* this, BOOL isEnable);
+void GameObjAnim_ShowOnlyFirstFrame(GameObjAnim* this);
 // private
 void GameObjAnim_init_animation(GameObjAnim* this);
 
 
 void GameObjAnim_Free(GameObjAnim* this);
+
+#endif /* OBJ_ANIM_H */

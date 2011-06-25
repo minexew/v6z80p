@@ -1,3 +1,15 @@
+#include <v6z80p_types.h>
+
+#include <stdlib.h>
+
+
+#include "obj_score.h"
+#include "obj_youwin.h"
+#include "low_memory_container.h"
+#include "sprites.h"
+#include "pong.h"
+#include "v6assert.h"
+
 
 void GameObjScore_Init(GameObjScore* this, int x, int y)
 {

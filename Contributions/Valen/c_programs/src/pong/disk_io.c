@@ -1,4 +1,16 @@
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
 
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+#include <set_stack.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+#include "disk_io.h"
+#include "util.h"
 
 BOOL load_file_to_buffer(const char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
 {
@@ -70,7 +82,7 @@ typedef struct {
 chunk_loader cl;        // global instance
 
 
-void ChunkLoader_Init(const char* pFilename, /*FLOS_FILE* file,*/ byte* buf, byte bank)
+void ChunkLoader_Init(const char* pFilename, byte* buf, byte bank)
 {
     cl.pFilename = pFilename;
 

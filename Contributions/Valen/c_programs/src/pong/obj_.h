@@ -1,3 +1,7 @@
+#ifndef OBJ_H
+#define OBJ_H
+
+
 // Generic game object (parent for others game objects)
 typedef enum {
     NORMAL = 0,
@@ -33,6 +37,10 @@ typedef struct GameObj_tag {
 
 #define CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(func1)      (void ()(struct GameObj_tag*))   func1
 
+void GameObj_Init(GameObj* this);
+void GameObj_InitCollideBox(GameObj* this);
+BOOL GameObj_Collide(GameObj* this, GameObj* other);
+
 void GameObj_SetPos(GameObj* this, int x, int y);
 void GameObj_SetInUse(GameObj* this, BOOL inUse);
 BOOL GameObj_GetInUse(GameObj* this);
@@ -57,11 +65,5 @@ BOOL GameObj_GetInUse(GameObj* this)
 }
 
 
-//word dbg[8];
-//#define ppp ((byte volatile *) 0x1234)
 
-
-
-
-
-
+#endif /* OBJ_H */

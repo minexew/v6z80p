@@ -1,6 +1,22 @@
-//
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
 
-void DiagMessage(char* pMsg, const char* pFilename);
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+#include <set_stack.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+#include <stdlib.h>
+#include <string.h>
+
+
+#include "util.h"
+#include "pong.h"
+#include "disk_io.h"
+
 
 void DiagMessage(char* pMsg, const char* pFilename)
 {

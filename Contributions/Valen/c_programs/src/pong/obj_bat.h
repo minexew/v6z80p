@@ -1,3 +1,10 @@
+#ifndef OBJ_BAT_H
+#define OBJ_BAT_H
+
+#include "obj_.h"
+#include "obj_rocket.h"
+#include "obj_score.h"
+
 // Game object: Bat
 // The bat can fire a rocket
 
@@ -39,3 +46,6 @@ void GameObjBat_Fire(GameObjBat* this);
 BOOL GameObjBat_IsCanFireWithRocket(GameObjBat* this);
 // private --------------------------------------
 void GameObjBat_state_handler(GameObjBat* this);
+
+
+#endif /* OBJ_BAT_H */

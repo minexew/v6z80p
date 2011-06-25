@@ -1,7 +1,7 @@
 /*
 PONG v0.03
 
-Valen 2009-2010
+Valen 2009,2010,2011
 -------------
 
 SDCC 2.9.7
@@ -36,7 +36,11 @@ TODO: fix for 60Hz video mode
 #include "obj_ball.h"
 #include "obj_youwin.h"
 #include "obj_gamemenu.h"
+#include "pool_gameobj.h"
+
 #include "sound_fx/sound_fx.h"
+
+#define EXTERN_PONG
 #include "pong.h"
 
 #define EXTERN extern
@@ -48,12 +52,6 @@ TODO: fix for 60Hz video mode
 #include <string.h>
 
 
-game_t game;
-debug_t debug;
-
-
-byte buffer[32+1];
-BOOL request_exit = FALSE;              // exit program request flag
 
 // foo funcs
 //typedef unsigned long  time_t;
@@ -75,10 +73,10 @@ void delay(int a) {a;}
 
 #include "v6assert.c"
 #include "math.c"
-#include "util.c"
-#include "disk_io.c"
-#include "loading_icon.c"
-#include "sprites.c"
+//#include "util.c"
+//#include "disk_io.c"
+//#include "loading_icon.c"
+//#include "sprites.c"
 #include "background.c"
 #include "keyboard.c"
 #include "joystick.c"
@@ -88,14 +86,14 @@ void delay(int a) {a;}
 #include "pool_gameobj.c"
 
 
-#include "obj_.c"
-#include "obj_anim.c"
-#include "obj_score.c"
-#include "obj_rocket.c"
+//#include "obj_.c"
+//#include "obj_anim.c"
+//#include "obj_score.c"
+//#include "obj_rocket.c"
 
-#include "obj_bat.c"
-#include "obj_ball.c"
-#include "obj_youwin.c"
+//#include "obj_bat.c"
+//#include "obj_ball.c"
+//#include "obj_youwin.c"
 #include "obj_gamemenu.c"
 
 
@@ -373,6 +371,7 @@ void Game_InitLevelBegining(void)
 int main (void)
 {
 
+    request_exit = FALSE;
     game.isRequestSetState = FALSE;
     loadingIcon.isLoaded = FALSE;
     game.isFLOSVideoMode = TRUE;

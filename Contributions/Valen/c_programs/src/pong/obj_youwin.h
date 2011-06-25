@@ -1,3 +1,9 @@
+#ifndef OBJ_YOUWIN_H
+#define OBJ_YOUWIN_H
+
+#include "obj_.h"
+#include "obj_anim.h"
+
 // Game object: YouWin
 // Display YouWin animation
 
@@ -26,3 +32,6 @@ void GameObjYouWin_AllocateAnimObjects(GameObjYouWin* this);
 void GameObjYouWin_SetState(GameObjYouWin* this, ObjState state);
 
 void helper_GameObjYouWin_StartAnimation(byte num_player);
+
+
+#endif /* OBJ_YOUWIN_H */

@@ -58,14 +58,16 @@
 #define SET_LIVE_SPRITE_REGISTER_BANK(b)     Game_SetReg_SprCtrl( Game_ReadReg_SprCtrl() & (~4) | ((b)<<2) );
 
 
-
 // --
+//#include <v6z80p_types.h>
 
-//#define GET_WORD_9TH_BIT(v) ( ((word)v>>8) & 1 )
+
 
 void initgraph(void);
 //void Sprites_EnableSprites(BYTE flags1);
 void clear_sprite_regs(void);
+void clear_shadow_sprite_regs(void);
+
 void DrawBat(int x1,int y1,int x2,int y2);
 void DrawBall(int x_center,int y_center);
 

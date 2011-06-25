@@ -1,13 +1,12 @@
-// GameObjRocket -----------------------------------------
-//
+#include <v6z80p_types.h>
 
-// prototypes
-void GameObjRocket_Move(GameObjRocket* this);
-void GameObjRocket_CheckCollision(GameObjRocket* this);
-void GameObjRocket_Draw(GameObjRocket* this);
-void GameObjRocket_Free(GameObjRocket* this);
-// private
-void GameObjRocket_AllocateAnimationObj(GameObjRocket* this);
+#include "obj_rocket.h"
+#include "obj_anim.h"
+#include "obj_bat.h"
+#include "pool_gameobj.h"
+#include "sprites.h"
+#include "pong.h"
+
 
 
 void GameObjRocket_Init(GameObjRocket* this, int x, int y)
