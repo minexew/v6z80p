@@ -1,3 +1,12 @@
+#include <v6z80p_types.h>
+
+//#include <stdlib.h>
+//#include <string.h>
+
+#include "sound_fx.h"
+#include "../disk_io.h"
+#include "../low_memory_container.h"
+
 
 byte bufModFileHeader[1084];
 
@@ -138,17 +147,4 @@ void MUSIC_Init(void)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-// -----------------
-// /////////////////
 

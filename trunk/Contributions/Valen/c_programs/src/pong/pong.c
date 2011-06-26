@@ -1,5 +1,5 @@
 /*
-PONG v0.03
+PONG v0.04
 
 Valen 2009,2010,2011
 -------------
@@ -26,6 +26,9 @@ TODO: fix for 60Hz video mode
 #include "v6assert.h"
 #include "util.h"
 #include "sprites.h"
+#include "background.h"
+#include "keyboard.h"
+#include "joystick.h"
 #include "disk_io.h"
 #include "loading_icon.h"
 #include "obj_.h"
@@ -37,8 +40,12 @@ TODO: fix for 60Hz video mode
 #include "obj_youwin.h"
 #include "obj_gamemenu.h"
 #include "pool_gameobj.h"
+#include "pool_sprites.h"
+#include "ai.h"
 
 #include "sound_fx/sound_fx.h"
+#include "debug.h"
+
 
 #define EXTERN_PONG
 #include "pong.h"
@@ -71,19 +78,19 @@ void delay(int a) {a;}
 
 
 
-#include "v6assert.c"
-#include "math.c"
+//#include "v6assert.c"
+//#include "math.c"
 //#include "util.c"
 //#include "disk_io.c"
 //#include "loading_icon.c"
 //#include "sprites.c"
-#include "background.c"
-#include "keyboard.c"
-#include "joystick.c"
+//#include "background.c"
+//#include "keyboard.c"
+//#include "joystick.c"
 
 
-#include "pool_sprites.c"
-#include "pool_gameobj.c"
+//#include "pool_sprites.c"
+//#include "pool_gameobj.c"
 
 
 //#include "obj_.c"
@@ -94,13 +101,13 @@ void delay(int a) {a;}
 //#include "obj_bat.c"
 //#include "obj_ball.c"
 //#include "obj_youwin.c"
-#include "obj_gamemenu.c"
+//#include "obj_gamemenu.c"
 
 
 
-#include "ai.c"
+//#include "ai.c"
 #include "sound_fx/sound_fx.c"
-#include "debug.c"
+//#include "debug.c"
 
 
 
@@ -226,7 +233,7 @@ void Game_HandlePlayerInput_PauseMode(void)
         game.is_paused ^= 1;
     }
 
-    if(keyboard.last_typed_scancode == SC_D) {
+    if(/*keyboard.last_typed_scancode*/ Keyboard_GetLastTypedScanCode() == SC_D) {
         keyboard.last_typed_scancode = 0;
         game.is_debug_mode ^= 1;
 

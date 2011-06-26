@@ -1,11 +1,12 @@
-#define BUF_FOR_LOADING_BACKGROUND_4KB     0xF000
+#include <v6z80p_types.h>
+#include <OSCA_hardware_equates.h>
+#include <macros.h>
 
-#define TILE_MAP_WIDTH_IN_BLOCKS           32       // 512/16
-#define TILEMAPS_VIDEO_PAGE                (0x70000/0x2000)
+//#include <stdlib.h>
+#include <string.h>
 
-//BOOL Background_LoadTiles(const char* pFilename, dword vram_addr);
-void TileMap_Fill(word tileNumber);
-
+#include "background.h"
+#include "disk_io.h"
 
 
 

@@ -1,5 +1,11 @@
+#include <v6z80p_types.h>
+
+#include <string.h>
+
+
 #define EXTERN_POOL_SPRITES
 #include "pool_sprites.h"
+#include "sprites.h"
 
 
 typedef struct  {

@@ -22,9 +22,11 @@ objects = $(basedir)/c_support/crt/obj/crt0_v6z80p.$(O)                   \
 
 INC=-I$(basedir)/inc
 
-# Output redirection to stdout (instead of stderr), for Windows shell.
-# Also QtCreator IDE want redirection to stderr.
-use_stdout = "--use-stdout"
+# Output redirection to stdout (instead of default stderr), for Windows shell.
+# (QtCreator IDE want output to stderr)
+# If you want to redirect sdcc output (in Windows shell), put next line to your makefile.
+# (don't uncomment next line in this file!)
+# use_stdout = "--use-stdout"
 
      
 v6-exe/$(prjname).exe : $(objects) $(prjobjects) $(prjbinaries)

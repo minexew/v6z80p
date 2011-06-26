@@ -1,10 +1,13 @@
-#include "keyboard.h"
+#include <v6z80p_types.h>
 
-struct {
-    BOOL is_looking_for_second_byte_of_scancode;
-    byte last_typed_scancode;
-    byte prev_pressed_scancode;
-} keyboard;
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+
+
+#include "keyboard.h"
+#include "pong.h"
+
 
 
 typedef struct /*keyboard_input_map_tag*/ {
@@ -36,6 +39,12 @@ void Keyboard_Init(void)
 byte Keyboard_GetLastPressedScancode(void)
 {
     return keyboard.prev_pressed_scancode;
+}
+
+
+byte Keyboard_GetLastTypedScanCode(void)
+{
+    return keyboard.last_typed_scancode;
 }
 
 

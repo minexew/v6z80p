@@ -4,13 +4,19 @@ prjobjects = obj/pong.rel \
              obj/util.rel obj/sprites.rel obj/disk_io.rel  obj/loading_icon.rel \
              obj/obj_.rel \
              obj/obj_anim.rel obj/obj_score.rel obj/obj_rocket.rel obj/obj_bat.rel \
-             obj/obj_ball.rel obj/obj_youwin.rel \
+             obj/obj_ball.rel obj/obj_youwin.rel obj/obj_gamemenu.rel \
+             obj/v6assert.rel obj/math.rel obj/background.rel \
+             obj/keyboard.rel obj/joystick.rel obj/ai.rel \
+             obj/pool_gameobj.rel obj/pool_sprites.rel obj/debug.rel \
+             obj/sound_fx.rel \
              obj/low_memory_container.rel 
 prjbinaries = sound_fx/sfx_proxy.asm.bin
 linkopt    = -Wl-b_LOW_MEM_CODE=0x6A80    --code-loc 0x8000  --data-loc 0xE000   
 # -Wl-b_SOUND_FX_CODE=0x6A80
 # stack: 5A80 - 6A80
 stack      = 0x6A80
+
+use_stdout = "--use-stdout"
 
 # Include main makefile
 include ../../Makefile_inc
@@ -37,6 +43,22 @@ obj/obj_rocket.rel      : obj_rocket.c obj_rocket.h
 obj/obj_bat.rel         : obj_bat.c obj_bat.h
 obj/obj_ball.rel        : obj_ball.c obj_ball.h
 obj/obj_youwin.rel      : obj_youwin.c obj_youwin.h
+obj/obj_gamemenu.rel    : obj_gamemenu.c obj_gamemenu.h
+obj/v6assert.rel        : v6assert.c v6assert.h
+obj/math.rel            : math.c math.h
+obj/background.rel      : background.c background.h
+obj/keyboard.rel        : keyboard.c keyboard.h
+obj/joystick.rel        : joystick.c joystick.h
+obj/ai.rel              : ai.c ai.h
+obj/pool_gameobj.rel    : pool_gameobj.c pool_gameobj.h
+obj/pool_sprites.rel    : pool_sprites.c pool_sprites.h
+obj/debug.rel           : debug.c debug.h
+obj/sound_fx.rel        : sound_fx/sound_fx.c sound_fx/sound_fx.h
+
+
+
+
+
 
 
 
@@ -59,4 +81,6 @@ sound_fx/sfx_proxy.asm.bin : sound_fx/sfx_proxy.asm sound_fx/inc/sfx_routine.asm
 
 
 obj/%.rel : %.c
+	sdcc  -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) --verbose $< 
+obj/%.rel : sound_fx/%.c
 	sdcc  -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) --verbose $< 

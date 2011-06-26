@@ -16,6 +16,19 @@ typedef struct {
 player_input player1_input = {FALSE, FALSE, FALSE, KEYBOARD};
 player_input player2_input = {FALSE, FALSE, FALSE, KEYBOARD};
 
+struct {
+    BOOL is_looking_for_second_byte_of_scancode;
+    byte last_typed_scancode;
+    byte prev_pressed_scancode;
+} keyboard;
+
+
+
+void Input_ClearPlayersInput(void);
+void Keyboard_Init(void);
+byte Keyboard_GetLastPressedScancode(void);
+byte Keyboard_GetLastTypedScanCode(void);
+//void Keyboard_IRQ_Handler();
 
 
 void irq_handler() NAKED;

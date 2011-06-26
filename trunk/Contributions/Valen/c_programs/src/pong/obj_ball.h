@@ -20,8 +20,6 @@ typedef struct {
 
 } GameObjBall;
 
-// There is only one Ball object.
-GameObjBall ball1;
 
 void GameObjBall_Init(GameObjBall* this);
 void GameObjBall_SetState(GameObjBall* this, ObjState state);

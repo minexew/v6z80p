@@ -43,6 +43,7 @@
 #define TILES_CREDITS_VRAM_ADDR     0x16000         // must be div by 0x1000 without reminder
 
 #include "obj_score.h"
+#include "obj_ball.h"
 
 
 
@@ -96,6 +97,9 @@ EXTERN_PONG debug_t debug;
 
 EXTERN_PONG byte buffer[32+1];
 EXTERN_PONG BOOL request_exit;              // exit program request flag
+
+// There is only one Ball object in Pong game.
+EXTERN_PONG GameObjBall ball1;
 
 /*static inline void myinline(BOOL b)
 {
