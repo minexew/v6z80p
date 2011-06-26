@@ -1,3 +1,5 @@
+#include <v6z80p_types.h>
+
 #include "math.h"
 
 

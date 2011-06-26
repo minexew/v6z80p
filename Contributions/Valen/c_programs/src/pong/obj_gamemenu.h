@@ -1,3 +1,8 @@
+#ifndef OBJ_GAMEMENU_H
+#define OBJ_GAMEMENU_H
+
+#include "obj_.h"
+
 // Game object: GameMenu
 
 typedef struct {
@@ -16,3 +21,6 @@ void GameObjGameMenu_Draw(GameObjGameMenu* this);
 
 void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this);
 void GameObjGameMenu_MoveAnimObjects(GameObjGameMenu* this);
+
+
+#endif /* OBJ_GAMEMENU_H */

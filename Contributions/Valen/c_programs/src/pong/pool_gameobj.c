@@ -1,3 +1,10 @@
+#include <v6z80p_types.h>
+
+//#include <stdlib.h>
+#include <string.h>
+
+#include "pool_gameobj.h"
+
 
 typedef struct  {
   // pool of game objects

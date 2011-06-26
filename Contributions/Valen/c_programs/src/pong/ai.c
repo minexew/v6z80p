@@ -1,4 +1,12 @@
-void ai_update(void);
+#include <v6z80p_types.h>
+
+#include "ai.h"
+#include "obj_rocket.h"
+#include "obj_bat.h"
+//#include "pool_gameobj.h"
+//#include "sprites.h"
+#include "pong.h"
+
 
 void ai_update(void)
 {

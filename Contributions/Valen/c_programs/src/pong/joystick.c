@@ -1,8 +1,13 @@
-// prototypes
-void Joystick_GetInputForPlayer(byte playerNumber);
-void Joystick_CheckInputAutoSwithForPlayer(byte playerNumber);
-void Joystick_CheckInputAutoSwith(void);
-BOOL Joystick_IsSecondJoyNeedToBeReaded(void);
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+#include <macros.h>
+
+
+#include "joystick.h"
+#include "keyboard.h"
+#include "pong.h"
+
 
 
 // Input:

@@ -1,5 +1,19 @@
-void Debug_Move(void);
-void Debug_Draw(void);
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+
+#include <stdlib.h>
+//#include <string.h>
+
+#include "debug.h"
+#include "pool_gameobj.h"
+#include "keyboard.h"
+#include "pong.h"
 
 // key "A" moves debug render to next gameobj in list of active game objects
 void Debug_Move(void)
@@ -16,9 +30,10 @@ void Debug_Move(void)
 }
 
 // render debug info
+/*SPRITE_DEF_NUM_DEBUG_POINT1*/
 void Debug_Draw(void)
 {
-    word i;
+/*    word i;
     GameObj* obj;
     short x,y;
     static short counter = 0;
@@ -44,11 +59,12 @@ void Debug_Draw(void)
             // show debug point at the corner of collision box
             // BUG: when spr num 61
             set_sprite_regs(SPRITE_NUM_DEBUG_POINT1, x, y, 1,
-                            /*SPRITE_DEF_NUM_DEBUG_POINT1*/ SPRITE_DEF_NUM_DIGIT,
+                             SPRITE_DEF_NUM_DIGIT,
                             FALSE, FALSE);
             return;
         }
     }
+*/
 
 }
 

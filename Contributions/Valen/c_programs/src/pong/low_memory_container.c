@@ -7,10 +7,13 @@
 // (We define struct with dummy members,
 // thus compiler can compile pointer to it.
 // We dont use that struct in this file.)
-typedef struct { char foo; } GameObjScore;  // <-- dummy definition
+//typedef struct { char foo; } GameObjScore;  // <-- dummy definition
+
+
+
 #include "pong.h"
 
-extern game_t game;
+//extern game_t game;
 
 //const char qqq[]="LOWMEMCODE";
 

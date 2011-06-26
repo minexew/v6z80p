@@ -1,3 +1,12 @@
+#include <v6z80p_types.h>
+#include <os_interface_for_c/i_flos.h>
+
+
+//#include <stdlib.h>
+#include <string.h>
+
+#include "v6assert.h"
+
 void _v6assert(char *expr, const char *filename, unsigned int linenumber)
 {
         linenumber; filename;

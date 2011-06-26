@@ -1,3 +1,15 @@
+#include <v6z80p_types.h>
+#include <scan_codes.h>
+#include <OSCA_hardware_equates.h>
+
+#include "obj_gamemenu.h"
+#include "obj_anim.h"
+#include "pool_gameobj.h"
+#include "keyboard.h"
+#include "pong.h"
+
+
+
 void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y)
 {
     // init parent obj

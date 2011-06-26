@@ -1,6 +1,9 @@
 #ifndef DISK_IO_H
 #define DISK_IO_H
 
+#include <os_interface_for_c/i_flos.h>
+
+
 #define BEGIN_DISK_OPERATION()      DiskIO_BeginDiskOperation()
 #define END_DISK_OPERATION(r)       DiskIO_EndDiskOperation(r)
 
