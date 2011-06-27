@@ -6,7 +6,7 @@ typedef struct {
     ushort palette[256];
 } LoadingIcon;
 
-LoadingIcon loadingIcon;
+
 
 BOOL LoadingIcon_LoadSprites(void);
 void LoadingIcon_Enable(BOOL isEnable);

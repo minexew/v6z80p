@@ -5,6 +5,7 @@
 #include <macros.h>
 
 
+#define EXTERN_KEYBOARD
 #include "keyboard.h"
 #include "pong.h"
 
@@ -34,6 +35,13 @@ void Keyboard_Init(void)
     keyboard.is_looking_for_second_byte_of_scancode = FALSE;
     keyboard.prev_pressed_scancode = 0;
     EI();
+
+    player1_input.up = player1_input.down = player1_input.fire1 = FALSE; //{FALSE, FALSE, FALSE, KEYBOARD};
+    player1_input.input_type = KEYBOARD;
+    player2_input.up = player2_input.down = player2_input.fire1 = FALSE;
+    player2_input.input_type = KEYBOARD;
+
+
 }
 
 byte Keyboard_GetLastPressedScancode(void)

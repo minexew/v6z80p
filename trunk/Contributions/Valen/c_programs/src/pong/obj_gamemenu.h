@@ -11,7 +11,7 @@ typedef struct {
 
 } GameObjGameMenu;
 
-GameObjGameMenu gameMenu;
+
 
 
 void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y);

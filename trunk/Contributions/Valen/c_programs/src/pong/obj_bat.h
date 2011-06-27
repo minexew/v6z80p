@@ -31,8 +31,6 @@ typedef struct
     GameObjScore* pScore;
 } GameObjBat;
 
-// There are two Bats. One for fach User.
-GameObjBat batA, batB;
 
 
 // public --------------------------------------

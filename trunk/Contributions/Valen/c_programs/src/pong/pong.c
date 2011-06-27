@@ -18,7 +18,7 @@ TODO: fix for 60Hz video mode
 #include <scan_codes.h>
 #include <macros.h>
 #include <macros_specific.h>
-#include <set_stack.h>
+#include <set_stack.h>                  // must be included only once, in main C program file
 
 #include <os_interface_for_c/i_flos.h>
 
@@ -45,13 +45,12 @@ TODO: fix for 60Hz video mode
 
 #include "sound_fx/sound_fx.h"
 #include "debug.h"
-
+#include "low_memory_container.h"
 
 #define EXTERN_PONG
 #include "pong.h"
 
-#define EXTERN extern
-#include "low_memory_container.h"
+
 
 
 
@@ -106,7 +105,7 @@ void delay(int a) {a;}
 
 
 //#include "ai.c"
-#include "sound_fx/sound_fx.c"
+//#include "sound_fx/sound_fx.c"
 //#include "debug.c"
 
 
