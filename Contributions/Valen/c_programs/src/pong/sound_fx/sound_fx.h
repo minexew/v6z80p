@@ -30,8 +30,8 @@ typedef struct {
 
 
 
-// There is dedicated memory bank for sound stuff.
-// Logic system memory bank for
+// There is dedicated audio memory bank for sound stuff.
+// (part of system memory)
 // - sound fx desc
 // - soundfx and MOD players
 // - MOD pattern data
@@ -62,4 +62,38 @@ typedef struct {
 // list of pointers to sound effects
 #define SOUND_FX__FXLIST    (SOUND_FX_CODE)
 
+BOOL Sound_LoadSoundCode(void);
+BOOL Sound_LoadSounds(void);
+BOOL Sound_LoadFxDescriptors(void);
+void Sound_InitFx();
+byte Mod_FindHighestUsedPattern(const byte* pPatternData);
+BOOL Mod_LoadMusicModule(const char* pFilename);
+void MUSIC_Silence(void);
+void MUSIC_Init(void);
+
+
 #endif /* SOUND_FX_H */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

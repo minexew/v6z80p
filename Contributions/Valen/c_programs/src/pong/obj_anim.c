@@ -5,7 +5,6 @@
 //#include <scan_codes.h>
 //#include <macros.h>
 //#include <macros_specific.h>
-//#include <set_stack.h>
 
 //#include <os_interface_for_c/i_flos.h>
 

@@ -5,7 +5,6 @@
 #include <scan_codes.h>
 #include <macros.h>
 #include <macros_specific.h>
-#include <set_stack.h>
 
 #include <os_interface_for_c/i_flos.h>
 
@@ -63,4 +62,22 @@ BOOL GameObj_Collide(GameObj* this, GameObj* other)
 
     return(TRUE);
 
+}
+
+// access funcs
+void GameObj_SetPos(GameObj* this, int x, int y)
+{
+    this->x = x;
+    this->y = y;
+}
+
+
+void GameObj_SetInUse(GameObj* this, BOOL inUse)
+{
+    this->in_use = inUse;
+}
+
+BOOL GameObj_GetInUse(GameObj* this)
+{
+    return this->in_use;
 }

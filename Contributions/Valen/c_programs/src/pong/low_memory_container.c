@@ -1,19 +1,8 @@
-
-
-#define EXTERN
+#define EXTERN_LOW_MEMORY_CONTAINER
 #include "low_memory_container.h"
-
-// forward declaration
-// (We define struct with dummy members,
-// thus compiler can compile pointer to it.
-// We dont use that struct in this file.)
-//typedef struct { char foo; } GameObjScore;  // <-- dummy definition
-
-
 
 #include "pong.h"
 
-//extern game_t game;
 
 //const char qqq[]="LOWMEMCODE";
 

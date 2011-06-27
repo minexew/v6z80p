@@ -23,8 +23,6 @@ typedef struct {
 
 } GameObjScore;
 
-// There are only two score objects in game
-GameObjScore scoreA, scoreB;
 
 
 // public

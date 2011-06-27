@@ -46,23 +46,6 @@ void GameObj_SetInUse(GameObj* this, BOOL inUse);
 BOOL GameObj_GetInUse(GameObj* this);
 
 
-// access funcs
-void GameObj_SetPos(GameObj* this, int x, int y)
-{
-    this->x = x;
-    this->y = y;
-}
-
-
-void GameObj_SetInUse(GameObj* this, BOOL inUse)
-{
-    this->in_use = inUse;
-}
-
-BOOL GameObj_GetInUse(GameObj* this)
-{
-    return this->in_use;
-}
 
 
 

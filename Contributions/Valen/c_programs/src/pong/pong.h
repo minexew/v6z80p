@@ -21,7 +21,7 @@
 #define RAND()                        rand()
 
 // we use wide left border (no realy reason for using left border, just want to test it)
-#define IS_WIDE_LEFT_BORDER
+#define IS_WIDE_LEFT_BORDER         1
 
 // ----------- filenames
 #define MUSIC_MENU_FILENAME         "BALLDRE2.MOD"
@@ -44,6 +44,10 @@
 
 #include "obj_score.h"
 #include "obj_ball.h"
+#include "obj_bat.h"
+#include "obj_youwin.h"
+#include "obj_gamemenu.h"
+#include "loading_icon.h"
 
 
 
@@ -98,8 +102,19 @@ EXTERN_PONG debug_t debug;
 EXTERN_PONG byte buffer[32+1];
 EXTERN_PONG BOOL request_exit;              // exit program request flag
 
-// There is only one Ball object in Pong game.
-EXTERN_PONG GameObjBall ball1;
+// Allocate some game objects as globals.
+//
+// There is only one Ball object in game.
+EXTERN_PONG GameObjBall         ball1;
+// There are only two Score objects in game.
+EXTERN_PONG GameObjScore        scoreA, scoreB;
+// There are two Bats. One for fach user.
+EXTERN_PONG GameObjBat          batA, batB;
+EXTERN_PONG GameObjYouWin       YouWinAnim;
+EXTERN_PONG LoadingIcon         loadingIcon;
+EXTERN_PONG GameObjGameMenu     gameMenu;
+
+
 
 /*static inline void myinline(BOOL b)
 {

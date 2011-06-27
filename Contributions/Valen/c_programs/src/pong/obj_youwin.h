@@ -24,7 +24,7 @@ typedef struct {
 } GameObjYouWin;
 
 
-GameObjYouWin YouWinAnim;
+
 
 void GameObjYouWin_Move(GameObjYouWin* this);
 void GameObjYouWin_Draw(GameObjYouWin* this);

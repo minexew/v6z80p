@@ -7,6 +7,7 @@
 
 #include "background.h"
 #include "disk_io.h"
+#include "pong.h"
 
 
 
