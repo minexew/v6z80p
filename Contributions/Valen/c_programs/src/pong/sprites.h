@@ -57,7 +57,6 @@
 // bank is 0 or 1
 #define SET_LIVE_SPRITE_REGISTER_BANK(b)     Game_SetReg_SprCtrl( Game_ReadReg_SprCtrl() & (~4) | ((b)<<2) );
 
-
 // --
 //#include <v6z80p_types.h>
 

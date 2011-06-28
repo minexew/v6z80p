@@ -137,5 +137,5 @@ void Game_MarkFrameTime(ushort color);
 void Game_SetReg_SprCtrl(BYTE r);
 BYTE Game_ReadReg_SprCtrl(void);
 
-
+void Game_EnableMatteMode(BOOL isEnable);
 #endif /* PONG_H */
