@@ -128,3 +128,8 @@ void PoolGameObj_ApplyFuncDrawToObjects()
     APPLY_FUNC_TO_ACTIVE_OBJECTS(pDrawFunc);
 
 }
+
+GameObj** PoolGameObj_GetListOfActiveObjects(void)
+{
+    return pool_game_obj.active_objects;
+}

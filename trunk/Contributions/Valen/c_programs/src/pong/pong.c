@@ -390,8 +390,8 @@ int main (void)
     if(!Debug_CheckCurrentBank())
         return NO_REBOOT; 
 
-    initgraph();   
-    Game_SetReg_SprCtrl(SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE | MATTE_MODE_ENABLE);
+    initgraph();
+    Game_SetReg_SprCtrl(SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE);
     Game_SetState(STARTUP);
 
     if(!LoadingIcon_Load())
@@ -545,6 +545,9 @@ BOOL Game_SetState(GameState state)
     game.game_state = state;
 
     if(state == LEVEL) {
+        // disable matte mode
+        Game_EnableMatteMode(FALSE);
+
         game.isMusicEnabled = FALSE;
         game.isSoundfxEnabled = TRUE;
 
@@ -560,6 +563,9 @@ BOOL Game_SetState(GameState state)
         Game_InitializeLevelGameObjects();
     }
     if(state == MENU) {
+        // enable matte mode
+        Game_EnableMatteMode(TRUE);     //  Game_SetReg_SprCtrl(SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE | MATTE_MODE_ENABLE);
+
         game.isMusicEnabled = TRUE;
         game.isSoundfxEnabled = FALSE;
 
@@ -658,3 +664,13 @@ BYTE Game_ReadReg_SprCtrl(void)
     // but we have a copy of reg in memory
     return game.regsdata.mm__vreg_sprctrl;
 }
+
+// Input:
+void Game_EnableMatteMode(BOOL isEnable)
+{
+    if(isEnable)
+        Game_SetReg_SprCtrl(Game_ReadReg_SprCtrl() | MATTE_MODE_ENABLE);
+    else
+        Game_SetReg_SprCtrl(Game_ReadReg_SprCtrl() & (~MATTE_MODE_ENABLE));
+}
+

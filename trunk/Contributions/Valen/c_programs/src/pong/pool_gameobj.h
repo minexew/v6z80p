@@ -2,6 +2,7 @@
 #define POOL_GAMEOBJ_H
 
 #include "obj_rocket.h"
+//#include "pong.h"
 
 // ---------- Pool of game objects ---------------------
 
@@ -24,6 +25,8 @@ BOOL PoolGameObj_AddObjToActiveObjects(GameObj* obj);
 BOOL PoolGameObj_RemoveObjFromActiveObjects(GameObj* obj);
 void PoolGameObj_ApplyFuncMoveToObjects();
 void PoolGameObj_ApplyFuncDrawToObjects();
+
+GameObj** PoolGameObj_GetListOfActiveObjects(void);
 
 
 

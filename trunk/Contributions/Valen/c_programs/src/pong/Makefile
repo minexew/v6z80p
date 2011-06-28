@@ -11,12 +11,13 @@ prjobjects = obj/pong.rel \
              obj/sound_fx.rel \
              obj/low_memory_container.rel 
 prjbinaries = sound_fx/sfx_proxy.asm.bin
-linkopt    = -Wl-b_LOW_MEM_CODE=0x6A80    --code-loc 0x8000  --data-loc 0xE000   
+linkopt    = -Wl-b_LOW_MEM_CODE=0x6A80    --code-loc 0x8000  --data-loc 0
 # -Wl-b_SOUND_FX_CODE=0x6A80
 # stack: 5A80 - 6A80
 stack      = 0x6A80
 
-use_stdout = "--use-stdout"
+# uncomment next line to redirect all sdcc output to stdout (this is just for windows shell)
+# use_stdout = "--use-stdout"
 
 # Include main makefile
 include ../../Makefile_inc
