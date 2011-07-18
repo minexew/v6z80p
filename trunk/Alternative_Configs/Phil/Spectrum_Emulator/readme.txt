@@ -2,6 +2,16 @@
 Spectrum 128 / 48 Emulator for V6Z80P+ by Phil Ruston 2009-2011
 --------------------------------------------------------------
 
+This is an "approximate" ZX Spectrum emulator config - it makes
+no attempt to be cycle-perfect, but there are speed adjust keys
+for the versions of the V6Z80Ps which do not have a 14MHz oscillator
+from which to derive a 3.5MHz CPU clock. It is also limited to
+loading only .sna image files.
+
+-------
+Changes
+-------
+
 v x013 - Changed ROM code to better activate Spectrum 48 Snapshots
        - Modified "Read from $0067 = Real Spectrum" logic.
        - Added version ID to all configs
