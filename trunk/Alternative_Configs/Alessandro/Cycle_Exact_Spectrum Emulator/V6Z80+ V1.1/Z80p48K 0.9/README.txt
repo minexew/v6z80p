@@ -13,12 +13,13 @@ Please, read the COPYRIGHT.txt file provided with the distribution package for f
 
 2. CORE DESCRIPTION
 ===================
-The core simulates a PAL ZX Spectrum 48K equipped with a ULA supporting the "ULA+ 64 color mode",
+The core simulates a ZX Spectrum 48K equipped with a ULA supporting the "ULA+ 64 color mode",
 a tape player and a Kempston joystick interface. The CPU clock frequence can be changed on-the-fly
 to 3.5MHz, 7MHz, 14MHz.
 
-PLEASE NOTE! The actual core needs a PAL TV to display the ZX Spectrum screen (please use the VGA
-to SCART RGB cable supplied with the board).
+PLEASE NOTE! The does not support VGA output yet (please use the VGA to SCART RGB cable supplied
+with the board). The core starts in PAL mode, but by pressing F12 you can switch between PAL and
+NTSC mode.
 
 3. SETUP
 ========
