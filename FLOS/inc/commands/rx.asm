@@ -72,8 +72,8 @@ serl_dfb	ld b,e
 	
 
 	ld hl,serial_filename	;filename location in HL
-	ld a,$8F			;time out = 15 seconds / escape key active
-	call serial_get_header
+	ld a,$80			;no time out / escape key active
+	call serial_get_header	
 	or a
 	ret nz			;if a = 0 on return, header was OK
 	ld hl,ser_rec2_msg
@@ -94,7 +94,7 @@ rx_run	ld hl,ser_rec_msg
 
 	ld hl,serial_filename
 	ld (hl),"*"
-	ld a,$8F			;time out = 15 seconds / escape key active
+	ld a,$80			;no time out / escape key active
 	call serial_get_header
 	or a
 	ret nz			;if a = 0 on return, header was OK

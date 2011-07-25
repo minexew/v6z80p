@@ -128,7 +128,7 @@ kjt_mouse_irq_code		jp mouse_irq_code		;start + $100 (added in v579)
 packed_font	incbin "philfont3_packed.bin"
 end_of_font	db 0
 
-os_version	dw $0582
+os_version	dw $0583
 
 char_colour	db 0
 
