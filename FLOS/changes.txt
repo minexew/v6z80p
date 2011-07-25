@@ -2,6 +2,8 @@
 FLOS for V6Z80P version info:
 -----------------------------
 
+5.83 - 25/07/11 : RX command no longer times out. Press ESC to abort.
+
 5.82 - 30/12/10 : Updated the RX command: If "RX !" is entered, a file is downloaded and immediately
                   executed as code. If the file has a location header, the file will be loaded to
                   the location and bank specified in the header (note: any file size load truncation
