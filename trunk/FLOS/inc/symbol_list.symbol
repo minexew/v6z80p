@@ -160,6 +160,7 @@ storesp		EQU 00B16H
 sys_alt_write_page EQU 0000BH
 sys_audio_enable EQU 00008H
 sys_audio_flags	EQU 00008H
+sys_audio_panning EQU 00022H
 sys_baud_rate	EQU 0000CH
 sys_clear_irq_flags EQU 00002H
 sys_eeprom_byte	EQU 0000DH

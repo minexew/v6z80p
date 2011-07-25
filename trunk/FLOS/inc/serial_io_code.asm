@@ -468,7 +468,10 @@ quit_ser	scf
 	pop bc
 	ret
 	
-sb_dchesc	dec c			; decrement 'time out' seconds
+sb_dchesc	ld a,c			; if time out setting was 0, never time out
+	or a
+	jr z,wait_sto			
+	dec c			; decrement 'time out' seconds
 	jr nz,wait_sto		; gives up with carry flag set after [x] seconds
 ser_tout	ld a,$14			; ERROR CODE $14 - "SERIAL TIME OUT"	
 	jr quit_ser
