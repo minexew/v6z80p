@@ -1,5 +1,5 @@
-Z80p48K 0.9 README
-==================
+Z80p48K 0.9.1 README
+====================
 This is the binary distribution of Z80p48K, a ZX Spectrum 48K FPGA core for the V6Z80P+ v1.1
 or v1.1b board. Version 1.1 or 1.1b of the board are required because:
 
@@ -17,9 +17,14 @@ The core simulates a ZX Spectrum 48K equipped with a ULA supporting the "ULA+ 64
 a tape player and a Kempston joystick interface. The CPU clock frequence can be changed on-the-fly
 to 3.5MHz, 7MHz, 14MHz.
 
-PLEASE NOTE! The does not support VGA output yet (please use the VGA to SCART RGB cable supplied
-with the board). The core starts in PAL mode, but by pressing F12 you can switch between PAL and
-NTSC mode.
+The core does support VGA output and TV output (PAL or NTSC).
+
+To use VGA output, please close the VGA mode jumper (exactly as you do for FLOS in VGA mode).
+The core starts in 50Hz vertical refresh mode; pressing F12 you can switch between 50Hz (PAL emulation)
+and 60Hz (NTSC emulation).
+
+To use TV output, please use the VGA to SCART RGB cable supplied with the board.
+The core starts in PAL mode, but by pressing F12 you can switch between PAL and NTSC mode.
 
 3. SETUP
 ========
@@ -65,6 +70,12 @@ The keyboard now behaves like that of normal Spectrum. For reference, you will f
 binary core distribution root directory) a JPG image ("spectrum_keyboard.jpg") of a real ZX
 Spectrum 48K "rubby" keyboard. All the original keys are mapped to the corresponding PS/2 key;
 "CAPS SHIFT" is mapped on the PS/2 "LEFT SHIFT", "SYMBOL SHIFT" is mapped on "RIGHT SHIFT".
+
+- Scanline effect
+-----------------
+When the core starts in VGA mode, the "scanline" effect is enabled by default; this effect
+mimics the "stripes" you see on a TV screen. If you don't like this effect, you can enable/disable
+it with the key "F11".
 
 - Tape player
 -------------
@@ -123,7 +134,7 @@ Basic programming manual - http://www.worldofspectrum.org/ZXBasicManual/
 
 7. ACKNOWLEDGEMENTS
 ===================
-The Z80p48K 0.9 core is derived from the ZX-One 1.0 core.
+The Z80p48K 0.9.1 core is derived from the ZX-One 1.0 core.
 
 I'd like to sincerely thank:
 
