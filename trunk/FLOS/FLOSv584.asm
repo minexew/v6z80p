@@ -1450,7 +1450,7 @@ readcode	ld (os_extcmd_jmp_addr),hl	; store code execution address
 	push bc 
 	pop ix			; ix = addr of command subroutine code
 	ld hl,(os_args_start_lo)	; hl = 1st char after command + a space 
-	ld iy,fs_file_length	; IY = location of file_length and file_start_cluster (+4)
+	ld iy,fs_file_length	; IY = location of file_length and file_start_cluster (+8)
 	call os_exec_command	; a call allows commands to return with "ret"
 
 extcmd_r	push af			; <-FIRST INSTRUCTION ON RETURN FROM EXTERNAL COMMAND	
