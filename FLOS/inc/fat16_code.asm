@@ -2096,9 +2096,9 @@ fs_alt_filename		ds 12,0
 fs_filename_buffer		ds 12,0
 
 fs_file_pointer		dw 0,0
-fs_file_length		dw 0,0
-fs_file_length_temp		dw 0,0
-fs_file_start_cluster	dw 0
+fs_file_length		dw 0,0	;Do not change the order from here..
+fs_file_length_temp		dw 0,0	;
+fs_file_start_cluster	dw 0	;..to here. FLOS v584+ relies on it.
 fs_file_working_cluster	dw 0
 
 fs_z80_address		dw 0
