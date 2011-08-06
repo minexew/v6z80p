@@ -52,7 +52,7 @@
 #define Y_WINDOW_START                0x3
 #define Y_WINDOW_STOP                 0xD
 
-#define BUF_FOR_LOADING_SPRITES_4KB          0xF000
+#define BUF_FOR_LOADING_SPRITES_4KB          buffer4K
 
 // bank is 0 or 1
 #define SET_LIVE_SPRITE_REGISTER_BANK(b)     Game_SetReg_SprCtrl( Game_ReadReg_SprCtrl() & (~4) | ((b)<<2) );

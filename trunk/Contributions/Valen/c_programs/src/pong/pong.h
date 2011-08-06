@@ -42,6 +42,7 @@
 
 #define TILES_CREDITS_VRAM_ADDR     0x16000         // must be div by 0x1000 without reminder
 
+#include "game_state.h"
 #include "obj_score.h"
 #include "obj_ball.h"
 #include "obj_bat.h"
@@ -51,12 +52,6 @@
 
 
 
-typedef enum {
-    LEVEL = 0,
-    MENU,
-    CREDITS,
-    STARTUP,
-} GameState;
 
 
 typedef struct {
@@ -114,14 +109,11 @@ EXTERN_PONG GameObjYouWin       YouWinAnim;
 EXTERN_PONG LoadingIcon         loadingIcon;
 EXTERN_PONG GameObjGameMenu     gameMenu;
 
+// disk buffer, used for loading sprites and tiles
+// TODO: find another place for buffer (big buffer in globals is not a good idea)
+EXTERN_PONG BYTE                buffer4K[4096];
 
 
-/*static inline void myinline(BOOL b)
-{
-    byte a = 0;
-    game.is_one_player_mode = b;
-
-}*/
 
 void Game_InitLevelBegining(void);
 

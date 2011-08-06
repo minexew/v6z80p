@@ -1,5 +1,6 @@
 ../ai.c
 ../background.c
+../data_loader.c
 ../debug.c
 ../disk_io.c
 ../joystick.c
@@ -23,6 +24,7 @@
 ../v6assert.c
 ../ai.h
 ../background.h
+../data_loader.h
 ../debug.h
 ../disk_io.h
 ../joystick.h

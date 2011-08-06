@@ -45,7 +45,7 @@ void GameObjYouWin_Move(GameObjYouWin* this)
     byte i;
     short x_center = this->gobj.x + SPR_YOUWIN_WIDTH*16/2;
     short y_center = this->gobj.y + SPR_YOUWIN_HEIGHT*16/2;
-    byte angle = this->angle/256;   // get integer part of fixet point value
+    byte angle = this->angle/256;   // get integer part of fixed point value
     char radius;
 
     radius = HW_SIN_MUL(angle, 75);

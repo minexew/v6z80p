@@ -247,7 +247,7 @@ BOOL Sprites_LoadSprites(const char *pFilename, DWORD destSpriteMem)
 
 
     // load by 4KB chunks (using chunk loader)
-    ChunkLoader_Init(pFilename, (byte*)BUF_FOR_LOADING_SPRITES_4KB, PONG_BANK);
+    ChunkLoader_Init(pFilename, BUF_FOR_LOADING_SPRITES_4KB, PONG_BANK);
 
     while(!ChunkLoader_IsDone()) {
         if(!ChunkLoader_LoadChunk())
@@ -256,7 +256,7 @@ BOOL Sprites_LoadSprites(const char *pFilename, DWORD destSpriteMem)
         // copy from mem buf to sprite mem
         PAGE_IN_SPRITE_RAM();
         SET_SPRITE_PAGE(sprite_page);
-        memcpy((byte*)SPRITE_BASE, (byte*)BUF_FOR_LOADING_SPRITES_4KB, 0x1000);
+        memcpy((byte*)SPRITE_BASE, BUF_FOR_LOADING_SPRITES_4KB, 0x1000);
         PAGE_OUT_SPRITE_RAM();
 
         sprite_page++;

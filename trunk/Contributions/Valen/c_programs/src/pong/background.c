@@ -21,7 +21,7 @@ BOOL Background_LoadTiles(const char* pFilename, word vram_addr)
 
     // load by 4KB chunks (using chunk loader)
     //video_offset = 0x1000;
-    ChunkLoader_Init(pFilename,/*&myFile,*/ (byte*)BUF_FOR_LOADING_BACKGROUND_4KB, 0);
+    ChunkLoader_Init(pFilename,/*&myFile,*/ BUF_FOR_LOADING_BACKGROUND_4KB, 0);
 
     while(!ChunkLoader_IsDone()) {
         if(!ChunkLoader_LoadChunk())
@@ -30,7 +30,7 @@ BOOL Background_LoadTiles(const char* pFilename, word vram_addr)
         // copy from mem buf to video mem
         PAGE_IN_VIDEO_RAM();
         SET_VIDEO_PAGE(video_page);
-        memcpy((byte*)(VIDEO_BASE + video_offset), (byte*)BUF_FOR_LOADING_BACKGROUND_4KB, 0x1000);
+        memcpy((byte*)(VIDEO_BASE + video_offset), BUF_FOR_LOADING_BACKGROUND_4KB, 0x1000);
         PAGE_OUT_VIDEO_RAM();
 
 
