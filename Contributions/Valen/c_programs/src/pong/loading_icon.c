@@ -24,13 +24,13 @@ BOOL LoadingIcon_LoadSprites(void)
     const char *pFilename = SPRITES_DISKETTE_FILENAME;
     word size = 48*48;
 
-    if(!load_file_to_buffer(pFilename, 0, (byte*)BUF_FOR_LOADING_SPRITES_4KB, size, PONG_BANK))
+    if(!load_file_to_buffer(pFilename, 0, BUF_FOR_LOADING_SPRITES_4KB, size, PONG_BANK))
         return FALSE;
 
     // put to the end of sprite memory
     PAGE_IN_SPRITE_RAM();
     SET_SPRITE_PAGE(31);
-    memcpy((byte*)(SPRITE_BASE+4096-size), (byte*)BUF_FOR_LOADING_SPRITES_4KB, size);
+    memcpy((byte*)(SPRITE_BASE+4096-size), BUF_FOR_LOADING_SPRITES_4KB, size);
     PAGE_OUT_SPRITE_RAM();
 
     loadingIcon.isLoaded = TRUE;

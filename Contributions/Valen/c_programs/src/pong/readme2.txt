@@ -1,5 +1,3 @@
-!!! at this moment i'm do a rewriting of some pong parts to achive modular structure  (i'll remove this warnig then finished)
-----
 
 System memory banks:
 15 logic banks for v6z80p

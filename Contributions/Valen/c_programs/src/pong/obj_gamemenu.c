@@ -2,13 +2,16 @@
 #include <scan_codes.h>
 #include <OSCA_hardware_equates.h>
 
+#include <string.h>
+
 #include "obj_gamemenu.h"
 #include "obj_anim.h"
 #include "pool_gameobj.h"
 #include "keyboard.h"
+#include "math.h"
 #include "pong.h"
 
-
+GameObjMenuTxt objMenuTxt[2];
 
 void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y)
 {
@@ -20,10 +23,14 @@ void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y)
     this->gobj.width  = 0;
     this->gobj.height = 0;
 
+
     this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Move);
     this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Draw);
 
-    GameObjGameMenu_AllocateAnimObjects(this);
+    // init menu txt objects
+    objMenuTxt[0].gobj.in_use = TRUE;
+    GameObjMenuTxt_Init(&objMenuTxt[0], 100, 100);
+    PoolGameObj_AddObjToActiveObjects(&objMenuTxt[0].gobj);
 }
 
 void GameObjGameMenu_Move(GameObjGameMenu* this)
@@ -65,7 +72,6 @@ void GameObjGameMenu_Move(GameObjGameMenu* this)
         }
     }
 
-    GameObjGameMenu_MoveAnimObjects(this);
 }
 
 void GameObjGameMenu_Draw(GameObjGameMenu* this)
@@ -74,16 +80,52 @@ void GameObjGameMenu_Draw(GameObjGameMenu* this)
 }
 
 // -----------------------------------------
-// temp quick func
-GameObjAnim* menuTxt1;
-void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this)
+
+
+// **************************
+
+
+void GameObjMenuTxt_Init(GameObjMenuTxt* this, int x, int y)
+{
+    // init parent obj
+    GameObj_Init((GameObj*)this);
+
+    this->gobj.x = x;
+    this->gobj.y = y;
+    this->x_pos  = x;
+    this->y_pos  = y;
+
+
+    this->gobj.width  = 0;
+    this->gobj.height = 0;
+
+    this->angle = 0;
+
+    this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjMenuTxt_Move);
+    this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjMenuTxt_Draw);
+
+    GameObjMenuTxt_AllocateAnimObjects(this);
+}
+
+void GameObjMenuTxt_Move(GameObjMenuTxt* this)
+{
+    this;
+    GameObjMenuTxt_MoveAnimObjects(this);
+}
+
+void GameObjMenuTxt_Draw(GameObjMenuTxt* this)
+{
+    this;
+}
+
+void GameObjMenuTxt_AllocateAnimObjects(GameObjMenuTxt* this)
 {
     GameObjAnim* obj;
-    int x = 100, y = 100;
+    int x = 0, y = 0;
     //byte i;
     this;
 
-        
+
     //x = this->gobj.x;
     //y = this->gobj.y;
     obj = PoolGameObj_AllocateGameObjAnim();
@@ -97,21 +139,37 @@ void GameObjGameMenu_AllocateAnimObjects(GameObjGameMenu* this)
 
     }
 
-    menuTxt1 = obj;
+    this->menuTxt = obj;
 
+/*
+    ipol.Init();
+    ipol.AddKeyInt(0,   0);
+    ipol.AddKeyInt(100, 0xFFFF/2);
+*/
 }
 
-void GameObjGameMenu_MoveAnimObjects(GameObjGameMenu* this)
+void GameObjMenuTxt_MoveAnimObjects(GameObjMenuTxt* this)
 {
 
     WORD* pColor;
     WORD* pColor1;
     WORD* pColor2;
+    BYTE angle;
     this;
-    //menuTxt1->gobj.y = 0;
 
 
-    GameObjAnim_EnableMatteMode(menuTxt1, TRUE);
+    GameObjAnim_EnableMatteMode(this->menuTxt, TRUE);
+
+    angle = this->angle>>8;   // get integer part of 8.8 fixed point value
+    this->menuTxt->gobj.y = this->y_pos + HW_SIN_MUL(angle, 120);
+    this->menuTxt->gobj.x = this->x_pos;
+
+//    if(counter_hold_position++ > time_hold_position)
+
+
+    this->angle += (WORD)(1.5*256);
+    if(this->angle > 0xFFFF/2) this->angle = 0;
+
 
     pColor  = (WORD*)(PALETTE + ((BYTE)game.global_time>>2) * 2);
     pColor1 = (WORD*)(PALETTE + 127*2);
@@ -120,4 +178,24 @@ void GameObjGameMenu_MoveAnimObjects(GameObjGameMenu* this)
     *pColor2 = *pColor;
 
 
+}
+
+// **************************
+
+void Ipol_Init(Ipol* this)
+{
+    memset(this->key_array, 0, sizeof(this->key_array));
+    this->key_index = 0;
+}
+
+void Ipol_AddKeyInt(Ipol* this, WORD time, short key)
+{
+    this->key_array[this->key_index].time = time;
+    this->key_array[this->key_index].key  = key;
+    this->key_index++;
+}
+
+void Ipol_Compute(Ipol* this)
+{
+    this;
 }

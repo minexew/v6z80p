@@ -7,7 +7,8 @@ prjobjects = obj/pong.rel \
              obj/obj_ball.rel obj/obj_youwin.rel obj/obj_gamemenu.rel \
              obj/v6assert.rel obj/math.rel obj/background.rel \
              obj/keyboard.rel obj/joystick.rel obj/ai.rel \
-             obj/pool_gameobj.rel obj/pool_sprites.rel obj/debug.rel \
+             obj/pool_gameobj.rel obj/pool_sprites.rel \
+             obj/data_loader.rel obj/debug.rel \
              obj/sound_fx.rel \
              obj/low_memory_container.rel 
 prjbinaries = sound_fx/sfx_proxy.asm.bin
@@ -23,14 +24,6 @@ stack      = 0x6A80
 include ../../Makefile_inc
 
 # Project specific rules
-#obj/pong.rel : pong.h v6assert.h util.h sprites.h disk_io.h loading_icon.h obj_.h obj_anim.h \
-#               obj_score.h obj_rocket.h obj_bat.h obj_ball.h obj_youwin.h obj_gamemenu.h \
-#               sound_fx/sound_fx.h low_memory_container.h pong.c v6assert.c math.c sprites.c \
-#               background.c keyboard.c joystick.c ai.c disk_io.c loading_icon.c util.c \
-#               obj_.c obj_anim.c obj_score.c obj_rocket.c obj_ball.c obj_youwin.c \
-#               obj_bat.c obj_gamemenu.c pool_gameobj.c pool_sprites.c sound_fx/sound_fx.c \
-#               debug.c low_memory_container.c
-#	sdcc  -c -o obj/ $(INC) --std-sdcc99   -mz80   --opt-code-speed $(use_stdout)  -DOWN_SP=$(stack) --verbose pong.c 
 
 obj/pong.rel            : pong.c pong.h
 obj/util.rel            : util.c util.h
@@ -53,8 +46,10 @@ obj/joystick.rel        : joystick.c joystick.h
 obj/ai.rel              : ai.c ai.h
 obj/pool_gameobj.rel    : pool_gameobj.c pool_gameobj.h
 obj/pool_sprites.rel    : pool_sprites.c pool_sprites.h
+obj/data_loader.rel     : data_loader.c data_loader.h
 obj/debug.rel           : debug.c debug.h
 obj/sound_fx.rel        : sound_fx/sound_fx.c sound_fx/sound_fx.h
+
 
 
 
