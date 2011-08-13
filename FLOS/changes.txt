@@ -2,6 +2,11 @@
 FLOS for V6Z80P version info:
 -----------------------------
 
+5.85 - 13/08/11: Bugfix: Previously, when disks were formatted (by Windows) without a label,
+                 garbage was displayed as the disk name and FLOS would crash after a DIR.
+                 Now, the disk label from the partition table is used (normall "NO NAME")
+                 if no label is specified.
+
 5.84 - 01/08/11 : When a program loads, IY now points to its filelength (4 bytes)
                   and first cluster (iy+8: 2 bytes)
 
