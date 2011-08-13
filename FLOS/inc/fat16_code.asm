@@ -1,8 +1,9 @@
 ;----------------------------------------------------------------------------------------------
-; Z80 FAT16 File System code for FLOS v1.13 by Phil @ Retroleum
+; Z80 FAT16 File System code for FLOS v1.14 by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.13 - bugfix: "fs_sectors_per_fat" was not being updated by "fs_check_disk_format"
+; Changes:1.14 - bugfix: when no disk label is found in the root dir, the label from the partition record is now used.
+;	1.13 - bugfix: "fs_sectors_per_fat" was not being updated by "fs_check_disk_format"
 ;              - speeded up directory read routine
 ;	1.12 - "hl_to_filename" - If filename has forward slash at 9th (dot) character, it now counts as end of filename
 ;	1.11 - "Dir not found" error now always $23 ($0b no longer used)
@@ -298,24 +299,11 @@ fs_check_disk_format
 	pop bc
 	ret
 	
-go_checkf	call fs_calc_volume_offset	
-	ld hl,volume_mount_list
-	add hl,de
-	ld a,(hl)
-	or a				; is volume present according to mount list?
-	jr nz,fs_volpre
-	xor a
-	ld a,$0e				; error $0e = "volume not mounted"
-	ret
-
-fs_volpre	ld de,8				; get first sector of partition
-	add hl,de
-	ld de,sector_lba0
-	ld bc,4
-	ldir
-	call fs_read_sector
-	ret c	
-	
+go_checkf	call fs_read_partition_bootsector
+	ret c
+	or a
+	ret nz
+		
 	call fs_check_fat_sig		; must have a FAT signature at $1FE
 	jr nz,formbad		
 
@@ -385,8 +373,31 @@ got_cmaxc	push hl				;if max clusters > $ffef, truncate to $fff0
 cmaxok	pop hl
 	ld (fs_max_data_clusters),hl
 	xor a
-	ret				
+	ret
+	
+	
+;---------------------------------------------------------------------------------------------
+	
+fs_read_partition_bootsector
+				
+	call fs_calc_volume_offset		; reads the current volume's partition boot sector into the sector buffer	
+	ld hl,volume_mount_list
+	add hl,de
+	ld a,(hl)
+	or a				; is volume present according to mount list?
+	jr nz,fs_volpre
+	xor a
+	ld a,$0e				; error $0e = "volume not mounted"
+	ret
 
+fs_volpre	ld de,8				; get first sector of partition
+	add hl,de
+	ld de,sector_lba0
+	ld bc,4
+	ldir
+	call fs_read_sector
+	ret	
+	
 ;---------------------------------------------------------------------------------------------
 
 fs_calc_free_space
@@ -1319,28 +1330,31 @@ fs_get_volume_label
 	xor a
 	call set_abs_lba_and_read_sector
 	ret c
-	ld c,16				; sixteen 32 byte entries per sector
-	ld ix,sector_buffer
-find_vl	ld a,(ix+$b)
+	ld b,16				; sixteen 32 byte entries per sector
+	ld hl,sector_buffer+$b
+	ld de,32
+find_vl	ld a,(hl)
 	cp $8
-	jr nz,not_label
-	ld (ix+$b),0			; null terminate volume label
-	push ix
-	pop hl
-	push hl
-	ld b,11
-	call uppercasify_string
-	pop hl
+	jr z,got_vlabel			; assume volume label is in first sector
+	add hl,de				; of root dir. If not, get label from partition sector
+	djnz find_vl
+	call fs_read_partition_bootsector	
+	ret c
+	or a
+	ret nz
+	ld hl,sector_buffer+$2b+$b
+	
+got_vlabel
+
+	ld (hl),0				; null terminate volume label
+	xor a
+	ld de,$b
+	sbc hl,de
 	xor a
 	ret
 	
-not_label	ld de,32				; assume volume label is in first sector
-	add ix,de				; of root dir
-	djnz find_vl
-	xor a
-	ld a,$26				; error $26 - cant find volume label
-	ret		
 
+	
 ;---------------------------------------------------------------------------------------------
 ; Internal subroutines
 ;---------------------------------------------------------------------------------------------
