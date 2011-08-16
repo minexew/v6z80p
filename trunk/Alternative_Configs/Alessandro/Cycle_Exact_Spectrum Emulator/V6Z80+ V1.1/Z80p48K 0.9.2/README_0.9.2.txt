@@ -1,4 +1,4 @@
-Z80p48K 0.9.1 README
+Z80p48K 0.9.2 README
 ====================
 This is the binary distribution of Z80p48K, a ZX Spectrum 48K FPGA core for the V6Z80P+ v1.1
 or v1.1b board. Version 1.1 or 1.1b of the board are required because:
@@ -15,7 +15,8 @@ Please, read the COPYRIGHT.txt file provided with the distribution package for f
 ===================
 The core simulates a ZX Spectrum 48K equipped with a ULA supporting the "ULA+ 64 color mode",
 a tape player and a Kempston joystick interface. The CPU clock frequence can be changed on-the-fly
-to 3.5MHz, 7MHz, 14MHz.
+to 3.5MHz, 7MHz, 14MHz. From version 0.9.2 a ZXMMC interface (by Alessandro Poppi) is also emulated;
+this enables the ResiDOS (by Garry Lancaster) installation and use.
 
 The core does support VGA output and TV output (PAL or NTSC).
 
@@ -40,6 +41,16 @@ are not supported at present). See details below.
 You also can attach a joystick to the V6Z80P joystick port "A"; this joystick will be seen as
 a Kempston joystick. A PS/2 keyboard must be, of course, connected to the board.
 
+3.1 ResiDOS
+-----------
+To install and use ResiDOS, you should download (and copy in your SD card) the following file:
+http://www.worldofspectrum.org/residos/files/zxmmc/residos.tap
+
+I strongly suggest to download (and copy in your SD card) also two additional ResiDOS packages.
+
+TapeI/O support package: http://www.worldofspectrum.org/residos/files/tapeio.pkg
+Task manager package: http://www.worldofspectrum.org/residos/files/taskman.pkg
+
 4. USAGE
 ========
 Start FLOS.
@@ -57,6 +68,13 @@ LOADVID <file_name.tap> 20000
 
 (The Spectrum ROM file and a test .tap file (Manic Miner) are supplied in the "support files"
 subdirectory of this project)
+
+4.1 ResiDOS installation tape
+-----------------------------
+If you have copied the residos.tap installation file in your SD card, you can use it to install
+ResiDOS typing at the prompt:
+
+LOADVID residos.tap 20000
 
 At this point you can boot the Spectrum core typing:
 
@@ -92,6 +110,12 @@ The tape player can be stopped/restarted when needed with the key "TAB".
 - Reset
 -------
 The RESET jumper on the board is handled by the core and, if closed, will reset the ZX Spectrum.
+From version 0.9.2 the "ESC" key too will behave as reset key.
+
+- NMI
+-----
+From version 0.9.2 the "CAPS" key will behave as NMI button; this button, normally resetting
+a ZX Spectrum 48K using a standard ROM, is useful to enter the Task Manager in ResiDOS.
 
 - CPU clock speed
 -----------------
@@ -122,7 +146,63 @@ with the minimum of effort.
 For further information about ULA+, please visit the following link:
 http://sites.google.com/site/ulaplus/
 
-6. USEFUL LINKS
+6. ResiDOS
+==========
+If, during the core startup, you have loaded the residos.tap file, please load it following the standard
+procedure (LOAD "", TAB key, eventually speedup the loading process using the 7MHz or the 14MHz modes).
+
+At the end of the tape loading, you'll se the ResiDOS installation screen; please press the "Enter" key.
+The 512KB additional external RAM should be recognised. Press the "Enter" key again. The machine should
+reboot in a second, showing the ResiDOS welcome screen.
+
+The system will check for a SD card.
+
+Please: be sure to use an SD card max 2GB in size and formatted with a FAT16 filesystem! If your SD
+card work in FLOS, it should work in ResiDOS too.
+
+- Quickstart
+------------
+For a complete overview of the system, please go to the URL:
+http://www.worldofspectrum.org/residos/
+
+Just as an example, I will list some useful commands.
+
+%dir - will show the current directory
+%cd"<directory>" - will change the current directory
+%snapload"<snapshot file.SNA>" - will load&run a "SNA" file
+%snapload"<z80snapshot file.Z80>" - will load&run a "Z80" snapshot file
+
+IMPORTANT!: ResiDOS will recognise the snapshot type (SNA or Z80) by the file extension!
+Please, use the correct file extension.
+
+- Install new packages
+----------------------
+If you want to install a package, go into the directory containing the "pkg" file.
+Type the following commands at the prompt:
+
+CLEAR 32767
+%install"<file.pkg>"
+
+- TAPE I/O package
+------------------
+This package enables the loading of TAP and TZX (partially supported) files.
+To load a TAP file, go into the directory containing the "tap" file.
+Type the following commands at the prompt:
+
+%tapein"<tapfile.tap>" - this command attaches the TAP file
+%tapelist - optional, this command will list the TAP content
+LOAD "" - exactly as you do to normally load a tape
+
+- TASK MANAGER
+--------------
+Using this package you can store several tasks at the same time, and switch between them instantly
+from the task manager screen. To recall the task manager, press the NMI button ("CAPS" key on the
+keyboard).
+
+ResiDOS it's a wonderful system and can do a lot more! For further details, please go to the URL:
+http://www.worldofspectrum.org/residos/
+
+7. USEFUL LINKS
 ===============
 The best source for ZX Spectrum stuff is "World of Spectrum" (http://www.worldofspectrum.org/).
 From there you can download tons of games in "TAP" format (http://www.worldofspectrum.org/archive.html).
@@ -132,7 +212,11 @@ If you are new to the ZX Spectrum, you could take a look to the following guides
 ZX Spectrum introduction - http://www.worldofspectrum.org/ZXSpectrumIntroduction/
 Basic programming manual - http://www.worldofspectrum.org/ZXBasicManual/
 
-7. ACKNOWLEDGEMENTS
+If you are new to ResiDOS, you could take a look at the following website:
+
+ResiDOS homepage - http://www.worldofspectrum.org/residos/
+
+8. ACKNOWLEDGEMENTS
 ===================
 The Z80p48K 0.9.1 core is derived from the ZX-One 1.0 core.
 
@@ -152,7 +236,10 @@ Jens Schönfeld for the C-One and for hosting the ZX-One core on the C-One offic
 Phil Ruston for the support during the Z80p48K core development and for the V6Z80p board
 (http://www.retroleum.co.uk/v6z80p/)
 
-8. CONTACT ME
+Garry Lancaster for ResiDOS and the support during the Z80p48K core development
+(http://www.worldofspectrum.org/residos/)
+
+9. CONTACT ME
 =============
 You can contact me (Alessandro Dorigatti) at the following e-mail address: adorigatti@gmail.com
 Every feedback is welcome.
