@@ -1,8 +1,11 @@
 ;----------------------------------------------------------------------------------------------
-; Z80 FAT16 File System code for FLOS v1.14 by Phil @ Retroleum
+; Z80 FAT16 File System code for FLOS v1.15 by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.14 - bugfix: when no disk label is found in the root dir, the label from the partition record is now used.
+; Changes:1.15 - Changed re-direct wrapper for SD card driver 1.10 (ZF/CF)
+;	     - "Make dir" code size optimized a bit
+;	     - Fixed format command sector capacity truncate
+;	1.14 - bugfix: when no disk label is found in the root dir, the label from the partition record is now used.
 ;	1.13 - bugfix: "fs_sectors_per_fat" was not being updated by "fs_check_disk_format"
 ;              - speeded up directory read routine
 ;	1.12 - "hl_to_filename" - If filename has forward slash at 9th (dot) character, it now counts as end of filename
@@ -21,7 +24,7 @@
 ;         1.03 - checks for MBR at LBA 0 (FAT16 partition must be within first 65536 sectors)
 ;
 ;
-; Known "issues":
+; Known issues:
 ; ---------------
 ; If a disk full error is returned during a file write: The file reported length is not truncated
 ; Allows a file to be created in root even if there's no space for it
@@ -30,7 +33,7 @@
 ;
 ; All routines return carry clear / zero flag set if OK
 ;
-; Carry set = hardware error, A = error byte from hardware (0 = timed out) 
+; Carry set = hardware error, A = error byte from hardware 
 ;
 ; Carry clear, A = 	$00 - Command comleted OK
 ;		$01 - Disk full
@@ -93,45 +96,38 @@ got_dev_info
 	inc hl
 	ld d,(hl)
 	inc hl
-	ld c,(hl)			;got device capacity in C:DE
-	
-	push bc
-	push de		
-	inc c			;c = (total sectors / 65536) + 1
-spc_loop	ld a,1			;working cluster size
-spc_comp	cp c			;sectors per cluster can only be 1,2,4,8,16,32 or 64
-	jr z,spcvalok
-	rlca
-	cp $80
-	jr nz,spc_comp
-	inc c			
+	ld c,(hl)			;got device capacity in BC:DE
+	inc hl
+	ld b,(hl)
+	ld a,b
+	or a
+	jr nz,fs_truncs
 	ld a,c
-	cp $41			;if cluster size reaches $41 and still hasn't matched
-	jr nz,spc_loop		;then card is > 2GB, force c:de to $400000 and cluster
-	pop de			;size to $40
-	pop bc
-	ld a,$40
-	ld c,a			
-	ld de,0
-	push bc
-	push de				
+	cp $3f
+	jr c,fs_fssok		;if more than $3f0000 sectors, fix at $3f0000
+fs_truncs	ld de,$0000
+	ld bc,$003f
+
+fs_fssok	ld a,c
+	ld hl,$0080		;find appropriate cluster size (in h)
+fs_fcls	add hl,hl
+	cp h
+	jr nc,fs_fcls
 	
-spcvalok	push af			;copy generic partition boot sector data to sector buffer
-	ld hl,bootsector_stub	;sector buffer will still be clear from ops at start
-	ld de,sector_buffer
+	exx
+	ld hl,bootsector_stub	;copy generic partition boot sector data to sector buffer
+	ld de,sector_buffer		;sector buffer will still be clear from ops at start
 	ld bc,$3f
 	ldir
+	exx
 	
-	pop hl			;pushed A popped to H (cluster size)
-	pop de			;get capacity back in C:DE
-	pop bc
-	ld a,c
-	or a
+	ld a,b
+	or c
 	jr nz,ts_dword
 	ld (sector_buffer+$13),de	;set total sectors (word) when < 65536
 	jr ts_done
-ts_dword	ld b,0
-	ld (sector_buffer+$20),de     ;set total sectors (dword lo) when >65535
+
+ts_dword	ld (sector_buffer+$20),de     ;set total sectors (dword lo) when >65535
 	ld (sector_buffer+$22),bc	;set total sectors (dword hi) when >65535
 
 ts_done	ld a,h			;A = cluster size
@@ -743,26 +739,28 @@ clrdiren	ld (de),a
 	ret c				;hardware error?
 	
 	call fs_clear_sector_buffer
-	ld ix,sector_buffer			;make the standard "." and ".." sub-directories
-	ld (ix+$00),$2e			;in first sector of new directory
-	ld (ix+$01),$20
-	ld (ix+$20),$2e
-	ld (ix+$21),$2e
-	ld (ix+$0b),$10
-	ld (ix+$2b),$10
+	ld hl,$202e			;make the standard "." and ".." sub-directories
+	ld (sector_buffer),hl		;in first sector of new directory	
+	ld h,l
+	ld (sector_buffer+$20),hl
+	ld a,$10
+	ld (sector_buffer+$0b),a
+	ld (sector_buffer+$2b),a
 	ld de,(fs_new_file_cluster)		; "." entry's cluster
-	ld (ix+$1a),e
-	ld (ix+$1b),d
+	ld (sector_buffer+$1a),de
 	call fs_get_dir_block		; ".." entry's cluster
-	ld (ix+$3a),e
-	ld (ix+$3b),d
-	ld (ix+$18),$21			;set date: Jan 1 1980
-	ld (ix+$38),$21			;set date: Jan 1 1980
-	ld b,9
-mndelp	ld (ix+$02),32
-	ld (ix+$22),32
-	inc ix
-	djnz mndelp
+	ld (sector_buffer+$3a),de
+	ld a,$21
+	ld (sector_buffer+$18),a		;set date: Jan 1 1980		
+	ld (sector_buffer+$38),a		;set date: Jan 1 1980
+	dec a
+	ld ix,sector_buffer			
+	ld b,9				
+mndelp	ld (ix+$02),a			;fill remaining filename data with spaces			
+	ld (ix+$22),a			
+	inc ix				
+	djnz mndelp			
+		
 	ld hl,(fs_new_file_cluster)		;write to first sector of the new dir cluster
 	xor a
 	call cluster_and_offset_to_lba
@@ -2055,8 +2053,9 @@ secaccend	pop iy
 	pop hl
 	pop de
 	pop bc
-	ccf			;flip carry flag so that 1 = IDE error
-	ret			;a = will be ide error reg bits in that case (00 = timeout)
+	ret z			; if ZF set on return, operation completed without error
+	scf
+	ret			; otherwise CF set and A = error code
 
 
 fs_write_sector	

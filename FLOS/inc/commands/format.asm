@@ -14,8 +14,12 @@ os_cmd_format
 	ld a,$1f
 	or a
 	ret
-
-fgotargs	
+	
+fgotargs	push hl
+	ld a,1			;quiet mode on
+	call os_mount_volumes	;refresh mount list
+	pop hl
+	
 	ld de,fs_sought_filename
 	call fs_clear_filename			
 	push hl			;use 2nd parameter as label if supplied
@@ -89,15 +93,15 @@ format_dev
 	or a
 	jr nz,form_err
 
-	ld hl,ok_txt		;say "OK"
-	call os_print_string
+	ld hl,ok_msg		;say "OK"
+	call show_packed_text_and_cr
 	
 f_end	call os_cmd_remount		;remount drives and show list
 	ret
 
 form_err
-	ld hl,ferr_txt
-	call os_print_string
+	ld hl,disk_err_msg
+	call show_packed_text_and_cr
 	jr f_end
 	
 	
@@ -137,10 +141,6 @@ form_dev_warn2
 formatting_txt
 
 	db 11,11,"Formatting.. ",0
-
-ok_txt	db "OK",11,11,0
-
-ferr_txt	db "ERROR!",11,11,0
 
 default_label	
 

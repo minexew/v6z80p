@@ -19,7 +19,7 @@ test_get_id
 	ld hl,test_message
 	ld bc,$0022
 	ld de,$0011
-	scf
+	xor a
 	ret
 
 test_read_sector
@@ -28,12 +28,12 @@ test_read_sector
 	ld hl,sector_buffer
 	ld bc,512
 	call os_bchl_memfill
-	scf
+	xor a
 	ret
 
 test_write_sector
 	
-	scf
+	xor a
 	ret
 	
 ;--------------------------------------------------------------------------------------------------
