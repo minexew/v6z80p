@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * DISK TOOL (PARTIONER) V0.03 by P.Ruston '08 - '10 		       *
+; * DISK TOOL (PARTION/FORMATTER) V0.04 by P.Ruston '08 - '11 	       *
 ; ****************************************************************************
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
@@ -222,6 +222,8 @@ waitkey	call kjt_wait_key_press
 	jp z,delete_part
 	cp "3"
 	jp z,format_part
+	cp "4"
+	jp z,remount_devs
 	
 	jr waitkey
 	
@@ -832,6 +834,13 @@ bootsector_stub
 
 ;---------------------------------------------------------------------------------------------------
 
+remount_devs
+
+	ld a,1
+	call kjt_mount_volumes
+	jp begin
+
+;---------------------------------------------------------------------------------------------------
 	
 disk_error
 
@@ -972,9 +981,8 @@ mbr_data		incbin "mbr_data.bin"
 
 app_banner
 
-	db "  ***********************************",11
-	db "  * DISK TOOL V0.03 - P.Ruston 2010 *",11
-	db "  ***********************************",11,11,0
+	db "  DISK TOOL V0.04 by Phil Ruston 2011",11
+	db "  ===================================",11,11,0
 	
 
 device	db 0
@@ -1062,6 +1070,7 @@ menu_txt		db "Options:",11
 		db "1  : Make new partition",11
 		db "2  : Delete last partition",11
 		db "3  : Format a partition",11
+		db "4  : Remount devices",11
 		db "ESC: Quit",0
 		
 
