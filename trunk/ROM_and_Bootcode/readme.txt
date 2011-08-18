@@ -12,6 +12,20 @@ app, inserting the data into page 0, address $f000 (and page 1, address $f000
 as a back up).
 
 
+Updating bootcode on the EEPROM
+-------------------------------
+
+If your OSCA/FLOS system is relatively up to date, simply load the latest
+version of EEPROM.EXE and choose the "Update Bootcode" option. Send the
+file "bootcode.epr" Update both the primary version of the bootcode first,
+reboot and if all OK then update the backup copy.
+
+
+If you have old versions of OSCA/FLOS, the latest version of the program
+"EEPROM.EXE" may not work. If this the case you use the command "FIRMWARE.EXE"
+to completely overwrite slots 0-2 with the latest bootcode and config data.
+
+
 *************
 * Revisions *
 *************
