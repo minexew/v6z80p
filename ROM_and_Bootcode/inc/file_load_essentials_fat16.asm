@@ -16,7 +16,7 @@ find_os_file_fat16
 	ld l,a
 	ld (sector_lba2),a
 retry_fbs	ld (sector_lba0),hl
-	call sdc_read_sector		; read sector zero
+	call fs_read_sector			; read sector zero
 	ret c				; quit on hardware error
 
 	ld hl,(sector_buffer+$1fe)		; check signature @ $1FE (applies to MBR and boot sector)
@@ -82,7 +82,7 @@ ffnnxtsec	ld hl,(fs_root_dir_loc_lba)		; set up LBA for a root dir scan
 	ld (sector_lba0),hl			; sector low bytes
 	xor a
 	ld (sector_lba2),a			; sector MSB = 0
-	call sdc_read_sector
+	call fs_read_sector
 	ret c
 
 	ld b,16				; sixteen 32 byte entries per sector
@@ -142,7 +142,7 @@ fs_flnc	ld a,(fs_cluster_size)		; find_os_file must be called first!!
 fs_flns	ld a,c				
 	ld hl,(fs_file_working_cluster) 
 	call cluster_and_offset_to_lba
-	call sdc_read_sector		;read first sector of file
+	call fs_read_sector		;read first sector of file
 	ret c				;h/w error?
 
 	push bc				;stash sector pos / countdown
@@ -183,7 +183,7 @@ fs_dadok	ld a,b				;last byte of sector?
 	ld (sector_lba0),hl
 	xor a
 	ld (sector_lba2),a
-	call sdc_read_sector
+	call fs_read_sector
 	ret c
 	push ix
 	ld ix,sector_buffer
@@ -261,13 +261,12 @@ doubclus	sla l				; cluster * 2
 ;-----------------------------------------------------------------------------------------------
 
 
-sdc_read_sector
+fs_read_sector
 
 	push bc
 	push de
 	push hl
-	call mmc_read_sector
-	ccf				;switch carry flag so set = error
+	call sd_read_sector		
 	pop hl
 	pop de
 	pop bc
