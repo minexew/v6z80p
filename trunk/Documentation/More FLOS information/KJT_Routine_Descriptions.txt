@@ -190,71 +190,33 @@ Output Registers : C:DE = number of sectors
 
 
 
-Routine name: kjt_find_file
+
+
+Routine name: kjt_load_file
 ---------------------------
 
-Action: Looks for a file on current disk, resets file pointer
 
-Input Registers  : HL = pointer to zero terminated filename to look for
+Action: Loads the specified file in its entirity to the specifed address.
 
-Output Registers : If Zero Flag is set: All OK. Registers are:
-                   B     = Bank file was saved from (always $5000 on FAT16)
-                   HL    = Address file was saved from (always $0 on FAT16)
-                   IX:IY = Length of file
-                   DE    = First disk cluster used by file
-                   
-			 If zero flag is not set: standard error codes.
+Input registers: IX   = address to load to
+                 B    = bank to load to
+                 HL   = zero terminated filename
 
+Output registers: Standard error codes 
 
+Notes:
 
-
-
-Routine name: kjt_set_file_pointer (use after find file, if desired)
---------------------------------------------------------------------
-
-Action: Moves the read point from the start of a file
-
-Input Registers  :  IX:IY = Offset in bytes from start of file.
-
-Output Registers :  none
+This routine both opens a file and reads all the data to RAM - for more
+flexibility use "kjt_open_file", "kjt_set_file_pointer", "kjt_set_read_length"
+and "kjt_read_file_data"
 
 
 
 
 
 
-
-Routine name: kjt_set_load_length (use after find file, if desired)
--------------------------------------------------------------------
-
-Action: Forces the read length of the file transfer to a certain value
-
-Input Registers  : IX:IY = Bytes to load
-
-Output Registers : none
-
-
-
-
-
-
-Routine name: kjt_force_load   (** kjt_find_file MUST be called first **)
--------------------------------------------------------------------------
-
-Action:  forces a file to be loaded to a particular address
-
-Input Registers  : HL = Load address.
-                   B  = Bank of load address.
-
-Output Registers : Standard error codes
-
-
-
-
-
-
-Routine name: kjt_save_file (Legacy)
-------------------------------------
+Routine name: kjt_save_file
+---------------------------
 
 Action: Saves a file to current disk / directory.
 
@@ -267,9 +229,82 @@ Output registers: Standard error codes
 
 Notes:
 
-This legacy routine both creates a new file and saves data to it - it cannot
-be used append new data to an existing file (will return "file already exists"
-error if attempted).
+This routine both creates a new file and saves data to it - it cannot
+be used append new data to an existing file (will return "file already
+exists" error if attempted).
+
+
+
+
+
+
+
+Routine name: kjt_open_file (formerly "kjt_find_file")
+------------------------------------------------------
+
+Action: Looks for a file on current disk and sets internal registers ready
+        for "kjt_read_file_data" call.
+
+Input Registers  : HL = pointer to zero terminated filename to look for
+
+Output Registers : If Zero Flag is set: All OK. Registers are:
+                   IX:IY = Length of file
+                   DE    = First disk cluster used by file
+                   
+		   If zero flag is not set: standard error codes.
+
+Notes:  File pointer is set to 0, transfer length = total file size 
+
+
+
+
+
+Routine name: kjt_set_file_pointer
+----------------------------------
+
+Action: Moves the read point from the start of a file
+
+Input Registers  :  IX:IY = Offset in bytes from start of file.
+
+Output Registers :  none
+
+Notes: Use after "kjt_open_file" (if required)
+
+
+
+
+
+
+Routine name: kjt_set_read_length - formerly "kjt_get_load_length" 
+------------------------------------------------------------------
+
+Action: Forces the read length of the file transfer to a certain value
+
+Input Registers  : IX:IY = Bytes to load
+
+Output Registers : none
+
+Notes: Use after kjt_find_file, if desired)
+
+
+
+
+
+
+Routine name: kjt_read_file_data (formerly "kjt_force_load") 
+------------------------------------------------------------
+
+
+Action:  Loads data (from the previously opened file) to a specified address.
+
+Input Registers  : HL = Destination address
+                   B  = Destination bank
+
+Output Registers : Standard error codes
+
+
+Note: "kjt_find_file" MUST be called first before using this routine.
+
 
 
 
@@ -281,7 +316,7 @@ Routine name: kjt_create_file
 
 Action: Makes a file stub for a new file on current disk, current directory.
 
-Input Registers : HL = address of zero terminated filename.
+Input Registers : HL = address of zero-terminated filename.
 		      
 
 Output Registers : Standard error codes
@@ -292,12 +327,12 @@ Output Registers : Standard error codes
 
 
 
-Routine name: kjt_write_bytes_to_file 
---------------------------------------
+Routine name: kjt_write_to_file (formerly "kjt_write_bytes_to_file")
+--------------------------------------------------------------------
 
 Action: Appends new data to an existing file on current disk / directory.
 
-Input Registers:HL   = null-terminated ascii filename of file to be appended to
+Input Registers:    HL   = null-terminated ascii filename of file to be appended to
 		    IX   = address of source data
 		    B    = bank of source data
 	  	    C:DE = number of bytes to write
@@ -308,6 +343,8 @@ Notes:
 
 Returns "file not found" error if the file has not been previously created 
 with “kjt_create_file” or “kjt_save_file”
+
+
 
 
 
@@ -350,6 +387,7 @@ Output registers: If zero flag is set:
          
 		If zero flag is not set, standard error codes
 		(EG: $24 = Reached end of directory)
+
 
 
 
@@ -510,20 +548,20 @@ Output Registers : Standard error codes
              Some Detail Concerning File Loading In User Programs:
 ------------------------------------------------------------------------------
 
+There are two ways to load a file, a simple single-call approach and a more
+flexible random-access approach.
 
-To load a file first, HL should be set to a zero terminated ASCII string (the
-filename) and "kjt_find_file" called. This sets up the internal file info
-data structure and resets the file pointer offset to zero. On return, if
-the zero flag is not set the operation failed - see error codes - the
-following values are returned if the operation completed OK:
+To load a file simply, set HL to a zero terminated ASCII filename string,
+IX to the destination address and B to the destination bank, then call
+"kjt_load_file" - check the return code (if the zero flag is set, everything
+is OK).
 
-IX:IY = Length of file
+The more flexible way to load file data is as follows: Set HL to a zero
+terminated ASCII filename string and call "kjt_find_file". If the zero flag
+is set on return, the file was found the length of the file will be in IX:IY
+(if the zero flag is not set, check the error code flags).
 
-(Additionally, HL and B are set (address file was saved from) but these
-values were only valid under the PQFS filesystem and should now be ignored)
-
-
-Next, the following routines can be called *if required*
+Next, the following two routines can be called *if required*
 
  * "kjt_set_file_pointer" - this allows data to be read from anywhere within
     a file, instead of right from the start. Registers required:
@@ -531,20 +569,20 @@ Next, the following routines can be called *if required*
     IX:IY = Offset in bytes from start of file. 	
 
 
- * "kjt_set_load_length" - allows the length of transfer to be set.
+ * "kjt_set_file_length" - allows the length of transfer to be set.
     Registers required:
    
     IX:IY = Bytes to load. 
 
 
-Finally, "kjt_force_load" should be called to transfer the data to memory.
+Finally, "kjt_read_file_data" should be called to transfer the data to memory.
 
   Registers required:
    
    HL = Load address.
    B  = Bank of load address.
 
-Again, on return, if the zero flag is not set then the operation failed.
+Again, on return, if the zero flag is set then the operation completed OK.
 
 The file pointer is automatically incremented by the number of bytes transferred,
 therefore it is not necessary call "kjt_set_file_pointer" each time if a chunks
@@ -553,10 +591,10 @@ will return an error (code $1B). The load length MUST be set for each read (and
 load address set appropriately each call). 
 
 To maintain speed, a fresh seek from the start of the file is not performed each
-time this routine is called unless the filepointer has been changed. Internal
-variables must be maintained, therefore do not perform any other disk / serial
-operations (or anything that changes the sector buffer) between successive calls
-to this routine.
+time "kjt_read_file_data" is called unless the filepointer has been changed.
+Internal variables must be maintained, therefore do not perform any other 
+disk / serial operations (or anything that changes the sector buffer) between
+successive calls to this routine.
 
 
 
