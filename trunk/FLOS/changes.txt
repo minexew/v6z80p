@@ -1,6 +1,14 @@
 
-FLOS for V6Z80P version info:
------------------------------
+FLOS version info:
+------------------
+
+5.87 - 18/08/11  : Fixed bug introduced to "KJT_save_file" in v586 (filenames all spaces)
+		 : Changed previously obsolete "kjt_load_file" call - this will now load an
+                   entire file to a specific location (does not need to be opened first)
+                 : New names given to various KJT calls for clarity. (Old names still work)
+                 : "kjt_find_file" no longer returns $5000 in HL and 0 in B (which was pointless)
+
+5.86 - 17/08/11: Added SDHC driver.
 
 5.85 - 13/08/11: Bugfix: Previously, when disks were formatted (by Windows) without a label,
                  garbage was displayed as the disk name and FLOS would crash after a DIR.
