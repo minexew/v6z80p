@@ -4,6 +4,9 @@ IMPORTANT!
 Please make sure you use files from the correct folder as the
 FPGA config files are not compatible between PCBs.
 
+Visible differences between boards
+----------------------------------
+
 * The original V6Z80P PCB was made prior to August 2010 and marked
   "V6Z80P Rev 1.1"  (it has an 8 pin mini DIN socket for video)
 
