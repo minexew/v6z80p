@@ -1,5 +1,5 @@
 ;-------------------------------
-;Kernal jump table for FLOS v575
+;Kernal jump table for FLOS v587
 ;-------------------------------
 
 os_start equ $1000
@@ -25,6 +25,7 @@ kjt_parent_dir		equ os_start + $46
 kjt_root_dir		equ os_start + $49
 kjt_delete_dir		equ os_start + $4c
 kjt_find_file		equ os_start + $4f
+kjt_open_file		equ os_start + $4f	; alternative name for above
 kjt_load_file		equ os_start + $52
 kjt_save_file		equ os_start + $55
 kjt_erase_file		equ os_start + $58
@@ -32,18 +33,21 @@ kjt_get_total_sectors	equ os_start + $5b
 kjt_wait_key_press		equ os_start + $5e
 kjt_get_key		equ os_start + $61
 kjt_forcebank		equ os_start + $64
-kjt_force_bank		equ os_start + $64
+kjt_force_bank		equ os_start + $64	; alternative name for above
 kjt_getbank		equ os_start + $67
-kjt_get_bank		equ os_start + $67
+kjt_get_bank		equ os_start + $67	; alternative name for above
 kjt_create_file		equ os_start + $6a
 kjt_incbank		equ os_start + $6d
-kjt_inc_bank		equ os_start + $6d
+kjt_inc_bank		equ os_start + $6d	; alternative name for above
 kjt_compare_strings		equ os_start + $70
 kjt_write_bytes_to_file	equ os_start + $73
+kjt_write_to_file		equ os_start + $73	; alternative name for above
 kjt_bchl_memfill		equ os_start + $76
 kjt_force_load		equ os_start + $79
+kjt_read_file_data		equ os_start + $79	; alternative name for above
 kjt_set_file_pointer	equ os_start + $7c
 kjt_set_load_length		equ os_start + $7f
+kjt_set_read_length		equ os_start + $7f	; alternative name for above
 kjt_serial_receive_header	equ os_start + $82
 kjt_serial_receive_file	equ os_start + $85
 kjt_serial_send_file	equ os_start + $88
