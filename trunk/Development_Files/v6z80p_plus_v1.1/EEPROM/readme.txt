@@ -1,16 +1,18 @@
 
-"default.bin" is an EEPROM image file. It can be written to the 
-onboard EEPROM (location $0) with the FLOS app "firmware.exe", EG:
+default.bin is an EEPROM image file. It can be written to EEPROM
+location $0 (slot 0/block 0) with the FLOS app "firmware.exe", IE:
 
 FIRMWARE default.bin 0
 
-Note: This method of writing to the EEPROM is normally only used when 
-first setting up a new PCB. Afterwards it is best to use the more elegant
-app "EEPROM.EXE" which updates just specific locations of the EEPROM. 
+Note: This is a fairly ham-fisted approach, and only normally used to
+update the OS/Bootcode/FPGA config in one go from very old versions.
+Most the time it is best to use the more elegant app "EEPROM.EXE"
+which just updates the specific areas on the EEPROM. 
 
 
-Contents:
----------
+
+Contents of default.bin
+-----------------------
 
 [SLOT 0]
 
@@ -25,3 +27,9 @@ $20000-$3FFFF - OSCA 669 (PAL)
 [SLOT 2]
 
 $40000-$5FFFF - OSCA 668 (NTSC)
+
+
+
+
+
+
