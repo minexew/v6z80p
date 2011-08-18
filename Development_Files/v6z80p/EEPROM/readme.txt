@@ -1,5 +1,6 @@
-default.bin is an EEPROM image file. It can be written to
-EEPROM location $0 (block 0) with the FLOS app "firmware.exe", IE:
+
+default.bin is an EEPROM image file. It can be written to EEPROM
+location $0 (slot 0/block 0) with the FLOS app "firmware.exe", IE:
 
 FIRMWARE default.bin 0
 
@@ -10,8 +11,8 @@ which just updates the specific areas on the EEPROM.
 
 
 
-Contents:
----------
+Contents of default.bin
+-----------------------
 
 [SLOT 0]
 
