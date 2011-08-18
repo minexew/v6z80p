@@ -44,7 +44,7 @@ kjt_write_bytes_to_file	equ os_start + $73
 kjt_write_to_file		equ os_start + $73	; alternative name for above
 kjt_bchl_memfill		equ os_start + $76
 kjt_force_load		equ os_start + $79
-kjt_read_file_data		equ os_start + $79	; alternative name for above
+kjt_read_from_file		equ os_start + $79	; alternative name for above
 kjt_set_file_pointer	equ os_start + $7c
 kjt_set_load_length		equ os_start + $7f
 kjt_set_read_length		equ os_start + $7f	; alternative name for above
