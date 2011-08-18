@@ -19,12 +19,16 @@ as a back up).
 Bootcode
 --------
 
+6.14 (18-08-2011)
+
+Added SDHC support.
+
+
+
 6.13 (31-07-2010)
 
 Bug fix: Restored missing "jr nz" after find file which was causing loader
 to try loading from card even when no .osf was present.
-
-
 
 6.12 (20-07-2010) 
 
@@ -41,8 +45,6 @@ Can now press F1-F7 to select configs (only F1-F3 previously)
 
 Removed PQFS support code
 
-
-
 V6.11 (27-08-2009)
 
 The OS is now loaded from disk as a normal file, not directly from
@@ -54,7 +56,6 @@ attached - this is also required for serially downloaded code
 (although the contents are ignored in this case).
 
 The bootcode font is copied to Video RAM.
-
 
 V6.03:
 
@@ -80,7 +81,6 @@ v6.15 (25/10/2010):
 
 Clears new port "sys_vram_location", ensuring VRAM is placed at $2000 on reset.
 
-
 v6.14 (20-07-2010):
 
 This version became necessary mainly due to the V6Z80P+ having the
@@ -101,13 +101,10 @@ serial download can be forced (skipping the EEPROM bootcode checks) by
 pressing Fire and holding UP+RIGHT on a joystick in port A on system
 start up.
 
-
-
 v6.12:
 
 Port $20 is cleared on start-up so PAGE 0 of system RAM is located
 at Z80 $0000-$7FFF
-
 
 V6.11:
 
@@ -117,12 +114,10 @@ registers" bit in OSCA V652). It is read from EEPROM location $0f000
 
 Various other changes connected to bootcode 6.11 (font location etc).
 
-
 V6.05:
 
 All video Registers $200-$27f (except $217 - blitwidth) are now cleared
 on boot. This means the new modulo register (OSCA V645) is reset to zero.
-
 
 V6.04:
 
