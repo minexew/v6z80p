@@ -519,10 +519,11 @@ fs_open_file_command
 	bit 4,(ix+$0b)
 	ret nz
 	
-	ld l,(ix+$1a)		
-	ld h,(ix+$1b)
-	ld (fs_file_start_cluster),hl		; set file's start cluster
-
+	ld e,(ix+$1a)		
+	ld d,(ix+$1b)
+	ld (fs_file_start_cluster),de		; set file's start cluster
+	push de
+	
 	call set_and_test_filelength		; default load length = file length
 	xor a
 	ld (fs_filepointer_valid),a		; invalidate filepointer
@@ -531,10 +532,11 @@ fs_open_file_command
 	ld (fs_file_pointer),hl		; default file offset = 0
 	ld (fs_file_pointer+2),hl
 	
-	ld (fs_z80_bank),a			; reset load bank to 0
+	ld (fs_z80_bank),a			; by default load bank is 0
 	ld h,$50				; by default load to $5000 
 	ld (fs_z80_address),hl		
-	ld de,(fs_file_start_cluster)
+	
+	pop de				; DE returns start cluster
 	ret
 
 	
@@ -542,9 +544,9 @@ fs_open_file_command
 
 fs_read_data_command		
 
-;*******************************************
-;*** "fs_open_file" must be called first ***
-;*******************************************
+; FS_OPEN_FILE_COMMAND must be called first (and if desired load location, bank, file pointer and length
+; can be modified. If no changes are made prior to this call, an entire file from the start will be
+; loaded to $5000 - bank 0)
 
 
 	call prep_bank	
