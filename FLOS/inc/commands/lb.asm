@@ -8,7 +8,7 @@ os_cmd_lb
 	ret nz
 	
 	call filename_or_bust		;filename supplied?
-	call kjt_find_file			;get header info
+	call os_find_file			;get header info
 	ret nz
 	ld (filesize_cache_lsw),iy		;note the filesize
 	ld (filesize_cache_msw),ix
@@ -40,7 +40,7 @@ os_lbprok	call hexword_or_bust		;the call only returns here if the hex in DE is 
 os_lbnao	ld hl,(lb_load_addr)		;load the file
 	ld a,(lb_load_bank)
 	ld b,a
-	call kjt_force_load
+	call os_force_load
 	ret nz
 
 
