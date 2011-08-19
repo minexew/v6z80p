@@ -66,7 +66,7 @@ $08     : Z80 code: JP read_sector routine
 $0B     : Z80 code: JP write_sector routine
 $0E     : "get_id" routine starts here.
 
-The three routines should return with the Carry Flag set if the operation was a success.
+The three routines should return with the Zero Flag set if the operation was a success.
 Otherwise, if an error was encountered a hardware error code can be placed in A.
 The "get_id" (initialization) routine should additionally return with BC:DE set
 to the total capacity of the device in sectors, and HL set to the location of a
