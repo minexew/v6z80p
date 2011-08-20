@@ -8,8 +8,8 @@ Purpose:
 
 Provides file requesters for user programs, allowing the entry of filenames, listing
 of directories etc.   (There are versions that include the ability to initiate load
-and saves serially.) NOTE: The requester code does not actually perform the actual
-load and save operation, that is left to the user program.
+and saves serially.) NOTE: The requester code does not perform the actual load and
+save operation, that is left to the user program.
 
 
 How to add to a project:
