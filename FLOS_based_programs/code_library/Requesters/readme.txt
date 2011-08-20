@@ -78,7 +78,7 @@ When control is returned to the host program, the following registers are set up
                         Other errors (file system related) can be reported with
                         the call "file_error_requester" if required)
    
-Disk-loads checks the requested file exists before leaving the requester (by calling
+Disk-loads check the requested file exists before leaving the requester (by calling
 "kjt_find_file") if the filename does not exist, a window message is shown and
 control goes back to the main load requester. Therefore the user program can use
 "kjt_force_load" immediately (IE: without its own "kjt_find_file") if desired.
