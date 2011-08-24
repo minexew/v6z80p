@@ -13,7 +13,7 @@ include "system_equates.asm"
 buffer_size	equ 512			
 buffer_bank	equ 0
 
-vram_load_addr_hi	equ $2		;bits 23:16 of the VRAM load address
+vram_load_addr_hi	equ $0		;bits 23:16 of the VRAM load address
 vram_load_addr_lo	equ $0000		;bits 15:0 of the VRAM load address
 
 spectrum_rom_addr	equ $8000
@@ -21,17 +21,55 @@ spectrum_rom_bank	equ 1
 
 ;----------------------------------------------------------------------------------------------
 
+	push hl			; save argument location
+	
+	call kjt_get_dir_cluster	; save current dir
+	push de
 	ld a,0
 	call kjt_force_bank
-
 	call kjt_root_dir
 	ld hl,spectrum_dir
 	call kjt_change_dir	
 	ld hl,cfg_fn
 	ld b,0
 	ld ix,cfg_txt
-	call kjt_load_file			;load config file (if available)
+	call kjt_load_file		; load config file (if available)	
 	call kjt_root_dir
+	call put_slot_in_menu	; sets slot (if valid)
+
+	pop de
+	call kjt_set_dir_cluster	; restore original dir
+	
+	call check_reconf_slot	; if the slot hasn't been set, ask now
+	
+	pop hl			; restore argument location
+	jr z,find_args		; was the slot set?
+	ld hl,slot_not_set_txt
+	jr err_quit
+	
+find_args	ld a,(hl)			; examine name argument text, if encounter 0: give up
+	or a			
+	jp z,no_args
+	cp " "			; ignore leading spaces...
+	jr nz,got_args
+	inc hl
+	jr find_args
+
+got_args	push hl			; look for specified file
+	call kjt_find_file
+	pop hl		
+	jp z,ldreq_ok1		; load spectrum rom etc and restart if found
+	
+	ld hl,bad_fn_txt		; else show an error message
+err_quit	call kjt_print_string
+	xor a
+	ret
+
+
+no_args
+
+;----------------------------------------------------------------------------------------------
+	
 
 start	call kjt_clear_screen	
 	call put_slot_in_menu
@@ -195,16 +233,12 @@ restore_reconf
 	
 check_reconf_slot
 	
-	ld hl,cfg_txt			; has Spectrum Emu slot been set?
-	call kjt_ascii_to_hex_word
+	ld a,(slot_number)
 	or a
-	jr nz,set_cfg_slot
+	jr z,set_cfg_slot			; has Spectrum Emu slot been set?
 	xor a
-	ld a,e
-	ld (slot_number),a
 	ret
-
-
+	
 set_cfg_slot
 
 	ld hl,slot_prompt_txt
@@ -223,6 +257,8 @@ gotstr	push hl
 	ret nz
 	
 	ld a,e
+	ld (slot_number),a
+	
 	ld hl,cfg_txt
 	call kjt_hex_byte_to_ascii
 
@@ -260,12 +296,16 @@ put_slot_in_menu
 	call kjt_ascii_to_hex_word
 	or a
 	ret nz
+	ld a,e
+	ld (slot_number),a
+	
 	ld hl,(cfg_txt)
 	ld (slot_txt),hl
 	ld hl,slot_txt+2
 	ld bc,7
 	ld a," "
 	call kjt_bchl_memfill
+	xor a
 	ret
 	
 ;----------------------------------------------------------------------------------------
@@ -525,11 +565,16 @@ cfg_saved_txt	db 11,11,"Config file saved..",11,11,0
 
 filename_txt	ds 16,0	
 
+bad_fn_txt	db 11,"Can't find that file.",11,11,0
+
+slot_not_set_txt	db 11,"Please set the Spectrum EEPROM slot,",11,11,0
+
+
 options_txt
 
-	db "*********************************",11
-	db "* Spectrum Emulator Kickstarter *",11
-	db "*********************************",11
+	db "***************************************",11
+	db "* Spectrum Emulator Kickstarter v0.01 *",11
+	db "***************************************",11
 	db 11,11
 	db "Emulator EEPROM slot: "
 slot_txt	db "Undefined",11,11
