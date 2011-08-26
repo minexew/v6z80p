@@ -156,9 +156,8 @@ go_cfg	ld a,$88				; send "set config base" command
 	ld a,$a1
 	call send_byte_to_pic
 
-	nop				; should never actaully return as FPFA will be
-	nop				; reconfiguring
-	ret
+
+stop_here	jr stop_here
 	
 	
 ;------------------------------------------------------------------------------------------
@@ -334,6 +333,19 @@ cpyfndone	pop hl
 ;----------------------------------------------------------------------------------------
 
 load_to_vram
+
+	ld a,4
+	ld (vreg_vidctrl),a		;disable video
+	call vram_load_main
+	ret z
+	push af			;if there was an error, re-enable video
+	xor a			;(how useful this is depends how much vram has been overwritten)
+	ld (vreg_vidctrl),a
+	pop af
+	ret
+	
+vram_load_main
+	
 
 	ld h,vram_load_addr_hi	; H:DE = VRAM load address
 	ld de,vram_load_addr_lo
@@ -573,7 +585,7 @@ slot_not_set_txt	db 11,"Please set the Spectrum EEPROM slot,",11,11,0
 options_txt
 
 	db "***************************************",11
-	db "* Spectrum Emulator Kickstarter v0.01 *",11
+	db "* Spectrum Emulator Kickstarter v0.02 *",11
 	db "***************************************",11
 	db 11,11
 	db "Emulator EEPROM slot: "
