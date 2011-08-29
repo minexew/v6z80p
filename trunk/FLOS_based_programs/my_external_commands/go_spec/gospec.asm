@@ -173,7 +173,7 @@ retrylr	ld b,8				; invoke load requester
 	xor a
 	ld hl,0
 	call load_requester
-	jr z,ldreq_ok1
+	jr z,ftapok
 	
 	cp $ff				; aborted?
 	ret z
@@ -187,7 +187,27 @@ ld_error	or a
 hw_err1	call hw_error_requester
 	jr retrylr
 
-	
+
+ftapok	push hl
+	push ix				; put $0,$0 at the end of tap files to assist
+	pop bc				; tap player logic in Spectrum config determine the end
+	push iy
+	pop de
+	xor a
+	call write_vram_flat
+	ld bc,1
+	add iy,bc
+	jr nc,addmswok
+	inc ix
+addmswok	push ix
+	pop bc
+	push iy
+	pop de
+	xor a
+	call write_vram_flat
+	pop hl
+
+		
 ldreq_ok1	call copy_filename
 	
 	call kjt_clear_screen
@@ -552,7 +572,46 @@ pdswlp	djnz pdswlp		; allows time for PIC to act on received byte
 	pop de			; (PIC will wait 300 microseconds for next clock high)
 	pop bc
 	ret			
-	
+
+
+;-------------------------------------------------------------------------------------------------
+
+write_vram_flat
+
+;set c:de to vram address
+;set a to byte to write
+;carry set on return if all OK
+
+	ld b,a
+	ld l,e
+	ld a,d
+	and $1f
+	or $20
+	ld h,a
+	srl c
+	rr d
+	srl c
+	rr d
+	srl c
+	rr d
+	srl c
+	rr d
+	srl c
+	rr d
+	ld a,d
+	cp $40
+	ret nc
+	ld (vreg_vidpage),a	
+	in a,(sys_mem_select)
+	set 6,a
+	out (sys_mem_select),a
+	ld (hl),b
+	res 6,a
+	out (sys_mem_select),a
+	scf
+	ret
+
+
 ;-------------------------------------------------------------------------------------------------
 
 include "file_requesters.asm"
@@ -585,7 +644,7 @@ slot_not_set_txt	db 11,"Please set the Spectrum EEPROM slot,",11,11,0
 options_txt
 
 	db "***************************************",11
-	db "* Spectrum Emulator Kickstarter v0.02 *",11
+	db "* Spectrum Emulator Kickstarter v0.03 *",11
 	db "***************************************",11
 	db 11,11
 	db "Emulator EEPROM slot: "
