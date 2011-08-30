@@ -1644,3 +1644,9 @@ Output Registers: 	HL = Address of sector read routine
 			DE = Location of the LSB of the 32bit LBA variable
 			BC = Location of the sector buffer location variable 
 
+
+Note: The sector buffer location is automatically reset to the location that the
+OS requires whenever a filesystem routine is called (this includes the KJT read/write
+sector calls above.) Similarly, altering the LBA variable manually should not
+affect the filesystem.
+
