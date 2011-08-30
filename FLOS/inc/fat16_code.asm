@@ -1,8 +1,9 @@
 ;----------------------------------------------------------------------------------------------
-; Z80 FAT16 File System code for FLOS v1.15 by Phil @ Retroleum
+; Z80 FAT16 File System code for FLOS v1.16 by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.15 - Changed re-direct wrapper for SD card driver 1.10 (ZF/CF)
+; Changes:1.16 - Indirect sector buffer is set to OS sector buffer in read/write sector routines
+;	1.15 - Changed re-direct wrapper for SD card driver 1.10 (ZF/CF)
 ;	     - "Make dir" code size optimized a bit
 ;	     - Fixed format command sector capacity truncate
 ;	1.14 - bugfix: when no disk label is found in the root dir, the label from the partition record is now used.
@@ -2077,9 +2078,10 @@ fs_write_sector
 
 sector_access_redirect
 
-	
+	ld hl,sector_buffer
+	ld (sector_buffer_loc),hl
 	ld a,(current_driver)	;selects sector h/w code to run based on the currently selected device type
-	call locate_driver_base	;current device is updated by change_volume routine (or forced
+	call locate_driver_base	;current device is updated by change_volume routine (or forced..)
 	ex de,hl
 	ld b,0
 	add hl,bc			;HL = address of required routine

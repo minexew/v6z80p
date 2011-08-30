@@ -57,8 +57,7 @@ nofmatch	inc ix
 	cp d
 	jr nz,fndloop1
 	
-	ld a,$20			;completion message
-	or a
-	ret
+	jp ret_ok_msg		;OK completion message
+
 
 ;-----------------------------------------------------------------------

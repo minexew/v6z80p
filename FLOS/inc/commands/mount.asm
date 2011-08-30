@@ -4,7 +4,7 @@
 
 os_cmd_remount
 
-	ld a,0			;quiet mode off
+	xor a			;quiet mode off
 	call os_mount_volumes
 	call os_new_line
 	xor a

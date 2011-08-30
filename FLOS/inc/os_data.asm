@@ -443,6 +443,9 @@ volume_count	db 0
 vol_txt		db " VOL0:",0	;space prefix intentional
 dev_txt		db "DEV0:",0
 
+
+sector_buffer_loc	dw sector_buffer
+
 ;===================================================================================
 
 ; Each storage device type has a pointer to its driver code here.

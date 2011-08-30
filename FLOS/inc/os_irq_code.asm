@@ -25,6 +25,7 @@ keyboard_irq_code
 
 	push af			; buffer the keypresses, keep track of qualifiers
 	push hl			
+	push bc
 	
 	ld a,(key_release_mode)
 	or a
@@ -37,11 +38,11 @@ keyboard_irq_code
 	jr z,kirq_done	
 	
 	call qualifiers
-	ld a,l
+	ld a,c
 	cpl
-	ld l,a
+	ld c,a
 	ld a,(key_mod_flags)
-	and l			;update qualifier key releases
+	and c			;update qualifier key releases
 	ld (key_mod_flags),a
 	xor a
 	ld (key_release_mode),a
@@ -66,7 +67,7 @@ key_pressed
 not_krel	push af
 	call qualifiers
 	ld a,(key_mod_flags)	;update qualifier presses
-	or l
+	or c
 	ld (key_mod_flags),a
 	
 	ld hl,scancode_buffer
@@ -91,6 +92,8 @@ kbhok2	ld a,(key_mod_flags)	; also record qualifier status in buffer
 	
 kirq_done	ld a,%00000001
 	out (sys_clear_irq_flags),a	; clear keyboard interrupt flag
+	
+	pop bc
 	pop hl
 	pop af
 	ret
@@ -98,36 +101,17 @@ kirq_done	ld a,%00000001
 
 qualifiers
 
-	ld l,$40
-	cp $2f
-	ret z
-
-	ld l,$20
-	cp $27
-	ret z
-
-	ld l,$10
-	cp $59
-	ret z
-
-	ld l,$08
-	cp $11
-	ret z
-
-	ld l,$04
-	cp $1f
-
-	ld l,$02
-	cp $14
-	ret z
-
-	ld l,$01
-	cp $12
-	ret z
+	ld hl,qualklist	
+	ld c,$40		
+qual_lp	cp (hl)		
+	ret z		
+	srl c		
+	ret z		
+	inc hl		
+	jr qual_lp	
 	
-	ld l,0
-	ret
 	
+qualklist	db $2f,$27,$59,$11,$1f,$14,$12
 
 
 ;-----------------------------------------------------------------------------------------

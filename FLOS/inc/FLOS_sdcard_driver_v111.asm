@@ -42,7 +42,7 @@
 ;
 ;---------------------------------------------------------------------------------------------------
 
-; Define "sector_buffer" in main code (512 bytes)
+; Set "sector_buffer_loc" variable in main code
 
 ;--------------------------------------------------------------------------------------------------
 ; SD Card INITIALIZE code begins...
@@ -290,7 +290,7 @@ sd_read_csd
 sd_id_ok	ld b,18				; read the card info to sector buffer (16 bytes + 2 CRC)
 	call sd_read_bytes_to_sector_buffer	
 
-	ld ix,sector_buffer			; compute card's capacity
+	ld ix,(sector_buffer_loc)		; compute card's capacity
 	bit 6,(ix)
 	jr z,sd_csd_v1
 
@@ -378,9 +378,15 @@ sd_read_cid
 	ld b,18
 	call sd_read_bytes_to_sector_buffer	; read 16 bytes + 2 CRC
 	
-	ld hl,sector_buffer+$03		; Build name / version / serial number of card as ASCII string
-	ld de,sector_buffer+$20
-	ld bc,5
+	ld hl,(sector_buffer_loc)		; Build name / version / serial number of card as ASCII string
+	push hl
+	ld bc,$20
+	add hl,bc
+	ex de,hl				; DE = sector buffer + 20
+	pop hl
+	ld c,3
+	add hl,bc				; HL = sector buffer + 3
+	ld c,5
 	ld a,(sd_card_info)
 	and $f
 	jr nz,sd_cn5
@@ -437,7 +443,9 @@ sd_hvl2	ld (de),a
 	inc hl
 	djnz sd_snulp
 	
-	ld hl,sector_buffer+$20		; Drive (hardware) name string at HL
+	ld hl,(sector_buffer_loc)		; Drive (hardware) name string at HL
+	ld de,$20
+	add hl,de
 	xor a
 	ret
 
@@ -473,7 +481,7 @@ sd_dt_timeout
 	ret
 	
 	
-sd_dt_ok	ld hl,sector_buffer			; optimized read sector code
+sd_dt_ok	ld hl,(sector_buffer_loc)		; optimized read sector code
 	ld c,sys_spi_port
 	ld b,0
 	ld a,$ff
@@ -529,7 +537,7 @@ sd_write_sector_main
 	ld a,$fe
 	call sd_send_byte			; send $FE = packet header code
 
-	ld hl,sector_buffer			; optimized write sector code
+	ld hl,(sector_buffer_loc)		; optimized write sector code
 	ld c,sys_spi_port
 	ld b,$00
 sd_owsl1	nop				; 4 cycles padding time
@@ -541,7 +549,7 @@ sd_owsl2	nop				; 4 cycles padding time
 
 
 ;..............................................................................................	
-;	ld hl,sector_buffer			; write out 512 bytes for sector -unoptimized
+;	ld hl,(sector_buffer_loc)		; write out 512 bytes for sector -unoptimized
 ;	ld b,0
 ;sd_wslp	ld a,(hl)
 ;	call sd_send_byte
@@ -696,7 +704,7 @@ sd_gcr	or a				; zero flag set if Command response = 00
 
 sd_read_bytes_to_sector_buffer
 
-	ld hl,sector_buffer
+	ld hl,(sector_buffer_loc)
 	
 sd_read_bytes
 

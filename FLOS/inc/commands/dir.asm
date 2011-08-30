@@ -98,8 +98,7 @@ ndecchar	ld a,(hl)				;covert to ascii
 
 ;-----------------------------------------------------------------------
 
-div_line	ld c,"-"
-	ld b,19
+div_line	ld bc,$132d			;2d = "-"
 	call os_print_multiple_chars
 	call os_new_line
 	ret
