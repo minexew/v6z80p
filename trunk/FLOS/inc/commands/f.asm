@@ -23,6 +23,8 @@ os_cmd_f
 	ex de,hl			;get start address in HL
 	call os_bchl_memfill
 
+ret_ok_msg
+
 	ld a,$20			;OK completion message
 	or a
 	ret

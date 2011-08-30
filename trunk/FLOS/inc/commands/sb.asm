@@ -82,9 +82,9 @@ os_sfapp	ld hl,(sb_save_name_addr)
 	ld b,a
 	call kjt_write_bytes_to_file
 	ret nz	
-	ld a,$20				;ok msg
-	or a
-	ret
+	jp ret_ok_msg			;return with ok msg
+	
+	
 
 	
 ;-------------------------------------------------------------------------------------------------

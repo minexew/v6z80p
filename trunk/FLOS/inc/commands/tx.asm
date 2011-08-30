@@ -82,9 +82,7 @@ sers_dfb	ld b,e
 	or a			;if a = 0 on return, load was OK
 	ret nz			
 
-	ld a,$20			;ok message on return
-	or a
-	ret
+	jp ret_ok_msg		;return with ok msg
 
 sers_fsb	pop hl
 	jp os_no_filesize

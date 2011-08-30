@@ -127,8 +127,8 @@ shdir_lp	pop de
 	call kjt_set_dir_cluster
 	call kjt_get_dir_name
 	call kjt_print_string
-	ld hl,cd_fwdslash_txt
-	call kjt_print_string
+	ld bc,$012f			;2f = "/"
+	call os_print_multiple_chars
 	pop bc
 	dec c
 	jr nz,shdir_lp
@@ -137,7 +137,6 @@ shdir_lp	pop de
 	xor a
 	ret
 
-cd_fwdslash_txt	db "/",0	
 
 ;--------------------------------------------------------------------------------------------------
 
