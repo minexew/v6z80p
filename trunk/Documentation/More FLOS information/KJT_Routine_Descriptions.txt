@@ -1632,3 +1632,15 @@ Output Registers: Zero flag = set if all OK, not set if named variable not found
 
 
 
+
+kjt_get_sector_read_addr (FLOS 588+)
+------------------------
+
+Action: Returns the address of the selected drive's sector read routine, also LBA variable and sector_location_variable
+
+Input Registers : A = Device to access
+
+Output Registers: 	HL = Address of sector read routine
+			DE = Location of the LSB of the 32bit LBA variable
+			BC = Location of the sector buffer location variable 
+
