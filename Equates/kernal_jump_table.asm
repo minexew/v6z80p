@@ -1,5 +1,5 @@
 ;-------------------------------
-;Kernal jump table for FLOS v587
+;Kernal jump table for FLOS v588
 ;-------------------------------
 
 os_start equ $1000
@@ -63,7 +63,7 @@ kjt_dir_list_next_entry	equ os_start + $a3
 kjt_get_cursor_position	equ os_start + $a6
 kjt_read_sector		equ os_start + $a9
 kjt_write_sector		equ os_start + $ac
-kjt_set_sector_and_dev	equ os_start + $af
+kjt_not_used1		equ os_start + $af   ; (obsolete - place holder)
 kjt_plot_char		equ os_start + $b2 
 kjt_set_pen		equ os_start + $b5 
 kjt_background_colours	equ os_start + $b8
@@ -73,22 +73,22 @@ kjt_scroll_up		equ os_start + $c1
 kjt_flos_display		equ os_start + $c4
 kjt_get_dir_name		equ os_start + $c7
 kjt_get_key_mod_flags	equ os_start + $ca
-kjt_get_display_size	equ os_start + $cd   ; added in FLOS v559
-kjt_timer_wait		equ os_start + $d0	 ; added in FLOS v559
-kjt_get_charmap_addr_xy	equ os_start + $d3	 ; added in FLOS v559
-kjt_store_dir_position	equ os_start + $d6	 ; added in FLOS v560
-kjt_restore_dir_position	equ os_start + $d9	 ; added in FLOS v560
-kjt_mount_volumes		equ os_start + $dc	 ; added in FLOS v562
-kjt_get_device_info		equ os_start + $df   ; added in FLOS v565
-kjt_read_sysram_flat	equ os_start + $e2 	 ; (added in v570)
-kjt_write_sysram_flat	equ os_start + $e5 	 ; (added in v570)
-kjt_get_mouse_motion	equ os_start + $e8	 ; (added in v571)
-kjt_get_dir_cluster		equ os_start + $eb 	 ; (added in v572)
-kjt_set_dir_cluster		equ os_start + $ee   ; (added in v572)
-kjt_rename_file		equ os_start + $f1   ; (added in v572)
-
-kjt_set_envar		equ os_start + $f4   ; (added in v575)
-kjt_get_envar		equ os_start + $f7   ; (added in v572)
-kjt_delete_envar		equ os_start + $fa   ; (added in v572)
-kjt_file_sector_list	equ os_start + $fd   ; (added in v575)
-kjt_mouse_irq_code		equ os_start + $100  ; (added in v579)
+kjt_get_display_size	equ os_start + $cd   ; added in v559
+kjt_timer_wait		equ os_start + $d0	 ; added in v559
+kjt_get_charmap_addr_xy	equ os_start + $d3	 ; added in v559
+kjt_store_dir_position	equ os_start + $d6	 ; added in v560
+kjt_restore_dir_position	equ os_start + $d9	 ; added in v560
+kjt_mount_volumes		equ os_start + $dc	 ; added in v562
+kjt_get_device_info		equ os_start + $df   ; added in v565
+kjt_read_sysram_flat	equ os_start + $e2 	 ; added in v570
+kjt_write_sysram_flat	equ os_start + $e5 	 ; added in v570
+kjt_get_mouse_motion	equ os_start + $e8	 ; added in v571
+kjt_get_dir_cluster		equ os_start + $eb 	 ; added in v572
+kjt_set_dir_cluster		equ os_start + $ee   ; added in v572
+kjt_rename_file		equ os_start + $f1   ; added in v572
+kjt_set_envar		equ os_start + $f4   ; added in v575
+kjt_get_envar		equ os_start + $f7   ; added in v572
+kjt_delete_envar		equ os_start + $fa   ; added in v572
+kjt_file_sector_list	equ os_start + $fd   ; added in v575
+kjt_mouse_irq_code		equ os_start + $100  ; added in v579
+kjt_get_sector_read_addr	equ os_start + $103	 ; added in v588
