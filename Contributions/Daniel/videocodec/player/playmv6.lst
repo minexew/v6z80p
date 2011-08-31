@@ -1,0 +1,6952 @@
+prgbegin	EQU 5000
+audioper	EQU 030D
+xmin		EQU 0008
+xmax		EQU 000C
+ymin		EQU 0003
+ymax		EQU 0008
+		INCLUDE common.inc
+		INCLUDE kernal_jump_table.asm
+os_start	EQU 1000
+kjt_print_string EQU 1013
+kjt_clear_screen EQU 1016
+kjt_page_in_video EQU 1019
+kjt_page_out_video EQU 101C
+kjt_wait_vrt	EQU 101F
+kjt_keyboard_irq_code EQU 1022
+kjt_hex_byte_to_ascii EQU 1025
+kjt_ascii_to_hex_word EQU 1028
+kjt_dont_store_registers EQU 102B
+kjt_get_input_string EQU 102E
+kjt_check_volume_format EQU 1031
+kjt_change_volume EQU 1034
+kjt_unnecessary	EQU 1037
+kjt_get_volume_info EQU 103A
+kjt_format_device EQU 103D
+kjt_make_dir	EQU 1040
+kjt_change_dir	EQU 1043
+kjt_parent_dir	EQU 1046
+kjt_root_dir	EQU 1049
+kjt_delete_dir	EQU 104C
+kjt_find_file	EQU 104F
+kjt_open_file	EQU 104F
+kjt_load_file	EQU 1052
+kjt_save_file	EQU 1055
+kjt_erase_file	EQU 1058
+kjt_get_total_sectors EQU 105B
+kjt_wait_key_press EQU 105E
+kjt_get_key	EQU 1061
+kjt_forcebank	EQU 1064
+kjt_force_bank	EQU 1064
+kjt_getbank	EQU 1067
+kjt_get_bank	EQU 1067
+kjt_create_file	EQU 106A
+kjt_incbank	EQU 106D
+kjt_inc_bank	EQU 106D
+kjt_compare_strings EQU 1070
+kjt_write_bytes_to_file EQU 1073
+kjt_write_to_file EQU 1073
+kjt_bchl_memfill EQU 1076
+kjt_force_load	EQU 1079
+kjt_read_from_file EQU 1079
+kjt_set_file_pointer EQU 107C
+kjt_set_load_length EQU 107F
+kjt_set_read_length EQU 107F
+kjt_serial_receive_header EQU 1082
+kjt_serial_receive_file EQU 1085
+kjt_serial_send_file EQU 1088
+kjt_enable_mouse EQU 108B
+kjt_get_mouse_position EQU 108E
+kjt_get_version	EQU 1091
+kjt_set_cursor_position EQU 1094
+kjt_serial_tx_byte EQU 1097
+kjt_serial_rx_byte EQU 109A
+kjt_dir_list_first_entry EQU 109D
+kjt_dir_list_get_entry EQU 10A0
+kjt_dir_list_next_entry EQU 10A3
+kjt_get_cursor_position EQU 10A6
+kjt_read_sector	EQU 10A9
+kjt_write_sector EQU 10AC
+kjt_not_used1	EQU 10AF
+kjt_plot_char	EQU 10B2
+kjt_set_pen	EQU 10B5
+kjt_background_colours EQU 10B8
+kjt_draw_cursor	EQU 10BB
+kjt_get_pen	EQU 10BE
+kjt_scroll_up	EQU 10C1
+kjt_flos_display EQU 10C4
+kjt_get_dir_name EQU 10C7
+kjt_get_key_mod_flags EQU 10CA
+kjt_get_display_size EQU 10CD
+kjt_timer_wait	EQU 10D0
+kjt_get_charmap_addr_xy EQU 10D3
+kjt_store_dir_position EQU 10D6
+kjt_restore_dir_position EQU 10D9
+kjt_mount_volumes EQU 10DC
+kjt_get_device_info EQU 10DF
+kjt_read_sysram_flat EQU 10E2
+kjt_write_sysram_flat EQU 10E5
+kjt_get_mouse_motion EQU 10E8
+kjt_get_dir_cluster EQU 10EB
+kjt_set_dir_cluster EQU 10EE
+kjt_rename_file	EQU 10F1
+kjt_set_envar	EQU 10F4
+kjt_get_envar	EQU 10F7
+kjt_delete_envar EQU 10FA
+kjt_file_sector_list EQU 10FD
+kjt_mouse_irq_code EQU 1100
+kjt_get_sector_read_addr EQU 1103
+		End of INCLUDE
+		INCLUDE OSCA_hardware_equates.asm
+sys_mem_select	EQU 0000
+sys_irq_ps2_flags EQU 0001
+sys_irq_enable	EQU 0001
+sys_keyboard_data EQU 0002
+sys_clear_irq_flags EQU 0002
+sys_mouse_data	EQU 0003
+sys_ps2_joy_control EQU 0003
+sys_serial_port	EQU 0004
+sys_joy_com_flags EQU 0005
+sys_sdcard_ctrl1 EQU 0005
+sys_sdcard_ctrl2 EQU 0006
+sys_timer	EQU 0007
+sys_vreg_read	EQU 0007
+sys_audio_enable EQU 0008
+sys_audio_flags	EQU 0008
+sys_hw_flags	EQU 0009
+sys_hw_settings	EQU 0009
+sys_spi_port	EQU 000A
+sys_alt_write_page EQU 000B
+sys_baud_rate	EQU 000C
+sys_pic_comms	EQU 000D
+sys_eeprom_byte	EQU 000D
+sys_io_pins	EQU 000E
+sys_io_dir	EQU 000F
+sys_low_page	EQU 0020
+sys_vram_location EQU 0021
+sys_audio_panning EQU 0022
+audchan0_loc	EQU 0010
+audchan0_len	EQU 0011
+audchan0_per	EQU 0012
+audchan0_vol	EQU 0013
+audchan1_loc	EQU 0014
+audchan1_len	EQU 0015
+audchan1_per	EQU 0016
+audchan1_vol	EQU 0017
+audchan2_loc	EQU 0018
+audchan2_len	EQU 0019
+audchan2_per	EQU 001A
+audchan2_vol	EQU 001B
+audchan3_loc	EQU 001C
+audchan3_len	EQU 001D
+audchan3_per	EQU 001E
+audchan3_vol	EQU 001F
+palette		EQU 0000
+video_registers	EQU 0200
+vreg_xhws	EQU 0200
+vreg_vidctrl	EQU 0201
+vreg_window	EQU 0202
+vreg_yhws_bplcount EQU 0203
+vreg_rasthi	EQU 0204
+vreg_rastlo	EQU 0205
+vreg_vidpage	EQU 0206
+vreg_sprctrl	EQU 0207
+mult_write	EQU 0208
+mult_index	EQU 020A
+linedraw_colour	EQU 020B
+vreg_ext_vidctrl EQU 020C
+vreg_linecop_lo	EQU 020D
+vreg_linecop_hi	EQU 020E
+vreg_palette_ctrl EQU 020F
+blit_src_loc	EQU 0210
+blit_dst_loc	EQU 0212
+blit_src_mod	EQU 0214
+blit_dst_mod	EQU 0215
+blit_height	EQU 0216
+blit_width	EQU 0217
+blit_misc	EQU 0218
+blit_src_msb	EQU 0219
+blit_dst_msb	EQU 021A
+linedraw_reg0	EQU 0220
+linedraw_reg1	EQU 0222
+linedraw_reg2	EQU 0224
+linedraw_reg3	EQU 0226
+linedraw_reg4	EQU 0228
+linedraw_reg5	EQU 022A
+linedraw_reg6	EQU 022C
+linedraw_reg7	EQU 022E
+linedraw_lut0	EQU 0230
+linedraw_lut1	EQU 0232
+linedraw_lut2	EQU 0234
+linedraw_lut3	EQU 0236
+linedraw_lut4	EQU 0238
+linedraw_lut5	EQU 023A
+linedraw_lut6	EQU 023C
+linedraw_lut7	EQU 023E
+bitplane0a_loc	EQU 0240
+bitplane1a_loc	EQU 0244
+bitplane2a_loc	EQU 0248
+bitplane3a_loc	EQU 024C
+bitplane4a_loc	EQU 0250
+bitplane5a_loc	EQU 0254
+bitplane6a_loc	EQU 0258
+bitplane7a_loc	EQU 025C
+bitplane0b_loc	EQU 0260
+bitplane1b_loc	EQU 0264
+bitplane2b_loc	EQU 0268
+bitplane3b_loc	EQU 026C
+bitplane4b_loc	EQU 0270
+bitplane5b_loc	EQU 0274
+bitplane6b_loc	EQU 0278
+bitplane7b_loc	EQU 027C
+bitplane_reset	EQU 0243
+bitplane_modulo	EQU 0247
+sprite_registers EQU 0400
+spr_registers	EQU 0400
+mult_table	EQU 0600
+vreg_read	EQU 0700
+mult_read	EQU 0704
+sprite_base	EQU 1000
+video_base	EQU 2000
+		End of INCLUDE
+Defining MACRO sthp
+Params: dat
+Defining MACRO copwait
+Params: line
+Defining MACRO copsel
+Params: reg
+Defining MACRO copsto
+Params: dat
+Defining MACRO copstp
+Params: dat
+Defining MACRO copstw
+Params: dat
+Defining MACRO align
+Params: dat
+		End of INCLUDE
+		ORG 5000
+5000:ED00	DEFW of 1 words
+5002:1807	JR 500B
+5004:0050	DEFW of 1 words
+5006:00		DEFB of 1 bytes
+5007:01		DEFB of 1 bytes
+5008:3C0A	DEFW of 1 words
+500A:00		DEFB of 1 bytes
+500B:		label init
+500B:220553	LD (5305), HL
+500E:21F152	LD HL, 52F1
+5011:11F252	LD DE, 52F2
+5014:011300	LD BC, 0013
+5017:3600	LD (HL), 00
+5019:EDB0	LDIR
+501B:ED730353	LD (5303), SP
+501F:CD9110	CALL 1091
+5022:1178FA	LD DE, FA78
+5025:19		ADD HL, DE
+5026:D23F52	JP NC, 523F
+5029:2A0553	LD HL, (5305)
+502C:		label findname
+502C:7E		LD A, (HL)
+502D:B7		OR A
+502E:CA3C52	JP Z, 523C
+5031:FE20	CP 20
+5033:2003	JR NZ, 5038
+5035:		label skipspc
+5035:23		INC HL
+5036:18F4	JR 502C
+5038:		label namefound
+5038:CD4F10	CALL 104F
+503B:C0		RET NZ
+503C:ED53FF52	LD (52FF), DE
+5040:ED530153	LD (5301), DE
+5044:FD22F852	LD (52F8), IY
+5048:DD22FA52	LD (52FA), IX
+504C:FD22F452	LD (52F4), IY
+5050:DD22F652	LD (52F6), IX
+5054:AF		XOR A
+5055:CD0311	CALL 1103
+5058:ED43D852	LD (52D8), BC
+505C:22DB52	LD (52DB), HL
+505F:3E04	LD A, 04
+5061:320102	LD (0201), A
+5064:AF		XOR A
+5065:320002	LD (0200), A
+5068:320402	LD (0204), A
+506B:214002	LD HL, 0240
+506E:014000	LD BC, 0040
+5071:		label clrbp
+5071:77		LD (HL), A
+5072:EDA1	CPI
+5074:EA7150	JP PE, 5071
+5077:3D		DEC A
+5078:324702	LD (0247), A
+507B:3E02	LD A, 02
+507D:320302	LD (0203), A
+5080:3E10	LD A, 10
+5082:324102	LD (0241), A
+5085:87		ADD A, A
+5086:324902	LD (0249), A
+5089:326902	LD (0269), A
+508C:3E38	LD A, 38
+508E:320202	LD (0202), A
+5091:3E04	LD A, 04
+5093:320402	LD (0204), A
+5096:3E8C	LD A, 8C
+5098:320202	LD (0202), A
+509B:3E02	LD A, 02
+509D:320F02	LD (020F), A
+50A0:3E0E	LD A, 0E
+50A2:D300	OUT (00), A
+50A4:211753	LD HL, 5317
+50A7:110080	LD DE, 8000
+50AA:010C07	LD BC, 070C
+50AD:EDB0	LDIR
+50AF:3E07	LD A, 07
+50B1:D321	OUT (21), A
+50B3:3E44	LD A, 44
+50B5:D300	OUT (00), A
+50B7:3E02	LD A, 02
+50B9:320602	LD (0206), A
+50BC:AF		XOR A
+50BD:CD5052	CALL 5250
+50C0:3E01	LD A, 01
+50C2:320602	LD (0206), A
+50C5:3EFF	LD A, FF
+50C7:CD5052	CALL 5250
+50CA:AF		XOR A
+50CB:320602	LD (0206), A
+50CE:210080	LD HL, 8000
+50D1:110180	LD DE, 8001
+50D4:01FF7F	LD BC, 7FFF
+50D7:77		LD (HL), A
+50D8:EDB0	LDIR
+50DA:3E02	LD A, 02
+50DC:320602	LD (0206), A
+50DF:DD211002	LD IX, 0210
+50E3:AF		XOR A
+50E4:321002	LD (0210), A
+50E7:DD360140	LD (IX+01), 40
+50EB:321202	LD (0212), A
+50EE:321302	LD (0213), A
+50F1:321402	LD (0214), A
+50F4:321502	LD (0215), A
+50F7:DD3606CA	LD (IX+06), CA
+50FB:DD360840	LD (IX+08), 40
+50FF:321902	LD (0219), A
+5102:321A02	LD (021A), A
+5105:210753	LD HL, 5307
+5108:110000	LD DE, 0000
+510B:011000	LD BC, 0010
+510E:EDB0	LDIR
+5110:AF		XOR A
+5111:320E02	LD (020E), A
+5114:3C		INC A
+5115:320D02	LD (020D), A
+5118:3EFF	LD A, FF
+511A:D322	OUT (22), A
+511C:CDE252	CALL 52E2
+511F:AF		XOR A
+5120:D308	OUT (08), A
+5122:3E40	LD A, 40
+5124:D313	OUT (13), A
+5126:D317	OUT (17), A
+5128:D31B	OUT (1B), A
+512A:D31F	OUT (1F), A
+512C:0603	LD B, 03
+512E:3E0D	LD A, 0D
+5130:0E12	LD C, 12
+5132:ED79	OUT (C), A
+5134:0E16	LD C, 16
+5136:ED79	OUT (C), A
+5138:0E1A	LD C, 1A
+513A:ED79	OUT (C), A
+513C:0E1E	LD C, 1E
+513E:ED79	OUT (C), A
+5140:AF		XOR A
+5141:0600	LD B, 00
+5143:0E10	LD C, 10
+5145:ED79	OUT (C), A
+5147:0E14	LD C, 14
+5149:ED79	OUT (C), A
+514B:0E18	LD C, 18
+514D:ED79	OUT (C), A
+514F:0E1C	LD C, 1C
+5151:ED79	OUT (C), A
+5153:0602	LD B, 02
+5155:0E11	LD C, 11
+5157:ED79	OUT (C), A
+5159:0E15	LD C, 15
+515B:ED79	OUT (C), A
+515D:0E19	LD C, 19
+515F:ED79	OUT (C), A
+5161:0E1D	LD C, 1D
+5163:ED79	OUT (C), A
+5165:CD1F10	CALL 101F
+5168:CDE252	CALL 52E2
+516B:3E0F	LD A, 0F
+516D:D308	OUT (08), A
+516F:		label main
+516F:CD5D52	CALL 525D
+5172:3E27	LD A, 27
+5174:321702	LD (0217), A
+5177:AF		XOR A
+5178:3AF352	LD A, (52F3)
+517B:3C		INC A
+517C:E601	AND 01
+517E:32F352	LD (52F3), A
+5181:0600	LD B, 00
+5183:2002	JR NZ, 5187
+5185:0602	LD B, 02
+5187:		label bs2
+5187:0E10	LD C, 10
+5189:ED79	OUT (C), A
+518B:0E14	LD C, 14
+518D:ED79	OUT (C), A
+518F:0E18	LD C, 18
+5191:ED79	OUT (C), A
+5193:0E1C	LD C, 1C
+5195:ED79	OUT (C), A
+5197:210000	LD HL, 0000
+519A:220000	LD (0000), HL
+519D:3E10	LD A, 10
+519F:DB08	IN A, (08)
+51A1:CB67	BIT 4, A
+51A3:280D	JR Z, 51B2
+51A5:21330F	LD HL, 0F33
+51A8:220000	LD (0000), HL
+51AB:2AF152	LD HL, (52F1)
+51AE:23		INC HL
+51AF:22F152	LD (52F1), HL
+51B2:		label waitaudio
+51B2:DB08	IN A, (08)
+51B4:CB67	BIT 4, A
+51B6:28FA	JR Z, 51B2
+51B8:D302	OUT (02), A
+51BA:CD6110	CALL 1061
+51BD:B7		OR A
+51BE:C2E151	JP NZ, 51E1
+51C1:010000	LD BC, 0000
+51C4:ED5BFC52	LD DE, (52FC)
+51C8:2AF852	LD HL, (52F8)
+51CB:AF		XOR A
+51CC:ED52	SBC HL, DE
+51CE:22F852	LD (52F8), HL
+51D1:EB		EX DE, HL
+51D2:2AFA52	LD HL, (52FA)
+51D5:ED42	SBC HL, BC
+51D7:22FA52	LD (52FA), HL
+51DA:B4		OR H
+51DB:B5		OR L
+51DC:B2		OR D
+51DD:B3		OR E
+51DE:C26F51	JP NZ, 516F
+51E1:		label quit
+51E1:3E5A	LD A, 5A
+51E3:D322	OUT (22), A
+51E5:CDE252	CALL 52E2
+51E8:AF		XOR A
+51E9:D308	OUT (08), A
+51EB:D321	OUT (21), A
+51ED:D300	OUT (00), A
+51EF:320E02	LD (020E), A
+51F2:320D02	LD (020D), A
+51F5:320F02	LD (020F), A
+51F8:CDC410	CALL 10C4
+51FB:11235A	LD DE, 5A23
+51FE:2AF152	LD HL, (52F1)
+5201:CD1652	CALL 5216
+5204:21235A	LD HL, 5A23
+5207:		label skip0
+5207:23		INC HL
+5208:7E		LD A, (HL)
+5209:FE30	CP 30
+520B:28FA	JR Z, 5207
+520D:FE20	CP 20
+520F:2803	JR Z, 5214
+5211:CD1310	CALL 1013
+5214:		label skipdrop
+5214:AF		XOR A
+5215:C9		RET
+5216:		label DispHL
+5216:01F0D8	LD BC, D8F0
+5219:CD2F52	CALL 522F
+521C:0118FC	LD BC, FC18
+521F:CD2F52	CALL 522F
+5222:019CFF	LD BC, FF9C
+5225:CD2F52	CALL 522F
+5228:0EF6	LD C, F6
+522A:CD2F52	CALL 522F
+522D:0EFF	LD C, FF
+522F:		label Num1
+522F:3E2F	LD A, 2F
+5231:		label Num2
+5231:3C		INC A
+5232:09		ADD HL, BC
+5233:38FC	JR C, 5231
+5235:ED42	SBC HL, BC
+5237:EB		EX DE, HL
+5238:77		LD (HL), A
+5239:23		INC HL
+523A:EB		EX DE, HL
+523B:C9		RET
+523C:		label flos_nofile
+523C:3E0D	LD A, 0D
+523E:01		DEFB of 1 bytes
+523F:		label flos_nok
+523F:3E24	LD A, 24
+5241:B7		OR A
+5242:C9		RET
+5243:		label abort
+5243:ED7B0353	LD SP, (5303)
+5247:21FFFF	LD HL, FFFF
+524A:22F152	LD (52F1), HL
+524D:C3E151	JP 51E1
+5250:		label clearvid
+5250:2100E0	LD HL, E000
+5253:1101E0	LD DE, E001
+5256:01FF1F	LD BC, 1FFF
+5259:77		LD (HL), A
+525A:EDB0	LDIR
+525C:C9		RET
+525D:		label readframe
+525D:AF		XOR A
+525E:32FD52	LD (52FD), A
+5261:ED5BFF52	LD DE, (52FF)
+5265:0602	LD B, 02
+5267:D9		EXX
+5268:010004	LD BC, 0400
+526B:210080	LD HL, 8000
+526E:3AF352	LD A, (52F3)
+5271:E601	AND 01
+5273:2801	JR Z, 5276
+5275:09		ADD HL, BC
+5276:		label skipaddbuf
+5276:D9		EXX
+5277:CDC752	CALL 52C7
+527A:0601	LD B, 01
+527C:D9		EXX
+527D:2100A0	LD HL, A000
+5280:D9		EXX
+5281:CDC752	CALL 52C7
+5284:3A00A0	LD A, (A000)
+5287:FE10	CP 10
+5289:D24352	JP NC, 5243
+528C:FE0F	CP 0F
+528E:281F	JR Z, 52AF
+5290:47		LD B, A
+5291:B7		OR A
+5292:2803	JR Z, 5297
+5294:CDC752	CALL 52C7
+5297:		label skipaddload
+5297:ED53FF52	LD (52FF), DE
+529B:2101A0	LD HL, A001
+529E:		label decomploop
+529E:5E		LD E, (HL)
+529F:23		INC HL
+52A0:56		LD D, (HL)
+52A1:23		INC HL
+52A2:7A		LD A, D
+52A3:B3		OR E
+52A4:2808	JR Z, 52AE
+52A6:4E		LD C, (HL)
+52A7:23		INC HL
+52A8:46		LD B, (HL)
+52A9:23		INC HL
+52AA:EDB0	LDIR
+52AC:18F0	JR 529E
+52AE:		label skipdecomp
+52AE:C9		RET
+52AF:		label directload
+52AF:D9		EXX
+52B0:2101A0	LD HL, A001
+52B3:1100E0	LD DE, E000
+52B6:01FF01	LD BC, 01FF
+52B9:EDB0	LDIR
+52BB:EB		EX DE, HL
+52BC:D9		EXX
+52BD:060F	LD B, 0F
+52BF:CDC752	CALL 52C7
+52C2:ED53FF52	LD (52FF), DE
+52C6:C9		RET
+52C7:		label readloop
+52C7:C5		PUSH BC
+52C8:3AFE52	LD A, (52FE)
+52CB:CDFD10	CALL 10FD
+52CE:32FE52	LD (52FE), A
+52D1:21FD52	LD HL, 52FD
+52D4:34		INC (HL)
+52D5:34		INC (HL)
+52D6:D9		EXX
+52D7:		label smcsec
+52D7:220000	LD (0000), HL
+52DA:		label smcread
+52DA:CD0000	CALL 0000
+52DD:D9		EXX
+52DE:C1		POP BC
+52DF:10E6	DJNZ 52C7
+52E1:C9		RET
+52E2:		label waitdma
+52E2:3A0007	LD A, (0700)
+52E5:E640	AND 40
+52E7:47		LD B, A
+52E8:		label loop2
+52E8:3A0007	LD A, (0700)
+52EB:E640	AND 40
+52ED:B8		CP B
+52EE:28F8	JR Z, 52E8
+52F0:C9		RET
+52F1:		label varstart
+52F1:		label dropframes
+52F1:0000	DEFW of 1 words
+52F3:		label bufsel
+52F3:00		DEFB of 1 bytes
+52F4:		label movsiz
+52F4:00000000	DEFW of 2 words
+52F8:		label movply
+52F8:00000000	DEFW of 2 words
+52FC:		label framesiz
+52FC:0000	DEFW of 1 words
+52FE:		label secofs
+52FE:00		DEFB of 1 bytes
+52FF:		label cluster
+52FF:0000	DEFW of 1 words
+5301:		label startcluster
+5301:0000	DEFW of 1 words
+5303:		label oldsp
+5303:0000	DEFW of 1 words
+5305:		label varend
+5305:		label cmdlineptr
+5305:0000	DEFW of 1 words
+5307:		label pal
+5307:00000000	DEFW of 8 words
+530B:00000000
+530F:00005505
+5313:AA0AFF0F
+5317:		label palend
+5317:		label copper
+Expanding MACRO copwait
+line= ymin * 0008 
+DW line | C000 
+5317:18C0	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copwait
+		REPT 50
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5319:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+531B:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+531D:0000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+531F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5321:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5323:1000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5325:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5327:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5329:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+532B:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+532D:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+532F:0000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5331:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5333:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5335:1000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5337:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5339:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+533B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+533D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+533F:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5341:0000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5343:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5345:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5347:1000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5349:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+534B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+534D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+534F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5351:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5353:0000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5355:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5357:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5359:1000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+535B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+535D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+535F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5361:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5363:A040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5365:0000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5367:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5369:A040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+536B:1000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+536D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+536F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5371:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5373:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5375:C840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5377:0000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5379:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+537B:C840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+537D:1000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+537F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5381:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5383:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5385:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5387:F040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5389:0000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+538B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+538D:F040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+538F:1000	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5391:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5393:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5395:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5397:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5399:1840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+539B:0100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+539D:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+539F:1840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+53A1:1100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+53A3:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+53A5:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+53A7:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+53A9:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53AB:4040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+53AD:0100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+53AF:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53B1:4040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+53B3:1100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+53B5:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+53B7:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+53B9:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+53BB:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53BD:6840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+53BF:0100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+53C1:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53C3:6840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+53C5:1100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+53C7:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+53C9:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+53CB:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+53CD:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53CF:9040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+53D1:0100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+53D3:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53D5:9040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+53D7:1100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+53D9:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+53DB:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+53DD:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+53DF:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53E1:B840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+53E3:0100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+53E5:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53E7:B840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+53E9:1100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+53EB:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+53ED:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+53EF:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+53F1:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53F3:E040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+53F5:0100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+53F7:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+53F9:E040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+53FB:1100	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+53FD:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+53FF:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5401:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5403:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5405:0840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5407:0200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5409:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+540B:0840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+540D:1200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+540F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5411:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5413:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5415:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5417:3040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5419:0200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+541B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+541D:3040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+541F:1200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5421:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5423:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5425:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5427:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5429:5840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+542B:0200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+542D:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+542F:5840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5431:1200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5433:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5435:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5437:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5439:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+543B:8040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+543D:0200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+543F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5441:8040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5443:1200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5445:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5447:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5449:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+544B:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+544D:A840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+544F:0200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5451:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5453:A840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5455:1200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5457:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5459:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+545B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+545D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+545F:D040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5461:0200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5463:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5465:D040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5467:1200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5469:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+546B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+546D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+546F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5471:F840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5473:0200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5475:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5477:F840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5479:1200	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+547B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+547D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+547F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5481:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5483:2040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5485:0300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5487:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5489:2040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+548B:1300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+548D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+548F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5491:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5493:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5495:4840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5497:0300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5499:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+549B:4840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+549D:1300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+549F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+54A1:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+54A3:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+54A5:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54A7:7040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+54A9:0300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+54AB:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54AD:7040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+54AF:1300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+54B1:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+54B3:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+54B5:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+54B7:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54B9:9840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+54BB:0300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+54BD:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54BF:9840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+54C1:1300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+54C3:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+54C5:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+54C7:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+54C9:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54CB:C040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+54CD:0300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+54CF:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54D1:C040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+54D3:1300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+54D5:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+54D7:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+54D9:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+54DB:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54DD:E840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+54DF:0300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+54E1:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54E3:E840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+54E5:1300	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+54E7:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+54E9:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+54EB:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+54ED:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54EF:1040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+54F1:0400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+54F3:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+54F5:1040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+54F7:1400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+54F9:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+54FB:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+54FD:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+54FF:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5501:3840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5503:0400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5505:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5507:3840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5509:1400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+550B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+550D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+550F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5511:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5513:6040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5515:0400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5517:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5519:6040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+551B:1400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+551D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+551F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5521:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5523:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5525:8840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5527:0400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5529:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+552B:8840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+552D:1400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+552F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5531:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5533:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5535:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5537:B040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5539:0400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+553B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+553D:B040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+553F:1400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5541:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5543:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5545:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5547:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5549:D840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+554B:0400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+554D:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+554F:D840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5551:1400	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5553:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5555:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5557:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5559:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+555B:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+555D:0500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+555F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5561:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5563:1500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5565:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5567:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5569:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+556B:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+556D:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+556F:0500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5571:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5573:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5575:1500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5577:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5579:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+557B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+557D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+557F:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5581:0500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5583:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5585:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5587:1500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5589:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+558B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+558D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+558F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5591:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5593:0500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5595:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5597:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5599:1500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+559B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+559D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+559F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+55A1:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55A3:A040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+55A5:0500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+55A7:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55A9:A040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+55AB:1500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+55AD:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+55AF:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+55B1:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+55B3:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55B5:C840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+55B7:0500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+55B9:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55BB:C840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+55BD:1500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+55BF:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+55C1:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+55C3:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+55C5:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55C7:F040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+55C9:0500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+55CB:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55CD:F040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+55CF:1500	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+55D1:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+55D3:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+55D5:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+55D7:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55D9:1840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+55DB:0600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+55DD:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55DF:1840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+55E1:1600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+55E3:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+55E5:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+55E7:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+55E9:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55EB:4040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+55ED:0600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+55EF:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55F1:4040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+55F3:1600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+55F5:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+55F7:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+55F9:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+55FB:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+55FD:6840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+55FF:0600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5601:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5603:6840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5605:1600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5607:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5609:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+560B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+560D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+560F:9040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5611:0600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5613:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5615:9040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5617:1600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5619:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+561B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+561D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+561F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5621:B840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5623:0600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5625:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5627:B840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5629:1600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+562B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+562D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+562F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5631:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5633:E040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5635:0600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5637:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5639:E040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+563B:1600	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+563D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+563F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5641:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5643:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5645:0840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5647:0700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5649:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+564B:0840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+564D:1700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+564F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5651:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5653:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5655:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5657:3040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5659:0700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+565B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+565D:3040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+565F:1700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5661:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5663:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5665:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5667:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5669:5840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+566B:0700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+566D:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+566F:5840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5671:1700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5673:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5675:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5677:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5679:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+567B:8040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+567D:0700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+567F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5681:8040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5683:1700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5685:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5687:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5689:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+568B:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+568D:A840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+568F:0700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5691:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5693:A840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5695:1700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5697:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5699:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+569B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+569D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+569F:D040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+56A1:0700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+56A3:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56A5:D040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+56A7:1700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+56A9:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+56AB:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+56AD:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+56AF:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56B1:F840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+56B3:0700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+56B5:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56B7:F840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+56B9:1700	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+56BB:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+56BD:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+56BF:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+56C1:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56C3:2040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+56C5:0800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+56C7:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56C9:2040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+56CB:1800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+56CD:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+56CF:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+56D1:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+56D3:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56D5:4840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+56D7:0800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+56D9:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56DB:4840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+56DD:1800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+56DF:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+56E1:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+56E3:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+56E5:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56E7:7040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+56E9:0800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+56EB:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56ED:7040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+56EF:1800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+56F1:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+56F3:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+56F5:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+56F7:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56F9:9840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+56FB:0800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+56FD:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+56FF:9840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5701:1800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5703:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5705:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5707:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5709:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+570B:C040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+570D:0800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+570F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5711:C040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5713:1800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5715:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5717:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5719:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+571B:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+571D:E840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+571F:0800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5721:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5723:E840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5725:1800	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5727:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5729:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+572B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+572D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+572F:1040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5731:0900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5733:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5735:1040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5737:1900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5739:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+573B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+573D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+573F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5741:3840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5743:0900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5745:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5747:3840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5749:1900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+574B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+574D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+574F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5751:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5753:6040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5755:0900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5757:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5759:6040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+575B:1900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+575D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+575F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5761:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5763:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5765:8840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5767:0900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5769:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+576B:8840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+576D:1900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+576F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5771:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5773:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5775:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5777:B040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5779:0900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+577B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+577D:B040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+577F:1900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5781:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5783:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5785:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5787:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5789:D840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+578B:0900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+578D:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+578F:D840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5791:1900	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5793:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5795:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5797:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5799:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+579B:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+579D:0A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+579F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57A1:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+57A3:1A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+57A5:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+57A7:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+57A9:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+57AB:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57AD:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+57AF:0A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+57B1:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57B3:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+57B5:1A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+57B7:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+57B9:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+57BB:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+57BD:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57BF:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+57C1:0A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+57C3:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57C5:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+57C7:1A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+57C9:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+57CB:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+57CD:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+57CF:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57D1:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+57D3:0A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+57D5:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57D7:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+57D9:1A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+57DB:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+57DD:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+57DF:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+57E1:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57E3:A040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+57E5:0A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+57E7:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57E9:A040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+57EB:1A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+57ED:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+57EF:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+57F1:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+57F3:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57F5:C840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+57F7:0A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+57F9:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+57FB:C840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+57FD:1A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+57FF:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5801:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5803:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5805:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5807:F040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5809:0A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+580B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+580D:F040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+580F:1A00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5811:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5813:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5815:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5817:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5819:1840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+581B:0B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+581D:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+581F:1840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5821:1B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5823:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5825:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5827:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5829:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+582B:4040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+582D:0B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+582F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5831:4040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5833:1B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5835:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5837:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5839:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+583B:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+583D:6840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+583F:0B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5841:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5843:6840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5845:1B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5847:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5849:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+584B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+584D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+584F:9040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5851:0B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5853:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5855:9040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5857:1B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5859:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+585B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+585D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+585F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5861:B840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5863:0B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5865:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5867:B840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5869:1B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+586B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+586D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+586F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5871:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5873:E040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5875:0B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5877:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5879:E040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+587B:1B00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+587D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+587F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5881:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5883:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5885:0840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5887:0C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5889:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+588B:0840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+588D:1C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+588F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5891:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5893:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5895:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5897:3040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5899:0C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+589B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+589D:3040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+589F:1C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+58A1:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+58A3:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+58A5:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+58A7:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58A9:5840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+58AB:0C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+58AD:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58AF:5840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+58B1:1C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+58B3:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+58B5:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+58B7:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+58B9:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58BB:8040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+58BD:0C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+58BF:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58C1:8040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+58C3:1C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+58C5:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+58C7:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+58C9:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+58CB:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58CD:A840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+58CF:0C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+58D1:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58D3:A840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+58D5:1C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+58D7:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+58D9:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+58DB:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+58DD:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58DF:D040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+58E1:0C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+58E3:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58E5:D040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+58E7:1C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+58E9:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+58EB:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+58ED:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+58EF:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58F1:F840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+58F3:0C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+58F5:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+58F7:F840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+58F9:1C00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+58FB:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+58FD:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+58FF:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5901:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5903:2040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5905:0D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5907:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5909:2040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+590B:1D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+590D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+590F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5911:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5913:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5915:4840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5917:0D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5919:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+591B:4840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+591D:1D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+591F:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5921:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5923:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5925:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5927:7040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5929:0D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+592B:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+592D:7040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+592F:1D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5931:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5933:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5935:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5937:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5939:9840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+593B:0D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+593D:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+593F:9840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5941:1D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5943:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5945:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5947:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5949:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+594B:C040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+594D:0D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+594F:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5951:C040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5953:1D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5955:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5957:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5959:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+595B:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+595D:E840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+595F:0D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5961:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5963:E840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5965:1D00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5967:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5969:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+596B:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+596D:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+596F:1040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5971:0E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5973:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5975:1040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5977:1E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5979:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+597B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+597D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+597F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5981:3840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5983:0E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5985:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5987:3840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5989:1E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+598B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+598D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+598F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+5991:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5993:6040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5995:0E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5997:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5999:6040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+599B:1E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+599D:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+599F:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+59A1:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+59A3:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59A5:8840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+59A7:0E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+59A9:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59AB:8840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+59AD:1E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+59AF:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+59B1:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+59B3:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+59B5:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59B7:B040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+59B9:0E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+59BB:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59BD:B040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+59BF:1E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+59C1:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+59C3:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+59C5:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+59C7:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59C9:D840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+59CB:0E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+59CD:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59CF:D840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+59D1:1E00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+59D3:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+59D5:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+59D7:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+59D9:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59DB:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+59DD:0F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+59DF:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59E1:0040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+59E3:1F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+59E5:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+59E7:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+59E9:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+59EB:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59ED:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+59EF:0F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+59F1:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59F3:2840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+59F5:1F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+59F7:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+59F9:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+59FB:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0a_loc 
+DW reg | 8000 
+59FD:4082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+59FF:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5A01:0F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1a_loc 
+DW reg | 8000 
+5A03:4482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5A05:5040	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5A07:1F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5A09:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5A0B:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0000 
+DB dat , 0020 
+5A0D:0020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copsel
+reg= bitplane0b_loc 
+DW reg | 8000 
+5A0F:6082	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5A11:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) & 00FF 
+DB dat , 0000 
+5A13:0F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= bitplane1b_loc 
+DW reg | 8000 
+5A15:6482	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstp
+dat= ( ( ( count * 0002 + 0001 ) * 0028 ) ) & 00FF 
+DB dat , 0040 
+5A17:7840	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstp
+Expanding MACRO copsto
+dat= ( ( ( ( count * 0002 + 0001 ) * 0028 ) >> 0008 ) + 0010 ) & 00FF 
+DB dat , 0000 
+5A19:1F00	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copsto
+Expanding MACRO copsel
+reg= vreg_vidctrl 
+DW reg | 8000 
+5A1B:0182	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copsel
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5A1D:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+Expanding MACRO copstw
+dat= 0020 
+DB dat , 0020 
+5A1F:2020	DEFB of 2 bytes
+ENDM 
+		ENDM
+End of MACRO copstw
+		ENDM
+Expanding MACRO copwait
+line= 01FF 
+DW line | C000 
+5A21:FFC1	DEFW of 1 words
+ENDM 
+		ENDM
+End of MACRO copwait
+5A23:		label copperend
+5A23:		label dropstring
+5A23:30303030	DEFB of 25 bytes
+5A27:30206672
+5A2B:616D6528
+5A2F:73292064
+5A33:726F7070
+5A37:65640D0A
+5A3B:00
+5A3C:		label prgend
+Emiting raw binary from 5000 to 5A3B

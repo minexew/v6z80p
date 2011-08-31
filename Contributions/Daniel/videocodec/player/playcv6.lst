@@ -1,0 +1,813 @@
+prgbegin	EQU 5000
+xmin		EQU 0008
+xmax		EQU 000C
+ymin		EQU 0003
+ymax		EQU 0008
+xsiz		EQU 0050
+		INCLUDE common.inc
+		INCLUDE kernal_jump_table.asm
+os_start	EQU 1000
+kjt_print_string EQU 1013
+kjt_clear_screen EQU 1016
+kjt_page_in_video EQU 1019
+kjt_page_out_video EQU 101C
+kjt_wait_vrt	EQU 101F
+kjt_keyboard_irq_code EQU 1022
+kjt_hex_byte_to_ascii EQU 1025
+kjt_ascii_to_hex_word EQU 1028
+kjt_dont_store_registers EQU 102B
+kjt_get_input_string EQU 102E
+kjt_check_volume_format EQU 1031
+kjt_change_volume EQU 1034
+kjt_unnecessary	EQU 1037
+kjt_get_volume_info EQU 103A
+kjt_format_device EQU 103D
+kjt_make_dir	EQU 1040
+kjt_change_dir	EQU 1043
+kjt_parent_dir	EQU 1046
+kjt_root_dir	EQU 1049
+kjt_delete_dir	EQU 104C
+kjt_find_file	EQU 104F
+kjt_open_file	EQU 104F
+kjt_load_file	EQU 1052
+kjt_save_file	EQU 1055
+kjt_erase_file	EQU 1058
+kjt_get_total_sectors EQU 105B
+kjt_wait_key_press EQU 105E
+kjt_get_key	EQU 1061
+kjt_forcebank	EQU 1064
+kjt_force_bank	EQU 1064
+kjt_getbank	EQU 1067
+kjt_get_bank	EQU 1067
+kjt_create_file	EQU 106A
+kjt_incbank	EQU 106D
+kjt_inc_bank	EQU 106D
+kjt_compare_strings EQU 1070
+kjt_write_bytes_to_file EQU 1073
+kjt_write_to_file EQU 1073
+kjt_bchl_memfill EQU 1076
+kjt_force_load	EQU 1079
+kjt_read_from_file EQU 1079
+kjt_set_file_pointer EQU 107C
+kjt_set_load_length EQU 107F
+kjt_set_read_length EQU 107F
+kjt_serial_receive_header EQU 1082
+kjt_serial_receive_file EQU 1085
+kjt_serial_send_file EQU 1088
+kjt_enable_mouse EQU 108B
+kjt_get_mouse_position EQU 108E
+kjt_get_version	EQU 1091
+kjt_set_cursor_position EQU 1094
+kjt_serial_tx_byte EQU 1097
+kjt_serial_rx_byte EQU 109A
+kjt_dir_list_first_entry EQU 109D
+kjt_dir_list_get_entry EQU 10A0
+kjt_dir_list_next_entry EQU 10A3
+kjt_get_cursor_position EQU 10A6
+kjt_read_sector	EQU 10A9
+kjt_write_sector EQU 10AC
+kjt_not_used1	EQU 10AF
+kjt_plot_char	EQU 10B2
+kjt_set_pen	EQU 10B5
+kjt_background_colours EQU 10B8
+kjt_draw_cursor	EQU 10BB
+kjt_get_pen	EQU 10BE
+kjt_scroll_up	EQU 10C1
+kjt_flos_display EQU 10C4
+kjt_get_dir_name EQU 10C7
+kjt_get_key_mod_flags EQU 10CA
+kjt_get_display_size EQU 10CD
+kjt_timer_wait	EQU 10D0
+kjt_get_charmap_addr_xy EQU 10D3
+kjt_store_dir_position EQU 10D6
+kjt_restore_dir_position EQU 10D9
+kjt_mount_volumes EQU 10DC
+kjt_get_device_info EQU 10DF
+kjt_read_sysram_flat EQU 10E2
+kjt_write_sysram_flat EQU 10E5
+kjt_get_mouse_motion EQU 10E8
+kjt_get_dir_cluster EQU 10EB
+kjt_set_dir_cluster EQU 10EE
+kjt_rename_file	EQU 10F1
+kjt_set_envar	EQU 10F4
+kjt_get_envar	EQU 10F7
+kjt_delete_envar EQU 10FA
+kjt_file_sector_list EQU 10FD
+kjt_mouse_irq_code EQU 1100
+kjt_get_sector_read_addr EQU 1103
+		End of INCLUDE
+		INCLUDE OSCA_hardware_equates.asm
+sys_mem_select	EQU 0000
+sys_irq_ps2_flags EQU 0001
+sys_irq_enable	EQU 0001
+sys_keyboard_data EQU 0002
+sys_clear_irq_flags EQU 0002
+sys_mouse_data	EQU 0003
+sys_ps2_joy_control EQU 0003
+sys_serial_port	EQU 0004
+sys_joy_com_flags EQU 0005
+sys_sdcard_ctrl1 EQU 0005
+sys_sdcard_ctrl2 EQU 0006
+sys_timer	EQU 0007
+sys_vreg_read	EQU 0007
+sys_audio_enable EQU 0008
+sys_audio_flags	EQU 0008
+sys_hw_flags	EQU 0009
+sys_hw_settings	EQU 0009
+sys_spi_port	EQU 000A
+sys_alt_write_page EQU 000B
+sys_baud_rate	EQU 000C
+sys_pic_comms	EQU 000D
+sys_eeprom_byte	EQU 000D
+sys_io_pins	EQU 000E
+sys_io_dir	EQU 000F
+sys_low_page	EQU 0020
+sys_vram_location EQU 0021
+sys_audio_panning EQU 0022
+audchan0_loc	EQU 0010
+audchan0_len	EQU 0011
+audchan0_per	EQU 0012
+audchan0_vol	EQU 0013
+audchan1_loc	EQU 0014
+audchan1_len	EQU 0015
+audchan1_per	EQU 0016
+audchan1_vol	EQU 0017
+audchan2_loc	EQU 0018
+audchan2_len	EQU 0019
+audchan2_per	EQU 001A
+audchan2_vol	EQU 001B
+audchan3_loc	EQU 001C
+audchan3_len	EQU 001D
+audchan3_per	EQU 001E
+audchan3_vol	EQU 001F
+palette		EQU 0000
+video_registers	EQU 0200
+vreg_xhws	EQU 0200
+vreg_vidctrl	EQU 0201
+vreg_window	EQU 0202
+vreg_yhws_bplcount EQU 0203
+vreg_rasthi	EQU 0204
+vreg_rastlo	EQU 0205
+vreg_vidpage	EQU 0206
+vreg_sprctrl	EQU 0207
+mult_write	EQU 0208
+mult_index	EQU 020A
+linedraw_colour	EQU 020B
+vreg_ext_vidctrl EQU 020C
+vreg_linecop_lo	EQU 020D
+vreg_linecop_hi	EQU 020E
+vreg_palette_ctrl EQU 020F
+blit_src_loc	EQU 0210
+blit_dst_loc	EQU 0212
+blit_src_mod	EQU 0214
+blit_dst_mod	EQU 0215
+blit_height	EQU 0216
+blit_width	EQU 0217
+blit_misc	EQU 0218
+blit_src_msb	EQU 0219
+blit_dst_msb	EQU 021A
+linedraw_reg0	EQU 0220
+linedraw_reg1	EQU 0222
+linedraw_reg2	EQU 0224
+linedraw_reg3	EQU 0226
+linedraw_reg4	EQU 0228
+linedraw_reg5	EQU 022A
+linedraw_reg6	EQU 022C
+linedraw_reg7	EQU 022E
+linedraw_lut0	EQU 0230
+linedraw_lut1	EQU 0232
+linedraw_lut2	EQU 0234
+linedraw_lut3	EQU 0236
+linedraw_lut4	EQU 0238
+linedraw_lut5	EQU 023A
+linedraw_lut6	EQU 023C
+linedraw_lut7	EQU 023E
+bitplane0a_loc	EQU 0240
+bitplane1a_loc	EQU 0244
+bitplane2a_loc	EQU 0248
+bitplane3a_loc	EQU 024C
+bitplane4a_loc	EQU 0250
+bitplane5a_loc	EQU 0254
+bitplane6a_loc	EQU 0258
+bitplane7a_loc	EQU 025C
+bitplane0b_loc	EQU 0260
+bitplane1b_loc	EQU 0264
+bitplane2b_loc	EQU 0268
+bitplane3b_loc	EQU 026C
+bitplane4b_loc	EQU 0270
+bitplane5b_loc	EQU 0274
+bitplane6b_loc	EQU 0278
+bitplane7b_loc	EQU 027C
+bitplane_reset	EQU 0243
+bitplane_modulo	EQU 0247
+sprite_registers EQU 0400
+spr_registers	EQU 0400
+mult_table	EQU 0600
+vreg_read	EQU 0700
+mult_read	EQU 0704
+sprite_base	EQU 1000
+video_base	EQU 2000
+		End of INCLUDE
+Defining MACRO sthp
+Params: dat
+Defining MACRO copwait
+Params: line
+Defining MACRO copsel
+Params: reg
+Defining MACRO copsto
+Params: dat
+Defining MACRO copstp
+Params: dat
+Defining MACRO copstw
+Params: dat
+Defining MACRO align
+Params: dat
+		End of INCLUDE
+		ORG 5000
+5000:ED00	DEFW of 1 words
+5002:1807	JR 500B
+5004:0050	DEFW of 1 words
+5006:00		DEFB of 1 bytes
+5007:01		DEFB of 1 bytes
+5008:8B03	DEFW of 1 words
+500A:00		DEFB of 1 bytes
+500B:		label init
+500B:228953	LD (5389), HL
+500E:217553	LD HL, 5375
+5011:117653	LD DE, 5376
+5014:011300	LD BC, 0013
+5017:3600	LD (HL), 00
+5019:EDB0	LDIR
+501B:ED738753	LD (5387), SP
+501F:CD9110	CALL 1091
+5022:1178FA	LD DE, FA78
+5025:19		ADD HL, DE
+5026:D28852	JP NC, 5288
+5029:2A8953	LD HL, (5389)
+502C:		label findname
+502C:7E		LD A, (HL)
+502D:B7		OR A
+502E:CA8552	JP Z, 5285
+5031:FE20	CP 20
+5033:2003	JR NZ, 5038
+5035:		label skipspc
+5035:23		INC HL
+5036:18F4	JR 502C
+5038:		label namefound
+5038:CD4F10	CALL 104F
+503B:C0		RET NZ
+503C:ED538353	LD (5383), DE
+5040:ED538553	LD (5385), DE
+5044:FD227C53	LD (537C), IY
+5048:DD227E53	LD (537E), IX
+504C:FD227853	LD (5378), IY
+5050:DD227A53	LD (537A), IX
+5054:AF		XOR A
+5055:CD0311	CALL 1103
+5058:ED432153	LD (5321), BC
+505C:222453	LD (5324), HL
+505F:3E04	LD A, 04
+5061:320102	LD (0201), A
+5064:AF		XOR A
+5065:320002	LD (0200), A
+5068:320402	LD (0204), A
+506B:214002	LD HL, 0240
+506E:014000	LD BC, 0040
+5071:		label clrbp
+5071:77		LD (HL), A
+5072:EDA1	CPI
+5074:EA7150	JP PE, 5071
+5077:3D		DEC A
+5078:324702	LD (0247), A
+507B:3E03	LD A, 03
+507D:320302	LD (0203), A
+5080:3E10	LD A, 10
+5082:324102	LD (0241), A
+5085:87		ADD A, A
+5086:324902	LD (0249), A
+5089:326902	LD (0269), A
+508C:3E38	LD A, 38
+508E:320202	LD (0202), A
+5091:3E04	LD A, 04
+5093:320402	LD (0204), A
+5096:3E8C	LD A, 8C
+5098:320202	LD (0202), A
+509B:3E02	LD A, 02
+509D:320F02	LD (020F), A
+50A0:3E0E	LD A, 0E
+50A2:D300	OUT (00), A
+50A4:210080	LD HL, 8000
+50A7:110000	LD DE, 0000
+50AA:012032	LD BC, 3220
+Expanding MACRO sthp
+dat= ymin * 0008 
+LD ( HL ) , dat 
+50AD:3618	LD (HL), 18
+INC HL 
+50AF:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= 00C0 
+LD ( HL ) , dat 
+50B0:36C0	LD (HL), C0
+INC HL 
+50B2:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+50B3:		label storeloop
+50B3:3E88	LD A, 88
+Expanding MACRO sthp
+dat= 0040 
+LD ( HL ) , dat 
+50B5:3640	LD (HL), 40
+INC HL 
+50B7:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+50B8:CD3A53	CALL 533A
+50BB:3EA8	LD A, A8
+Expanding MACRO sthp
+dat= 0060 
+LD ( HL ) , dat 
+50BD:3660	LD (HL), 60
+INC HL 
+50BF:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+50C0:CD3A53	CALL 533A
+50C3:10EE	DJNZ 50B3
+Expanding MACRO sthp
+dat= 00FF 
+LD ( HL ) , dat 
+50C5:36FF	LD (HL), FF
+INC HL 
+50C7:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= 00C1 
+LD ( HL ) , dat 
+50C8:36C1	LD (HL), C1
+INC HL 
+50CA:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+50CB:3E07	LD A, 07
+50CD:D321	OUT (21), A
+50CF:3E44	LD A, 44
+50D1:D300	OUT (00), A
+50D3:3E02	LD A, 02
+50D5:320602	LD (0206), A
+50D8:AF		XOR A
+50D9:CD9952	CALL 5299
+50DC:3E01	LD A, 01
+50DE:320602	LD (0206), A
+50E1:3EFF	LD A, FF
+50E3:CD9952	CALL 5299
+50E6:AF		XOR A
+50E7:320602	LD (0206), A
+50EA:210080	LD HL, 8000
+50ED:110180	LD DE, 8001
+50F0:01FF7F	LD BC, 7FFF
+50F3:77		LD (HL), A
+50F4:EDB0	LDIR
+50F6:3E02	LD A, 02
+50F8:320602	LD (0206), A
+50FB:DD211002	LD IX, 0210
+50FF:AF		XOR A
+5100:321002	LD (0210), A
+5103:DD360140	LD (IX+01), 40
+5107:321202	LD (0212), A
+510A:321302	LD (0213), A
+510D:321402	LD (0214), A
+5110:321502	LD (0215), A
+5113:DD3606CA	LD (IX+06), CA
+5117:DD360840	LD (IX+08), 40
+511B:321902	LD (0219), A
+511E:321A02	LD (021A), A
+5121:AF		XOR A
+5122:320E02	LD (020E), A
+5125:3C		INC A
+5126:320D02	LD (020D), A
+5129:ED5B8353	LD DE, (5383)
+512D:0601	LD B, 01
+512F:D9		EXX
+5130:2100A0	LD HL, A000
+5133:D9		EXX
+5134:CD1053	CALL 5310
+5137:ED538353	LD (5383), DE
+513B:010000	LD BC, 0000
+513E:110002	LD DE, 0200
+5141:2A7C53	LD HL, (537C)
+5144:AF		XOR A
+5145:ED52	SBC HL, DE
+5147:227C53	LD (537C), HL
+514A:EB		EX DE, HL
+514B:2A7E53	LD HL, (537E)
+514E:ED42	SBC HL, BC
+5150:227E53	LD (537E), HL
+5153:2102A0	LD HL, A002
+5156:110200	LD DE, 0002
+5159:01FE01	LD BC, 01FE
+515C:EDB0	LDIR
+515E:3EFF	LD A, FF
+5160:D322	OUT (22), A
+5162:CD2B53	CALL 532B
+5165:AF		XOR A
+5166:D308	OUT (08), A
+5168:3E40	LD A, 40
+516A:D313	OUT (13), A
+516C:D317	OUT (17), A
+516E:D31B	OUT (1B), A
+5170:D31F	OUT (1F), A
+5172:3A01A0	LD A, (A001)
+5175:47		LD B, A
+5176:3A00A0	LD A, (A000)
+5179:0E12	LD C, 12
+517B:ED79	OUT (C), A
+517D:0E16	LD C, 16
+517F:ED79	OUT (C), A
+5181:0E1A	LD C, 1A
+5183:ED79	OUT (C), A
+5185:0E1E	LD C, 1E
+5187:ED79	OUT (C), A
+5189:AF		XOR A
+518A:0600	LD B, 00
+518C:0E10	LD C, 10
+518E:ED79	OUT (C), A
+5190:0E14	LD C, 14
+5192:ED79	OUT (C), A
+5194:0E18	LD C, 18
+5196:ED79	OUT (C), A
+5198:0E1C	LD C, 1C
+519A:ED79	OUT (C), A
+519C:0602	LD B, 02
+519E:0E11	LD C, 11
+51A0:ED79	OUT (C), A
+51A2:0E15	LD C, 15
+51A4:ED79	OUT (C), A
+51A6:0E19	LD C, 19
+51A8:ED79	OUT (C), A
+51AA:0E1D	LD C, 1D
+51AC:ED79	OUT (C), A
+51AE:CD1F10	CALL 101F
+51B1:CD2B53	CALL 532B
+51B4:3E0F	LD A, 0F
+51B6:D308	OUT (08), A
+51B8:		label main
+51B8:CDA652	CALL 52A6
+51BB:3E27	LD A, 27
+51BD:321702	LD (0217), A
+51C0:AF		XOR A
+51C1:3A7753	LD A, (5377)
+51C4:3C		INC A
+51C5:E601	AND 01
+51C7:327753	LD (5377), A
+51CA:0600	LD B, 00
+51CC:2002	JR NZ, 51D0
+51CE:0602	LD B, 02
+51D0:		label bs2
+51D0:0E10	LD C, 10
+51D2:ED79	OUT (C), A
+51D4:0E14	LD C, 14
+51D6:ED79	OUT (C), A
+51D8:0E18	LD C, 18
+51DA:ED79	OUT (C), A
+51DC:0E1C	LD C, 1C
+51DE:ED79	OUT (C), A
+51E0:210000	LD HL, 0000
+51E3:220000	LD (0000), HL
+51E6:3E10	LD A, 10
+51E8:DB08	IN A, (08)
+51EA:CB67	BIT 4, A
+51EC:280D	JR Z, 51FB
+51EE:21330F	LD HL, 0F33
+51F1:220000	LD (0000), HL
+51F4:2A7553	LD HL, (5375)
+51F7:23		INC HL
+51F8:227553	LD (5375), HL
+51FB:		label waitaudio
+51FB:DB08	IN A, (08)
+51FD:CB67	BIT 4, A
+51FF:28FA	JR Z, 51FB
+5201:D302	OUT (02), A
+5203:CD6110	CALL 1061
+5206:B7		OR A
+5207:C22A52	JP NZ, 522A
+520A:010000	LD BC, 0000
+520D:ED5B8053	LD DE, (5380)
+5211:2A7C53	LD HL, (537C)
+5214:AF		XOR A
+5215:ED52	SBC HL, DE
+5217:227C53	LD (537C), HL
+521A:EB		EX DE, HL
+521B:2A7E53	LD HL, (537E)
+521E:ED42	SBC HL, BC
+5220:227E53	LD (537E), HL
+5223:B4		OR H
+5224:B5		OR L
+5225:B2		OR D
+5226:B3		OR E
+5227:C2B851	JP NZ, 51B8
+522A:		label quit
+522A:3E5A	LD A, 5A
+522C:D322	OUT (22), A
+522E:CD2B53	CALL 532B
+5231:AF		XOR A
+5232:D308	OUT (08), A
+5234:D321	OUT (21), A
+5236:D300	OUT (00), A
+5238:320E02	LD (020E), A
+523B:320D02	LD (020D), A
+523E:320F02	LD (020F), A
+5241:CDC410	CALL 10C4
+5244:115C53	LD DE, 535C
+5247:2A7553	LD HL, (5375)
+524A:CD5F52	CALL 525F
+524D:215C53	LD HL, 535C
+5250:		label skip0
+5250:23		INC HL
+5251:7E		LD A, (HL)
+5252:FE30	CP 30
+5254:28FA	JR Z, 5250
+5256:FE20	CP 20
+5258:2803	JR Z, 525D
+525A:CD1310	CALL 1013
+525D:		label skipdrop
+525D:AF		XOR A
+525E:C9		RET
+525F:		label DispHL
+525F:01F0D8	LD BC, D8F0
+5262:CD7852	CALL 5278
+5265:0118FC	LD BC, FC18
+5268:CD7852	CALL 5278
+526B:019CFF	LD BC, FF9C
+526E:CD7852	CALL 5278
+5271:0EF6	LD C, F6
+5273:CD7852	CALL 5278
+5276:0EFF	LD C, FF
+5278:		label Num1
+5278:3E2F	LD A, 2F
+527A:		label Num2
+527A:3C		INC A
+527B:09		ADD HL, BC
+527C:38FC	JR C, 527A
+527E:ED42	SBC HL, BC
+5280:EB		EX DE, HL
+5281:77		LD (HL), A
+5282:23		INC HL
+5283:EB		EX DE, HL
+5284:C9		RET
+5285:		label flos_nofile
+5285:3E0D	LD A, 0D
+5287:01		DEFB of 1 bytes
+5288:		label flos_nok
+5288:3E24	LD A, 24
+528A:B7		OR A
+528B:C9		RET
+528C:		label abort
+528C:ED7B8753	LD SP, (5387)
+5290:21FFFF	LD HL, FFFF
+5293:227553	LD (5375), HL
+5296:C32A52	JP 522A
+5299:		label clearvid
+5299:2100E0	LD HL, E000
+529C:1101E0	LD DE, E001
+529F:01FF1F	LD BC, 1FFF
+52A2:77		LD (HL), A
+52A3:EDB0	LDIR
+52A5:C9		RET
+52A6:		label readframe
+52A6:AF		XOR A
+52A7:328153	LD (5381), A
+52AA:ED5B8353	LD DE, (5383)
+52AE:0602	LD B, 02
+52B0:D9		EXX
+52B1:010004	LD BC, 0400
+52B4:210080	LD HL, 8000
+52B7:3A7753	LD A, (5377)
+52BA:E601	AND 01
+52BC:2801	JR Z, 52BF
+52BE:09		ADD HL, BC
+52BF:		label skipaddbuf
+52BF:D9		EXX
+52C0:CD1053	CALL 5310
+52C3:0601	LD B, 01
+52C5:D9		EXX
+52C6:2100A0	LD HL, A000
+52C9:D9		EXX
+52CA:CD1053	CALL 5310
+52CD:3A00A0	LD A, (A000)
+52D0:FE10	CP 10
+52D2:D28C52	JP NC, 528C
+52D5:FE0F	CP 0F
+52D7:281F	JR Z, 52F8
+52D9:47		LD B, A
+52DA:B7		OR A
+52DB:2803	JR Z, 52E0
+52DD:CD1053	CALL 5310
+52E0:		label skipaddload
+52E0:ED538353	LD (5383), DE
+52E4:2101A0	LD HL, A001
+52E7:		label decomploop
+52E7:5E		LD E, (HL)
+52E8:23		INC HL
+52E9:56		LD D, (HL)
+52EA:23		INC HL
+52EB:7A		LD A, D
+52EC:B3		OR E
+52ED:2808	JR Z, 52F7
+52EF:4E		LD C, (HL)
+52F0:23		INC HL
+52F1:46		LD B, (HL)
+52F2:23		INC HL
+52F3:EDB0	LDIR
+52F5:18F0	JR 52E7
+52F7:		label skipdecomp
+52F7:C9		RET
+52F8:		label directload
+52F8:D9		EXX
+52F9:2101A0	LD HL, A001
+52FC:1100E0	LD DE, E000
+52FF:01FF01	LD BC, 01FF
+5302:EDB0	LDIR
+5304:EB		EX DE, HL
+5305:D9		EXX
+5306:060F	LD B, 0F
+5308:CD1053	CALL 5310
+530B:ED538353	LD (5383), DE
+530F:C9		RET
+5310:		label readloop
+5310:C5		PUSH BC
+5311:3A8253	LD A, (5382)
+5314:CDFD10	CALL 10FD
+5317:328253	LD (5382), A
+531A:218153	LD HL, 5381
+531D:34		INC (HL)
+531E:34		INC (HL)
+531F:D9		EXX
+5320:		label smcsec
+5320:220000	LD (0000), HL
+5323:		label smcread
+5323:CD0000	CALL 0000
+5326:D9		EXX
+5327:C1		POP BC
+5328:10E6	DJNZ 5310
+532A:C9		RET
+532B:		label waitdma
+532B:3A0007	LD A, (0700)
+532E:E640	AND 40
+5330:47		LD B, A
+5331:		label loop2
+5331:3A0007	LD A, (0700)
+5334:E640	AND 40
+5336:B8		CP B
+5337:28F8	JR Z, 5331
+5339:C9		RET
+533A:		label cop4
+Expanding MACRO sthp
+dat= 0082 
+LD ( HL ) , dat 
+533A:3682	LD (HL), 82
+INC HL 
+533C:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= E 
+LD ( HL ) , dat 
+533D:73		LD (HL), E
+INC HL 
+533E:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= 0040 
+LD ( HL ) , dat 
+533F:3640	LD (HL), 40
+INC HL 
+5341:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= D 
+LD ( HL ) , dat 
+5342:72		LD (HL), D
+INC HL 
+5343:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= 0000 
+LD ( HL ) , dat 
+5344:3600	LD (HL), 00
+INC HL 
+5346:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= 0001 
+LD ( HL ) , dat 
+5347:3601	LD (HL), 01
+INC HL 
+5349:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= 0082 
+LD ( HL ) , dat 
+534A:3682	LD (HL), 82
+INC HL 
+534C:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= A 
+LD ( HL ) , dat 
+534D:77		LD (HL), A
+INC HL 
+534E:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= C 
+LD ( HL ) , dat 
+534F:71		LD (HL), C
+INC HL 
+5350:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= A 
+LD ( HL ) , dat 
+5351:77		LD (HL), A
+INC HL 
+5352:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+Expanding MACRO sthp
+dat= C 
+LD ( HL ) , dat 
+5353:71		LD (HL), C
+INC HL 
+5354:23		INC HL
+ENDM 
+		ENDM
+End of MACRO sthp
+5355:7B		LD A, E
+5356:C650	ADD A, 50
+5358:5F		LD E, A
+5359:D0		RET NC
+535A:14		INC D
+535B:C9		RET
+535C:		label conststart
+535C:		label dropstring
+535C:30303030	DEFB of 25 bytes
+5360:30206672
+5364:616D6528
+5368:73292064
+536C:726F7070
+5370:65640D0A
+5374:00
+5375:		label constend
+5375:		label varstart
+5375:		label dropframes
+5375:0000	DEFW of 1 words
+5377:		label bufsel
+5377:00		DEFB of 1 bytes
+5378:		label movsiz
+5378:00000000	DEFW of 2 words
+537C:		label movply
+537C:00000000	DEFW of 2 words
+5380:		label framesiz
+5380:0000	DEFW of 1 words
+5382:		label secofs
+5382:00		DEFB of 1 bytes
+5383:		label cluster
+5383:0000	DEFW of 1 words
+5385:		label startcluster
+5385:0000	DEFW of 1 words
+5387:		label oldsp
+5387:0000	DEFW of 1 words
+5389:		label varend
+5389:		label cmdlineptr
+5389:0000	DEFW of 1 words
+538B:		label prgend
+Emiting raw binary from 5000 to 538A
