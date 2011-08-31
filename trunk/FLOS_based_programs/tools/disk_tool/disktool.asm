@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * DISK TOOL (PARTION/FORMATTER) V0.04 by P.Ruston '08 - '11 	       *
+; * DISK TOOL (PARTION/FORMATTER) V0.05 by P.Ruston '08 - '11 	       *
 ; ****************************************************************************
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
@@ -633,49 +633,81 @@ ptntok	ld l,(ix+$8)
 	ld b,(ix+$b)
 	ld (partition_base),hl
 	ld (partition_base+2),bc
-	ld l,(ix+$c)			;bc:hl = total sectors in partition
-	ld h,(ix+$d)
+
+	ld e,(ix+$c)			
+	ld d,(ix+$d)
 	ld c,(ix+$e)
-	ld b,(ix+$f)
-	ld (partition_size),hl
+	ld b,(ix+$f)			;bc:de = total sectors in partition according to MBR
+	ld a,b
+	or a
+	jr nz,fs_truncs
+	ld a,c
+	cp $3f
+	jr c,fs_fssok			;if more than $3f0000 sectors, fix at $3f0000
+fs_truncs	ld de,$0000
+	ld bc,$003f
+fs_fssok	ld (partition_size),de
 	ld (partition_size+2),bc
-	ld a,2				;calculate necessary cluster size
-fcs_lp	push af
-	srl b
-	rr c
+
+	ld a,c
+	ld hl,$0080			;find appropriate cluster size (in h)
+fs_fcls	add hl,hl
+	cp h
+	jr nc,fs_fcls
+	ld a,h
+	ld (cluster_size),a		
+	
+	ld hl,0				
+ffatslp1	srl a	
+	jr z,fatsc1			;divide total sectors by sectors per cluster..
+	srl c				
+	rr d
+	rr e
 	rr h
 	rr l
-	ld a,b
-	or c
-	jr nz,csts
-	push hl
-	ld de,65514
-	xor a
-	sbc hl,de
-	pop hl
-	jr c,gotcs
-csts	pop af
-	rlca
-	jr fcs_lp
-gotcs	pop af
-
-	ld (cluster_size),a			
-	ld d,0				;calculate number of sectors required for FAT tables
-	ld e,h
-	ld a,l
-	or a
-	jr z,gspfat
+	jr ffatslp1
+fatsc1	ld b,8
+ffatslp2	srl c				; ..and 256 to find length of FAT tables
+	rr d
+	rr e
+	rr h
+	rr l
+	djnz ffatslp2
+	ld a,h
+	or l
+	jr z,gotfatsize			;if remainder, add 1 to number of sectors in FAT
 	inc de
-gspfat	ld (sectors_per_fat),de
+	
+
+gotfatsize
+
+	ld (sectors_per_fat),de
+	ld (bootsector_stub+$16),de		;update sectors per fat
 	
 	ld a,(cluster_size)			;update bootsector stub - sectors per cluster
 	ld (bootsector_stub+$0d),a
-	ld hl,(sectors_per_fat)		;update sectors per fat
-	ld (bootsector_stub+$16),hl
-	ld hl,(partition_size)		;update partition size
+
+	ld hl,0
 	ld (bootsector_stub+$20),hl
-	ld hl,(partition_size+2)
 	ld (bootsector_stub+$22),hl
+	ld (bootsector_stub+$13),hl
+	
+	ld hl,(partition_size+2)		;partition size hi word
+	ld a,h
+	or l
+	jr nz,bigptnsize
+	ld hl,(partition_size)		;ptn size low word
+	ld (bootsector_stub+$13),hl		;if ptn size < 65536, fill in this word
+	jr ptnsizeset
+
+bigptnsize
+
+	ld (bootsector_stub+$22),hl		;if ptn size > 65535, fill in double word here
+	ld hl,(partition_size)		
+	ld (bootsector_stub+$20),hl		;low word
+	
+ptnsizeset
+	
 	ld hl,volume_label_txt		;update volume name in bootsector (obsolete)
 	ld de,bootsector_stub+$2b
 	ld bc,11
@@ -981,7 +1013,7 @@ mbr_data		incbin "mbr_data.bin"
 
 app_banner
 
-	db "  DISK TOOL V0.04 by Phil Ruston 2011",11
+	db "  DISK TOOL V0.05 by Phil Ruston 2011",11
 	db "  ===================================",11,11,0
 	
 
