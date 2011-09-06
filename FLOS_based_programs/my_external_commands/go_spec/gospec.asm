@@ -13,9 +13,6 @@ include "system_equates.asm"
 buffer_size	equ 512			
 buffer_bank	equ 0
 
-vram_load_addr_hi	equ $0		;bits 23:16 of the VRAM load address
-vram_load_addr_lo	equ $0000		;bits 15:0 of the VRAM load address
-
 spectrum_rom_addr	equ $8000
 spectrum_rom_bank	equ 1
 
@@ -138,6 +135,8 @@ reconfigure
 
 	call load_spectrum_rom		; load the spectrum ROM
 	ret nz				
+
+	call copy_bank_switch_code_to_vram
 		
 go_cfg	ld a,$88				; send "set config base" command
 	call send_byte_to_pic
@@ -214,11 +213,47 @@ ldreq_ok1	call copy_filename
 	
 	call load_spectrum_rom		; load the spectrum ROM
 	ret nz
+
+	ld de,0
+	ld (vram_load_addr_lo),de		; normally, load file to VRAM $00000
+
+	ld hl,filename
+	ld b,11
+fnddot	ld a,(hl)
+	cp "."
+	jr z,gotdot
+	inc hl
+	djnz fnddot
+	jr not_tap
+gotdot	inc hl
+	ld a,(hl)
+	cp "t"
+	jr z,got_t
+	cp "T"
+	jr nz,not_tap
+got_t	inc hl
+	ld a,(hl)
+	cp "a"
+	jr z,got_a
+	cp "A"
+	jr nz,not_tap
+got_a	inc hl
+	ld a,(hl)
+	cp "p"
+	jr z,is_tap
+	cp "P"
+	jr nz,not_tap
 	
+is_tap	call copy_bank_switch_code_to_vram	; but if it is a .tap file, copy the bank switch code to $00000
+	ld de,$14				; and load the .tap file after it (VRAM $00014)
+	ld (vram_load_addr_lo),de
+	
+not_tap	ld a,0
+	ld (vram_load_addr_hi),a
 	call load_to_vram			
 	ret nz
 		
-vrlok	jr go_cfg			
+vrlok	jp go_cfg			
 
 
 load_quit	xor a
@@ -367,8 +402,9 @@ load_to_vram
 vram_load_main
 	
 
-	ld h,vram_load_addr_hi	; H:DE = VRAM load address
-	ld de,vram_load_addr_lo
+	ld a,(vram_load_addr_hi)	; H:DE = VRAM load address
+	ld h,a
+	ld de,(vram_load_addr_lo)
 
 	ld a,e			; convert linear address to 8KB page and address between 2000-3fff
 	ld (page_address),a
@@ -614,6 +650,36 @@ write_vram_flat
 
 ;-------------------------------------------------------------------------------------------------
 
+
+copy_bank_switch_code_to_vram
+
+	ld hl,bank_switch_code
+	ld de,0
+	ld c,0
+	ld b,end_of_bank_switch_code-bank_switch_code
+bscc_lp	ld a,(hl)
+	push bc
+	push de
+	push hl
+	call write_vram_flat
+	pop hl
+	pop de
+	pop bc
+	inc hl
+	inc de
+	djnz bscc_lp	
+	ret
+
+
+bank_switch_code
+
+	incbin "bank_switch_code.bin"
+
+end_of_bank_switch_code
+
+
+;-------------------------------------------------------------------------------------------------
+
 include "file_requesters.asm"
 
 ;----------------------------------------------------------------------------------------
@@ -644,13 +710,13 @@ slot_not_set_txt	db 11,"Please set the Spectrum EEPROM slot,",11,11,0
 options_txt
 
 	db "***************************************",11
-	db "* Spectrum Emulator Kickstarter v0.03 *",11
+	db "* Spectrum Emulator Kickstarter v0.04 *",11
 	db "***************************************",11
 	db 11,11
 	db "Emulator EEPROM slot: "
 slot_txt	db "Undefined",11,11
-	db "1.Reconfigure to Spectrum.",11
-	db "2.Load a .tap file and reconfigure.",11
+	db "1.Reconfigure to Spectrum 48",11
+	db "2.Load .tap /.bin file & reconfigure.",11
 	db "3.Restore RAM and reconfigure.",11
 	db "4.Set Spectrum emulator config slot.",11,11
 	db "ESC - quit",11
@@ -677,6 +743,9 @@ read_bytes	dw 0
 filename		ds 16,0
 
 dir_cache		dw 0
+
+vram_load_addr_hi	db $0		;bits 23:16 of the VRAM load address
+vram_load_addr_lo	dw $0000		;bits 15:0 of the VRAM load address
 
 load_buffer	ds buffer_size,0
 
