@@ -1,6 +1,6 @@
 
 ;  Sets up a 640x256x16 pixel display (81920 bytes)  
-;  Fills with individual pixels (using a put_pixel routine)
+;  Fills with individual pixels (using a SLOW put_pixel routine)
 ;
 ; ** Hi-Res Mode Works on TV-out only! **
 
@@ -32,6 +32,10 @@ start	ld a,0
 	ld (ix),l			
 	ld (ix+1),h		
 	ld (ix+2),a		
+
+	xor a			
+	ld (bitplane_modulo),a	; no vram data_fetch modulo is required
+
 
 	ld a,%10000000
 	ld (vreg_vidctrl),a		; Set bitmap mode (bit 0 = 0) + chunky pixel mode (bit 7 = 1)	
