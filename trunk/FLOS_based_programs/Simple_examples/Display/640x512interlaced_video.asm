@@ -1,6 +1,6 @@
 
 ;  Sets up a 640x512x16 pixel display (163840 bytes)  
-;  Fills with individual pixels (using a put_pixel routine)
+;  Fills with individual pixels (using a SLOW put_pixel routine)
 ;
 ; ** Hi-Res / Interlace modes work on TV-out only! **
 
