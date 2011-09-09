@@ -175,7 +175,11 @@ rxe_done	call set_serial_bank	; need to set the bank again as "s_gbloop" call re
 call_rx
 	ld a,1
 	ld (store_registers),a	; switching to external code, so store registers by default
-	ld hl,(serial_address)
-	jp (hl)
+	
+	ld hl,(os_args_start_lo)	; set default args position in HL
+	call os_next_arg
+	
+	ld ix,(serial_address)
+	jp (ix)
 	
 ;----------------------------------------------------------------------------------------------
