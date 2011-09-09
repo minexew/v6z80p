@@ -2,16 +2,19 @@
 FLOS version info:
 ------------------
 
-5.88 - 29/08/11	 : Added "KJT_get_sector_read_addr"  Programs can load sectors
-		   directly to an arbitrary location with minimal OS overhead.
-
-		 : Removed some legacy V5Z80P support and optimized code to create space.
-
+5.89 - 09/09/11 : When a "G xxxx" "RX !" command is entered, HL = the location of
+                  the first non-space character after the address / "!" respectively.
+                  This allows easier testing of apps with command line arguments.
 
 
 Previous changes:
 ----------------
 
+
+5.88 - 29/08/11	 : Added "KJT_get_sector_read_addr"  Programs can load sectors
+		   directly to an arbitrary location with minimal OS overhead.
+
+		 : Removed some legacy V5Z80P support and optimized code to create space.
 
 5.87 - 18/08/11  : Fixed bug introduced to "KJT_save_file" in v586 (filenames all spaces)
 		 : Changed previously obsolete "kjt_load_file" call - this will now load an
