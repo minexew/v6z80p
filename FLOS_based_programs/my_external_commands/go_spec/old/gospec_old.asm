@@ -1,5 +1,3 @@
-;GoSpec.exe - A boot util for Alessandro's Cycle Perfect Spectrum Emulator (V6Z80P v1.1 only)
-
 ;======================================================================================
 ; Standard header for OSCA and FLOS
 ;======================================================================================
@@ -216,8 +214,6 @@ ldreq_ok1	call copy_filename
 	call load_spectrum_rom		; load the spectrum ROM
 	ret nz
 
-	call show_loading_msg
-	
 	ld de,0
 	ld (vram_load_addr_lo),de		; normally, load file to VRAM $00000
 
@@ -393,14 +389,15 @@ cpyfndone	pop hl
 
 load_to_vram
 
-
+	ld a,4
+	ld (vreg_vidctrl),a		;disable video
 	call vram_load_main
 	ret z
-	
-	ld hl,$f00		;if error, make text red
-	ld (palette+2),hl
+	push af			;if there was an error, re-enable video
+	xor a			;(how useful this is depends how much vram has been overwritten)
+	ld (vreg_vidctrl),a
+	pop af
 	ret
-
 	
 vram_load_main
 	
@@ -468,14 +465,6 @@ btg_ok	ld (length_hi),de		; update bytes-to-go
 	ld (read_bytes),bc
 	call fill_buffer
 	call copy_buffer_to_vram
-	
-	ld hl,$222		; flash loading message
-	ld a,(length_lo+1)
-	and $40
-	jr z,got_col
-	ld hl,$fff
-got_col	ld (palette+2),hl
-	
 	jr b_loop
 
 
@@ -695,69 +684,6 @@ include "file_requesters.asm"
 
 ;----------------------------------------------------------------------------------------
 
-
-show_loading_msg
-
-	ld a,0
-	ld (vreg_rasthi),a		; select y window reg
-	ld a,$f0
-	ld (vreg_window),a		; set y window size/position (48 lines)
-	ld a,%00000100
-	ld (vreg_rasthi),a		; select x window reg
-	ld a,$aa
-	ld (vreg_window),a		; set x window size/position (256 pixels)
-	
-	ld a,0
-	ld (vreg_yhws_bplcount),a	; set 1 bitplane display
-		
-	ld a,0
-	ld (vreg_vidctrl),a		; set bitmap mode + normal border + video enabled
-
-	ld hl,$f800
-	ld (bitplane0a_loc),hl	; start address of video datafetch for window [15:0]
-	ld a,7
-	ld (bitplane0a_loc+2),a	; start address of video datafetch for window [18:16]
-
-
-	ld hl,palette		; background = black, colour 1 = white
-	ld (hl),0
-	inc hl
-	ld (hl),0
-	inc hl
-	ld (hl),$ff
-	inc hl
-	ld (hl),$0f
-
-
-	call kjt_page_in_video	; page video RAM in at $2000-$3fff
-	
-	ld a,63
-	ld (vreg_vidpage),a		; read / writes to last VRAM page 
-
-	ld hl,loading_msg
-	ld de,$2000+$1800
-	ld bc,$100
-	ldir
-	ld bc,$700
-gfxlp	xor a
-	ld (de),a
-	inc de
-	dec bc
-	ld a,b
-	or c
-	jr nz,gfxlp
-	
-	call kjt_page_out_video	; page video RAM out of $2000-$3fff
-	ret
-
-;-----------------------------------------------------------------------------------
-
-loading_msg
-
-	incbin	"loading_txt.bin"
-
-;------------------------------------------------------------------------------------
-
 no_restore_txt	db "Cannot find:"
 restore_fn	db "RAMDUMP.BIN",0
 
@@ -784,7 +710,7 @@ slot_not_set_txt	db 11,"Please set the Spectrum EEPROM slot,",11,11,0
 options_txt
 
 	db "***************************************",11
-	db "* Spectrum Emulator Kickstarter v0.05 *",11
+	db "* Spectrum Emulator Kickstarter v0.04 *",11
 	db "***************************************",11
 	db 11,11
 	db "Emulator EEPROM slot: "
