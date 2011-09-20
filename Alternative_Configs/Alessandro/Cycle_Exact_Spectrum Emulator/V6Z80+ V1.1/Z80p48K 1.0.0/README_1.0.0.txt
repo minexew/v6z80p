@@ -1,4 +1,4 @@
-Z80p48K 0.9.2 README
+Z80p48K 1.0.0 README
 ====================
 This is the binary distribution of Z80p48K, a ZX Spectrum 48K FPGA core for the V6Z80P+ v1.1
 or v1.1b board. Version 1.1 or 1.1b of the board are required because:
@@ -29,58 +29,74 @@ The core starts in PAL mode, but by pressing F12 you can switch between PAL and 
 
 3. SETUP
 ========
+
+FPGA Configuration File
+-----------------------
 To install the core, you should copy the ".bin" file contained in the "configuration" directory
 to the root directory of the SD card. Start FLOS, then start the EEPROM TOOL typing "EEPROM + <Enter>"
 at the prompt. Identify a free slot, then type "1"; when asked, enter the number of the free slot.
 When the file selector appears, select the ".bin" file you have previously copied on the SD card.
 
-Currently, the core requires some manual initialization under FLOS before starting up each time.
-You need to copy the Spectrum ROM to system memory and a .TAP file to multimedia memory (TZX files
-are not supported at present). See details below.
+GOSPEC.EXE
+----------
+From version 1.0.0, the core can be started using a FLOS program programmed by Phil Ruston called GOSPEC.EXE.
+This program can be copied in any SD Card directory; if you copy it inside the /COMMANDS directory, it will
+be available together all the other standard FLOS commands.
 
+ZX Spectrum 48K ROM
+-------------------
+The ZXSPEC48.ROM file, contained in the "support files" distribution directory, should be copied in the
+/SPECTRUM directory of the SD Card; in most cases the file should be already there, as it's used also by
+the ZX Spectrum emulator made by Phil Ruston.
+
+TAP files
+---------
+The .TAP files can be stored in any directory on the multimedia memory (TZX files are not supported at present).
+Those files will be selected using the GOSPEC.EXE program at the core startup.
+
+Joystick
+--------
 You also can attach a joystick to the V6Z80P joystick port "A"; this joystick will be seen as
-a Kempston joystick. A PS/2 keyboard must be, of course, connected to the board.
+a Kempston joystick.
+
+Keyboard
+--------
+A PS/2 keyboard must be, of course, connected to the board.
 
 3.1 ResiDOS
 -----------
-To install and use ResiDOS, you should download (and copy in your SD card) the following file:
-http://www.worldofspectrum.org/residos/files/zxmmc/residos.tap
-
-I strongly suggest to download (and copy in your SD card) also two additional ResiDOS packages.
-
-TapeI/O support package: http://www.worldofspectrum.org/residos/files/tapeio.pkg
-Task manager package: http://www.worldofspectrum.org/residos/files/taskman.pkg
+From version 1.0.0, a standard installation of ResiDOS (with pre-installed TapeIO and TaskMan
+packages) can be initialised during the core startup using the GOSPEC.EXE command. To take
+advantage of this feature, you should copy the RAMDUMP.BIN file, contained in the "support files" distribution
+directory, in the root directory of the SD Card.
 
 4. USAGE
 ========
 Start FLOS.
-First of all you must copy the ZX Spectrum 48K ROM into the system RAM.
-Assuming you have the Spectrum ROM file inside the directory "SPECTRUM" of the SD card and that
-it's named "ZXSPEC48.ROM", type the following commands at the prompt:
 
-CD SPECTRUM <Enter>
-LB ZXSPEC48.ROM 8000 1
+4.1 GOSPEC.EXE
+--------------
+Thanks to Phil Ruston, from version 1.0.0 the emulator can be started running the GOSPEC.EXE command.
 
-If you want to use a TAP file as tape image for the core, you have to load it into the multimedia
-RAM. To do this, type the following command at the prompt:
+Option 4 - Set Spectrum emulator config slot
+--------------------------------------------
+First of all, you must tell GOSPEC the number of the EEPROM slot where the config file is stored; to
+do this, choose the option 4 and then specify the correct slot number.
 
-LOADVID <file_name.tap> 20000
+Option 1 - Reconfigure to Spectrum 48
+-------------------------------------
+Selecting this option, the emulator will be started in standard ZX Spectrum 48K mode; no tapes, no ResiDOS installed.
 
-(The Spectrum ROM file and a test .tap file (Manic Miner) are supplied in the "support files"
-subdirectory of this project)
+Option 2 - Load .tap /.bin file & reconfigure
+---------------------------------------------
+Selecting this option, a file selector will allow you to choose a TAP file that will be available to the tape player
+after the ZX Spectrum boot. Alternatively you can choose a ZX Spectrum binary file that will be executed just after the
+core start (this option can be useful to test small Speccy machine code programs...)
 
-4.1 ResiDOS installation tape
------------------------------
-If you have copied the residos.tap installation file in your SD card, you can use it to install
-ResiDOS typing at the prompt:
-
-LOADVID residos.tap 20000
-
-At this point you can boot the Spectrum core typing:
-
-BOOT <n>, with <n> the slot number where you flashed the configuration file using the EEPROM tool.
-
-After the core startup, you'll see the familiar Sinclair copyright screen.
+Option 3 - Restore RAM and reconfigure
+--------------------------------------
+Selecting this option, if in the SD Card root directory is present a RAMDUMP.BIN file, this will be automatically restored.
+A RAMDUMP.BIN file should contain a ResiDOS RAM dump (this is the case of the file in the "support files" directory).
 
 - Keyboard
 ----------
@@ -88,6 +104,13 @@ The keyboard now behaves like that of normal Spectrum. For reference, you will f
 binary core distribution root directory) a JPG image ("spectrum_keyboard.jpg") of a real ZX
 Spectrum 48K "rubby" keyboard. All the original keys are mapped to the corresponding PS/2 key;
 "CAPS SHIFT" is mapped on the PS/2 "LEFT SHIFT", "SYMBOL SHIFT" is mapped on "RIGHT SHIFT".
+
+From version 1.0.0 some PS/2 keys are mapped to ZX Spectrum keys combo; the handled combo are:
+
+- Backspace -> CAPS + 0
+- Cursors -> CAPS + 5,6,7,8
+- "," -> CAPS + n
+- "." -> CAPS + m
 
 - Scanline effect
 -----------------
@@ -148,17 +171,7 @@ http://sites.google.com/site/ulaplus/
 
 6. ResiDOS
 ==========
-If, during the core startup, you have loaded the residos.tap file, please load it following the standard
-procedure (LOAD "", TAB key, eventually speedup the loading process using the 7MHz or the 14MHz modes).
-
-At the end of the tape loading, you'll se the ResiDOS installation screen; please press the "Enter" key.
-The 512KB additional external RAM should be recognised. Press the "Enter" key again. The machine should
-reboot in a second, showing the ResiDOS welcome screen.
-
-The system will check for a SD card.
-
-Please: be sure to use an SD card max 2GB in size and formatted with a FAT16 filesystem! If your SD
-card work in FLOS, it should work in ResiDOS too.
+Please: be sure to use an SD card max 2GB in size and formatted with a FAT16 filesystem!
 
 - Quickstart
 ------------
