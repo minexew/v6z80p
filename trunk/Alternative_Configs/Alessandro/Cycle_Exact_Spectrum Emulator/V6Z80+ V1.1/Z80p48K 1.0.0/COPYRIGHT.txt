@@ -1,7 +1,7 @@
 1. Z80p48K COPYRIGHT
 ====================
 
-* Z80p48K 0.9 (released under Modified BSD license)
+* Z80p48K 1.0.0 (released under Modified BSD license)
 * Copyright (c) 2011, Alessandro Dorigatti
 * All rights reserved.
 *
@@ -42,6 +42,14 @@ details.
 Amstrad have kindly given their permission for the redistribution of
 their copyrighted material but retain that copyright. Thank you Amstrad.
 -----------------------------------------------------------------------
+
+3. ResiDOS
+==========
+
+ResiDOS is copyrighted by Garry Lancaster. For more information about it,
+please visit the following URL:
+
+http://www.worldofspectrum.org/residos/
 
 3. MANIC MINER
 ==============
