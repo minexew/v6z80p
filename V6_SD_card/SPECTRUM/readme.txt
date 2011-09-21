@@ -1,5 +1,6 @@
 
-There are now two main Spectrum Emulators for the V6Z80P:
+There are two main Spectrum Emulators for the V6Z80P:
+
 
 1. Phil's Spectrum 48/128 "approximating" (IE: non-cycle-perfect) emulator for all
    models of the V6Z80P board. Please install the correct config file for your
@@ -7,20 +8,28 @@ There are now two main Spectrum Emulators for the V6Z80P:
    I.O. on this emulator is limited to the loading of .sna files. You can launch
    this emulator with the FLOS command "BOOT [slot]"
 
+   This emulator requires the files BOOTCODE.BIN, ZXSPEC48.ROM and ZXSPE128.ROM
+   in the [ROOT]:Spectrum directory of the SD Card and 
+
+
 
 2. Alessandro's cycle-perfect Spectrum 48 emulator for the V6Z80P v1.1 only (it
-   requires clocking features only available on this board). Please install the
-   latest version to a free slot with eeprom.exe and the launch with the FLOS
-   command GOSPEC.EXE. 
+   requires clocking features only available on this board). Install the
+   latest version to a free slot with eeprom.exe and the launch the emulator
+   with the FLOS command GOSPEC.EXE 
 
    This emulator can load .tap files (with the normal spectrum LOAD instruction)
    and also includes the ZXMMC+ expansion system, allowing programs like Residos
    to be installed (which can load and save files to the SD card, start snapshots etc).
+   
    Additionally, the emulator is able to start from a previously saved RAMDUMP.BIN file,
    which removes the need to manually install EG: Residos each time. Use option 3 of
    GOSPEC.EXE to load a RAMDUMP.BIN file - it should be in the root directory of your
    SD Card).
-   
+
+   The emulator also requires the file "ZXSPEC48.ROM" in the [ROOT]:SPECTRUM directory
+   of the SD CARD (this is loaded by FLOS's GOSPEC.EXE command.)
+        
    For full info see the V6Z80P project folder: Alternative_Configs/Alessandro
 
 
