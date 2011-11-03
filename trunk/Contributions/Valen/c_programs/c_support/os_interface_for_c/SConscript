@@ -1,0 +1,7 @@
+# 
+Import('v6_prj')
+
+v6_prj.depend.Make_OS_interface_for_C()
+v6_prj.depend.Make_C_FLOS_Lib()
+
+
