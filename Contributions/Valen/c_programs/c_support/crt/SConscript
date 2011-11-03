@@ -1,0 +1,5 @@
+# CRT make rules
+Import('v6_prj')
+
+v6_prj.depend.Make_CRT_Obj()
+

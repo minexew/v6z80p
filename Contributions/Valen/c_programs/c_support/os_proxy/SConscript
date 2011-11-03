@@ -1,0 +1,4 @@
+# FLOS proxy
+Import('v6_prj')
+
+v6_prj.depend.Make_FLOS_Proxy_Obj()

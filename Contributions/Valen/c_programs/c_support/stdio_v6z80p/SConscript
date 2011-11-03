@@ -1,0 +1,6 @@
+# stdio lib
+Import('v6_prj')
+
+v6_prj.depend.Make_stdio_Lib()
+
+

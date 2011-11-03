@@ -1,0 +1,23 @@
+import os
+from  v6_project import V6_Project
+
+
+
+#
+v6_prj = V6_Project()
+if  v6_prj.Init() == False:    
+    Exit()
+v6_prj.SetupEnv()
+if v6_prj.checker.Init(v6_prj) == False:
+    Exit()
+
+bdir = v6_prj.basedir
+SConscript([bdir + '/c_support/crt/SConscript'],                  exports='v6_prj', variant_dir=bdir + '/c_support/crt/obj')
+SConscript([bdir + '/c_support/os_interface_for_c/SConscript'],   exports='v6_prj', variant_dir=bdir + '/c_support/os_interface_for_c/obj/')
+SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='v6_prj', variant_dir=bdir + '/c_support/os_proxy/obj/')
+SConscript([bdir + '/c_support/stdio_v6z80p/SConscript'],         exports='v6_prj', variant_dir=bdir + '/c_support/stdio_v6z80p/obj/')
+  
+  
+
+SConscript(['src/test0/SConscript'], exports='v6_prj', variant_dir='src/test0/obj')
+
