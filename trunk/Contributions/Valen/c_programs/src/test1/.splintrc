@@ -1,5 +1,0 @@
-#-type
-#+relax-types
-
-+bool-int
-+shortint
