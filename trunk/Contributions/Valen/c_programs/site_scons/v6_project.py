@@ -145,7 +145,11 @@ class V6_Project(object):
             util = strName
         return util
             
-            
+    def Upload(self, upload_target, upload_command):
+        
+        upload = self.env.Alias('upload_' + self.name, upload_target, upload_command)
+        upload[0].my_progress_message = '------------- Upload file to V6 -------------'
+        Alias('upload_all', upload)
 
 
 # this class know, how to build all v6 proj depend. (CRT for FLOS, C FLOS interface, asm FLOS proxy, C libs)

@@ -1,7 +1,7 @@
 #scons --clean	
-#scons
-scons upload
+scons
+#scons upload_all
 
+#  --tree=prune  >a
 
-#--tree=prune  >a
 #--debug=explain
