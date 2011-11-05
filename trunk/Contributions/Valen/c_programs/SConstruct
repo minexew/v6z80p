@@ -1,3 +1,4 @@
+# This is main SDCC framework configuration file. (scons file). When scons is started it will read this file.
 import os
 from  v6_project import V6_Project
 
@@ -18,7 +19,8 @@ SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='v6_pr
 SConscript([bdir + '/c_support/stdio_v6z80p/SConscript'],         exports='v6_prj', variant_dir=bdir + '/c_support/stdio_v6z80p/obj/')
   
   
-projects = ['test0', 'test1']
+projects = ['test0', 'test1',
+            'pong']
 for prjName in projects:
     SConscript(['src/' + prjName + '/SConscript'], exports='v6_prj', variant_dir='src/' + prjName + '/obj')
 
