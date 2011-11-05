@@ -99,7 +99,7 @@ class V6_Project(object):
         env['ENV']['PATH'] = os.environ['PATH']
 
 
-        env['CPPPATH'] =  self.basedir + 'inc/'
+        env['CPPPATH'] =  [self.basedir + 'inc/']
         env['CPPDEFINES'] = []      # env wide defines (just an empty list)        can be somethisng like [{'MYDEFINEVAR' : 'MYGOODVALUE'}]
 
         env['PROGSUFFIX'] = '.ihx'
@@ -145,10 +145,14 @@ class V6_Project(object):
             util = strName
         return util
             
-    def Upload(self, upload_target, upload_command):
+    def Upload(self, upload_target, is_upload_always, upload_command):
         
-        upload = self.env.Alias('upload_' + self.name, upload_target, upload_command)
+        upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
+        if is_upload_always:
+            AlwaysBuild(upload)
         upload[0].my_progress_message = '------------- Upload file to V6 -------------'
+        
+        upload2 = self.env.Alias('upload_' + self.name, upload)
         Alias('upload_all', upload)
 
 

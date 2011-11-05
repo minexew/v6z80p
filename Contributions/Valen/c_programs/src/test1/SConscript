@@ -14,4 +14,4 @@ objs = env.Object(   ['test1.c'],
 
 final_exe = v6_prj.FLOS_Program(objs)
 
-v6_prj.Upload(final_exe, 'sendv6 S0 $SOURCE')
+v6_prj.Upload(final_exe, False, 'sendv6 S0 $SOURCE')
