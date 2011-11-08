@@ -1,4 +1,4 @@
 cls
 
 #scons --clean	
-scons upload
+scons upload_all

@@ -13,23 +13,23 @@ v6_prj.stack    = '0xffff'
 env = v6_prj.env
 
 
-# compile user .c files to oject files
+# compile user .c files to object files
 objs = env.Object(   ['test0.c'], 
                 CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
                 CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
                 )
 
-# link and convert .ihx to .exe
+# link to .ihx and convert .ihx to .exe
 final_exe = v6_prj.FLOS_Program(objs)
 
 # Let's, for example,  send FLOS exe to V6 board.
 
-# Upload FLOS exe file to V6Z80P (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
+# Upload FLOS exe file to V6Z80P 
 # Params:
-# 1. list of targets 
+# 1. list of targets to upload
 # 2. True - always upload, False - upload only if file (target) was re-builded
 #
-v6_prj.Upload(final_exe, False, 'sendv6 S0 $SOURCE')
+#v6_prj.Upload(final_exe, False)
 
 
 

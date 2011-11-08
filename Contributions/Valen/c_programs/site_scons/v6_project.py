@@ -3,7 +3,8 @@ import string
 import re
 import subprocess
 import pprint
-
+import time
+import datetime
 from SCons.Script import *
 
 class V6_Project(object):
@@ -49,21 +50,32 @@ class V6_Project(object):
         return True
     
     """This func will be called from SConscript file."""
-    def FLOS_Program(self, objs):
-        #print self.env.Dump()
-        
+    def FLOS_Program(self, objs):       
         objs[0].my_progress_message = '------------- Compile user files ---------'
         
         obj_heap = self.MakeHeapObj()
+        self.obj_proj_info = self.Make_ProjectInfo_Obj()
         # 
         
+        #variant_dir =  Dir('.').get_abspath()
+        variant_dir =  Dir('.').path    #'src/pong/obj'
+        #print ' ======= ' + variant_dir
         
-        # NOTE: CRT object file (crt0_v6z80p) must be first in this sources list!! 
+        # NOTE: CRT object file (crt0_v6z80p) must be first in this sources list!!!
         file_ihx = self.env.Program(self.name , self.depend.obj_crt + self.depend.obj_iflos
                     + self.depend.obj_flosproxy
-                    + obj_heap + objs, LINKFLAGS=self.env['LINKFLAGS'] + self.linkopt  )
+                    + obj_heap + objs, LINKFLAGS=self.env['LINKFLAGS'] + self.linkopt,
+                      
+                    # Wee need to link file proj_info.rel, with our .ihx file.
+                    # But  we can't just add  proj_info.rel to 'sources' of .ihx file, because proj_info.rel file is 'order-only' dependency.
+                    # So, to link it, we will add proj_info.rel to the end of link command line.
+                    # (This little trick was described in scons docs.)
+                    LINKCOM = self.env['LINKCOM'] + '  ' + os.path.join(variant_dir, str(self.obj_proj_info[0]))
+                                    )
         #pprint.pprint(vars(file_ihx))                    
         
+        # make order-only dependency, the target should not change in response to changes in the dependent file (doc here http://www.scons.org/doc/production/HTML/scons-user/x1302.html)
+        Requires(file_ihx, self.obj_proj_info)
         
         # convert IHX to BIN
         srec_util = self.GetUtilFilename('srec_cat')
@@ -89,6 +101,31 @@ class V6_Project(object):
         obj_heap = env_sdasz80.Object('myheap' + env_sdasz80['OBJSUFFIX'], asm_heap)     #"cp $SOURCE $TARGET")
         return obj_heap
         #src/$(prjname)/obj/myheap.rel
+        
+    # generate proj info .c file, it will contain sdcc version, compilation date
+    def Make_ProjectInfo_Obj(self):
+        env_text = Environment(tools = ['textfile'])
+        # generate c file, with some info
+        #time_now = time.ctime(time.time())
+        date_now = datetime.datetime.now()
+        str_date_now = date_now.strftime("%d-%m-%Y")        # %H:%M")
+        
+        project_info_c_source = env_text.Textfile(target = 'v6_project_info/proj_info.c',              
+                                source = ['// project info ', 
+                                          'const char projInfo[] = "' 
+                                          + 'Info: SDCC ' 
+                                          + self.checker.sdcc_version  + '  '
+                                          + self.checker.sdcc_revision + '  '
+                                          + str_date_now + '" ;    '], 
+                                
+                                )
+            
+      
+        
+        obj_project_info =  self.env.Object(project_info_c_source, 
+                                            CCCOMSTR = "Compiling proj info file")
+        
+        return obj_project_info
    
     def SetupEnv(self):
         env = Environment(tools = ['default', 'sdcc', 'sdcclib'])
@@ -145,7 +182,8 @@ class V6_Project(object):
             util = strName
         return util
             
-    def Upload(self, upload_target, is_upload_always, upload_command):
+    def Upload(self, upload_target, is_upload_always):
+        upload_command = 'sendv6 S0 $SOURCE'    # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
         
         upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
         if is_upload_always:
@@ -162,6 +200,8 @@ class V6_Project_Dependencies():
     def Init(self, v6_project):
         self.v6_project = v6_project
         
+    
+    
     # ------------------------------------------------------------------
     # C runtime (object file)
     def Make_CRT_Obj(self):        
@@ -257,8 +297,13 @@ class V6_Project_SystemChecker():
         match = re.search(r'[0-9]+(\.[0-9]+)+', line)                                                                      
         if match:                                                                                                          
             #self.v6_project.env['CXXVERSION'] = 
-            match.group(0)
-                                                                                                     
+            self.sdcc_version = match.group(0)
+        
+        # revision 
+        match = re.search(r'(\#[0-9]+)+', line)                                                                      
+        if match:                                                                                                                      
+            self.sdcc_revision =  match.group(0)
+            
         return True                
 
     def Check_srec_cat(self):
