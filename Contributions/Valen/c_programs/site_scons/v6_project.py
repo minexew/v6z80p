@@ -183,7 +183,7 @@ class V6_Project(object):
         return util
             
     def Upload(self, upload_target, is_upload_always):
-        upload_command = 'sendv6 S0 $SOURCE'    # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
+        upload_command = 'cd ${SOURCE.dir} && sendv6 S0 ${SOURCE.file}'    # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
         
         upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
         if is_upload_always:
