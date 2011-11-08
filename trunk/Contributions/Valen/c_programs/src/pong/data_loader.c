@@ -18,27 +18,27 @@
 #include "loading_icon.h"
 #include "pong.h"
 
-static LoadTilesDescription tilesMenu[] = {
+static const LoadTilesDescription tilesMenu[] = {
     {TILES_MENU_FILENAME, 0}, {TILES_CREDITS_FILENAME, TILES_CREDITS_VRAM_ADDR/0x100},
     {NULL, 0}
 };
-static LoadTilesDescription tilesLevel[] = {
+static const LoadTilesDescription tilesLevel[] = {
     {TILES_LVL_FILENAME, 0}, {NULL, 0}
 };
 // srpites menu
-static LoadFileDescription spritesMenu[] = {
+static const LoadFileDescription spritesMenu[] = {
     {SPRITES_FILENAME_MENUTXT, 0, 1}, {NULL, 0, 0}
 };
 // srpites level
-static LoadFileDescription spritesLevel[] = {
+static const LoadFileDescription spritesLevel[] = {
     {SPRITES_FILENAME, 0, 1}, {NULL, 0, 0}
 };
 
 static struct {
     GameState s;                    // to   which gamestate
     GameState prev_s;               // from which gamestate
-    LoadTilesDescription *tiles;
-    LoadFileDescription  *file;
+    const LoadTilesDescription *tiles;
+    const LoadFileDescription  *file;
 
     const char* pFilenameMusic;
     const char* pFilenamePalette;
@@ -58,8 +58,8 @@ BOOL DataLoader_LoadData(GameState state, GameState prev_state)
     byte i;
     byte num;
     const char* pFilename;
-    LoadTilesDescription *pTilesDesc;
-    LoadFileDescription  *pFileDesc;
+    const LoadTilesDescription *pTilesDesc;
+    const LoadFileDescription  *pFileDesc;
 
     num = sizeof(gameStateData)/sizeof(gameStateData[0]);
     for(i=0 ;i<num; i++)
