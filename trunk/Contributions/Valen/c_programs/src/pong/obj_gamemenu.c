@@ -83,6 +83,8 @@ void GameObjGameMenu_Draw(GameObjGameMenu* this)
 
 
 // **************************
+// display sprite 'PRESS FIRE TO START'
+
 
 
 void GameObjMenuTxt_Init(GameObjMenuTxt* this, int x, int y)

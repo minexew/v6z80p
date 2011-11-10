@@ -298,6 +298,8 @@ class V6_Project_SystemChecker():
         if match:                                                                                                          
             #self.v6_project.env['CXXVERSION'] = 
             self.sdcc_version = match.group(0)
+        if self.sdcc_version[0] == '2':
+            print 'Warn: SDCC 3.0 or later is recommended!'
         
         # revision 
         match = re.search(r'(\#[0-9]+)+', line)                                                                      
