@@ -1,5 +1,7 @@
 Import('v6_prj')
 
+import string
+
 v6_prj.name     = 'pong'
 v6_prj.linkopt  = '-Wl-b_LOW_MEM_CODE=0x6A80    --code-loc 0x8000 --data-loc 0'
 v6_prj.stack    = '0x6A80'
@@ -9,12 +11,15 @@ v6_prj.stack    = '0x6A80'
 env = v6_prj.env
 env_pasmo = v6_prj.env_pasmo
 
-# we need all .c files in cur dir, but one (low_memory_container.c) 
+# we need all .c files in cur project dir, but one (low_memory_container.c) 
 sources = Glob('*.c')
 for s in sources:
-    if str(s) == 'low_memory_container.c':
+    if string.find(str(s), 'low_memory_container.c') != -1:
         sources.remove(s)
 
+#for s in sources:
+#    print s
+    
 # compile user .c files to object files
 objs = env.Object( sources + ['sound_fx/sound_fx.c'], 
                 CPPPATH     = env['CPPPATH']           + ['.'], 
@@ -31,7 +36,7 @@ objs2 = env.Object( ['low_memory_container.c'],
 binary_sfx_proxy = env_pasmo.Object('sfxproxy.bin', 'sound_fx/sfx_proxy.asm',
                                     CPPPATH = [v6_prj.v6_dir + '/Equates/', 'sound_fx/inc', '.']
                                     )
-# we have not (yet) pasmo scanner in scons (to scan for include asm files), thus we must provide asm depend. here
+# we have not (yet) pasmo scanner in scons (to scan for include asm files), thus we must provide asm dependency here
 Depends(binary_sfx_proxy, Glob('sound_fx/inc/*.asm'))
 
 
