@@ -86,7 +86,7 @@ void TileMap_Fill(word tileNumber)
 // firstTileDef = first tile def
 void Background_InitTilemap(word firstTileDef)
 {
-    byte x, y;
+    WORD x, y;
     word tile_num;
     byte* p;
 
@@ -100,6 +100,7 @@ void Background_InitTilemap(word firstTileDef)
 #ifdef IS_WIDE_LEFT_BORDER
             p++;
 #endif
+
             *p         = tile_num & 0xFF;
             *(p+0x800) = tile_num >> 8;
         }
