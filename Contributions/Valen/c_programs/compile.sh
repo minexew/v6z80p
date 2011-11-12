@@ -1,4 +1,4 @@
-scons --clean	
+#scons --clean	
 scons 
 #upload_all
 # --tree=prune  >a
