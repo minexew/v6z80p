@@ -4,10 +4,12 @@ PONG v0.04
 Valen 2009,2010,2011
 -------------
 
-SDCC 2.9.7
+- originaly was developed with 2.9.7
+- adopted for 3.0.6 #6969
 
 
-TODO: fix for 60Hz video mode
+TODO: Need fix for 60Hz video mode. Call the pong code at 50Hz, in both 50Hz and 60Hz videomodes.
+
 */
 
 
