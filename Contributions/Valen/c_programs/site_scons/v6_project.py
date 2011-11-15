@@ -5,6 +5,7 @@ import subprocess
 import pprint
 import time
 import datetime
+import ConfigParser             # to read ini file
 from SCons.Script import *
 
 class V6_Project(object):
@@ -17,7 +18,8 @@ class V6_Project(object):
         self.depend  = V6_Project_Dependencies()
         self.depend.Init(self)
         
-        self.checker = V6_Project_SystemChecker()
+        self.checker         = V6_Project_SystemChecker()
+        self.options_handler = V6_Project_OptionsHandler()  
         
         self.utilFilename_xd = self.GetUtilFilename('xd')
         
@@ -149,10 +151,8 @@ class V6_Project(object):
         env['LIBS'] =['i_flos_lib', 'stdio_v6z80p_lib']
         env.Append(LIBPATH=[self.basedir + 'c_support/os_interface_for_c/obj/', self.basedir + 'c_support/stdio_v6z80p/obj/'])
 
-        # modify default lib command
-        #env['AR']     = 'sdcclib'
-        #env['ARCOM']     = '$LINK -o $TARGET $LINKFLAGS $__RPATH $SOURCES $_LIBDIRFLAGS $_LIBFLAGS'
         
+        env.Append(SENDV6_PORT=self.options_handler.config.get('SendV6', 'port'))
         
         #print env['CC']
         #print env['ENV']['PATH']
@@ -183,7 +183,8 @@ class V6_Project(object):
         return util
             
     def Upload(self, upload_target, is_upload_always):
-        upload_command = 'cd ${SOURCE.dir} && sendv6 S0 ${SOURCE.file}'    # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
+        upload_command = 'cd ${SOURCE.dir} && sendv6 $SENDV6_PORT ${SOURCE.file}'    # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
+        #upload_command = 'sendv6 S0 $SOURCE'
         
         upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
         if is_upload_always:
@@ -319,6 +320,39 @@ class V6_Project_SystemChecker():
         if pipe.wait() != 0: 
             print 'Error: ' + str + ' not found! '
             return False
+
+# this class know how to handle specific ini file options
+class V6_Project_OptionsHandler():
+    
+    def __init__(self):
+        # add options for sendv6 'port'
+        #AddOption('--sendv6_port',
+                  #dest='sendv6_port',
+                  #type='string',
+                  #nargs=1,
+                  #action='store',   
+                  #default='USB0',
+                  #help='sendv6 connection port')
+                  
+        
+        try:
+            file_ini = open('sdccfw_config.ini')
+            config = ConfigParser.ConfigParser()
+            config.readfp(file_ini)
+            #config.get('SendV6', 'port')
+            self.config = config
+            
+        except IOError as (errno, strerror):
+            print "I/O warning({0}): {1}".format(errno, strerror) + ' sdccfw_config.ini'
+            
+            # if no ini was readed, we build ini file, in memory, with default values
+            config = ConfigParser.RawConfigParser()
+            config.add_section('SendV6')
+            config.set('SendV6', 'port', 'USB0')
+            self.config = config
+           
+
+ 
                         
 #screen = open('/dev/tty', 'w')
 def progress_function(node):
@@ -364,6 +398,7 @@ def progress_function(node):
         
     
         
+# register our own progress function
 Progress(progress_function)
 
 
