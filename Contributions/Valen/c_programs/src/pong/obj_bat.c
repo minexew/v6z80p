@@ -120,7 +120,7 @@ void GameObjBat_Draw(GameObjBat* this)
              this->gobj.x + this->gobj.width, this->gobj.y + this->gobj.height);
 }
 
-//GameObjRocket rocket[2];    // static pool of rockets (GameObjRocket objects)
+
 void GameObjBat_Fire(GameObjBat* this)
 {
     GameObjRocket *new_obj;
