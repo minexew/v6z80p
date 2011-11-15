@@ -14,7 +14,7 @@ if v6_prj.checker.Init(v6_prj) == False:
 
 bdir = v6_prj.basedir
 
-variantBaseDir = 'build/v6/c_programs/'
+variantBaseDir = v6_prj.base_variant_dir
 SConscript([bdir + '/c_support/crt/SConscript'],                  exports='v6_prj', variant_dir=variantBaseDir + '/c_support/crt/', duplicate=0)
 SConscript([bdir + '/c_support/os_interface_for_c/SConscript'],   exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_interface_for_c/', duplicate=0)
 SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_proxy/', duplicate=0)
