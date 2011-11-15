@@ -13,10 +13,12 @@ if v6_prj.checker.Init(v6_prj) == False:
     Exit()
 
 bdir = v6_prj.basedir
-SConscript([bdir + '/c_support/crt/SConscript'],                  exports='v6_prj', variant_dir=bdir + '/c_support/crt/obj', duplicate=0)
-SConscript([bdir + '/c_support/os_interface_for_c/SConscript'],   exports='v6_prj', variant_dir=bdir + '/c_support/os_interface_for_c/obj/', duplicate=0)
-SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='v6_prj', variant_dir=bdir + '/c_support/os_proxy/obj/', duplicate=0)
-SConscript([bdir + '/c_support/stdio_v6z80p/SConscript'],         exports='v6_prj', variant_dir=bdir + '/c_support/stdio_v6z80p/obj/', duplicate=0)
+
+variantBaseDir = 'build/v6/c_programs/'
+SConscript([bdir + '/c_support/crt/SConscript'],                  exports='v6_prj', variant_dir=variantBaseDir + '/c_support/crt/', duplicate=0)
+SConscript([bdir + '/c_support/os_interface_for_c/SConscript'],   exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_interface_for_c/', duplicate=0)
+SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_proxy/', duplicate=0)
+SConscript([bdir + '/c_support/stdio_v6z80p/SConscript'],         exports='v6_prj', variant_dir=variantBaseDir + '/c_support/stdio_v6z80p/', duplicate=0)
   
   
 
@@ -26,7 +28,10 @@ files = Glob('src/*/SConscript')
 for projectSconscript in files:
     #print projectSconscript
     projectDir = os.path.dirname(str(projectSconscript))
-    SConscript([projectSconscript], exports='v6_prj', variant_dir=projectDir + '/obj', duplicate=0)
+    #print projectDir
+    projectName = os.path.split(projectDir)[1]
+    #print projectName
+    SConscript([projectSconscript], exports='v6_prj', variant_dir=variantBaseDir + projectName, duplicate=0)
   
         
     
