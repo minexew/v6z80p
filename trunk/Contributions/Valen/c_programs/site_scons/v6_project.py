@@ -15,6 +15,8 @@ class V6_Project(object):
         self.v6_dir  = os.environ['v6z80pdir']
         self.basedir = os.environ['v6z80pdir'] + '/Contributions/Valen/c_programs/'
         
+        self.base_variant_dir = 'build/v6/c_programs/'
+        
         self.depend  = V6_Project_Dependencies()
         self.depend.Init(self)
         
@@ -149,7 +151,8 @@ class V6_Project(object):
         env.Append(LINKFLAGS=['-mz80', '--no-std-crt0' , '-Wl-b_FLOS_PROXY_CODE=0x5080'])
         #env['LINKCOMSTR'] = "Linking $TARGET"
         env['LIBS'] =['i_flos_lib', 'stdio_v6z80p_lib']
-        env.Append(LIBPATH=[self.basedir + 'c_support/os_interface_for_c/obj/', self.basedir + 'c_support/stdio_v6z80p/obj/'])
+        env.Append(LIBPATH=[self.basedir + self.base_variant_dir + 'c_support/os_interface_for_c/', 
+                            self.basedir + self.base_variant_dir + 'c_support/stdio_v6z80p/'])
 
         
         env.Append(SENDV6_PORT=self.options_handler.config.get('SendV6', 'port'))
