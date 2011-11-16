@@ -13,15 +13,10 @@ const
 
 var
   ser: TBlockSerial;
-  quit:boolean=false;
   sendstat:boolean;
   buffer:array[0..257] of byte;
-  fbuffer:array[0..16777215] of byte;
-  fbufpos,
-  flen:dword;
   fname,
   devstring:string;
-  f:file;
 
 function isesc:boolean;
 begin
@@ -57,14 +52,11 @@ end;
 
 procedure makehdr;
 var s:array[0..15] of char;
-    nd:dirstr;nn:namestr;ne:extstr;
 begin
   fillchar(buffer,258,0);
   fillchar(s,16,0);
-  fsplit(fname,nd,nn,ne);
-  s:=nn+ne;
+  s:=fname;
   move(s,buffer[0],16);
-  move(flen,buffer[16],4);
   move(hdr,buffer[$14],12);
 end;
 
@@ -88,19 +80,17 @@ end;
 begin
   if ((paramcount<1) or (paramcount>2))   then 
   begin
-    writeln('Usage: SENDV6 <device> file');
+    writeln('Usage: SENDCMD <device> command');
 {$IFDEF LINUX}
-    writeln('use "SENDV6 file.asm" to send file.asm to /dev/ttyUSB0');
-    writeln('use "SENDV6 USB1 file.asm" to send file.asm to /dev/ttyUSB1');
+    writeln('use "SENDCMD command" to send command to /dev/ttyUSB0');
+    writeln('use "SENDCMD USB1 command" to send command to /dev/ttyUSB1');
 {$ELSE}
-    writeln('use "SENDV6 file.asm" to send file.asm to COM1');
-    writeln('use "SENDV6 COM3 file.asm" to send file.asm to COM3');
+    writeln('use "SENDCMD command" to send command to COM1');
+    writeln('use "SENDCMD COM3 command" to send command to COM3');
 {$ENDIF}
     halt;
   end;
   if paramcount=1 then fname:=paramstr(1) else begin fname:=paramstr(2); ttydev:=paramstr(1);end;
-  if not fileexists(fname) then begin writeln('?File not Found ERROR');halt; end;
-  filemode:=0; assign(f,fname); reset(f,1); flen:=filesize(f); blockread(f,fbuffer,flen); close(f); fbufpos:=0;
   ser:=TBlockSerial.Create;
 {$IFDEF LINUX}
   devstring:='/dev/tty'+ttydev;
@@ -113,21 +103,7 @@ begin
     ser.config(115200, 8, 'N', SB1, False, False);
     makehdr;
     clreol;write('connecting to V6Z80P');gotoxy(1,wherey);
-    if sendbuf then
-    begin
-      while not quit do
-      begin
-        clreol;write('sending to '+devstring+':',fbufpos,'/',flen);gotoxy(1,wherey);
-        if fbufpos>=flen then quit:=true else
-        begin
-          move(fbuffer[fbufpos],buffer[0],256);
-          inc(fbufpos,256);
-          sendstat:=sendbuf;
-          quit:=not sendstat;
-        end;
-        if isesc then quit:=true;
-      end;  
-    end;
+    sendstat:=sendbuf;
   finally
     ser.free;
   end;
