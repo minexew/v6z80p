@@ -23,7 +23,8 @@ class V6_Project(object):
         self.checker         = V6_Project_SystemChecker()
         self.options_handler = V6_Project_OptionsHandler()  
         
-        self.utilFilename_xd = self.GetUtilFilename('xd')
+        self.utilFilename_xd     = self.GetUtilFilename('xd')
+        self.utilFilename_sendv6 = self.GetUtilFilename('sendv6')
         
         # this files (objects) will be passed to link command
         # NOTE: CRT object file (crt0_v6z80p) must be first in this list!! 
@@ -158,7 +159,8 @@ class V6_Project(object):
                             
 
         
-        env.Append(SENDV6_PORT=self.options_handler.config.get('SendV6', 'port'))
+        env.Append( SENDV6_UTIL = self.utilFilename_sendv6,
+                    SENDV6_PORT = self.options_handler.config.get('SendV6', 'port'))
         
         #print env['CC']
         #print env['ENV']['PATH']
@@ -179,7 +181,13 @@ class V6_Project(object):
         if strName == 'xd':
             return self.basedir + 'c_support/tools/xd.exe' 
 
-             
+        if strName == 'sendv6':                   
+            if platform == 'win32':
+                return os.path.join(self.v6_dir, 'Contributions/Daniel/Linux_tools/sendv6')
+            else:                
+                return 'sendv6'
+            
+                         
         if platform == 'win32':
             # in win32 we have all utils in this dir
             util = self.basedir + 'c_support/tools/' + strName
@@ -189,8 +197,8 @@ class V6_Project(object):
         return util
             
     def Upload(self, upload_target, is_upload_always):
-        upload_command = 'cd ${SOURCE.dir} && sendv6 $SENDV6_PORT ${SOURCE.file}'    # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
-        #upload_command = 'sendv6 S0 $SOURCE'
+        upload_command = 'cd ${SOURCE.dir} && $SENDV6_UTIL $SENDV6_PORT ${SOURCE.file}'    
+        #upload_command = 'sendv6 S0 $SOURCE'       # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
         
         upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
         if is_upload_always:

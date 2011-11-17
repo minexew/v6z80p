@@ -29,7 +29,7 @@ final_exe = v6_prj.FLOS_Program(objs)
 # 1. list of targets to upload
 # 2. True - always upload, False - upload only if file (target) was re-builded
 #
-#v6_prj.Upload(final_exe, False)
+v6_prj.Upload(final_exe, False)
 
 
 
