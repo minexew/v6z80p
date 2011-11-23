@@ -1,0 +1,33 @@
+Import('v6_prj')
+
+v6_prj.name     = 'tstgfx2'
+v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0'
+v6_prj.stack    = '0xffff'
+
+env = v6_prj.env
+
+
+# We need to add variand dir (the dir, where scons do build) to include path, because we will generate file object_32x28.c and this file
+# will be created in scons variant dir. 
+# And we include generated file object_32x28.c with #include in our C program.
+objs = env.Object(   ['tstgfx2.c'], 
+                CPPPATH     = env['CPPPATH']           + ['.'],         # add variant dir to include paths
+                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
+                CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
+                )
+
+final_exe = v6_prj.FLOS_Program(objs)
+
+# Generate object_32x28.c from two binary files.
+command1  =  ['echo // Machine generated. Dont edit. > $TARGET' ,
+            'echo const >> $TARGET',
+            v6_prj.utilFilename_xd + ' -d$MYPARAM1 $SOURCE >> $TARGET']
+# generate two .c files (each .c file from binary file)
+src1 = env.Command('object_32x28_p1.c', 'data/object_32x28.bin',   command1, MYPARAM1 = 'object_32x28_pixels')
+src2 = env.Command('object_32x28_p2.c', 'data/object_palette.bin', command1, MYPARAM1 = 'object_32x28_palette')
+# concat two .c files to target .c file
+env_text = Environment(tools = ['textfile'])
+src_generated = env_text.Textfile(target = 'object_32x28.c',  source = [src1, src2])
+                                
+                                    
+v6_prj.Upload(final_exe, False)
