@@ -57,7 +57,7 @@ char myTestString[128];
     #define NO_REBOOT 0
 
 
-    char *myFilename =      "/home/valen/_1/test3.exe";
+    char *myFilename =      "/home/valen/_1/v6z80p_SVN/Contributions/Valen/c_programs/build/v6/c_programs/test3/test3.exe";
     char *myFilenameW =     "/home/valen/_1/test3.txt";
 
 

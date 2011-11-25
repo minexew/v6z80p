@@ -1,0 +1,52 @@
+Import('v6_prj')
+
+v6_prj.name     = 'tstsnd1'
+
+sound_fx_code   = '0xA800'
+v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0x8000 -Wl-b_FX_PLAYER_CODE=' + sound_fx_code
+v6_prj.stack    = '0x8000'
+
+env = v6_prj.env
+env_pasmo = v6_prj.env_pasmo
+
+
+objs1 = env.Object(   ['tstsnd1.c'], 
+                CPPPATH     = env['CPPPATH']           + ['.'],         # add variant dir to include paths
+                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
+                CPPDEFINES  = env['CPPDEFINES']        + [{'SOUND_FX_CODE' : sound_fx_code}, {'OWN_SP' : v6_prj.stack}]
+                )
+
+
+# ------ compile fx player code (pasmo asm --> bin --> C file --> Obj file)
+# generate sound_fx_code_address.asm
+env_text = Environment(tools = ['textfile'])
+asm_src_generated = env_text.Textfile(target = 'sound_fx_code_address.asm',  source = ['; Machine generated. Dont edit.', 
+                                                                                       'org ' + sound_fx_code])
+# assemble fx_player_code
+binary_fx_player_code = env_pasmo.Object('fx_player_code.asm.bin', 'fx_player/fx_player_code.asm',                                              
+                                    CPPPATH = [v6_prj.v6_dir + '/Equates/', 
+                                    'fx_player/inc',
+                                    'fx_player/demo_data',
+                                    '.']                    # add scons variant dir (build dir) to pasmo include paths
+                                    ) 
+Depends(binary_fx_player_code, asm_src_generated)
+
+# convert binary to C file (array of bytes)
+command1  =  ['echo // Machine generated. Dont edit. > $TARGET' ,
+            'echo const >> $TARGET',
+            v6_prj.utilFilename_xd + ' -d$MYPARAM1 $SOURCE >> $TARGET']
+fx_player_code_generated = env.Command('fx_player_code.c', binary_fx_player_code,  command1, MYPARAM1 = 'fx_player_code')
+
+# compile fx_player_code.c (array of bytes) to separate segment FX_PLAYER_CODE
+objs2 = env.Object(   fx_player_code_generated, 
+#                CPPPATH     = env['CPPPATH']           + ['.'],         # add variant dir to include paths
+                CCFLAGS     = env['CCFLAGS']           + ['--constseg', 'FX_PLAYER_CODE', '--std-sdcc99', '--opt-code-speed'],  
+#                CPPDEFINES  = env['CPPDEFINES']        + [{'SOUND_FX_CODE' : sound_fx_code}, {'OWN_SP' : v6_prj.stack}]
+                )
+                
+
+final_exe = v6_prj.FLOS_Program(objs1 + objs2)
+
+                                
+                                    
+v6_prj.Upload(final_exe, False)
