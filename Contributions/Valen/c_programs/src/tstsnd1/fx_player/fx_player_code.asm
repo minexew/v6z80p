@@ -8,7 +8,7 @@ include "system_equates.asm"
 
 
 ;	org
-include "fx_player/obj/sound_fx_code_address.asm"
+include "sound_fx_code_address.asm"
 
 
 
@@ -23,4 +23,4 @@ include "fx_player.asm"
 
  
 ; include sounds descriptors (there are 7 descriptors in my_fx1.dat)
-fx_data incbin "my_fx1.dat"
+fx_data incbin "MY_FX1.DAT"
