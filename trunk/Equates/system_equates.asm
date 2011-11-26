@@ -22,7 +22,6 @@ irq_jp_inst		equ $a00
 irq_vector		equ $a01		; to $a02
 nmi_jp_inst		equ $a03
 nmi_vector		equ $a04		; to $a05
-ide_status		equ $a06		; not used on v6z80p
 
 scratch_pad		equ $a08		; general work RAM (WARNING: MAY APPROACH STACK)
 
