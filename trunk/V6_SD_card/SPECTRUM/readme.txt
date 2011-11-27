@@ -22,9 +22,9 @@ There are two main Spectrum Emulators for the V6Z80P:
    and also includes the ZXMMC+ expansion system, allowing programs like Residos
    to be installed (which can load and save files to the SD card, start snapshots etc).
    
-   Additionally, the emulator is able to start from a previously saved RAMDUMP.BIN file,
-   which removes the need to manually install EG: Residos each time. Use option 3 of
-   GOSPEC.EXE to load a RAMDUMP.BIN file - it should be in the root directory of your
+   Additionally, the emulator is able to start from a previously saved RESIDOS.NVR file,
+   which removes the need to manually install Residos each time. Use option 3 of
+   GOSPEC.EXE to load a RESIDOS.NVR file - it should be in the root directory of your
    SD Card).
 
    The emulator also requires the file "ZXSPEC48.ROM" in the [ROOT]:SPECTRUM directory
