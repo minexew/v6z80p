@@ -71,7 +71,6 @@ first_os_var	EQU 00B1EH
 hl_store1	EQU 00B09H
 hl_store2	EQU 00B10H
 host_device_hardware_info EQU 00380H
-ide_status	EQU 00A06H
 in_script_flag	EQU 00B34H
 insert_mode	EQU 00BF1H
 irq_jp_inst	EQU 00A00H
@@ -99,6 +98,7 @@ linedraw_reg4	EQU 00228H
 linedraw_reg5	EQU 0022AH
 linedraw_reg6	EQU 0022CH
 linedraw_reg7	EQU 0022EH
+master_commandstring EQU 00FE8H
 max_bank	EQU 00B35H
 max_envars	EQU 00010H
 memmonaddrh	EQU 00B23H
