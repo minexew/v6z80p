@@ -1,4 +1,4 @@
-; Machine generated. Dont edit. Source file: /home/valen/_1/v6z80p_SVN/FLOS/FLOSv579.asm
+; Machine generated. Dont edit. Source file: /home/valen/_1/v6z80p_SVN/FLOS/FLOSv590.asm
 ; FLOS proxy jump table (must be identical to Kernel jump table)
     jp proxy__print_string		  ;   start + $13
     jp proxy__clear_screen		  ;   start + $16
@@ -20,23 +20,23 @@
     jp proxy__parent_dir		  ;   start + $46
     jp proxy__root_dir		  ;   start + $49
     jp proxy__delete_dir		  ;   start + $4c
-    jp proxy__find_file		  ;   start + $4f
-    jp proxy__load_file		  ;   start + $52
+    jp proxy__open_file		  ;   start + $4f
+    jp proxy__load_file		  ;   start + $52 
     jp proxy__save_file		  ;   start + $55
     jp proxy__erase_file		  ;   start + $58
     jp proxy__get_total_sectors	  ;   start + $5b
     jp proxy__wait_key_press		  ;   start + $5e
     jp proxy__get_key		  ;   start + $61
-    jp proxy__forcebank		  ;   start + $64
-    jp proxy__getbank		  ;   start + $67
+    jp proxy__force_bank		  ;   start + $64
+    jp proxy__get_bank		  ;   start + $67
     jp proxy__create_file		  ;   start + $6a
-    jp proxy__incbank		  ;   start + $6d
+    jp proxy__inc_bank		  ;   start + $6d
     jp proxy__compare_strings		  ;   start + $70
     jp proxy__write_bytes_to_file	  ;   start + $73
     jp proxy__bchl_memfill		  ;   start + $76
-    jp proxy__force_load		  ;   start + $79
+    jp proxy__read_file_data		  ;   start + $79
     jp proxy__set_file_pointer	  ;   start + $7c
-    jp proxy__set_load_length		  ;   start + $7f
+    jp proxy__set_read_length		  ;   start + $7f
     jp proxy__serial_receive_header	  ;   start + $82
     jp proxy__serial_receive_file	  ;   start + $85
     jp proxy__serial_send_file	  ;   start + $88
@@ -52,7 +52,7 @@
     jp proxy__get_cursor_position	  ;   start + $a6 (added in v538)
     jp proxy__read_sector		  ;   start + $a9 (updated in v565)
     jp proxy__write_sector		  ;   start + $ac ""
-    jp proxy__not_used_one		  ;   start + $af obsoleted in V565
+    jp proxy__set_commander		  ;   start + $af (added in v590)
     jp proxy__plot_char		  ;   start + $b2 (added in v539)
     jp proxy__set_pen		  ;   start + $b5 ("")
     jp proxy__background_colours	  ;   start + $b8 ("")
@@ -80,3 +80,4 @@
     jp proxy__delete_envar		  ;   start + $fa (added in v572)
     jp proxy__file_sector_list	  ;   start + $fd (added in v575)
     jp proxy__mouse_irq_code		  ;   start + $100 (added in v579)
+    jp proxy__get_sector_read_addr	  ;   start + $103 (added in v588)

@@ -28,6 +28,7 @@
 
 #define SYS_LOW_PAGE	   0x20
 #define SYS_VRAM_LOCATION	   0x21
+#define SYS_AUDIO_PANNING	   0x22
 
 //---- Sound system ports ---------------------------------------------------
 

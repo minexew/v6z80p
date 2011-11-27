@@ -5,7 +5,7 @@
 V6Z80P_path="/home/valen/_1/v6z80p_SVN/"
 
 # find name of source asm file (of FLOS)
-flos_search_pattern=$V6Z80P_path"FLOS/FLOSv*.asm"
+flos_search_pattern=$V6Z80P_path"FLOS/FLOSv59*.asm"
 flos_asm_file=`find $flos_search_pattern`
 #echo $flos_asm_file
 
