@@ -63,7 +63,7 @@ kjt_dir_list_next_entry	equ os_start + $a3
 kjt_get_cursor_position	equ os_start + $a6
 kjt_read_sector		equ os_start + $a9
 kjt_write_sector		equ os_start + $ac
-kjt_not_used1		equ os_start + $af   ; (obsolete - place holder)
+kjt_set_commander		equ os_start + $af   ; added in v590
 kjt_plot_char		equ os_start + $b2 
 kjt_set_pen		equ os_start + $b5 
 kjt_background_colours	equ os_start + $b8
