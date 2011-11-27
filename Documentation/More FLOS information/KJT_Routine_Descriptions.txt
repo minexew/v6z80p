@@ -1,5 +1,5 @@
 
-  			Kernal Routines - Full Descriptions 11/11/2010
+  			Kernal Routines - Full Descriptions 27/11/2011
 			-----------------------------------------------
 
 
@@ -1579,6 +1579,31 @@ Input Registers: A = number of 16 microsecond periods to wait
 Output Registers: None (A is trashed)
 
 Note: Preserves all other registers.
+
+
+
+
+
+
+
+Routine name: kjt_set_commander (FLOS 590+)
+-------------------------------------------
+
+Action: Sets a "permanent" command string that is to be launched when progams exit
+
+Input Registers: HL = location of command string (40 chars max)
+
+Output Registers: None
+
+Notes: 
+
+* The "commander program" will run on when a program exits back to FLOS unless that program specifically
+  tells FLOS to launch some other program (with A=$FE on exit). In this case, the commander program will
+  eventually launch when control is passed back to the FLOS CLI (IE: A <> $FE on exit)
+
+* To remove the commander string, point HL at a null string (a zero btyte in memory) and call the routine.
+
+
 
 
 
