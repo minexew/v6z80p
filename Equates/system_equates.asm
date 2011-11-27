@@ -30,6 +30,7 @@ stack			equ $aff		; max stack height = 250 byes
 OS_variables		equ $b00		; max length = 256 bytes
 OS_charmap		equ $c00		; 25 x 40 chars
 
+master_commandstring	equ $fe8		; extends to $100F (IE: overwrites OS header)
 OS_location		equ $1000
 
 ;-------------------------------------------------------------------------------------
