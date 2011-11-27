@@ -2,13 +2,20 @@
 FLOS version info:
 ------------------
 
-5.89 - 09/09/11 : When a "G xxxx" "RX !" command is entered, HL = the location of
-                  the first non-space character after the address / "!" respectively.
-                  This allows easier testing of apps with command line arguments.
+5.90 - 27/11/11 : Kernal call KJT_SET_COMMANDER added. Set HL = address of command
+                  string that is required to run return to FLOS (unless A=$FE). To
+                  remove, set HL to point at a null string (zero)
+		  
+		: Optimizations to fit in the above
 
 
 Previous changes:
 ----------------
+
+
+5.89 - 09/09/11 : When a "G xxxx" "RX !" command is entered, HL = the location of
+                  the first non-space character after the address / "!" respectively.
+                  This allows easier testing of apps with command line arguments.
 
 
 5.88 - 29/08/11	 : Added "KJT_get_sector_read_addr"  Programs can load sectors

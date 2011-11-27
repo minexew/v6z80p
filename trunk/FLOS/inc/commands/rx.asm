@@ -17,8 +17,7 @@ os_cmd_rx:
 	push hl			;clear serial filename area
 	ld hl,serial_filename
 	ld bc,16
-	xor a
-	call os_bchl_memfill
+	call os_bchl_memclear
 	pop hl
 
 	ld a,(hl)			;If args = "!", RX and run requested.

@@ -1239,9 +1239,15 @@ fs_dir_entry_free
 fs_dir_entry_in_use
 
 	ld (fs_dir_entry_line_offset),de
+	
+	ld hl,output_line			; clear_output_line
+	ld b,OS_window_cols
+fs_clrol 	ld (hl),32
+	inc hl
+	djnz fs_clrol 
+	
 	push ix
 	pop hl
-	call os_clear_output_line
 	ld b,8				;8 chars in FAT16 filename
 	ld de,output_line
 dcopyn	ld a,(hl)
@@ -1552,9 +1558,8 @@ fs_clear_sector_buffer
 	push hl
 	push bc
 	ld hl,sector_buffer			
-	ld bc,512				
-	xor a				
-	call os_bchl_memfill	
+	ld bc,512						
+	call os_bchl_memclear	
 	pop bc
 	pop hl
 	ret

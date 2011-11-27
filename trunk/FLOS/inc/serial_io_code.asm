@@ -283,8 +283,7 @@ serial_send_file
 s_flok	push hl				; clear the header	
 	ld hl,serial_fileheader
 	ld bc,16
-	xor a
-	call os_bchl_memfill
+	call os_bchl_memclear
 	pop hl				; fill in filename
 	ld de,serial_fileheader
 	ld b,16
@@ -335,9 +334,8 @@ s_makeblock
 	push hl
 	push de
 	ld hl,sector_buffer			; make a block
-	ld bc,256				; set ix = src addr
-	xor a				; hl:de = byte count
-	call os_bchl_memfill		; a =0 on return if all ok
+	ld bc,256				; set ix = src addr, hl:de = byte count, a =0 on return if all ok
+	call os_bchl_memclear		 
 	pop de
 	pop hl
 	pop bc
