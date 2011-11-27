@@ -1,5 +1,8 @@
 ;GoSpec.exe - A boot util for Alessandro's Cycle Perfect Spectrum Emulator (V6Z80P v1.1 only)
 
+;New in v0.06 - restore system filename "ramdump.bin" changed to "residos.nvr"
+;to use with Garry Lancaster's update of Residos.
+
 ;======================================================================================
 ; Standard header for OSCA and FLOS
 ;======================================================================================
@@ -759,7 +762,7 @@ loading_msg
 ;------------------------------------------------------------------------------------
 
 no_restore_txt	db "Cannot find:"
-restore_fn	db "RAMDUMP.BIN",0
+restore_fn	db "residos.nvr",0
 
 spectrum_dir	db "spectrum",0
 
@@ -784,7 +787,7 @@ slot_not_set_txt	db 11,"Please set the Spectrum EEPROM slot,",11,11,0
 options_txt
 
 	db "***************************************",11
-	db "* Spectrum Emulator Kickstarter v0.05 *",11
+	db "* Spectrum Emulator Kickstarter v0.06 *",11
 	db "***************************************",11
 	db 11,11
 	db "Emulator EEPROM slot: "
