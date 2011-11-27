@@ -2,6 +2,8 @@
 ; This proxy is portable across C compilers  (proxy don't depend on any specific C compiler)
 ; Coded in Pasmo.
 ; -----------------------
+; TODO: this file include all proxies and compiled binary is about 3KB. 
+; So, need think how to compile only proxies, used in user project. This will save some memory.
 
 
 ;---Standard header for V6Z80P and OS -------------------------------------------------
@@ -160,11 +162,11 @@ failed11
 
 
 
-        proxy__find_file    ;start + $4f
+        proxy__open_file    ;start + $4f
 
         PUSH_ALL_REGS
         GET_I_DATA l, h
-        call kjt_find_file
+        call kjt_open_file
         push de
         ld e,0                  ; status = failed
         jr nz,failed1
@@ -245,9 +247,9 @@ failed5
         ret
 
 
-        proxy__forcebank    ;start + $64
+        proxy__force_bank    ;start + $64
 
-        proxy__getbank    ;start + $67
+        proxy__get_bank    ;start + $67
 
         proxy__create_file    ;start + $6a
         PUSH_ALL_REGS
@@ -271,7 +273,7 @@ failed4
 
 
 
-        proxy__incbank    ;start + $6d
+        proxy__inc_bank    ;start + $6d
 
         proxy__compare_strings    ;start + $70
 
@@ -300,10 +302,10 @@ failed30
 
         proxy__bchl_memfill    ;start + $76
 
-        proxy__force_load    ;start + $79
+        proxy__read_file_data    ;start + $79
         PUSH_ALL_REGS
         GET_I_DATA l, h, b
-        call kjt_force_load
+        call kjt_force_load	; read_file_data and force_load are equ
         ld c,0                  ; status = failed
         jr nz,failed2
         ld c,1                  ; status = ok
@@ -330,7 +332,7 @@ failed2
         ret
 
 
-        proxy__set_load_length    ;start + $7f
+        proxy__set_read_length    ;start + $7f
         PUSH_ALL_REGS
         GET_I_DATA l, h, e, d
         push hl
@@ -338,7 +340,7 @@ failed2
 ; IX:IY = load len
         pop ix
         pop iy
-        call kjt_set_load_length
+        call kjt_set_read_length
         POP_ALL_REGS
         ret
 
@@ -445,7 +447,7 @@ failed15
         proxy__get_cursor_position    ;os_start + $a6
         proxy__read_sector    ;os_start + $a9
         proxy__write_sector    ;os_start + $ac
-        proxy__not_used_one    ;os_start + $af
+        proxy__set_commander    ;os_start + $af
 
         proxy__plot_char    ;os_start + $b2
         proxy__set_pen    ;os_start + $b5
@@ -549,6 +551,7 @@ failed20
         ret
 
         proxy__mouse_irq_code		  ;   start + $100 (added in v579)
+        proxy__get_sector_read_addr	;   start + $103 (added in v588)
 
 
 
