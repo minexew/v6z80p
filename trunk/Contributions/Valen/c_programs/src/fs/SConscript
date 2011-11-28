@@ -1,0 +1,17 @@
+Import('v6_prj')
+
+v6_prj.name     = 'fs'
+v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0'
+v6_prj.stack    = '0xffff'
+
+env = v6_prj.env
+
+
+objs = env.Object(   ['fs_walk.c'], 
+                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
+                CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
+                )
+
+final_exe = v6_prj.FLOS_Program(objs)
+
+v6_prj.Upload(final_exe, False)

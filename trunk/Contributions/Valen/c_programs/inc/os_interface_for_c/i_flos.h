@@ -154,6 +154,7 @@ V6Z80P_EXTERN const char* FLOS_GetDirName(void);
 
 // Misc --------------------------------------
 V6Z80P_EXTERN void FLOS_GetVersion(word* os_version_word, word* hw_version_word);
+V6Z80P_EXTERN void FLOS_SetCommander(const char* pCmdLine);
 
 // Mouse --------------------------------------
 V6Z80P_EXTERN BOOL FLOS_GetMousePosition(MouseStatus* ms);
