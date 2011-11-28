@@ -149,7 +149,7 @@ void TileMap_PutTileToTilemap(BYTE playfieldNumber, BYTE x, BYTE y, WORD tileNum
 
     PAGE_IN_VIDEO_RAM();
     SET_VIDEO_PAGE(TILEMAPS_VIDEO_PAGE + playfieldNumber);  // video addr: 8KB - PF A, then 8KB PF_B
-    pTilemap = (byte*)(VIDEO_BASE + y*64 + x);
+    pTilemap = (byte*)(VIDEO_BASE + y*64U + x);
     *pTilemap         = (byte) tileNumber;         //LSB
     *(pTilemap+0x800) = (byte)(tileNumber >> 8); //MSB
     PAGE_OUT_VIDEO_RAM();
