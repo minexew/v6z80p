@@ -447,7 +447,13 @@ failed15
         proxy__get_cursor_position    ;os_start + $a6
         proxy__read_sector    ;os_start + $a9
         proxy__write_sector    ;os_start + $ac
+        
         proxy__set_commander    ;os_start + $af
+        PUSH_ALL_REGS
+        GET_I_DATA l, h
+        call kjt_set_commander
+        POP_ALL_REGS
+        ret
 
         proxy__plot_char    ;os_start + $b2
         proxy__set_pen    ;os_start + $b5
