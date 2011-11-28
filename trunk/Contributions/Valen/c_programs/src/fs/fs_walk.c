@@ -1,5 +1,5 @@
 /*
-FS v0.014
+FS v0.015
 ---------
 File System walk 
 Valen
@@ -16,7 +16,9 @@ changelog
 0.014
 - adapted to SDCC 2.9.7 (and fixed some compiler warnings)
 - name of project changed to "fs" (was "fs_walk")
-
+0.015
+- adapted to SDCC 3.0.6 (minor issue)
+- use FLOS_SetCommander()
 
 -------------
 */
@@ -43,7 +45,7 @@ changelog
 //#define USE_FLOS_DISPALY
 #define USE_TILEMAP_DISPALY
 
-#define OS_VERSION_REQ  0x560           // OS version req. to run this program
+#define OS_VERSION_REQ  0x590           // OS version req. to run this program
 #define FLOS_START_ADDR 0x1000
 
 
@@ -122,6 +124,8 @@ int main (void)
     FLOS_RestoreDirPosition();
 
 
+    FLOS_SetCommander("FS.EXE");    // set FS as commander application
+
     MarkFrameTime(0x00f);
     if(!Display_InitVideoMode())
         return NO_REBOOT;
@@ -152,6 +156,7 @@ int main (void)
     if(request_spawn_command)
         return SPAWN_COMMAND;
 
+    FLOS_SetCommander("");
     return NO_REBOOT;
 }
 

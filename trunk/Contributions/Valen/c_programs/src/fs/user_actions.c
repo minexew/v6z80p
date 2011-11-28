@@ -161,7 +161,7 @@ BOOL request_to_exit_and_execute_command_with_filename(const char* command, cons
 
 BOOL f1_pressed(void)
 {
-    GUI_MessageBox("FS-WALK v0.014", "Info", 1, 1, 20, 4+2);
+    GUI_MessageBox("FS-WALK v0.015", "Info", 1, 1, 20, 4+2);
     ListView_Update(&lview);
     return TRUE;
 }
