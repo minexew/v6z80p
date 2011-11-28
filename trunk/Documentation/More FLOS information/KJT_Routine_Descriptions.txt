@@ -1142,7 +1142,7 @@ Routine name: kjt_write_sysram_flat
 
 Action: Writes to system memory in a flat, linear addressing mode
 
-Input Registers  : E:HL = $00000 - $7FFFF (address to write)
+Input Registers  : E:HL = $00000 - $7FFFF (address to write), A = data to write
 
 Output Registers : None (but see below)
 
