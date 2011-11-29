@@ -56,6 +56,7 @@ void PrintMessage(const char* str);
 BOOL check_OS_version(void);
 void clear_keyboard_buffer(void);
 void DisplayHelpString(void);
+void DisplayString(BYTE x, BYTE y, BYTE pen, const char* str);
 
 BOOL request_exit = FALSE;              // exit program request flag
 BOOL request_spawn_command = FALSE;     // spawn command request flag
@@ -131,6 +132,7 @@ int main (void)
         return NO_REBOOT;
     Display_ClearScreen();
     Display_SetPen(PEN_DEFAULT);
+    //DisplayString(/*SCREEN_WIDTH/8/2*/ 0, SCREEN_HEIGHT/8/2, 2, "Generating fonts...");
     clear_keyboard_buffer();
 
 
@@ -316,3 +318,11 @@ void DisplayHelpString(void) {
 
 }
 
+
+// x and y - in chars (not pixels)
+void DisplayString(BYTE x, BYTE y, BYTE pen, const char* str) {
+
+    Display_SetCursorPos(x, y);
+    Display_SetPen(pen); Display_PrintString(str);
+
+}
