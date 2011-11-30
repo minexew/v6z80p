@@ -7,6 +7,9 @@ Both support VGA output.
 Updates to OSCA
 ---------------
 
+670 - Added more flexible sprite-background priority control.
+
+
 669 - Audio mixing changed. Channels can be directed to left, right or both.
       Controlled by sys_audio_panning (port $22)
 
