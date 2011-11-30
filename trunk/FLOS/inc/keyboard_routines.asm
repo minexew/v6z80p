@@ -5,7 +5,7 @@
 os_wait_key_press
 
 ; Busy waits for a keypress.
-; Handles the following modifier keys (key_mod_flags):
+; Handles the modifier keys (key_mod_flags):
 ; Returns scancode in A and ASCII code in B (B=$00 if no valid ascii char)
 ; (ASCII code is modifed by shift / alt key status)
 

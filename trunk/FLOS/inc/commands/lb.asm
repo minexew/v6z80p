@@ -1,21 +1,22 @@
 ;-----------------------------------------------------------------------
-;"lb" - Load binary file command. V6.03
+;"lb" - Load binary file command. V6.04
 ;-----------------------------------------------------------------------
 
 os_cmd_lb
 	
 	call kjt_check_volume_format	
 	ret nz
-	
+
+	call os_getbank			;default load bank is current bank
+	ld (lb_load_bank),a
+		
 	call filename_or_bust		;filename supplied?
 	call os_find_file			;get header info
 	ret nz
 	ld (filesize_cache_lsw),iy		;note the filesize
 	ld (filesize_cache_msw),ix
 	ld (lb_load_addr),hl
-	ld a,b
-	ld (lb_load_bank),a
-	
+
 	ld hl,(os_args_start_lo)
 	call os_next_arg
 	call hexword_or_bust		;the call only returns here if the hex in DE is valid
