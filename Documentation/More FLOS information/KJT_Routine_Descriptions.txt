@@ -342,7 +342,7 @@ Output Registers : Standard error codes
 Notes:
 
 Returns "file not found" error if the file has not been previously created 
-with “kjt_create_file” or “kjt_save_file”
+with "kjt_create_file" or "kjt_save_file"
 
 
 
@@ -994,6 +994,22 @@ is required, this routine can be called when the mouse IRQ flag is set.
 The above kernal mouse routines will then still work. (The call clears
 the relevant IRQ flag).
 
+
+
+Routine name: kjt_get_key_buffer (FLOS v591+)
+---------------------------------------------
+
+Action: Returns values for monitoring the keyboard buffer
+
+Input Registers: None
+
+Output Registers: HL  = Location of the keyboard buffer WRITE index variable
+		    (The actual keyboard buffer starts 32 bytes lower in memory)
+		    
+		A = The value of the keyboard READ index variable.
+		
+Notes: On return, if A = (HL) no key has been pressed (IE: the keyboard buffer is empty)
+		
 
 
 ******************************************************************************
