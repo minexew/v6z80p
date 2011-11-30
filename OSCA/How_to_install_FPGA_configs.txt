@@ -1,0 +1,64 @@
+----------
+IMPORTANT!
+----------
+
+Please make sure you use files from the correct folder as the FPGA config
+files are not compatible between different versions of the V6Z80P.
+
+
+Visible differences between boards
+----------------------------------
+
+* The original V6Z80P PCB was made prior to August 2010 and marked
+  "V6Z80P Rev 1.1" Uniquely, it has an 8 pin mini DIN socket for video.
+
+* The V6Z80P+ V1.0 PCB was made between August 2010 and Dec 2010, the
+  PCB is marked "V6Z80P+ Rev1.0". Uniquely, it has a 3 pin serial comms socket.
+
+* The V6Z80P+ V1.1 was made after Jan 2011 and is marked "V6Z80P+ Rev 1.1"
+  Uniquely, it has a switch marked "OSC SEL" in the bottom right - Make
+  sure this is set to the DOWN POSITION.
+
+* The V6Z80P+ 1.1b is marked "V6Z80P+ V1.1b" - Uniquely, the SD card connector
+  is a push-push, enclosed type. This board uses the same config files as the
+  V6Z80P+ V1.1
+
+
+
+Installing an FPGA config onto the EEPROM
+-----------------------------------------
+
+1. [Optional: Copy the relevant FPGA config *.bin file to the SD card.]
+
+2. Boot into FLOS.
+
+3. Load the EEPROM tool (eeprom.exe)
+
+4. Choose Option 1 "Write config to slot".
+
+5. Choose an inactive slot.
+
+6. Locate the config .bin file on disk, or send it (from "Config File" folder)
+   with the Serial Link app, choosing the "RS232" option in the dialog box for
+   serial download.
+
+7. Wait for file to load, write to EEPROM and complete verification.
+
+8. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
+
+9. When prompted, choose to reconfigure from whichever slot you
+   used in step 5
+
+10. The FPGA restarts with the new FPGA firmware. This selection
+    persists until power off (or changed again with this util)
+
+11. If everything is OK, you can reload the EEPROM tool and choose option 3
+    to make the new slot active.
+
+   ( If you want, you can just rewrite the active slot in the first place, but       )
+   ( the method above allows you to test the new config before making it the         )
+   ( default startup config.  IE: If you accidentally overwrite the current Active   ) 
+   ( Slot data with a bad config, the system will not start at power on and you'll   )
+   ( be forced to use one of the manual config options to correct it - details below )
+
+   ( It is recommended that a known-working OSCA config file is always left in slot 1 )
