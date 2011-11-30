@@ -128,6 +128,7 @@ os_extcmd_jmp_addr EQU 00B95H
 os_linecount	EQU 00B3BH
 output_line	EQU 00B67H
 palette		EQU 00000H
+priority_registers EQU 00280H
 scancode_buffer	EQU 00BCCH
 scratch_pad	EQU 00A08H
 script_buffer	EQU 00B9CH

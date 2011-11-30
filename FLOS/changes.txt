@@ -2,15 +2,29 @@
 FLOS version info:
 ------------------
 
-5.90 - 27/11/11 : Kernal call KJT_SET_COMMANDER added. Set HL = address of command
-                  string that is required to run return to FLOS (unless A=$FE). To
-                  remove, set HL to point at a null string (zero)
-		  
-		: Optimizations to fit in the above
+5.91 - 28/11/11:
+
+	LB command fixed: When no bank override is supplied on the command
+	line, the current selected bank is used. (Previously always loading
+	to bank 0)
+		
+	Added code to restore the sprite priority registers to the default
+	(legacy) state when FLOS restarts.
+
+	Added kernal call: KJT_get_key_buffer - allows monitoring of keyboard without
+        affecting the internal FLOS keyboard buffer.
+
+	Packed default UK keymap data and optimized cursor flash code to fit in above.
 
 
 Previous changes:
 ----------------
+
+5.90 - 27/11/11 : Kernal call KJT_SET_COMMANDER added. Set HL = address of command
+                  string that is required to run return to FLOS (unless A=$FE). To
+                  remove, set HL to point at a null string (zero)
+		  
+		: Optimizations to fit in the above code
 
 
 5.89 - 09/09/11 : When a "G xxxx" "RX !" command is entered, HL = the location of
