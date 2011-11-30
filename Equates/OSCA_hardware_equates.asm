@@ -120,6 +120,7 @@ bitplane7b_loc	equ $27c
 bitplane_reset	equ $243
 bitplane_modulo	equ $247
 
+priority_registers	equ $280
 
 sprite_registers	equ $400		; sprite coord/def/size registers
 spr_registers	equ $400		; alternate name

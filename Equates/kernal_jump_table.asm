@@ -92,3 +92,4 @@ kjt_delete_envar		equ os_start + $fa   ; added in v572
 kjt_file_sector_list	equ os_start + $fd   ; added in v575
 kjt_mouse_irq_code		equ os_start + $100  ; added in v579
 kjt_get_sector_read_addr	equ os_start + $103	 ; added in v588
+kjt_get_key_buffer		equ os_start + $106  ; added in v591
