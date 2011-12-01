@@ -100,7 +100,7 @@ param_ok	call kjt_ascii_to_hex_word
 	ld a,e
 	or a
 	jr z,badslot
-	cp $10
+	cp $20
 	jr nc,badslot
 	ld (slot_number),a
 	
