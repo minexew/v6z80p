@@ -34,6 +34,7 @@ kjt_wait_key_press		equ os_start + $5e
 kjt_get_key		equ os_start + $61
 kjt_forcebank		equ os_start + $64
 kjt_force_bank		equ os_start + $64	; alternative name for above
+kjt_set_bank		equ os_start + $64	; alternative name for above
 kjt_getbank		equ os_start + $67
 kjt_get_bank		equ os_start + $67	; alternative name for above
 kjt_create_file		equ os_start + $6a
