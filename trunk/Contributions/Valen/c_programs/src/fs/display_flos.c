@@ -1,9 +1,14 @@
 // Display functions
 // using FLOS output.
 
-void Display_InitVideoMode(void)
+#include <v6z80p_types.h>
+#include <os_interface_for_c/i_flos.h>
+
+#include "display.h"
+
+BOOL Display_InitVideoMode(void)
 {
-    return;
+    return TRUE;
 }
 
 void Display_SetCursorPos(BYTE x, BYTE y)

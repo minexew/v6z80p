@@ -8,10 +8,13 @@ env = v6_prj.env
 
 
 objs = env.Object(   ['fs_walk.c'], 
-                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
+                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-size'],  
                 CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
                 )
 
+obj_d1 = env.Object(   ['display_flos.c'],    CCFLAGS = env['CCFLAGS'] + ['--std-sdcc99', '--opt-code-size'] )
+obj_d2 = env.Object(   ['display_tilemap.c'], CCFLAGS = env['CCFLAGS'] + ['--std-sdcc99', '--opt-code-size'] )
+                
 final_exe = v6_prj.FLOS_Program(objs)
 
 v6_prj.Upload(final_exe, False)

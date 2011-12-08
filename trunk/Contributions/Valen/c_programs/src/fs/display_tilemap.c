@@ -1,6 +1,22 @@
 // Display functions
 // using tilemap 8x8 video mode.
 
+
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+
+
+
+#include "display.h"
+
 // Playfield A - background of chars
 // Playfield B - chars 8x8
 
@@ -21,7 +37,8 @@
 void Display_PrintChar(BYTE c);
 void Display_InitFont(void);
 BOOL Display_LoadFont(void);
-void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress);
+//void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress);
+//void Display_SetNonZeroBytesToValue(BYTE value, WORD dataVideoAddress);
 void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress);
 void Display_SetPalette(void);
 //void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddress, BYTE fontColor);
@@ -163,20 +180,21 @@ void Display_InitFont(void)
     BYTE colorIndex;
 
     // make 15 fonts, with color index 1 to 15
-    destVideoAddress = 0;
-    for(colorIndex=1; colorIndex<16; colorIndex++) {
-        Display_CreateChunkyFont(colorIndex, destVideoAddress);
-        destVideoAddress += FONT_8x8_SIZE;
-    }
+//    destVideoAddress = 0;
+//    for(colorIndex=1; colorIndex<2; colorIndex++) {
+//        Display_CreateChunkyFont(colorIndex, destVideoAddress);
+//        destVideoAddress += FONT_8x8_SIZE;
+//    }
 
+//    Display_LoadChunkyFont();
 
     // Make 15 tiles, with color index 1 to 15 (will be used as background tiles)
     // Put in video memory right after fonts.
     //fontVideoAddress = 0;
-    for(colorIndex=1; colorIndex<16; colorIndex++) {
-        Display_FillTile8x8(colorIndex, destVideoAddress);
-        destVideoAddress += 8*8;
-    }
+//    for(colorIndex=1; colorIndex<16; colorIndex++) {
+//        Display_FillTile8x8(colorIndex, destVideoAddress);
+//        destVideoAddress += 8*8;
+//    }
 }
 
 
@@ -185,6 +203,7 @@ void Display_InitFont(void)
 // Font 96 chars.
 //
 // fontVideoAddress - must be div by 8 without remainder
+/*
 void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress)
 {
     BYTE b;
@@ -228,6 +247,44 @@ void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress)
 
     PAGE_OUT_VIDEO_RAM();
 }
+*/
+
+// Load 15 fonts, 8x8 with colors 1-16.
+//
+//
+// dataVideoAddress - in chunks of 64 bytes
+
+/*
+BOOL Display_LoadChunkyFont(void)
+{
+    DWORD i;
+//    BYTE* p;
+
+    FLOS_FILE myFile;
+    BOOL r;
+
+    r = FLOS_FindFile(&myFile, 'MYFONTS.BIN');
+    if(!r) return FALSE;
+    FLOS_SetLoadLength(0x2000);
+
+
+    for(i=0; i<96UL*64*15 / 0x2000; i++) {
+        SET_VIDEO_PAGE(i);
+
+//        FLOS_SetFilePointer(0);
+        r = FLOS_ForceLoad(0xA000, 0);
+
+        PAGE_IN_VIDEO_RAM();
+        memcpy(VIDEO_BASE, 0xA000, 0x2000);
+        PAGE_OUT_VIDEO_RAM();
+    }
+
+    return TRUE;
+}
+*/
+
+
+
 
 // Calc video page and video pointer from linear video address.
 #define CALC_VIDEO_PAGE_NUMBER(dw)       (dw/0x2000)
