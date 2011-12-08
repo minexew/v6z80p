@@ -13,9 +13,12 @@
 #include <os_interface_for_c/i_flos.h>
 
 
-
+#include <string.h>
 
 #include "display.h"
+#include "../src/lib/video_mode.h"
+#include "../src/lib/assert_v6.h"
+#include "../src/lib/file_operations.h"
 
 // Playfield A - background of chars
 // Playfield B - chars 8x8
@@ -176,8 +179,8 @@ void TileMap_PutTileToTilemap(BYTE playfieldNumber, BYTE x, BYTE y, WORD tileNum
 #define FONT_8x8_SIZE   (96*8*8)
 void Display_InitFont(void)
 {
-    DWORD destVideoAddress;
-    BYTE colorIndex;
+//    DWORD destVideoAddress;
+//    BYTE colorIndex;
 
     // make 15 fonts, with color index 1 to 15
 //    destVideoAddress = 0;
@@ -338,7 +341,7 @@ BOOL Display_LoadFont(void)
     FLOS_StoreDirPosition();
     FLOS_RootDir();
     FLOS_ChangeDir("FONTS");
-    if(!load_file_to_buffer(/*"ZXSPEC.FNT"*/"PHILFONT.FNT", 0, fontBuffer, 0x300, 0))
+    if(!/*load_file_to_buffer*/FileOp_LoadFileToBuffer("PHILFONT.FNT", 0, fontBuffer, 0x300, 0))
         return FALSE;
     FLOS_RestoreDirPosition();
 
