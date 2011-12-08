@@ -1,3 +1,5 @@
+#include "video_mode.h"
+
 // Setup display window size
 void VideoMode_SetupDisplayWindowSize(byte window_x_start,  byte window_x_stop,
 			              byte window_y_start,  byte window_y_stop)
