@@ -1,15 +1,17 @@
+# FS
 Import('v6_prj')
 
 v6_prj.name     = 'fs'
 v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0'
 v6_prj.stack    = '0xffff'
 
-env = v6_prj.env
-
+env = v6_prj.env.Clone()
+env['CPPPATH'] =  env['CPPPATH']    + [v6_prj.basedir + 'c_support/misc_lib/']
 
 objs = env.Object(   ['fs_walk.c'], 
-                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-size'],  
-                CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
+#        CPPPATH     = 
+        CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-size'],  
+        CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
                 )
 
 obj_d1 = env.Object(   ['display_flos.c'],    CCFLAGS = env['CCFLAGS'] + ['--std-sdcc99', '--opt-code-size'] )
