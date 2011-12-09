@@ -1,0 +1,20 @@
+#  Misc lib
+# 
+Import('v6_prj')
+
+
+env_lib = v6_prj.env
+
+obj = env_lib.Object(  ['video_mode.c', 
+                        'file_operations.c', 
+                        'assert_v6.c',
+                        'utils.c'], 
+        CCFLAGS     = env_lib['CCFLAGS'] + ['--std-sdcc89', '--opt-code-size' ]  )
+obj[0].my_progress_message = '-------------  Misc lib: Compile C to object files ---------'
+
+    
+v6_prj.depend.lib_misc = env_lib.Library('misc_lib', obj)
+v6_prj.depend.lib_misc[0].my_progress_message = '------------- Misc lib: Add objects to Lib ---------'  
+
+
+#print "aaa ---------"
