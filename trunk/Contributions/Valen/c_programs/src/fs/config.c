@@ -108,7 +108,7 @@ BOOL load_config_file(void)
     }
 
     memset(config_file_buffer, 0, CONFIG_FILE_MAX_SIZE);
-    if(!load_file_to_buffer("FS.CFG", 0, config_file_buffer, CONFIG_FILE_MAX_SIZE, 0))
+    if(!FileOp_LoadFileToBuffer("FS.CFG", 0, config_file_buffer, CONFIG_FILE_MAX_SIZE, 0))
         return FALSE;
 
 
