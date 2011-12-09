@@ -16,9 +16,11 @@
 #include <string.h>
 
 #include "display.h"
-#include "../src/lib/video_mode.h"
-#include "../src/lib/assert_v6.h"
-#include "../src/lib/file_operations.h"
+
+// from misc_lib
+#include <video_mode.h>
+#include <assert_v6.h>
+#include <file_operations.h>
 
 // Playfield A - background of chars
 // Playfield B - chars 8x8

@@ -39,7 +39,12 @@ changelog
 #include <string.h>
 
 #include "display.h"
-#include "../../src/lib/assert_v6.h"
+
+
+// from misc_lib
+#include <assert_v6.h>
+#include <utils.h>
+
 
 // define one of two possible video modes
 //#define USE_FLOS_DISPALY
@@ -77,9 +82,9 @@ word numStrings;        //
 
 #define FILENAME_LEN    8+1+3                // FILENAME + dot + EXT  
 
-#include "util.c"
-#include "../../src/lib/video_mode.c"
-#include "../../src/lib/assert_v6.c"
+
+//#include "../../src/lib/video_mode.c"
+//#include "../../src/lib/assert_v6.c"
 
 #ifdef  USE_FLOS_DISPALY
 #include "display_flos.c"
