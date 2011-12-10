@@ -1,4 +1,4 @@
-#  Misc lib
+#  Base lib
 # 
 Import('v6_prj')
 
@@ -13,7 +13,7 @@ obj = env_lib.Object(  ['video_mode.c',
 obj[0].my_progress_message = '-------------  Misc lib: Compile C to object files ---------'
 
     
-v6_prj.depend.lib_misc = env_lib.Library('misc_lib', obj)
+v6_prj.depend.lib_misc = env_lib.Library('base_lib', obj)
 v6_prj.depend.lib_misc[0].my_progress_message = '------------- Misc lib: Add objects to Lib ---------'  
 
 

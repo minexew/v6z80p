@@ -19,7 +19,7 @@ SConscript([bdir + '/c_support/crt/SConscript'],                  exports='v6_pr
 SConscript([bdir + '/c_support/os_interface_for_c/SConscript'],   exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_interface_for_c/', duplicate=0)
 SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_proxy/', duplicate=0)
 SConscript([bdir + '/c_support/stdio_v6z80p/SConscript'],         exports='v6_prj', variant_dir=variantBaseDir + '/c_support/stdio_v6z80p/', duplicate=0)
-SConscript([bdir + '/c_support/misc_lib/SConscript'],         exports='v6_prj', variant_dir=variantBaseDir + '/c_support/misc_lib/', duplicate=0)
+SConscript([bdir + '/c_support/base_lib/SConscript'],         exports='v6_prj', variant_dir=variantBaseDir + '/c_support/base_lib/', duplicate=0)
   
   
 

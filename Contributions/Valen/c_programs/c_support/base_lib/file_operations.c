@@ -9,8 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "utils.h"
-#include "file_operations.h"
+#include "base_lib/utils.h"
+#include "base_lib/file_operations.h"
 
 
 BOOL FileOp_LoadFileToBuffer(char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
