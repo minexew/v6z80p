@@ -8,7 +8,7 @@ v6_prj.stack    = '0xffff'
 env = v6_prj.env.Clone()
 #env['CPPPATH'] =  env['CPPPATH']    + [v6_prj.basedir + 'c_support/misc_lib/']
 
-objs = env.Object(   ['list_view.c',
+objs = env.Object(   ['list_view.c', 'config.c', 'user_actions.c', 'os_onexit.c',
                     'fs_walk.c', ], 
 #        CPPPATH     = 
         CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-size'],  

@@ -1,8 +1,26 @@
-BOOL enter_pressed(void);
-BOOL f4_pressed(void);
-BOOL f3_pressed(void);
-BOOL f1_pressed(void);
-BOOL do_action_based_on_file_extension(const char* filename);
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+//#include <base_lib/file_operations.h>
+
+
+#include <string.h>
+
+
+#include "fs_walk.h"
+#include "display.h"
+#include "list_view.h"
+#include "config.h"
+#include "os_onexit.h"
+#include "user_actions.h"
+
+extern ListView lview;
 
 BOOL request_to_exit_and_execute_command_with_filename(const char* command, const char* filename);
 BOOL extract_filename_from_buffer(const char* pFrom, char* pTo);
@@ -14,9 +32,6 @@ BOOL ExecuteCommandWithSelectedItem(const char* strCommand);
 BOOL GUI_MessageBox_YesNow(const char* strText, const char* strCaption, BYTE x, BYTE y, BYTE width, BYTE height);
 void GUI_MessageBox(const char* strText, const char* strCaption, BYTE x, BYTE y, BYTE width, BYTE height);
 
-/*struct {
-    short prevSelectedIndex;
-} user_actions;*/
 
 BOOL enter_pressed(void)
 {

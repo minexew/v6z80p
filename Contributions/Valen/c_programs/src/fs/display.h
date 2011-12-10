@@ -1,3 +1,6 @@
+#ifndef DISPLAY_H
+#define DISPLAY_H
+
 // Display functions
 
 BOOL Display_InitVideoMode(void);
@@ -7,3 +10,4 @@ void Display_PrintStringLFCR(const char* str);
 void Display_SetPen(BYTE color);
 void Display_ClearScreen(void);
 
+#endif /* DISPLAY_H */

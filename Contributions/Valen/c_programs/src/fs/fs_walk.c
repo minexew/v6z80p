@@ -39,7 +39,10 @@ changelog
 #include <string.h>
 
 #include "display.h"
+#include "config.h"
 #include "list_view.h"
+#include "user_actions.h"
+#include "fs_walk.h"
 
 
 #include <base_lib/assert_v6.h>
@@ -56,7 +59,7 @@ changelog
 
 
 void main_loop(void);
-void clear_area(byte x, byte y, byte width, byte height);
+
 void PrintMessage(const char* str);
 BOOL check_OS_version(void);
 void clear_keyboard_buffer(void);
@@ -71,6 +74,8 @@ byte buffer[32+1];      // buffer for numbers to string conversion
 
 byte buf[8];
 
+ListView lview;
+
 
 // ---- buffer for list of dir entries ----
 byte bufCatalog[1024*2];        // main buffer
@@ -80,11 +85,7 @@ byte* tmp1 = bufCatalog;
 
 word numStrings;        // 
 
-#define FILENAME_LEN    8+1+3                // FILENAME + dot + EXT  
 
-
-//#include "../../src/lib/video_mode.c"
-//#include "../../src/lib/assert_v6.c"
 
 #ifdef  USE_FLOS_DISPALY
 #include "display_flos.c"
@@ -93,19 +94,19 @@ word numStrings;        //
 #include "display_tilemap.c"
 #endif
 
-#include "os_onexit.c"
+
 #include "os_cmd.c"
 
 
-#include "config.c"
 
 
 
-ListView lview;     
 
-void fill_ListView_by_entries_from_current_dir(void);
 
-#include "user_actions.c"
+
+
+
+
 
 
 
