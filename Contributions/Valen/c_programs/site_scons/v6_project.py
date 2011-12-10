@@ -151,11 +151,11 @@ class V6_Project(object):
 
         env.Append(LINKFLAGS=['-mz80', '--no-std-crt0' , '-Wl-b_FLOS_PROXY_CODE=0x5080'])
         #env['LINKCOMSTR'] = "Linking $TARGET"
-        env['LIBS'] =['i_flos_lib', 'stdio_v6z80p_lib', 'misc_lib']
+        env['LIBS'] =['i_flos_lib', 'stdio_v6z80p_lib', 'base_lib']
         
         lib1 = Dir(self.basedir + self.base_variant_dir + 'c_support/os_interface_for_c/')
         lib2 = Dir(self.basedir + self.base_variant_dir + 'c_support/stdio_v6z80p/')
-        lib3 = Dir(self.basedir + self.base_variant_dir + 'c_support/misc_lib/')
+        lib3 = Dir(self.basedir + self.base_variant_dir + 'c_support/base_lib/')
         env.Append(LIBPATH=[lib1, lib2, lib3])
                             
 
