@@ -1,3 +1,23 @@
+// Quick and Dirty config file implementation.
+// TODO: replace with some good config library
+
+//#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+//#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+#include <base_lib/file_operations.h>
+
+
+#include <string.h>
+
+#include "config.h"
+
 #define CONFIG_FILE_MAX_SIZE            1024
 #define CONFIG_FILE_DIR                 "COMMANDS"
 #define CONFIG_FILE_MAX_EXT_ACTIONS     64
@@ -13,8 +33,9 @@ struct {
 
 } config;
 
-// prototypes
+
 void add_user_action_based_on_ext(const char *pExt, const char *pAction);
+
 
 //void parse_config_file(void)
 void replace_new_lines_with_zero_bytes(void)
