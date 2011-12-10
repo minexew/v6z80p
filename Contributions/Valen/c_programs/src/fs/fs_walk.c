@@ -39,11 +39,11 @@ changelog
 #include <string.h>
 
 #include "display.h"
+#include "list_view.h"
 
 
-// from misc_lib
-#include <assert_v6.h>
-#include <utils.h>
+#include <base_lib/assert_v6.h>
+#include <base_lib/utils.h>
 
 
 // define one of two possible video modes
@@ -96,7 +96,7 @@ word numStrings;        //
 #include "os_onexit.c"
 #include "os_cmd.c"
 
-#include "list_view.c"
+
 #include "config.c"
 
 
