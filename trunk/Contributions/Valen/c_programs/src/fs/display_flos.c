@@ -1,11 +1,15 @@
 // Display functions
 // using FLOS output.
 
+
+
+
 #include <v6z80p_types.h>
 #include <os_interface_for_c/i_flos.h>
 
 #include "display.h"
 
+#ifdef  USE_FLOS_DISPALY
 BOOL Display_InitVideoMode(void)
 {
     return TRUE;
@@ -35,3 +39,5 @@ void Display_ClearScreen(void)
 {
     FLOS_ClearScreen();
 }
+
+#endif /* USE_FLOS_DISPALY */

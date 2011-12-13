@@ -2,7 +2,7 @@
 FS v0.015
 ---------
 File System walk 
-Valen
+Valen, 2010-2011
 
 changelog
 
@@ -38,10 +38,14 @@ changelog
 #include <stdlib.h>
 #include <string.h>
 
+
 #include "display.h"
 #include "config.h"
 #include "list_view.h"
 #include "user_actions.h"
+#include "os_cmd.h"
+
+#define EXTERN_FS_WALK
 #include "fs_walk.h"
 
 
@@ -49,9 +53,7 @@ changelog
 #include <base_lib/utils.h>
 
 
-// define one of two possible video modes
-//#define USE_FLOS_DISPALY
-#define USE_TILEMAP_DISPALY
+
 
 #define OS_VERSION_REQ  0x590           // OS version req. to run this program
 #define FLOS_START_ADDR 0x1000
@@ -78,42 +80,17 @@ ListView lview;
 
 
 // ---- buffer for list of dir entries ----
-byte bufCatalog[1024*2];        // main buffer
-#define DIRBUF_LEN     (sizeof(bufCatalog))
-byte* tmp1 = bufCatalog;
+byte bufCatalog[DIRBUF_LEN];        // main buffer
+
+
 
 
 word numStrings;        // 
 
-
-
-#ifdef  USE_FLOS_DISPALY
-#include "display_flos.c"
-#endif
-#ifdef  USE_TILEMAP_DISPALY
-#include "display_tilemap.c"
-#endif
-
-
-#include "os_cmd.c"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 int main (void)
 {
 
-
+    tmp1 = bufCatalog;
 
     if(!check_OS_version()) {
         FLOS_PrintString("FLOS v");
@@ -131,8 +108,6 @@ int main (void)
     FLOS_RestoreDirPosition();
 
 
-    FLOS_SetCommander("FS.EXE");    // set FS as commander application
-
     MarkFrameTime(0x00f);
     if(!Display_InitVideoMode())
         return NO_REBOOT;
@@ -140,7 +115,7 @@ int main (void)
     Display_SetPen(PEN_DEFAULT);
     //DisplayString(/*SCREEN_WIDTH/8/2*/ 0, SCREEN_HEIGHT/8/2, 2, "Generating fonts...");
     clear_keyboard_buffer();
-
+    FLOS_SetCommander("FS.EXE");    // set FS as commander application
 
     // ---
     lview.width = 24; lview.height = 23;

@@ -8,11 +8,22 @@
 
 */
 
-// --- Public -----------------------------------------
-// init
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
 
-// 
-word do_dir(void);
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+
+#include <os_interface_for_c/i_flos.h>
+
+#include <string.h>
+#include <stdlib.h>
+
+#include "fs_walk.h"
+#include "display.h"
+#include "os_cmd.h"
 
 // --- Internal ---------------------------------------
 // init
@@ -27,6 +38,8 @@ word do_dir(void)
     byte str[40+1];
     FLOS_DIR_ENTRY e;
     byte num_spaces, k;
+
+    BYTE buffer[32];
 
     // iterate through current dir entries  (FLOS v537+)
     FLOS_DirListFirstEntry();
