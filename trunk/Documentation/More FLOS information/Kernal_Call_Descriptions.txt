@@ -142,6 +142,34 @@ The file pointer is automatically incremented by the number of bytes transferred
 
 To maintain speed, a fresh seek from the start of the file is not performed each time "kjt_read_file_data" is called unless the filepointer has been changed. Internal variables must be maintained, therefore do not perform any other  disk / serial operations (or anything that changes the sector buffer) between successive calls to this routine.
 
+Whenever a disk file transfer reaches address $FFFF, it wraps around to $8000 and continues onto the next bank.
+
+Most of the file system kernal calls return one of these standard error codes:
+
+  If the zero flag is set, the operation was a success.
+  If the zero flag is not set, there was an error. A = error code:
+
+    $00 - Hardware error: B contains the device's H/W error code (If B = 0 it timed out).
+    $01 - Disk full
+    $02 - File not found
+    $03 - (Root) dir table is full
+    $04 - Directory requested is actually a file
+    $05 - Cant delete dir, it is not empty
+    $06 - Not a file
+    $07 - File length is zero
+    $08 - File too big (IE: Memory address out of range)
+    $09 - Filename already exists
+    $0a - Already at root directory
+    $0e - Invalid filename
+    $13 - Unknown/incorrect disk format
+    $1b - Requested bytes beyond EOF
+    $1e - Bad range (sector out of range)
+    $21 - Invalid disk
+    $22 - Device not present       
+    $23 - Directory not found
+    $24 - End of directory list
+    $25 - Device does not use MBR
+    $26 - Cant find volume label
 
 --------------------------------------------------------------------------------
 
