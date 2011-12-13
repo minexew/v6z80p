@@ -2,6 +2,9 @@
 // using tilemap 8x8 video mode.
 
 
+
+
+
 #include <kernal_jump_table.h>
 #include <v6z80p_types.h>
 
@@ -12,15 +15,17 @@
 
 #include <os_interface_for_c/i_flos.h>
 
+#include <base_lib/video_mode.h>
+#include <base_lib/assert_v6.h>
+#include <base_lib/file_operations.h>
 
 #include <string.h>
 
 #include "display.h"
 
 
-#include <base_lib/video_mode.h>
-#include <base_lib/assert_v6.h>
-#include <base_lib/file_operations.h>
+
+#ifdef  USE_TILEMAP_DISPALY
 
 // Playfield A - background of chars
 // Playfield B - chars 8x8
@@ -34,15 +39,14 @@
 #define Y_WINDOW_START                0x2
 #define Y_WINDOW_STOP                 0xC
 
-// Display window size, in pixels.
-#define SCREEN_WIDTH                  368
-#define SCREEN_HEIGHT                 240
+
 
 
 void Display_PrintChar(BYTE c);
-void Display_InitFont(void);
+BOOL Display_InitFont(void);
 BOOL Display_LoadFont(void);
-//void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress);
+void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress);
+BOOL Display_LoadChunkyFont(void);
 //void Display_SetNonZeroBytesToValue(BYTE value, WORD dataVideoAddress);
 void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress);
 void Display_SetPalette(void);
@@ -73,14 +77,19 @@ BYTE fontBuffer[0x300];
 BOOL Display_InitVideoMode(void)
 {
     // load font
-    if(!Display_LoadFont()) {
-        FLOS_PrintStringLFCR("Load font failed!");
-        return FALSE;
-    }
+//    if(!Display_LoadFont()) {
+//        FLOS_PrintStringLFCR("Load font failed!");
+//        return FALSE;
+//    }
     MarkFrameTime(2);
     // disable hardware data fetching from video memory, because we want write to video memory at highest speed
-    DISABLE_NON_SPRITE_VIDEO;
-    Display_InitFont();
+    //DISABLE_NON_SPRITE_VIDEO;
+
+    // load font and copy it to video memory
+    if(!Display_InitFont()) {
+        FLOS_PrintStringLFCR("Init font failed!");
+        return FALSE;
+    }
     MarkFrameTime(0);
 
 
@@ -179,27 +188,29 @@ void TileMap_PutTileToTilemap(BYTE playfieldNumber, BYTE x, BYTE y, WORD tileNum
 
 
 #define FONT_8x8_SIZE   (96*8*8)
-void Display_InitFont(void)
+BOOL Display_InitFont(void)
 {
-//    DWORD destVideoAddress;
-//    BYTE colorIndex;
+    DWORD destVideoAddress, fontVideoAddress;
+    BYTE colorIndex;
 
     // make 15 fonts, with color index 1 to 15
-//    destVideoAddress = 0;
-//    for(colorIndex=1; colorIndex<2; colorIndex++) {
+    destVideoAddress = 0;
+//    for(colorIndex=1; colorIndex<16; colorIndex++) {
 //        Display_CreateChunkyFont(colorIndex, destVideoAddress);
 //        destVideoAddress += FONT_8x8_SIZE;
 //    }
 
-//    Display_LoadChunkyFont();
+    if(!Display_LoadChunkyFont())
+        return FALSE;
 
     // Make 15 tiles, with color index 1 to 15 (will be used as background tiles)
     // Put in video memory right after fonts.
-    //fontVideoAddress = 0;
-//    for(colorIndex=1; colorIndex<16; colorIndex++) {
-//        Display_FillTile8x8(colorIndex, destVideoAddress);
-//        destVideoAddress += 8*8;
-//    }
+    fontVideoAddress = 0;
+    for(colorIndex=1; colorIndex<16; colorIndex++) {
+        Display_FillTile8x8(colorIndex, destVideoAddress);
+        destVideoAddress += 8*8;
+    }
+    return TRUE;
 }
 
 
@@ -208,7 +219,7 @@ void Display_InitFont(void)
 // Font 96 chars.
 //
 // fontVideoAddress - must be div by 8 without remainder
-/*
+
 void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress)
 {
     BYTE b;
@@ -252,24 +263,28 @@ void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress)
 
     PAGE_OUT_VIDEO_RAM();
 }
-*/
+
 
 // Load 15 fonts, 8x8 with colors 1-16.
 //
 //
-// dataVideoAddress - in chunks of 64 bytes
+//
 
-/*
+BYTE buf8K[8 * 1024];
 BOOL Display_LoadChunkyFont(void)
 {
     DWORD i;
-//    BYTE* p;
+    BYTE* disk_buffer = buf8K;
 
     FLOS_FILE myFile;
     BOOL r;
 
-    r = FLOS_FindFile(&myFile, 'MYFONTS.BIN');
-    if(!r) return FALSE;
+    FLOS_RootDir();
+    r = FLOS_FindFile(&myFile, "MYFONTS.BIN");
+    if(!r) {
+        FLOS_PrintStringLFCR("Open font file failed!");
+        return FALSE;
+    }
     FLOS_SetLoadLength(0x2000);
 
 
@@ -277,16 +292,16 @@ BOOL Display_LoadChunkyFont(void)
         SET_VIDEO_PAGE(i);
 
 //        FLOS_SetFilePointer(0);
-        r = FLOS_ForceLoad(0xA000, 0);
+        r = FLOS_ForceLoad(disk_buffer, 0);
 
         PAGE_IN_VIDEO_RAM();
-        memcpy(VIDEO_BASE, 0xA000, 0x2000);
+        memcpy(VIDEO_BASE, disk_buffer, 0x2000);
         PAGE_OUT_VIDEO_RAM();
     }
 
     return TRUE;
 }
-*/
+
 
 
 
@@ -433,3 +448,5 @@ void Display_SetPalette(void)
     Display_SetPen(15); Display_PrintString("ABCD1234");
     */
 }
+
+#endif /* USE_TILEMAP_DISPALY */
