@@ -1,8 +1,9 @@
 ;----------------------------------------------------------------------------------------------
-; Z80 FAT16 File System code for FLOS v1.16 by Phil @ Retroleum
+; Z80 FAT16 File System code for FLOS by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.16 - Indirect sector buffer is set to OS sector buffer in read/write sector routines
+; Changes:1.17 - Converts filenames to upper case (work around an annoying Microsoft convention..)
+;	1.16 - Indirect sector buffer is set to OS sector buffer in read/write sector routines
 ;	1.15 - Changed re-direct wrapper for SD card driver 1.10 (ZF/CF)
 ;	     - "Make dir" code size optimized a bit
 ;	     - Fixed format command sector capacity truncate
@@ -1698,6 +1699,7 @@ csfnlp2	ld a,(hl)				; now copy filename, upto 8 characters
 	ret z				; is char a fwd slash?
 	cp "."
 	jr z,dofn_ext			; is char a dot?
+	call os_uppercasify
 	ld (de),a
 	inc de
 	inc hl
@@ -1722,6 +1724,7 @@ fnextlp	ld a,(hl)				; copy 3 filename extension chars
 	ret z				; end if space or zero
 	cp 32
 	ret z
+	call os_uppercasify
 	ld (ix+8),a
 	inc ix
 	inc hl
