@@ -24,7 +24,10 @@
 #define Y_WINDOW_START                0x5
 #define Y_WINDOW_STOP                 0xA
 
-#include "../../src/lib/sprites.c"
+
+
+#include <base_lib/sprites.h>
+
 
 unsigned char Img1[16 * 16];
 unsigned char Img2[16 * 16];
@@ -51,6 +54,9 @@ void SetVideoMode(void)
 
     // Enable sprites
     mm__vreg_sprctrl = SPRITE_ENABLE;
+
+    // set display window params to sprite functions
+    SpritesRegsBuffer_SetDisplayWindowParams(X_WINDOW_START, Y_WINDOW_START);
 }
 
 void FillVideoMem(void)

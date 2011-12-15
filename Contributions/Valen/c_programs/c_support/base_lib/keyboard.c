@@ -1,10 +1,16 @@
 // ------------
-void Keyboard_Clear_IRQ_Flag(void);
 
-typedef struct {
-    byte  scancode;
-    BOOL* pVar;
-} keyboard_input_map_t;
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+
+#include <base_lib/keyboard.h>
+
+
 
 struct {
     BOOL is_looking_for_second_byte_of_scancode;

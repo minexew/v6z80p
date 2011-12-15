@@ -29,12 +29,12 @@
 #define Y_WINDOW_STOP                 0xA
 
 
+#include "base_lib/sprites.h"
+#include "base_lib/keyboard.h"
+
 #define APP_USE_OWN_KEYBOARD_IRQ
+#include "../../src/inc/irq.c"
 
-
-#include "../../src/lib/sprites.c"
-#include "../../src/lib/keyboard.c"
-#include "../../src/lib/irq.c"
 
 //  application flags for pressed keyboard keys
 typedef struct {
@@ -77,6 +77,9 @@ void SetVideoMode(void)
 
     // Enable sprites
     mm__vreg_sprctrl = SPRITE_ENABLE;
+
+    // set display window params to sprite functions
+    SpritesRegsBuffer_SetDisplayWindowParams(X_WINDOW_START, Y_WINDOW_START);
 }
 
 /*void FillVideoMem(void)
