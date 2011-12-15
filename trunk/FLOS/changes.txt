@@ -2,6 +2,17 @@
 FLOS version info:
 ------------------
 
+5.92 - 14/12/11:
+
+	When saving, the FAT16 code now converts all filenames to upper case
+	since saving mixed case filenames is not supported in Windohs (sic).
+	(If a file was saved with a lower case filename, Windows would say
+	"Cannot open file" even though it'd appear in the dir list).
+
+
+Previous changes:
+----------------
+
 5.91 - 28/11/11:
 
 	LB command fixed: When no bank override is supplied on the command
@@ -16,9 +27,6 @@ FLOS version info:
 
 	Packed default UK keymap data and optimized cursor flash code to fit in above.
 
-
-Previous changes:
-----------------
 
 5.90 - 27/11/11 : Kernal call KJT_SET_COMMANDER added. Set HL = address of command
                   string that is required to run return to FLOS (unless A=$FE). To
