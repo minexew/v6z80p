@@ -5,17 +5,28 @@ The origin (x=0,y=0) of this local coordinate system is in the top left
 corner of your display window.
 (I think, it's more easy to manipulate sprite coordinates in local coordinate system.)
 */
-typedef struct {
-    byte sprite_number;                 // 127 total sprite numbers [0-126]
-    int x;                              // x, y in local coordinate system
-    int y;
-    byte height;                        // height in 16 pixels chunks (0 - 240 pixels, 1 - 16pix, 2 - 32pix, etc...)
-    word sprite_definition_number;
-    BOOL x_flip;    
-} sprite_regs_t;
+
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+
+#include <string.h>
+
+#include <base_lib/sprites.h>
 
 
 
+
+struct {
+    WORD x_window_start;
+    WORD y_window_start;
+} sprite_regs_buffer_data;
+
+/*
 static inline void set_sprite_regs_hw(byte sprite_number, byte x, byte misc, byte y, byte sprite_definition_number)
 {
     byte* p;
@@ -27,9 +38,17 @@ static inline void set_sprite_regs_hw(byte sprite_number, byte x, byte misc, byt
     *p =  sprite_definition_number;
 
 }
+*/
 
 // buffer for sprite registers
 byte spritesRegsBuffer[127*4];               // 127 sprites (4 bytes per sprite)
+
+void SpritesRegsBuffer_SetDisplayWindowParams(WORD x_window_start, WORD y_window_start)
+{
+
+    sprite_regs_buffer_data.x_window_start = x_window_start;
+    sprite_regs_buffer_data.y_window_start = y_window_start;
+}
 
 // Set sprite regs to system memory buffer.
 // 
@@ -44,10 +63,10 @@ void SpritesRegsBuffer_SetSpriteRegs(sprite_regs_t* r)
 
 
     // convert X coord to hardware sprite coord
-    x =  r->x + X_WINDOW_START*16;
+    x =  r->x + sprite_regs_buffer_data.x_window_start*16;
     //x =  x + 16;  // + wide left border
     // convert Y coord to hardware sprite coord
-    y =  r->y + Y_WINDOW_START*8 + 1;
+    y =  r->y + sprite_regs_buffer_data.y_window_start*8 + 1;
 
     // build "misc" reg
     reg_misc = GET_WORD_9TH_BIT(x)                                  |
