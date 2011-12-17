@@ -140,7 +140,6 @@ main_loop	call get_next_char
 	ret z
 	
 	ld bc,(cursor_pos)
-	
 	cp 9
 	jr z,tab
 	cp 10
@@ -190,7 +189,10 @@ tab	ld a,b
 	add a,8
 	and $f8
 	ld b,a
-	jr sameline
+	cp window_cols
+	jr c,sameline
+	jr crlf
+
 
 ;---------------------------------------------------------------------------------------------
 
