@@ -1,6 +1,8 @@
 
-; Type [filename] command - shows text files - v1.02 By Phil '09
+; Type [filename] command - shows text files By Phil '09
 ;
+; v1.03 - tab positioning added
+
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------
 
 include "kernal_jump_table.asm"
@@ -79,12 +81,13 @@ flos_ok
 
 fnd_para	ld a,(hl)			; examine argument text, if encounter 0: give up
 	or a			
-	ret z
-	cp " "			; ignore leading spaces...
 	jr nz,fn_ok
-skp_spc	inc hl
-	jr fnd_para
 
+show_use	ld hl,usage_txt
+	call kjt_print_string
+	xor a
+	ret
+	
 fn_ok	push hl			; copy args to working filename string
 	ld de,filename
 	ld b,16
@@ -138,6 +141,8 @@ main_loop	call get_next_char
 	
 	ld bc,(cursor_pos)
 	
+	cp 9
+	jr z,tab
 	cp 10
 	jr z,linefeed
 	cp 13
@@ -179,6 +184,12 @@ sameline	ld (cursor_pos),bc
 	jr main_loop
 	
 car_ret	ld b,0
+	jr sameline
+
+tab	ld a,b
+	add a,8
+	and $f8
+	ld b,a
 	jr sameline
 
 ;---------------------------------------------------------------------------------------------
@@ -270,6 +281,8 @@ more_prompt
 	ret
 	
 ;-------------------------------------------------------------------------------------------
+
+usage_txt		db "TYPE v1.03 - shows ASCII text",11,"Usage: TYPE filename",11,0
 
 more_txt		db " More? (y/n) ",13,0
 more_gone_txt	db "             ",0
