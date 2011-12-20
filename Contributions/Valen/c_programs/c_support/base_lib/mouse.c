@@ -1,7 +1,12 @@
-// mouse.buttons bits
-#define MOUSE_LEFT_BUTTON_PRESSED       1
-#define MOUSE_RIGHT_BUTTON_PRESSED      2
-#define MOUSE_MIDDLE_BUTTON_PRESSED     4
+#include <kernal_jump_table.h>
+#include <v6z80p_types.h>
+
+#include <OSCA_hardware_equates.h>
+//#include <scan_codes.h>
+#include <macros.h>
+#include <macros_specific.h>
+
+#include <base_lib/mouse.h>
 
 
 struct {
@@ -10,6 +15,11 @@ struct {
     short offsetX, offsetY;
     
 } mouse;
+
+
+BYTE Mouse_GetButtons(void) {
+    return mouse.buttons;
+}
 
 
 short Mouse_GetX(void) {

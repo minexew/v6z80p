@@ -15,10 +15,16 @@
 
 #include <os_interface_for_c/i_flos.h>
 
+#include <base_lib/sprites.h>
+#include <base_lib/keyboard.h>
 
 
 #include <stdlib.h>
 #include <string.h>
+
+#define APP_USE_OWN_KEYBOARD_IRQ
+#include "../../src/inc/irq.c"
+
 
 // Display Window sizes:
 // Width  320 pixels
@@ -28,12 +34,6 @@
 #define Y_WINDOW_START                0x5
 #define Y_WINDOW_STOP                 0xA
 
-
-#include "base_lib/sprites.h"
-#include "base_lib/keyboard.h"
-
-#define APP_USE_OWN_KEYBOARD_IRQ
-#include "../../src/inc/irq.c"
 
 
 //  application flags for pressed keyboard keys

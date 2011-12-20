@@ -5,7 +5,7 @@ Import('v6_prj')
 
 env_lib = v6_prj.env
 
-obj = env_lib.Object(  ['video_mode.c', 'sprites.c', 'keyboard.c',
+obj = env_lib.Object(  ['video_mode.c', 'sprites.c', 'keyboard.c', 'mouse.c',
                         'file_operations.c', 
                         'assert_v6.c',
                         'utils.c'], 
