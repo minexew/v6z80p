@@ -12,7 +12,6 @@
 #include <os_interface_for_c/i_flos.h>
 
 
-
 #include <stdlib.h>
 #include <string.h>
 
