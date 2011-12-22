@@ -13,12 +13,14 @@
 
 #include <os_interface_for_c/i_flos.h>
 
+#include <base_lib/file_operations.h>
 
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../src/lib/file_operations.c"
+
+
 
 #include "fx_player/sound_fx.h"
 #include "fx_player/sound_fx.c"
