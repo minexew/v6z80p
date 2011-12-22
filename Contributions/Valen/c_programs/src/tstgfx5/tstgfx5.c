@@ -16,10 +16,22 @@
 
 #include <os_interface_for_c/i_flos.h>
 
-
+#include <base_lib/sprites.h>
+#include <base_lib/keyboard.h>
+#include <base_lib/mouse.h>
+#include <base_lib/video_mode.h>
+#include <base_lib/utils.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+
+
+// we use our own irq code for keyb and mouse
+#define APP_USE_OWN_KEYBOARD_IRQ
+#define APP_USE_OWN_MOUSE_IRQ
+#include "../../src/inc/irq.c"
+
 
 // Display Window sizes:
 // Width  368 pixels
@@ -31,18 +43,8 @@
 
 #define OS_VERSION_REQ  0x571           // OS version req. to run this program
 
-// we use our own irq code for keyb and mouse 
-#define APP_USE_OWN_KEYBOARD_IRQ
-#define APP_USE_OWN_MOUSE_IRQ
 
 
-#include "../../src/lib/sprites.c"
-#include "../../src/lib/keyboard.c"
-#include "../../src/lib/mouse.c"
-#include "../../src/lib/irq.c"
-
-#include "../../src/lib/video_mode.c"
-#include "../../src/lib/utils.c"
 
 //  application flags for pressed keyboard keys
 typedef struct {
@@ -85,6 +87,9 @@ void SetVideoMode(void)
 
     // Enable sprites
     mm__vreg_sprctrl = SPRITE_ENABLE;
+
+    // set display window params to sprite functions
+    SpritesRegsBuffer_SetDisplayWindowParams(X_WINDOW_START, Y_WINDOW_START);
 }
 
 void FillVideoMem(void)
@@ -151,7 +156,7 @@ void DoMain(void)
     screenY -= Mouse_GetOffsetY();
     Mouse_ClearOffsets();
 
-    if(mouse.buttons & MOUSE_RIGHT_BUTTON_PRESSED) colorIndex++;
+    if(Mouse_GetButtons()  & MOUSE_RIGHT_BUTTON_PRESSED) colorIndex++;
 
 
     // check bounds
@@ -166,7 +171,7 @@ void DoMain(void)
     r.x_flip                   = FALSE;      
     SpritesRegsBuffer_SetSpriteRegs(&r);
 
-    if(mouse.buttons & MOUSE_LEFT_BUTTON_PRESSED)
+    if(Mouse_GetButtons() & MOUSE_LEFT_BUTTON_PRESSED)
         PutPixel(screenX, screenY, colorIndex);
 
 

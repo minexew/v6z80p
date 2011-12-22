@@ -21,10 +21,21 @@
 
 #include <os_interface_for_c/i_flos.h>
 
-
+#include <base_lib/keyboard.h>
+#include <base_lib/timer.h>
+#include <base_lib/utils.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+// We use our own irq code for:
+// - keyb (ESC - exit from program) and timer
+#define APP_USE_OWN_KEYBOARD_IRQ
+#define APP_USE_OWN_TIMER_IRQ
+#include "../../src/inc/irq.c"
+
+
+
 
 // prototype
 void Application_Timer_IRQ_Handler(void);
@@ -34,21 +45,9 @@ void Application_Timer_IRQ_Handler(void);
 // let's set timer to 4 milliseconds
 #define TIMER_MILLISEC_PERIOD   4                                       // possible values are [0,016...4] 
 #define TIMER_HARDWARE_PERIOD   256-(TIMER_MILLISEC_PERIOD/0.016)       // calculate timer hardware period (8-bit value)
-//#if TIMER_HARDWARE_PERIOD > 255
-//#endif
-
-// We use our own irq code for:
-// - keyb (ESC - exit from program) and timer
-#define APP_USE_OWN_KEYBOARD_IRQ
-#define APP_USE_OWN_TIMER_IRQ
 
 
 
-#include "../../src/lib/keyboard.c"
-#include "../../src/lib/timer.c"
-#include "../../src/lib/irq.c"
-
-#include "../../src/lib/utils.c"
 
 
 //  application flags for pressed keyboard keys
@@ -85,12 +84,13 @@ void DoMain(void)
     FLOS_PrintString("Seconds: ");
     _uitoa(GetSeconds(), buffer, 10);
     FLOS_PrintStringLFCR(buffer);
+    FLOS_PrintStringLFCR("Press ESC to reboot...");
     
 }
 
 
 
-// function provided by application for irq handler
+// function provided by application for timer irq handler
 void Application_Timer_IRQ_Handler(void)
 {
     static word counter = 0;
@@ -111,6 +111,24 @@ void Application_Timer_IRQ_Handler(void)
 }
 
 
+// Timer ISR
+void Timer_IRQ_Handler()
+{
+    // call application function, to do some useful work
+    Application_Timer_IRQ_Handler();
+
+
+    // clear timer interrupt flag
+    BEGINASM()
+    PUSH_ALL_REGS()
+
+    ld a,#0x04
+    out (SYS_CLEAR_IRQ_FLAGS),a ; clear timer interrupt flag
+
+    POP_ALL_REGS()
+    ENDASM()
+
+}
 
 
 BOOL Check_FLOS_Version(void) 

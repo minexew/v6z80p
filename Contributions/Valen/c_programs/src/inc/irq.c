@@ -1,6 +1,8 @@
 void irq_handler() NAKED;
 void install_irq_handler(byte irq_enable_mask);
 
+// This is main IRQ handler.
+// It will route call to specific functions.
 void irq_handler() NAKED
 {
     BEGINASM()
