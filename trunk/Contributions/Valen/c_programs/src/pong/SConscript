@@ -44,8 +44,8 @@ Depends(binary_sfx_proxy, Glob('sound_fx/inc/*.asm'))
 final_exe = v6_prj.FLOS_Program(objs + objs2)
 
 
-v6_prj.Upload(final_exe,        False)
-v6_prj.Upload(binary_sfx_proxy, False)
+v6_prj.Upload(final_exe)
+v6_prj.Upload(binary_sfx_proxy)
 
 
 

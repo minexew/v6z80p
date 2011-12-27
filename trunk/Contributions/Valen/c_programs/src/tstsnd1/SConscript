@@ -49,4 +49,4 @@ final_exe = v6_prj.FLOS_Program(objs1 + objs2)
 
                                 
                                     
-v6_prj.Upload(final_exe, False)
+v6_prj.Upload(final_exe)

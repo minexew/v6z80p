@@ -30,4 +30,4 @@ env_text = Environment(tools = ['textfile'])
 src_generated = env_text.Textfile(target = 'object_32x28.c',  source = [src1, src2])
                                 
                                     
-v6_prj.Upload(final_exe, False)
+v6_prj.Upload(final_exe)
