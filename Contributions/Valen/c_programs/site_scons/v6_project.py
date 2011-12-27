@@ -197,12 +197,12 @@ class V6_Project(object):
             util = strName
         return util
             
-    def Upload(self, upload_target, is_upload_always):
+    def Upload(self, upload_target):     #, is_upload_always):
         upload_command = 'cd ${SOURCE.dir} && $SENDV6_UTIL $SENDV6_PORT ${SOURCE.file}'    
         #upload_command = 'sendv6 S0 $SOURCE'       # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
         
         upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
-        if is_upload_always:
+        if 1:        #is_upload_always:
             AlwaysBuild(upload)
         upload[0].my_progress_message = '------------- Upload file to V6 -------------'
         

@@ -14,4 +14,4 @@ objs = env.Object(   ['tstgfx3.c'],
 
 final_exe = v6_prj.FLOS_Program(objs)
 
-v6_prj.Upload(final_exe, False)
+v6_prj.Upload(final_exe)
