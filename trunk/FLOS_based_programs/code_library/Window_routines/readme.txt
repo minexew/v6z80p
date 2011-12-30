@@ -99,7 +99,7 @@ Each four-byte element reference starting at byte 6 is defined as follows:
 
 Because bytes 2:3 contain a pointer to the actual element description instead
 of the element description itself, you can use define an element, EG: A "cancel"
-button, and use it multiple windows. The data structure the label points to
+button, and use it for multiple windows. The data structure the label points to
 is defined as follows:
 
 Data structure for each unique element:
@@ -120,7 +120,7 @@ can be omitted.
 
 -----------------------------------------------------------------------------
 
-For example here's an element (an "OK" button) used by the above window
+For example, here's an element (an "OK" button) used by the above window
 description:
 
 win_element_a	db 0		;0 = Element Type: 0 = A button
@@ -138,7 +138,7 @@ Window support code
 
 This is a loose set of helper routines to provide support for the operation a
 window system. Please include "Window routines/inc/Window_Support_Routines.asm"
-into your program.
+into your program if you want to use them.
 
 The routines use the same data-sets as the draw routines above and now the control
 bits (byte 3 of element descriptions) come into play. The bits are defined:
