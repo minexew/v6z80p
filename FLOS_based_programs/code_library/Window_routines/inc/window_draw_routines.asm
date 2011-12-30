@@ -1,5 +1,5 @@
 ;-------------------------------------------------------------------------------
-; FLOS Character-based window drawing code v0.03 by Phil Ruston
+; FLOS Character-based window drawing code v0.04 by Phil Ruston
 ;-------------------------------------------------------------------------------
 ;
 ; Before calling "draw_window", set:
@@ -9,7 +9,9 @@
 ; C = Y coordinate of top left window border
 ;
 ; Requires an array labelled "window_list" which contains the description of
-; windows and their elements - See end of source for an example..
+; windows and their elements - See end of source for an example.. (The variable
+; "w_addr_loc" by default contains this base address, but it can be changed by
+; a user program so that different groups of windows can be used, if desired).
 ;
 ;-------------------------------------------------------------------------------
 ; ALL REGISTERS ARE PRESERVED!
@@ -66,7 +68,7 @@ w_invloop	ld a,(hl)
 	rrca
 	ld (w_inv_pen),a
 	
-	ld hl,window_list		;locate desired window info
+	ld hl,(w_list_loc)		;locate desired window info
 	ld a,(w_active_window)
 	sla a
 	ld e,a
@@ -351,6 +353,8 @@ w_button_swaplist
 	db $8e,$82,$96, $bf,$81,$97, $90,$82,$98, $91,$81,$99
 	db 0
 	
+
+w_list_loc	dw window_list
 	
 w_swap_list	dw 0	;internal working registers
 w_frame_x		db 0

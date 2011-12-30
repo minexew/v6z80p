@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------
-; Window support routines v0.03 - by Phil Ruston
+; Window support routines v0.04 - by Phil Ruston
 ;------------------------------------------------------------------------------
 ;
 ; These routines support the "Window_draw.asm" code, providing a framework of
@@ -108,7 +108,7 @@ w_law	sla a				;HL returns "" window [A]
 	push de
 	ld e,a
 	ld d,0
-	ld hl,window_list
+	ld hl,(w_list_loc)
 	add hl,de
 	ld e,(hl)
 	inc hl
