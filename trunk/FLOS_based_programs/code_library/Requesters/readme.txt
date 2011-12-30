@@ -1,7 +1,7 @@
 FLOS Load and Save Requesters for user programs - By Phil Ruston 2010
 ---------------------------------------------------------------------
 
-Requires FLOS v562+ / Last update 8-3-2010
+Requires FLOS v562+ / Last update 28-12-2011
 
 Purpose:
 ---------
@@ -146,3 +146,7 @@ Windows are drawn on top of anything on the display. If the original character
 map is to be restored after a window is finished with, the user's program must
 handle this.
 
+If the user program wants to use the window draw/support code to make windows
+other than those used for the load/save requesters, it can set the variable
+w_addr_loc to point to a different set of windows (the file requester calls
+always switch the window list pointer back to that used by this code).

@@ -1,9 +1,11 @@
 ;--------------------------------------------------------------------------------
-; Library Code: FLOS File Requestors with RS232 RX/TX v0.03 By Phil Ruston
+; Library Code: FLOS File Requestors with RS232 RX/TX v0.04 By Phil Ruston
 ;--------------------------------------------------------------------------------
 ;
 ; Changes:
 ; --------
+; 0.04 -  Added indirect window list location, renames old file to .bak when file exists
+;
 ; 0.03 -  Added automatic "File not found" requester - disk load performs "kjt_find_file" on exit.
 ;         Added re-mount drives option to disk h/w error requester
 ;         Fixed error code reporting - Now standard FLOS KJT (ZF/A/B) No carry flag tests! 
@@ -135,7 +137,9 @@ save_requester
 	ld a,1				; window number 1 = save requester
 	
 req_tlsetup
-
+	
+	call set_filereq_win_pointer
+	
 	ld (req_top_level_window_number),a
 	ld (req_top_level_window_coords),bc
 
@@ -425,7 +429,7 @@ req_enter_pressed
 	cp 3
 	jp z,req_makenewdir			;3 = dir name already exists window?
 	cp 4
-	jp z,req_fae			;4 = file already exists window?
+	jp z,req_dofae			;4 = file already exists window?
 	cp 5
 	jp z,req_redsr			;5 = rs232 load active - cancel button pressed
 	cp 6
@@ -582,13 +586,50 @@ req_sfe	ld bc,(req_top_level_window_coords)
 
 
 
-req_fae	
-	call w_get_element_selection		; file exists requester
+req_dofae	call w_get_element_selection		; file exists requester
 	cp 2
 	jr z,req_redsr			; if pressed Enter on "NO", go back to load/save requester
 	ld hl,req_filename	
-	call kjt_erase_file			; if pressed Enter on "OK", delete existing file and
-	ret nz
+	ld de,req_swap_filename
+	ld b,8				; if yes, delete file called *.bak, rename existing file
+req_faelp	ld a,(hl)				; to *.bak, and save new file
+	or a
+	jr z,req_faesf
+	cp "."
+	jr z,req_faesf
+	ld (de),a
+	inc hl
+	inc de
+	djnz req_faelp
+req_faesf	ld a,"."
+	ld (de),a
+	inc de
+	ld a,"B"
+	ld (de),a
+	inc de
+	ld a,"A"
+	ld (de),a
+	inc de
+	ld a,"K"
+	ld (de),a
+	inc de
+	xor a
+	ld (de),a
+	
+	ld hl,req_swap_filename	
+	call kjt_erase_file
+	jr z,req_faernok
+	cp 2
+	ret nz				; dont care about "file not found" when erasing existing *.bak
+	
+req_faernok
+
+	ld hl,req_filename			; rename existing file to *.bak
+	ld de,req_swap_filename
+	call kjt_rename_file		 
+	jp z,req_exit_ok
+	cp 2				; dont care about file not found (if actually saving as "*.bak")
+	ret nz				
 	jp req_exit_ok
 
 
@@ -907,6 +948,8 @@ req_draw_requester
 
 file_error_requester
 
+	call set_filereq_win_pointer
+
 	push hl
 	push de
 	push bc
@@ -927,7 +970,9 @@ file_error_requester
 	jr req_disk_err_loop
 
 hw_error_requester
-
+	
+	call set_filereq_win_pointer
+	
 	push hl
 	push de
 	push bc
@@ -977,10 +1022,21 @@ req_de_exit
 	xor a
 	ret		
 
+;--------------------------------------------------------------------------------------
 
+set_filereq_win_pointer
+
+	push hl				; ensures window code is looking at the
+	ld hl,file_req_windows		; following window list
+	ld (w_list_loc),hl
+	pop hl
+	ret
+	
 ;------ My Window Descriptions --------------------------------------------------------
 
-window_list	dw win_inf_load		; Window 0
+window_list
+
+file_req_windows	dw win_inf_load		; Window 0
 		dw win_inf_save		; Window 1
 		dw win_inf_new_dir		; Window 2
 		dw win_inf_dir_exists	; Window 3
@@ -1317,6 +1373,7 @@ req_fnf_err_txt	db "File Not Found!",0
 
 ;--------------------------------------------------------------------------------------
 
+req_swap_filename		ds 17,0
 req_filename		ds 17,0
 req_dir_name		ds 17,0
 req_dir_line_selection	db 0
