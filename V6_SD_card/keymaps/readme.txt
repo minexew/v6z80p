@@ -6,7 +6,11 @@ PT.bin = Portugal
 UK.bin = UK (default)
 US.bin = USA
 
-Use the command keymap.exe to set, normally you'd
-add this to your boot_run.scr startup script.
+To set the keyboard type, use the command
 
-EG: "keymap DE.bin"
+KEYMAP.EXE xyz.bin
+
+where xyz is one of the files above.
+
+(Normally you'd add this to your
+boot_run.scr startup script.)
