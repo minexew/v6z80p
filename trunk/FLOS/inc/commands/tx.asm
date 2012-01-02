@@ -64,7 +64,7 @@ sers_fln	call hexword_or_bust	;do (rest of) length
 	ld e,a
 sers_dfb	ld b,e
 	ld a,b			;check bank is valid
-	call test_bank
+	cp max_bank+1
 	jp nc,os_invalid_bank
 	ld (fs_z80_bank),a
 

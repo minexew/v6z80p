@@ -53,6 +53,7 @@ blit_src_msb	EQU 00219H
 blit_width	EQU 00217H
 cmdop_end_address EQU 00B2FH
 cmdop_start_address EQU 00B2DH
+colours_mirror	EQU 00500H
 com_start_addr	EQU 00B1CH
 commandstring	EQU 00B3DH
 copy_dest_address EQU 00B31H
@@ -66,7 +67,7 @@ cursorstatus	EQU 00B9BH
 de_store1	EQU 00B07H
 de_store2	EQU 00B0EH
 env_var_list	EQU 00480H
-find_hexstringascii EQU 00B38H
+find_hexstringascii EQU 00B37H
 first_os_var	EQU 00B1EH
 hl_store1	EQU 00B09H
 hl_store2	EQU 00B10H
@@ -99,7 +100,6 @@ linedraw_reg5	EQU 0022AH
 linedraw_reg6	EQU 0022CH
 linedraw_reg7	EQU 0022EH
 master_commandstring EQU 00FE8H
-max_bank	EQU 00B35H
 max_envars	EQU 00010H
 memmonaddrh	EQU 00B23H
 memmonaddrl	EQU 00B22H
@@ -125,7 +125,7 @@ os_args_start_hi EQU 00B92H
 os_args_start_lo EQU 00B91H
 os_dir_block_cache EQU 00B97H
 os_extcmd_jmp_addr EQU 00B95H
-os_linecount	EQU 00B3BH
+os_linecount	EQU 00B3AH
 output_line	EQU 00B67H
 palette		EQU 00000H
 priority_registers EQU 00280H
@@ -133,7 +133,7 @@ scancode_buffer	EQU 00BCCH
 scratch_pad	EQU 00A08H
 script_buffer	EQU 00B9CH
 script_buffer_offset EQU 00BC8H
-script_dir	EQU 00B36H
+script_dir	EQU 00B35H
 script_file_offset EQU 00BC6H
 script_orig_dir	EQU 00BCAH
 sector_buffer	EQU 00800H
@@ -185,8 +185,9 @@ sys_spi_port	EQU 0000AH
 sys_timer	EQU 00007H
 sys_vram_location EQU 00021H
 sys_vreg_read	EQU 00007H
-temphex		EQU 00B3AH
-ui_index	EQU 00B3CH
+temphex		EQU 00B39H
+ui_index	EQU 00B3BH
+ui_max_chars	EQU 00B3CH
 use_mouse	EQU 00BF6H
 video_base	EQU 02000H
 video_registers	EQU 00200H

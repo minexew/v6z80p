@@ -14,7 +14,7 @@ os_cmd_c
 	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jp z,copytsb		;1f = no args so copy to same bank
 	ld a,e
-	call test_bank
+	cp max_bank+1
 	jp nc,os_invalid_bank
 	
 	ld (copy_dest_bank),a

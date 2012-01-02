@@ -115,6 +115,7 @@ ab_form	call os_new_line
 	
 confirm_yes
 
+	ld a,3
 	call os_user_input
 	ld b,3
 	ld de,yes_txt+1

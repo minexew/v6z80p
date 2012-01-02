@@ -8,7 +8,7 @@ os_cmd_b
 	jr z,shwbnk		;If no args so just show bank currently selected
 	
 	ld a,e			;force new bank setting
-	call test_bank		;must be in range
+	cp max_bank+1		;must be in range
 	jp nc,os_invalid_bank
 	ld (bank_pre_cmd),a		;code on return actually changes the bank
 	jr shwbnk2

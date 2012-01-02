@@ -2,6 +2,36 @@
 FLOS version info:
 ------------------
 
+5.93 - 02/01/12:
+
+	Added support for "programmable" function keys. When F1-F9 is pressed
+        in the UI, FLOS looks for a file called F1.CMD (to F9.CMD) in the
+        current dir (or if not present, VOL0:KEYMAPS folder). The file should
+        be a line of text to acts as a command string (just as if it was
+        manually typed and enter pressed.)
+
+	Modified KJT_GET_INPUT_STRING - Set A to maximum characters allowed before
+        calling (this breaks compatibility a little with any previous program that 
+        called the routine..)
+
+	Added: new kernal calls "kjt_get_colours" and "kjt_set_colours"
+	
+	Removed: kjt_background_colours (no longer has any effect)
+
+	"Mount" routine now deletes any environment variables that are dir assignments.
+
+	Video initialization code now resets the video window to default: $2000	
+
+	Optimization: "Max_bank" converted from variable to absolute label
+
+	Optimization: decimal print routine (dir now shows free space in KB/MB)
+
+
+
+Previous changes:
+-----------------
+
+
 5.92 - 14/12/11:
 
 	When saving, the FAT16 code now converts all filenames to upper case
@@ -9,9 +39,6 @@ FLOS version info:
 	(If a file was saved with a lower case filename, Windows would say
 	"Cannot open file" even though it'd appear in the dir list).
 
-
-Previous changes:
-----------------
 
 5.91 - 28/11/11:
 

@@ -34,7 +34,7 @@ os_cmd_lb
 os_lbprok	call hexword_or_bust		;the call only returns here if the hex in DE is valid
 	jr z,os_lbnao			;bank override too?
 	ld a,e				
-	call test_bank			;must be in range
+	cp max_bank+1			;must be in range
 	jp nc,os_invalid_bank
 	ld (lb_load_bank),a
 
