@@ -1,6 +1,6 @@
 ;---------------------------------------------------------------------------------
 ; Reads a source palette and brightens or darkens the RGB nybbles before
-; writing the values to the a destination (normally the hardware palette registers)
+; writing the values to a destination (normally the hardware palette registers)
 ;----------------------------------------------------------------------------------
 ;
 ;set ix = source colours
