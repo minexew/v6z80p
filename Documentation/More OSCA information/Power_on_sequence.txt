@@ -1,0 +1,61 @@
+
+Normal power On activity
+------------------------
+
+(Applies to all V6Z80P configurations)
+
+0. Power switched on.
+
+1. Z80 CPU is held reset (by FPGA "done" line)
+
+2. PIC checks JTAG-mode jumper J2 (only)
+
+  * If jumper J2 is installed, the yellow LED flashes rapidly until the FPGA has 
+    been manually configured by downloading a .bit file from Xilinx impact software
+    on PC.
+
+  * If jumper J2 is not installed, the PIC sends the config data stored in
+    the current active slot of the EEPROM to the FPGA. (The active slot address can
+    be changed via software - by default the source address is $20000, IE: Slot 1)
+
+3. If the FPGA starts up correctly with the architecture file supplied (ie: the
+   FPGA "Done" line goes high) the yellow LED stays on. If the config fails, the
+   yellow LED will pulse and the PIC goes back to step 2.
+
+
+(The following is OSCA specific)
+--------------------------------
+
+4. The Z80 is released from reset and runs the ROM code which is held internally
+   in a 512-byte FPGA BlockRAM (mapped into Z80 address space $0-$1ff). This short
+   bootstrap ROM sends a databurst request for the "Bootcode" to the PIC. 
+
+    Detail: The PIC microcontroller clocks out 3520 bytes from EEPROM location
+    $F000 onwards (the primary bootcode location). The ROM code reads this data into
+    system RAM $200 onwards, checks the CRC checksum (held in the last two bytes) 
+    and executes it (JP $200) if all is OK. If the CRC doesn't match, the screen
+    flashes magenta and the databurst is requested again, but this time from EEPROM
+    location $1F000 (back-up bootcode location) If this also fails, the screen 
+    goes grey indicating that a bootcode file should be serially downloaded.
+    This grey screen condition can also be forced by holding up, right and fire on a
+    joystick in port 2 at power up. (If at any point the screen flashes yellow,
+    there was a time-out during the EEPROM databurst.)
+
+5. The bootcode executes: The keyboard is reset, welcome message appears (black
+   and white text) and the bootcode looks for an operating system (.OSF file) on
+   the root dir of the SD card. If an OS is not found there, EEPROM address
+   $00800 is checked for the the OS signature ("Z80P*OS*") - if found, the
+   OS is loaded from the EEPROM. Whenever an OS file is found, it is loaded to
+   $1000, the checksum is tested and if OK, code executes from $1010.
+
+   During the bootcode screen:
+
+    ESC key: Normal OS load is aborted and a prompt for serial download of
+    the OS code is displayed. (Left CTRL will reset the system at this point.)
+
+    F1-F7: The FPGA will reconfigure from slot 1-7.
+
+    F11: Set BAUD rate to 57600
+
+    F12: Set BAUD rate to 115200 
+
