@@ -49,7 +49,7 @@ Brief description of the "FLOS" Operating System
 -------------------------------------------------
 
 FLOS is a simple command line operating system / memory monitor similar to that
-used by freezer cartridges in the 80's. In some ways it behaves like a
+used by freezer cartridges on the 80s home computers. In some ways it behaves like a
 more modern DOS in that disk-based programs can be executed simply by entering
 their filenames. The usual commands are present (show memory as hex, disassemble,
 load and save bytes to RAM etc) - a full list with parameter requirements is
@@ -69,12 +69,11 @@ jumper (on the 10 pin header) is installed if using a PC monitor. The JTAG jumpe
 (J1 and J2) should be uninstalled for normal EEPROM-based start-up and the OSC SEL
 switch (where fitted) should be in the down position.
 
-Download the full project archive (to PC) then format an SD card to FAT16 (the card
-needs to be between 32MB and 2GB, please use a good brand to ensure compatibility).
-Copy the contents of the archive "V6_SD_Card.rar" from the project archive to the
-card and insert into the V6Z80P's card slot. (You can use the V6Z80P without an
-SD card, but you'll need to download everything serially except the internal commands
-via serial comms).
+Download the full project archive (to PC) then format an SD card to FAT16 (please
+use a good brand to ensure compatibility). Copy the contents of the folder
+"V6_SD_Card" from the project archive to the card and insert into the V6Z80P's card
+slot. (You can use the V6Z80P without an SD card, but you'll need to download
+everything serially except the internal commands via serial comms).
 
 Power on the V6Z80P with the switch near the DC power socket. The yellow LED should
 come on, the black and white boot-up display appears on screen and afterwards the OS
@@ -84,7 +83,7 @@ Programs can be run from the SD card (use the command line to navigate in a simi
 manner to DOS) or downloaded into memory via serial comms from a Windows PC using
 the "Serial_link" cable and utility provided (see the "PC_based_apps" folder in
 project archive). Most of the demos etc can be quit by pressing the ESC key (bear
-in mind, some were programs were coded specifically for the PAL TV system so may
+in mind, some programs were coded specifically for the PAL TV system so may
 not work properly on VGA or in 60Hz NTSC display modes).
 
 
@@ -93,14 +92,16 @@ Alternative configs:
 --------------------
 
 The onboard EEPROM can store multiple FPGA configurations in what (for simplicity)
-are called "slots" On power-up the FPGA starts from whichever is the "Active Slot". 
-As supplied, OSCA for 50Hz PAL TVs in Slot 1, OSCA for 60Hz NTSC TVs is in Slot2
-and a Spectrum 128 / 48 emulator is in Slot 3 (PAL). Slot 1 or Slot 2 will be the
-default Active Slot depending on locale. (All the configs supplied support VGA output.)
+are called "slots". On power-up, the FPGA starts from whichever is the "Active Slot". 
+As supplied, OSCA for 50Hz PAL TVs in Slot 1 and OSCA for 60Hz NTSC TVs is in Slot2.
 
-The OSCA/FLOS Bootloader allows you switch to one of the other slots by tapping F1-F7
-as the system starts up. EG: Tap F3 for the Spectrum Emulator (you can also use the
-FLOS command "BOOT" or the FLOS command "EEPROM" to reconfigure the FPGA).
+On newer boards (V6+ v1.1) slot 3 contains Alessandro Dorigatti's Cycle Perfect
+Spectrum 48 Emulator - this is run via the FLOS command "GOSPEC". 
+
+My own (inaccurate) Spectrum 128 emulator (PAL and NTSC versions) is the slots
+following on.
+
+All the configs supplied support VGA output.
 
 
 
@@ -131,7 +132,6 @@ FLOS cannot automatically recognize card swaps and any card inserted whilst the 
 on (not recommended) needs to be initialized with the "MOUNT" command.
 
 If your PC doesn't have a (free) serial port, a USB->RS232 adapter should work.
-
-Occasionally, the first time the serial link util is used, the first file transfer fails
-with a "bad acknowledge" report. (I've yet to find out exactly why..)
+Occasionally, the first time the serial link util is used, the first file transfer
+fails with a "bad acknowledge" report. (I've yet to find out exactly why..)
 
