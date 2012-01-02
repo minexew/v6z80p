@@ -59,7 +59,7 @@ win_y_size 	equ 24
 	jr z,args_done
 	
 	call hl_to_filename
-
+	
 findpar	inc hl
 	ld a,(hl)
 	or a

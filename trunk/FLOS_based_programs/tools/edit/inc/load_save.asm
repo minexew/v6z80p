@@ -105,8 +105,8 @@ commence_load
 	jp z,new_document
 	call hl_to_filename		; replace with filename from requester in case its changed
 	ld hl,filename		; does filename exist?
-	call kjt_find_file		; if not, make a new document
-	jp nz,new_document		
+	call kjt_find_file		; if not, make a new document (but use the filename specified)
+	jp nz,new_doc_same_filename		
 	ld (file_length),iy		; LSW
 	ld (file_length+2),ix	; MSW
 	
@@ -177,6 +177,8 @@ new_document
 
 	ld hl,new_doc_txt
 	call hl_to_filename
+
+new_doc_same_filename
 	
 	ld hl,0
 	ld (file_length),hl		
