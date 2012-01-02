@@ -679,23 +679,12 @@ HEXOP  	AND $0F
 ;
 ; End of John Kerr's DIS-Z80 routine.
 ; 
-; The "following on" routine outputs a character.
+; The "following on" routine outputs a character from A.
 ;
 ; --------------------------------------------------------------------------------------
 
-CHROP  	PUSH HL
-       	PUSH DE
-       	PUSH BC
-
-       	ld b,1
-       	ld c,a
-       	call os_print_multiple_chars
-
-       	POP BC
-       	POP DE
-       	POP HL
-
-       	RET
+CHROP  	CALL os_print_char			;routine itself pushes HL,DE,BC
+	RET
 
 ;-----------------------------------------------------------------------------------------
 

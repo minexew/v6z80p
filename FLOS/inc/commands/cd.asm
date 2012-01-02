@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"cd" - Change Dir command. V6.05
+;"cd" - Change Dir command. V6.06
 ;-----------------------------------------------------------------------
 
 os_cmd_cd	
@@ -127,8 +127,8 @@ shdir_lp	pop de
 	call kjt_set_dir_cluster
 	call kjt_get_dir_name
 	call kjt_print_string
-	ld bc,$012f			;2f = "/"
-	call os_print_multiple_chars
+	ld a,$2f				;2f = "/"
+	call os_print_char
 	pop bc
 	dec c
 	jr nz,shdir_lp

@@ -55,7 +55,7 @@ sb_hok	exx
 sb_gsl	call hexword_or_bust		;the call only returns here if the hex in DE is valid			
 	jr z,os_sfgds			;no hex = no bank override
 	ld a,e
-	call test_bank			;bank must be in correct range
+	cp max_bank+1			;bank must be in correct range
 	jp nc,os_invalid_bank
 	ld (sb_save_bank),a
 	

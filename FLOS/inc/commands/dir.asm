@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-; FAT16 "dir" - show directory command. v6.04
+; "dir" - show directory command. v6.06
 ;-----------------------------------------------------------------------
 
 os_cmd_dir
@@ -66,32 +66,29 @@ os_dpl	call os_print_string
 	jr z,os_dfllp
 	
 os_dlr	call div_line			;now show remaining disk space
-	call fs_calc_free_space
+	call fs_calc_free_space		;hl:de = free space in kb
 	ret c	
-	call os_hex_to_decimal		;pass hl:de longword to decimal convert routine
-	ld de,9
-	add hl,de				;move to MSB of decimal digits
-	ld b,e
-	ld de,output_line
-	push de
-dec2strlp	ld a,(hl)				;scan for non-zero MSB
-	or a
-	jr nz,foundlnz
-	dec hl
-	djnz dec2strlp
-foundlnz	inc b
-ndecchar	ld a,(hl)				;covert to ascii
-	add a,$30
-	ld (de),a
-	inc de
-	dec hl
-	djnz ndecchar
-	xor a
-	ld (de),a
-	pop hl				;output line address
-	call os_print_string
+
+	ld c,"K"				;if > 1024KB, show as MB
+dir_getr	ld a,d
+	and $c0
+	or h
+	or l
+	jr z,dir_gotr
+	ld b,10
+dir_rlp1	srl h
+	rr l
+	rr d
+	rr e
+	djnz dir_rlp1
+	ld c,"M"
 	
-	ld hl,kb_spare_txt
+dir_gotr	ld a,c
+	ld (xb_spare_txt),a
+	ex de,hl
+	call os_print_decimal
+
+	ld hl,xb_spare_txt
 	call os_print_string
 	xor a
 	ret
@@ -106,8 +103,7 @@ div_line	ld bc,$132d			;2d = "-"
 ;-----------------------------------------------------------------------
 
 dir_txt		db "[DIR]",0
-
-kb_spare_txt	db " KB Free",11,0
+xb_spare_txt	db "xB Free",11,0
 
 ;-----------------------------------------------------------------------
 	

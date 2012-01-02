@@ -63,7 +63,7 @@ os_prok	pop hl
 serl_dfb	ld b,e
 	ld a,b			;check bank is in valid range
 	ld (serial_bank),a
-	call test_bank
+	cp max_bank+1
 	jp nc,os_invalid_bank
 			
 	ld hl,ser_rec_msg

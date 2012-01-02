@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------------------------
-;"Colour" - Change UI colours v6.02
+;"Colour" - Change UI colours v6.04
 ;-----------------------------------------------------------------------------------------
 
 os_cmd_colour
@@ -11,17 +11,20 @@ os_cmd_colour
 	ld b,4
 	ld ix,current_pen
 	
-chcollp	call hexword_or_bust	;the call only returns here if the hex in DE is valid
-	jr z,colrdone		;any more data?
+chcollp	call hexword_or_bust		;the call only returns here if the hex in DE is valid
+	jr z,colrdone			;any more data?
 	inc hl
 	ld (ix),e
 	ld (ix+1),d
 	inc ix
 	inc ix
 	djnz chcollp
-
-colrdone	call os_set_ui_colours	
-	xor a
+	
+colrdone	ld a,b				;dont update the colour list of only arg was pen colour
+	cp 3
+	ret z
+	call default_colours		;this command changes the *default* FLOS colours
+	xor a				;so will persist until the system is reset
 	ret
 
 ;------------------------------------------------------------------------------------------

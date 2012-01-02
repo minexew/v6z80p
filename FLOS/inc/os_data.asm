@@ -8,7 +8,7 @@
 
 welcome_message	db "FLOS by Phil Ruston 2011",0
 storage_txt	db "Drives:",11,0
-os_dos_cmds_txt	db "COMMANDS",0
+commands_txt	db "COMMANDS",0
 boot_script_fn	db "BOOT_RUN.SCR",0
 os_hex_prefix_txt	db "$",0
 os_version_txt	db "FLOS V:$",0		
@@ -16,11 +16,11 @@ hw_version_txt	db "OSCA V:$",0
 fwd_slash_txt	db " / ",0
 loading_txt	db "Loading..",11,0
 saving_txt	db "Saving..",11,0
-exe_extension_txt	db ".exe",32
 os_more_txt	db 11,"More?",11,11,0
 nmi_freeze_txt	db 11,11,"** BREAK! **"
 crlfx2_txt	db 11,11,0
 rep_char_txt	db "x",0
+
 
 ;------------------------------------------------------------------------------------------------
 ; Packed text section
@@ -400,16 +400,29 @@ shifted_keymap	db                     $7e	;$0e-$0e	;shifted
 		db $00,$40,$00,$7b,$2b,$00	;$51-$56
 		db $00,$00,$7d,$00,$7e,$00	;$59-$5e
 		db $7c			;$61-$61		
-	
+
 ;---------------------------------------------------------------------------------------------
+
+function_key_list	db $05,$06,$04,$0c,$03,$0b,$83,$0a,$01	;scancodes for F1->F9
+		
+keymaps_txt	db "KEYMAPS",0
+
+fkey_filename	db "Fx.CMD",0
+	
+	
+;----------------------------------------------------------------------------------
+; Colours - dont change the order of these labels
+;----------------------------------------------------------------------------------
+
+current_pen	dw $7		; current pen selection - WORD padded! (bit 7 = inverse mode)
+
+default_paper	dw $007		; background colour ($RGB)
+default_border	dw $00b		; border colour
+default_cursor	dw $48f		; cursor colour
 
 pen_colours	dw $000,$00f,$f00,$f0f,$0f0,$0ff,$ff0,$fff
 		dw $555,$999,$ccc,$f71,$07f,$df8,$840
 
-current_pen	dw $7		; current pen selection - WORD padded! (bit 7 = inverse mode)
-ui_paper		dw $007		; background colour ($RGB)
-ui_border		dw $00b		; border colour
-ui_cursor		dw $48f		; cursor colour
 
 ;==================================================================================
 ;  Serial Routine Data

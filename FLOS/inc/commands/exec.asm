@@ -14,7 +14,7 @@ os_cmd_exec:
 	jr z,oktlscr
 	xor a
 	ret
-oktlscr	set 0,(hl)
+oktlscr	set 0,(hl)			;set the in-script flag
 
 	ld hl,(os_args_start_lo)		;copy the script filename (scripts cannot launch
 	ld de,script_fn			;scripts as this would require nested script filenames)
@@ -30,7 +30,7 @@ oktlscr	set 0,(hl)
 	ld (script_file_offset),hl
 	
 
-scrp_loop	ld a,(key_mod_flags)		; skip boot script if L-CTRL is pressed
+scrp_loop	ld a,(key_mod_flags)		; skip script if L-CTRL is pressed
 	and 2
 	jr z,noskip_script	
 	ld d,0
@@ -54,7 +54,7 @@ no_cpr	dec d
 
 noskip_script
 
-	ld hl,script_buffer			;clear bootscript buffer and command string		
+	ld hl,script_buffer			;clear script buffer and command string		
 	ld de,commandstring
 	ld b,OS_window_cols+1
 	ld a,$20				;fill 'em with spaces

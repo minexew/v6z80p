@@ -66,13 +66,13 @@ copy_dest_address	db 0,0
 copy_dest_bank	db 0
 
 in_script_flag	db 0
-max_bank		db 0
 script_dir	dw 0
 
 find_hexstringascii db 0,0
 temphex		db 0
 os_linecount	db 0
 ui_index		db 0 
+ui_max_chars	db 0
 
 commandstring	ds OS_window_cols+2,0
 output_line	ds OS_window_cols+2,0
