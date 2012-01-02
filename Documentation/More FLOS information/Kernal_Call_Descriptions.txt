@@ -27,8 +27,8 @@ kjt_dir_list_next_entry - Moves directory list pointer to the next entry
 kjt_get_dir_name - Returns the name of the current directory.
 kjt_mount_volumes - Initializes the attached disk list.
 kjt_store_dir_position - Internally remembers the current directory position.
-kjt_restore_dir_position - Restores directory to that stored by above.
-kjt_get_device_info - Returns info about the storage devices.
+kjt_restore_dir_position  - Restores directory to that stored by above.
+kjt_get_device_info  - Returns info about the storage devices.
 kjt_get_dir_cluster - Returns the cluster address of the current dir
 kjt_set_dir_cluster - Sets the dir from a cluster address
 kjt_rename_file - Renames files and directories
@@ -92,7 +92,7 @@ Kernal Misc Routines:
 
 kjt_hex_byte_to_ascii - Make ASCII version of a hex byte
 kjt_ascii_to_hex_word - Converts text hex number to real hex word
-kjt_dont_store_registers - Stops the OS updating the stored register values on exit
+kjt_dont_store_registers – Stops the OS updating the stored register values on exit
 kjt_get_version - Returns OS and hardware ID numbers
 kjt_compare_strings - Compares two ASCII strings
 kjt_bchl_memfill - Fill memory with value in accumulator
@@ -350,9 +350,9 @@ This routine both creates a new file and saves data to it - it cannot be used ap
 
 --------------------------------------------------------------------------------
 
-kjt_open_file (formerly "kjt_find_file")
+kjt_open_file
 
-Action: Looks for a file on current disk and sets internal registers ready for "kjt_read_file_data" call.
+Action: Looks for a file on current disk and sets internal registers ready for "kjt_read_from_file" call.
 
 Input Registers  :
 
@@ -389,7 +389,7 @@ Notes: Use after "kjt_open_file" (if required)
 
 --------------------------------------------------------------------------------
 
-kjt_set_read_length - formerly "kjt_get_load_length" 
+kjt_set_read_length
 
 Action: Forces the read length of the file transfer to a certain value
 
@@ -406,7 +406,7 @@ Notes: Use after kjt_find_file, if desired)
 
 --------------------------------------------------------------------------------
 
-kjt_read_from_file (formerly "kjt_force_load") 
+kjt_read_from_file
 
 Action:  Loads data (from the previously opened file) to a specified address.
 
@@ -419,7 +419,7 @@ Output Registers : Standard error codes
 
 Notes:
 
- "kjt_find_file" MUST be called first before using this routine.
+ "kjt_open_file" MUST be called first before using this routine.
 
 Whenever a disk file transfer reaches address $FFFF, it wraps around to $8000 and continues onto the next bank. 
 
@@ -439,7 +439,7 @@ Output Registers : Standard error codes
 
 --------------------------------------------------------------------------------
 
-kjt_write_to_file (formerly "kjt_write_bytes_to_file")
+kjt_write_to_file
 
 Action: Appends new data to an existing file on current disk / directory.
 
@@ -1062,7 +1062,7 @@ $0e = $78000-$7ffff @ $8000-$ffff
 
 --------------------------------------------------------------------------------
 
-kjt_set_bank (formely kjt_force_bank)
+kjt_set_bank
 
 Action: Changes the currently selected upper RAM page
 
@@ -1284,9 +1284,10 @@ Output Registers : None
 kjt_get_colours
 
 Action: Returns the location of the FLOS colour list.
+
 Input registers: none
 
-Output registers:  HL = location of colour list: 18 words (RGB values). Note: FLOS stores its colour list under the hardware registers so system memory needs to paged into that region if writing directly to the address returned from this call. (Simply reading the list poses no such problem). In all cases, kjt_set_colours needs to be called to actually change the palette (unless writing directly to the Palette's hardware registers)
+Output registers:  HL = location of colour list: 18 words (RGB values). Note: FLOS stores its colour list under the hardware registers so system memory needs to paged into that region if writing directly to the address returned from this call. (Simply reading the list poses no such problem). In all cases, kjt_set_colours needs to be called to actually change the palette (unless writing directly to the Hardware Palette Registers)
 
 $00 - Paper 
 $02 - Border
@@ -1300,9 +1301,7 @@ kjt_set_colours
 
 Action: Sets FLOS border, paper and cursor colours and updates the pen colour list
 
-Input registers:
-
-HL - location of the colour palette list (18 RGB words)
+Input registers: HL = location of the colour palette list (18 RGB words)
 
 $00 - Paper 
 $02 - Border
@@ -1328,7 +1327,7 @@ HL = offset of cursor char image in VRAM font area.
 
 EG: 
 
-HL = $0000 : delete cursor
+HL = $0000 : delete the cursor
 HL = $043f : underscore cursor ($400-$45f are ASCII chars 32-95)
 HL=  $0c00 : solid block cursor
          
