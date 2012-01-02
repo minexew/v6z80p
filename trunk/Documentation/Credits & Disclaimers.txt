@@ -20,7 +20,7 @@ Any future developments should be backwards compatible with
 the existing hardware design, but this is not guaranteed.
 
 The V6Z80P PCB design, OSCA FPGA architecture, FLOS operating system
-and software supplied remain the copyright of Phil Ruston 2008-2010,
+and software supplied remain the copyright of Phil Ruston 2008-2012,
 but can be modified if desired and used freely for non-profit,
 non-commercial applications.
 
