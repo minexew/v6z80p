@@ -16,6 +16,8 @@ volume_mount_list		equ $400		; "under" the video registers (to $47f)
 max_envars 		equ 16	
 env_var_list		equ $480		; "under" the video registers (to $4ff)
 
+colours_mirror		equ $500		; "under" the video registers (to $523)
+
 sector_buffer		equ $800
 
 irq_jp_inst		equ $a00		
