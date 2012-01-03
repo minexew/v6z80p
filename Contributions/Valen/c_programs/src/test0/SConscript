@@ -26,8 +26,8 @@ final_exe = v6_prj.FLOS_Program(objs)
 
 # Upload FLOS exe file to V6Z80P 
 # Params:
-# 1. list of targets to upload
-# 2. True - always upload, False - upload only if file (target) was re-builded
+# - list of targets to upload
+# TODO: add second boolean param to Upload() func. True - always upload, False - upload only if file (target) was re-builded
 #
 v6_prj.Upload(final_exe)
 
