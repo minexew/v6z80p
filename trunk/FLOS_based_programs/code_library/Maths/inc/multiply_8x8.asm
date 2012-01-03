@@ -5,7 +5,9 @@
 ; input  H = multiplier, E = multiplicand
 ; output HL = product
 	
-multiply	ld l,0			; Multiply H by E, result in HL
+multiply_8_8
+
+	ld l,0			; Multiply H by E, result in HL
 	ld d,l
 	sla h		
 	jr nc,muliter1

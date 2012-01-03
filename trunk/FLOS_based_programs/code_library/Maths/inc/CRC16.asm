@@ -4,7 +4,7 @@
 
 ; makes checksum in HL, src addr = DE, length = C bytes
 
-crc_checksum
+crc_16
 
 	ld hl,$ffff		
 crcloop	ld a,(de)			

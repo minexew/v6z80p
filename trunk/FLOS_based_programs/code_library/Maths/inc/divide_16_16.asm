@@ -5,7 +5,8 @@
 ;Input: A:C = Dividend, DE = Divisor
 ;Output: BC = Quotient, HL = Remainder 
 
-div16_16
+divide_16_16
+
 	ld	hl,0
 	
 	rl	c		; iteration 1

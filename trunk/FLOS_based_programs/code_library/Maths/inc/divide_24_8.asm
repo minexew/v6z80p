@@ -7,7 +7,8 @@
 ;Input: E:HL = Dividend, D = Divisor
 ;Output: E:HL = Quotient, A = Remainder 
 
-div24_8
+divide_24_8
+
 	xor a
 	
 	add	hl,hl		; iteration 1

@@ -2,7 +2,7 @@
 ;Thanks to Milos "baze" Bazelides: http://baze.au.com/misc/z80bits.html for collecting these routines
 ;----------------------------------------------------------------------------------------------------
 
-mult_816
+multiply_8_16
 
 ; Input:  A = Multiplier, DE = Multiplicand
 ; Output: A:HL = Product 
