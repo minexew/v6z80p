@@ -1,10 +1,14 @@
 ;=======================================================================================
 ;
-; SERIAL COPY V2.2 - Receives multiple files from serial port, writes to current disk directory
+; SERIAL COPY V2.3 
+;
+; v2.3 - Cosmetic changes only
+;
+; v2.2 - Receives multiple files from serial port, writes to current disk directory
+;      - Check serial filename for "exit command". Exit to FLOS if command is founded. (Valen)
 ;
 ; v2.1 - Prompts to overwrite duplicate file
 ;      - Loads to $78000 in sys RAM
-; v2.2 - Check serial filename for "exit command". Exit to FLOS if command is founded. (Valen)
 ;
 ;=======================================================================================
 
@@ -117,8 +121,6 @@ flos_ok
 
 load_buffer_length equ $7800
 
-
-	call kjt_clear_screen
 	ld hl,start_text
 	call kjt_print_string
 	in a,(sys_serial_port)		; flush serial buffer at prog start
@@ -433,16 +435,13 @@ ocs_diff	pop de
 
 
 ;----------------------------------------------------------------------------------
-internal_command_exit    
-                db "EXIT.---",0         ; command, to exit sercopy
+internal_command_exit
 
-start_text	db 11," *************************************",11
-		db    " *          Serial copy v2.2         *",11
-		db    " * Copies multiple files from serial *",11
-		db    " * link to disk.    ESC key to quit. *",11 
-		db    " *************************************",11,11,0
+		db "EXIT.---",0         ; command, to exit sercopy
+
+start_text	db 11,"Serial Copy v2.3",11,0
 		
-waiting_text	db "Waiting for file..",11,0		
+waiting_text	db "Waiting for file.. (ESC Quits)",11,0		
 
 overwrite_text	db "File exists. Overwrite (y/n)",11,0
 
