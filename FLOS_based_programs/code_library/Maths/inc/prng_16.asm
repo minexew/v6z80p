@@ -6,7 +6,7 @@
 ; output: HL = random number 
 
 
-get_rand	ld	de,(seed)		
+rand_16	ld	de,(seed)		
 	ld	a,d
 	ld	h,e
 	ld	l,253

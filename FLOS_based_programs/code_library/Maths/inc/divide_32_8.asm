@@ -6,7 +6,9 @@
 ;Input: DE:HL = Dividend, C = Divisor
 ;Output: DE:HL = Quotient, A = Remainder 
 
-div32_8	ld 	b,32
+divide_32_8
+
+	ld 	b,32
 	xor 	a
 	
 div32_8lp	add	hl,hl		; 32 iterations
