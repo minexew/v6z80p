@@ -1,11 +1,14 @@
-;--------------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------------
+;Thanks to Milos "baze" Bazelides: http://baze.au.com/misc/z80bits.html for collecting these routines
+;----------------------------------------------------------------------------------------------------
 
 divide_16_8	
 
-;Input:  HL = Dividend, C = Divisor, A = 0
+;Input:  HL = Dividend, C = Divisor
 ;Output: HL = Quotient, A = Remainder
 
-
+	xor a
+	
 	add hl,hl		
 	rla		
 	cp c		

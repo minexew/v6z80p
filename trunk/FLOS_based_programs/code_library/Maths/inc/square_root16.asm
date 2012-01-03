@@ -2,27 +2,20 @@
 ;Thanks to Milos "baze" Bazelides: http://baze.au.com/misc/z80bits.html for collecting these routines
 ;----------------------------------------------------------------------------------------------------
 
-; input : none
-; output: HL = random number 
+;Input: HL = Radicand
+;Output: A = Radix 
 
+square_root16
 
-get_rand	ld	de,(seed)		
-	ld	a,d
-	ld	h,e
-	ld	l,253
-	or	a
-	sbc	hl,de
-	sbc	a,0
-	sbc	hl,de
-	ld	d,0
-	sbc	a,d
+	ld	a,-1
+	ld	d,a
 	ld	e,a
-	sbc	hl,de
-	jr	nc,rand
-	inc	hl
-rand	ld	(seed),hl		
+Sqrt16	add	hl,de
+	inc	a
+	dec	e
+	dec	de
+	jp	c,Sqrt16	
+
 	ret
 	
-seed	dw $d297
-
 ;--------------------------------------------------------------------------------------------------
