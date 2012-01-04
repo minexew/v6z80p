@@ -1,5 +1,5 @@
 
-V6Z80P EEPROM TOOL V1.18 - Phil Ruston www.retroleum.co.uk 2008-10
+V6Z80P EEPROM TOOL V1.20 - Phil Ruston www.retroleum.co.uk 2008-10
 ------------------------------------------------------------------
 
 *******************************************************************
@@ -232,6 +232,8 @@ UP+RIGHT+FIRE on a joystick in port A. (Note: The transfer must be at 115200 BAU
 
 Update History:
 ---------------
+
+v1.20 - Fixed for FLOS v593 (KJT_GET_INPUT_STRING required limit in A.)
 
 v1.18 - Fixed Success text after using "change slot" option.
       - Fixed bug where wrong slot was erased when active slot chosen
