@@ -1,7 +1,8 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.19 - P.Ruston '08 - '10    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.19 - P.Ruston '08 - '12    *
 ; ****************************************************************************
 ;
+; V1.20 - fixed for FLOS v593 (call to KJT_GET_INPUT_STRING)
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
@@ -125,6 +126,7 @@ option_1	call show_banner
 
 	ld hl,slot_prompt_text	; which slot?
 	call kjt_print_string
+	ld a,2
 	call kjt_get_input_string
 	or a
 	jp z,begin
@@ -144,6 +146,7 @@ option_1	call show_banner
 	jr nz,ok_to_wr
 	ld hl,warning_1_text
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string	; and ask for confirmation
 	or a
 	jp z,begin
@@ -383,6 +386,7 @@ option_2	call show_banner
 
 	ld hl,reconfig_now_text	; reconfig now - what slot?
 	call kjt_print_string
+	ld a,2
 	call kjt_get_input_string
 	or a
 	jp z,begin
@@ -440,6 +444,7 @@ option_3	call show_banner
 	
 	ld hl,set_slot_text		; change config to what slot?
 	call kjt_print_string
+	ld a,2
 	call kjt_get_input_string
 	or a
 	jp z,begin
@@ -463,6 +468,7 @@ option_3	call show_banner
 	ld hl,warning_2_text
 	call kjt_print_string
 
+	ld a,1
 	call kjt_get_input_string	; ask for confirmation
 	or a
 	jp z,begin
@@ -559,7 +565,8 @@ endop4	call kjt_print_string
 op4retry	call kjt_print_string	; state error and ask if want to retry the write
 	ld hl,retry_txt
 	call kjt_print_string
-op4gtri	call kjt_get_input_string
+op4gtri	ld a,1
+	call kjt_get_input_string
 	or a
 	jr z,op4gtri
 	ld a,(hl)
@@ -578,6 +585,7 @@ option_5	call show_banner
 	ld hl,uninstall_os_txt
 	call kjt_print_string
 	
+	ld a,1
 	call kjt_get_input_string	; and ask for confirmation
 	or a
 	jp z,begin
@@ -625,7 +633,8 @@ endop5	call kjt_print_string
 op5retry	call kjt_print_string	; state error and ask if want to retry the write
 	ld hl,retry_txt
 	call kjt_print_string
-op5gtri	call kjt_get_input_string
+op5gtri	ld a,1
+	call kjt_get_input_string
 	or a
 	jr z,op5gtri
 	ld a,(hl)
@@ -642,6 +651,7 @@ option_6	call show_banner
 	ld hl,update_bootcode_txt	; ask which bootcode to update
 	call kjt_print_string
 	
+	ld a,1
 	call kjt_get_input_string
 	or a
 	jp z,begin
@@ -683,7 +693,8 @@ endop6	call kjt_print_string
 op6retry	call kjt_print_string	; state error and ask if want to retry the write
 	ld hl,retry_txt
 	call kjt_print_string
-op6gtri	call kjt_get_input_string
+op6gtri	ld a,1
+	call kjt_get_input_string
 	or a
 	jr z,op6gtri
 	ld a,(hl)
@@ -723,6 +734,7 @@ option_7	call show_banner
 	
 as_unk	ld hl,block_prompt_text		; write data to block - ask what block..
 	call kjt_print_string
+	ld a,2
 	call kjt_get_input_string
 	or a
 	jp z,aborted
@@ -753,6 +765,7 @@ as_unk	ld hl,block_prompt_text		; write data to block - ask what block..
 	
 as_unk2	ld hl,cfg_warning_txt
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string		; ask for confirmation
 	or a				
 	jp z,aborted
@@ -766,6 +779,7 @@ selpzero	call read_in_block
 	
 	ld hl,addr_prompt_text		; ask what address to load to..
 	call kjt_print_string
+	ld a,4
 	call kjt_get_input_string
 	or a
 	jp z,aborted
@@ -798,6 +812,7 @@ selpzero	call read_in_block
 	jr op7end
 allowwarn	ld hl,bbc_warning_txt
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string		
 	or a				
 	jp z,begin
@@ -810,6 +825,7 @@ fsokop7	ld a,(block_number)			;warn about OS..
 	jr nz,osissafe
 	ld hl,os_warn_txt
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string		
 	or a				
 	jp z,aborted
@@ -843,7 +859,8 @@ stopwas	ld hl,warn_active_slot_txt
 op7retry	call kjt_print_string		; state error and ask if want to retry the write
 	ld hl,retry_txt
 	call kjt_print_string
-op7gtri	call kjt_get_input_string
+op7gtri	ld a,1
+	call kjt_get_input_string
 	or a
 	jr z,op7gtri
 	ld a,(hl)
@@ -860,6 +877,7 @@ option_8	call show_banner
 
 	ld hl,erase_prompt_text	; which slot?
 	call kjt_print_string
+	ld a,2
 	call kjt_get_input_string
 	or a
 	jp z,begin
@@ -877,6 +895,7 @@ option_8	call show_banner
 	jr nz,ok_to_er
 	ld hl,er_warning_1_text
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string	; and ask for confirmation
 	or a
 	jp z,begin
@@ -889,6 +908,7 @@ ok_to_er	ld a,(slot_number)
 	jr nz,ne_slot0		; confirm slot 0 erase 
 	ld hl,er_warning_2_text
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string	; and ask for confirmation
 	or a
 	jp z,begin
@@ -1599,7 +1619,7 @@ include "file_requesters_with_rs232.asm"
 
 
 start_text1	db 11," ************************************ ",11
-		db    " * V6Z80P ONBOARD EEPROM TOOL V1.19 * ",11
+		db    " * V6Z80P ONBOARD EEPROM TOOL V1.20 * ",11
 		db    " ************************************ ",11,0
 		
 start_text2	db 11
