@@ -1,6 +1,8 @@
 ; ****************************************************************************
-; * DISK TOOL (PARTION/FORMATTER) V0.05 by P.Ruston '08 - '11 	       *
+; * DISK TOOL (PARTION/FORMATTER) V0.06 by P.Ruston '08 - '11 	       *
 ; ****************************************************************************
+
+; Changes: v0.06 - fixed for FLOS v593 (kjt_get_input_string limiter)
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
@@ -238,6 +240,7 @@ quit	call new_line
 
 init_mbr	ld hl,mbr_warn_txt
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string		; wait for confirmation
 	or a
 	jp z,begin
@@ -307,6 +310,7 @@ mbrok	ld a,(partition_count)
 		
 makeptn	ld hl,sizereq_txt
 	call kjt_print_string
+	ld a,4
 	call kjt_get_input_string
 	or a
 	jp z,begin
@@ -481,6 +485,7 @@ ptdel	push af
 	ld hl,yesno_txt
 	call kjt_print_string
 		
+	ld a,1
 	call kjt_get_input_string		; wait for confirmation
 	or a
 	jp z,begin
@@ -556,6 +561,7 @@ okform1	cp 1				;if there's only one partition dont ask which..
 	jr z,skpwhich
 	ld hl,which_part_tf_txt		;which partition to format?
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string		
 	or a
 	jp z,begin
@@ -574,6 +580,7 @@ skpwhich	ld hl,volume_label_txt		;wipe volume label string
 	call kjt_bchl_memfill
 	ld hl,prompt_label_txt		;prompt for volume label
 	call kjt_print_string
+	ld a,12
 	call kjt_get_input_string
 	ld de,volume_label_txt
 cpyvlab	ld a,(hl)
@@ -589,6 +596,7 @@ labeldun	ld a,(ptn2format)
 	ld (ptnfchar),a
 	ld hl,format_confirm_txt		;confirm format
 	call kjt_print_string
+	ld a,1
 	call kjt_get_input_string		
 	or a
 	jp z,begin
@@ -1013,7 +1021,7 @@ mbr_data		incbin "mbr_data.bin"
 
 app_banner
 
-	db "  DISK TOOL V0.05 by Phil Ruston 2011",11
+	db "  DISK TOOL V0.06 by Phil Ruston 2011",11
 	db "  ===================================",11,11,0
 	
 
