@@ -1,7 +1,12 @@
-;GoSpec.exe - A boot util for Alessandro's Cycle Perfect Spectrum Emulator (V6Z80P v1.1 only)
+; GoSpec.exe - A boot util for Alessandro's Cycle Perfect Spectrum Emulator (V6Z80P v1.1 only)
 
-;New in v0.06 - restore system filename "ramdump.bin" changed to "residos.nvr"
-;to use with Garry Lancaster's update of Residos.
+; Changes:
+
+; v0.07 - fixed for FLOS v593 (kjt_get_input_string limiter)
+
+; v0.06 - restore system filename "ramdump.bin" changed to "residos.nvr"
+; to use with Garry Lancaster's update of Residos. Note: Awaiting further
+; Residos update from Garry - needs to init SD Cards after restart.
 
 ;======================================================================================
 ; Standard header for OSCA and FLOS
@@ -305,6 +310,7 @@ set_cfg_slot
 	ld hl,slot_prompt_txt
 	call kjt_print_string
 	
+	ld a,2
 	call kjt_get_input_string
 	or a
 	jr nz,gotstr
@@ -787,7 +793,7 @@ slot_not_set_txt	db 11,"Please set the Spectrum EEPROM slot,",11,11,0
 options_txt
 
 	db "***************************************",11
-	db "* Spectrum Emulator Kickstarter v0.06 *",11
+	db "* Spectrum Emulator Kickstarter v0.07 *",11
 	db "***************************************",11
 	db 11,11
 	db "Emulator EEPROM slot: "
