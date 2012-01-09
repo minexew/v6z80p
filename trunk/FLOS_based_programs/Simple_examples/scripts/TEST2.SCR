@@ -1,0 +1,5 @@
+set loop = 0
+[LP1]
+set loop +
+echo some text
+if loop < 10 goto lp1
