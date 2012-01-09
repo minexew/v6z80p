@@ -1,8 +1,8 @@
 
 Use: ASM source.asm %INCDIR1 %INCDIR2 
 
-It will produce a binary file (same name
-as source but with .exe extension)
+Produces a binary file (same name as
+source but with .exe extension)
 
 The optional "%INCDIR"s allow the
 assembler to check other folders
