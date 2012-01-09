@@ -1,20 +1,24 @@
 ;-----------------------------------------------------------------------
-;"exec" - execute script V6.01
+;"exec" - execute script V6.02
 ;
-; Changes in 6.01 - abort with CRTL + C
+;Changes:
 ;
-; Notes: Changing drives within a script not supported yet.
-;        Scripts cannot launch scripts
+;6.02 - Support for loop (via GOTO envar and [xxxx] labels)
+;6.01 - abort with CRTL + C
+;
+;Notes: Changing drives within a script not supported yet.
+;       Scripts cannot launch scripts
 ;-----------------------------------------------------------------------
 
-os_cmd_exec:
+os_cmd_exec
 
+	call scr_clear_goto
+	
 	ld hl,in_script_flag		;test if already in a script
 	bit 0,(hl)
-	jr z,oktlscr
-	xor a
-	ret
-oktlscr	set 0,(hl)			;set the in-script flag
+	jp nz,scr_error
+
+	set 0,(hl)			;set the in-script flag
 
 	ld hl,(os_args_start_lo)		;copy the script filename (scripts cannot launch
 	ld de,script_fn			;scripts as this would require nested script filenames)
@@ -25,33 +29,24 @@ oktlscr	set 0,(hl)			;set the in-script flag
 	
 	call kjt_check_volume_format	
 	ret nz
-	
-	ld hl,0
-	ld (script_file_offset),hl
-	
 
-scrp_loop	ld a,(key_mod_flags)		; skip script if L-CTRL is pressed
+;----------------------------------------------------------------------------------------------------------
+	
+scr_begin	ld hl,0
+	ld (script_file_offset),hl		; go to start of script
+
+;----------------------------------------------------------------------------------------------------------
+
+scrp_loop
+	
+	ld a,(key_mod_flags)
 	and 2
-	jr z,noskip_script	
-	ld d,0
-chk_c	call os_get_key_press
-	cp $21
-	jr nz,no_cpr
-wkend	ld d,25				; wait for key repeats to stop for a while
-wkend2	call kjt_wait_vrt			; before continuing	
-	call os_get_key_press		
-	or a
-	jr nz,wkend
-	dec d
-	jr nz,wkend2
+	jr z,noskip_script
+	call os_get_key_press
 	ld hl,script_aborted_msg
-	call os_show_packed_text
-	xor a				; script aborted error message
-	ret
-no_cpr	dec d
-	jr nz,chk_c
-
-
+	cp $21
+	jp z,scr_err2
+	
 noskip_script
 
 	ld hl,script_buffer			;clear script buffer and command string		
@@ -69,12 +64,9 @@ scrp_flp	ld (hl),a
 	ld de,(script_dir)			;return to dir that contains the script
 	call fs_update_dir_block
 	ld hl,script_fn			;locate the script file - this needs to be done every
-	call fs_hl_to_filename		;script line as external commands will have opened files
-	call fs_open_file_command		
-	jr c,pop_ret
-	or a
-	jr nz,pop_ret
+	call os_find_file			;script line as external commands will have opened files
 	pop de
+	ret nz
 	call fs_update_dir_block		;return to dir selected prior to script
 	
 	ld ix,0
@@ -85,11 +77,10 @@ scrp_flp	ld (hl),a
 		
 	ld hl,script_buffer			;load in part of the script	
 	ld b,0
-	call os_force_load
-	or a			
+	call os_force_load			
 	jr z,scrp_ok			;file system error?
 	cp $1b			
-	ret nz				;Dont mind if attempted to load beyond end of file
+	ret nz				;We dont mind if attempted to load beyond end of file
 	
 scrp_ok	ld iy,(script_file_offset)
 	ld hl,script_buffer			;copy ascii from script buffer to command string
@@ -103,19 +94,53 @@ scrp_cmd	ld a,(hl)
 	inc de
 	inc iy
 	djnz scrp_cmd
-	
 scrp_eol	xor a
 	ld (de),a				;null terminate command string 
 	ld (script_file_offset),iy
 	ld (script_buffer_offset),hl
 
-	call os_parse_cmd_chk_ps		;attempt to launch commands (check for spawn progs)
+			
+	ld a,(commandstring)		;Is this line a label?
+	cp "["
+	jr nz,scr_norm
+	call scr_test_goto			;Yes, is goto mode (envar) set?
+	jr nz,scr_skpl			
+	ld de,commandstring+1		;Yes, is the label that set by the goto envar?
+	ld b,4
+scr_lablp	ld a,(hl)
+	or a
+	jr z,scr_ggl
+	ld a,(de)
+	cp "]"
+	jr z,scr_ggl
+	call os_uppercasify			;make label compare non case sensitive
+	ld c,a
+	ld a,(hl)
+	call os_uppercasify
+	cp c
+	jr nz,scr_skpl
+	inc hl
+	inc de
+	djnz scr_lablp
+scr_ggl	call scr_clear_goto			;label match: get out of goto mode (remove envar)
+	jr scr_skpl			;skip this line and continue parsing script
 	
-	ld iy,(script_file_offset)		;skip <CR> etc when repositioning file pointer
+	
+	
+scr_norm	call scr_test_goto			;dont parse the command if a goto is set (as we're just scanning script)
+	jr z,scr_skpl
+	
+	call os_parse_cmd_chk_ps		;attempt to launch commands (and check for spawn progs)
+	call scr_test_goto			;if the command set a goto envar, start from start of script
+	jp z,scr_begin	
+	
+
+
+scr_skpl	ld iy,(script_file_offset)		;skip <CR> etc when repositioning file pointer
 	ld hl,(script_buffer_offset)
 scrp_fnc	ld a,(hl)		
 	or a
-	ret z				;if encounter a zero, its the end of the file
+	jr z,scr_end			;if encounter a zero, its the end of the file
 	cp $20
 	jr nc,scrp_gnc			;if a space or higher, we have the next command
 	inc hl		
@@ -127,8 +152,33 @@ scrp_gnc	ld (script_file_offset),iy		;update file offset and loop
 
 
 
-pop_ret	pop de
+;-----------------------------------------------------------------------------------------------
+	
+scr_end	call scr_test_goto			;was a goto still outstanding at end of script?
+	jr z,scr_error			;if so show "script error"
+	xor a
+	ret
+	
+scr_error	ld hl,script_error_msg
+
+scr_err2	call os_show_packed_text
+
+scr_clear_goto
+
+	ld hl,goto_txt			
+	call os_delete_envar		
+	xor a				;allows this routine to be used as exit jump too
 	ret
 	
 
-;-----------------------------------------------------------------------------------------------
+scr_test_goto 
+
+	ld hl,goto_txt			;Yes, is goto mode (envar) set?
+	call os_get_envar
+	ret
+
+
+goto_txt	db "GOTO",0
+
+;------------------------------------------------------------------------------------------------
+	

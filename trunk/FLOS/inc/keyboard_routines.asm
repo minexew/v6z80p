@@ -1,5 +1,5 @@
 ;---------------------------------------------------------------------------------------
-; CORE KEYBOARD ROUTINES V6.03
+; CORE KEYBOARD ROUTINES V6.04
 ;---------------------------------------------------------------------------------------
 
 os_wait_key_press
@@ -27,6 +27,9 @@ new_key	call get_buffer_loc		; HL = location in scancode buffer
 	jr nc,kbhok3
 	inc h
 kbhok3	ld a,(hl)			; get qualifier status
+	
+	bit 1,a
+	jr nz,gotkdone		; no ASCII conversion if CTRL is pressed
 	
 	ld hl,keymaps+$100		; ascii conversion table (with "ALT" pressed)	
 	bit 3,a

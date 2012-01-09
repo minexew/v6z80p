@@ -6,79 +6,117 @@
 ; Non-packed Text Strings
 ;-------------------------------------------------------------------------------------------
 
-welcome_message	db "FLOS by Phil Ruston 2011",0
+welcome_message	db "FLOS by Phil Ruston 2012",0
+
 storage_txt	db "Drives:",11,0
+
 commands_txt	db "COMMANDS",0
+
 boot_script_fn	db "BOOT_RUN.SCR",0
+
 os_hex_prefix_txt	db "$",0
+
 os_version_txt	db "FLOS V:$",0		
+
 hw_version_txt	db "OSCA V:$",0
+
 fwd_slash_txt	db " / ",0
+
 loading_txt	db "Loading..",11,0
+
 saving_txt	db "Saving..",11,0
+
 os_more_txt	db 11,"More?",11,11,0
-nmi_freeze_txt	db 11,11,"** BREAK! **"
+
 crlfx2_txt	db 11,11,0
+
+nmi_freeze_txt	db 11,11,"** BREAK! **"
+
 rep_char_txt	db "x",0
 
+err_txt		db "ERR",0
+
+formatting_txt	db 11,11,"Formatting.. ",0
+default_label	db "FLOS_DISK",0
+
+dir_txt		db "[DIR]",0
+xb_spare_txt	db "xB Free",11,0
+
+register_txt	db " A=",0,1
+		db " BC=",0,2
+		db " DE=",0,2
+		db " HL=",0,2
+		
+		db 11,$27,"A=",0,1
+		db $27,"BC=",0,2
+		db $27,"DE=",0,2
+		db $27,"HL=",0,2
+		
+		db 11," IX=",0,2
+		db " IY=",0,2
+		db " SP=",0,2
+		db " PC=",0,2,0,0
+
+flag_txt		db " ZF=0 CF=0 SF=P PV=E IFF=0",11,11,0
+		
 
 ;------------------------------------------------------------------------------------------------
 ; Packed text section
 ;------------------------------------------------------------------------------------------------
 
-dictionary	db 0,"DEBUG"		;01	
-		db 0,"-----"		;02
-		db 0,"IO"			;03
-		db 0,"--"			;04
-		db 0,"MISC"		;05
-		db 0,"----"		;06
-		db 0,"ad"			;07
-		db 0,"bnk"		;08
-		db 0,"a b c"		;09
+dictionary	db 0,"DEBUG:"		;01	
+		db 0,"------"		;02
+		db 0,"IO:"		;03
+		db 0,"---"		;04
+		db 0,"MISC:"		;05
+		db 0,"-----"		;06
+		db 0,"Filename"		;07
+		db 0,""			;08
+		db 0,""			;09
 		db 0,"Address"		;0a
-		db 0,"Bytes"		;0b
+		db 0,""			;0b
 		db 0,"Bank"		;0c
-		db 0,"Hunt"		;0d
-		db 0,"Fill"		;0e
-		db 0,"Goto"		;0f
+		db 0,""			;0d
+		db 0,""			;0e
+		db 0,""			;0f
 		
-		db 0,"Show"		;10
-		db 0,"CPU"		;11
-		db 0,"Registers"		;12
-		db 0,"As"			;13
-		db 0,"ASCII"		;14
-		db 0,"Clear"		;15
-		db 0,"Screen"		;16
-		db 0,"Disassemble"		;17
-		db 0,"Switch"		;18
-		db 0,"Copy"		;19
+		db 0,""			;10
+		db 0,""			;11
+		db 0,""			;12
+		db 0,""			;13
+		db 0,""			;14
+		db 0,""			;15
+		db 0,""			;16
+		db 0,""			;17
+		db 0,""			;18
+		db 0,""			;19
 		db 0,"Device"		;1a
-		db 0,"Change"		;1b
-		db 0,"Drive"		;1c
+		db 0,""			;1b
+		db 0,""			;1c
 		db 0,"Dir"		;1d
-		db 0,"/"			;1e
-		db 0,"fn"			;1f
+		db 0,""			;1e
+		db 0,""			;1f
 		
-		db 0,"Delete"		;20
+		db 0,""			;20
 		db 0,"File"		;21
-		db 0,"Info"		;22
+		db 0,""			;22
 		db 0,"VOLx:"		;23
-		db 0,"Make"		;24
-		db 0,"Remount"		;25
+		db 0,""			;24
+		db 0,""			;25
 		db 0,"Start"		;26
-		db 0,"Warning!"		;27 
+		db 0,"Warning!"		;27
 		db 0,"All"		;28
-		db 0,"Remove"		;29
-		db 0,"Rename"		;2a
-		db 0,"Or"			;2b
+		db 0,""			;29
+		db 0,""			;2a
+		db 0,""			;2b
 		db 0,"Receive"		;2c
 		db 0,"Save"		;2d
-		db 0,"Transmit"		;2e
+		db 0,""			;2e
 		db 0,"Load"		;2f
 		
-		db 0,"OS/HW"		;30
-		db 0,"Version"		;31
-		db 0,"pen [pap brd crs]"	;32				
+		db 0,""			;30
+		db 0,""			;31
+		db 0,""	;32				
 		db $80,":"		;33
 		db $81,">"		;34
 		db $82,"B"		;35
@@ -93,7 +131,7 @@ dictionary	db 0,"DEBUG"		;01
 		db $8a,"H"		;3e
 		db $8b,"F"		;3f
 		
-		db 0,"On"			;40 
+		db 0,""			;40 
 		db $8c,"FORMAT"		;41
 		db 0,"G"			;42
 		db $8d,"LB"		;43
@@ -108,23 +146,23 @@ dictionary	db 0,"DEBUG"		;01
 		db $95,"T"		;4c
 		db $96,"TX"		;4d
 		db $97,"VERS"		;4e	
-		db 0,"Write"		;4f
+		db 0,""			;4f
 		
 		db 0,"Mem"		;50
-		db 0,$22,"txt",$22		;51
+		db 0,""			;51
 		db 0,"Will"		;52
-		db 0,"Rate"		;53
-		db 0,"a"			;54
-		db 0,"Prep"		;55
+		db 0,""			;53
+		db 0,""			;54
+		db 0,""			;55
 		db $98,"MD"		;56
-		db 0,"Drives"		;57
-		db 0,"oldfn"		;58
-		db 0,"newfn"		;59
-		db 0,"len"		;5a
-		db 0,"Cols"		;5b
+		db 0,""			;57
+		db 0,""			;58
+		db 0,""			;59
+		db 0,""			;5a
+		db 0,""			;5b
 		db $99,"?"		;5c
-		db 0,"Commands"		;5d
-		db 0," "			;5e
+		db 0,""			;5d
+		db 0," "			;5e ???
 		db 0,"-"			;5f
 		
 		db 0,"Volume"		;60
@@ -193,13 +231,13 @@ hex_byte_txt	db "xx"			;90 (for hex-to-ascii)
 		db 0,".."			;98
 		db 0,"Name"		;99
 		db 0," Bytes"		;9a
-		db 0,"Press"		;9b
-		db 0,"Any"		;9c
-		db 0,"Key"		;9d
-		db 0,"Enter"		;9e
+		db 0,""			;9b
+		db 0,""			;9c
+		db 0,""			;9d
+		db 0,"Enter"		;9e 
 		db $9a,"EXEC"		;9f
 
-		db 0,"Run"		;a0
+		db 0,""			;a0
 		db 0,"Script"		;a1
 yes_txt		db 0,"YES" 		;a2
 		db 0,"To"			;a3
@@ -208,6 +246,7 @@ yes_txt		db 0,"YES" 		;a2
 		db 0,"None"		;a6
 		db 0,"Driver"		;a7
 		db $9b,"<"		;a8
+		db 0,"Envar"		;a9
 				
 		db 0,1			;END MARKER
 
@@ -215,67 +254,16 @@ yes_txt		db 0,"YES" 		;a2
 
 
 
-save_append_msg	db $21,$99,$69,$6a,$5f,$91,$6f,$92,0	;"File Name Already Exists - Append data?"
-os_loadaddress_msg 	db $2f,$0a,$93,0			;"Load Addr: $",0
-os_bank_msg	db $26,$0c,$93,0			;"Start Bank: $",0
-os_filesize_msg	db $21,$64,$93,0			;"File Size: $",0
-ser_rec_msg	db $94,$21,$98,$97,0		;"Waiting For File..",11,0
-ser_rec2_msg	db $95,$6f,$98,$97,0		;"Receiving Data..",11,0
-ser_send_msg	db $96,$6f,$98,$97,0		;"Sending Data..",11,0
-hw_err_msg	db $a7,$7c,$90,$97,0		;"Driver Error:$xx",11,0
-disk_err_msg	db $60,$7c,0			;"Disk Error",0
-script_aborted_msg	db $a1,$77,$97,$97,0		;"Script Aborted",11.0
-
-
-packed_help1	db $97,$0
-		db $01,$0					;DEBUG
-		db $02,$0					;-----
-		db $33,$07,$09,$5f,$4f,$50,$0b,$0		; ": ad a b c - Write Mem Bytes"
-		db $34,$07,$51,$5f,$4f,$14,$0			; "> ad "txt" - write ASCII"
-		db $a8,$07,$09,$5f,$4f,$0b,$1e,$17,$0		; "< ad a b c - write bytes / disassemble" 
-		db $35,$08,$5f,$1b,$0c,$0			; "B bnk - change bank"
-		db $37,$19,$07,$07,$07,$08,$19,$50,$0		; "C ad ad ad bnk - copy mem"
-		db $3b,$07,$07,$5f,$17,$0			; "D ad ad - disassemble"
-		db $3f,$07,$07,$54,$5f,$0e,$50,$0		; "F ad ad a" - fill mem"		
-		db $42,$07,$5f,$0f,$0a,$0			; "G ad - goto address"
-		db $3e,$07,$07,$09,$5f,$0d,$50,$0		; "H ad ad a b c - hunt mem"
-		db $44,$07,$5f,$10,$50,$0b,$0			; "M ad - show mem bytes"
-		db $47,$5f,$10,$11,$12,$0			; "R - show CPU registers"
-		db $4c,$5f,$10,$50,$13,$14,$0			; "T - show mem as ASCII"
-		db $97,0
-		db $98,0					; ".."
-		db $ff
-	
-		db $97,$0
-		db $03,$0					; IO
-		db $04,$0					; --
-		db $38,$23,$1e,$1d,$5f,$1b,$60,$1e,$1d,$0	; "CD DRVx/dir - change volume / dir"
-		db $3c,$1f,$5f,$20,$21,$0			; "DEL fn - delete file"
-		db $3d,$5f,$10,$1d,$0			; "DIR - show dir"
-		db $41,$1a,$99,$0				; "FORMAT Device Name - prep drive"
-		db $43,$1f,$07,$08,$5f,$2f,$21,$0		; "LB fn ad bnk - load file"
-		db $56,$1d,$5f,$24,$1d,$0			; "MD fn make dir"
-		db $45,$5f,$25,$57,$0			; "MOUNT remount drives"
-		db $48,$1d,$5f,$29,$1d,$0			; "RD dir - remove dir"
-		db $49,$58,$59,$5f,$2a,$21,$0			; "RN oldfn newfn - rename file"
-		db $4a,$1f,$07,$08,$5f,$2c,$21,$0		; "RX fn ad bnk - receive file"
-		db $4b,$1f,$07,$08,$5a,$5f,$2d,$21,$0		; "SB fn len bnk - save file"
-		db $4d,$1f,$07,$08,$5a,$5f,$2e,$21,$0		; "TX fn len bnk - transmit file"		
-		db $23,$5f,$18,$60,0			; "VOLx: - switch volume"
-		db $97,$0
-		db $98,$0					; ".."
-		db $ff
-
-		db $97,0
-		db $05,0					; MISC
-		db $06,0					; ----
-		db $39,$5f,$15,$16,0			; "CLS - clear screen"
-		db $3a,$32,$5f,$1b,$5b,0			; "COLOUR pen [paper border cursor] change cols"
-		db $9f,$1f,$5f,$a0,$a1,0			; "EXEC fn - run script"
-		db $4e,$5f,$10,$30,$31,0			; "VERS - show OS/HW version"
-		db $5c,$5f,$10,$5d,0			; "? - Show commands"		
-		db $97,0
-		db $ff
+save_append_msg	db $07,$69,$6a,$5f,$91,$6f,$92,$97,0		;"Filename Already Exists - Append data?"
+ser_rec_msg	db $94,$21,$98,$97,0			;"Awaiting File..",11,0
+ser_rec2_msg	db $95,$6f,$98,$97,0			;"Receiving Data..",11,0
+ser_send_msg	db $96,$6f,$98,$97,0			;"Sending Data..",11,0
+hw_err_msg	db $a7,$7c,$90,$97,0			;"Driver Error:$xx",11,0
+disk_err_msg	db $60,$7c,0				;"Disk Error",0
+script_aborted_msg	db $a1,$77,$97,$97,0			;"Script Aborted",11.0
+script_error_msg	db $a1,$7c,$97,$97,0			;"Script Error",11,0
+form_dev_warn1	db $27,$28,$36,$40,$97,$97,0			;"Warning! all volumes on"
+form_dev_warn2	db $52,$46,$7e,$98,$9e,$a2,$a3,$a5,$97,0	;"will be lost. Enter YES to Continue"
 
 
 
@@ -308,9 +296,29 @@ os_cmd_locs	dw os_cmd_colon	;command 0
 
 		dw os_cmd_vers	;17											
 		dw os_cmd_md	;18
-		dw os_cmd_help	;19
+		dw os_cmd_list	;19
 		dw os_cmd_exec	;1a
 		dw os_cmd_ltn	;1b
+
+
+
+packed_cmd_list	db $97,0
+		db $01,$97,0
+		db $02,$97,0					; DEBUG
+		db $33,$34,$a8,$35,$37,$3b,$3f,$42,$3e,$44,$47,$4c,0
+		db $97,$97,0
+
+		db $03,$97,0
+		db $04,$97,0					; IO
+		db $38,$3c,$3d,$41,$43,$56,$45,$48,$49,$97,0
+		db $4a,$4b,$4d,$23,0
+		db $97,$97,0
+
+		db $05,$97,0
+		db $06,$97,0					; MISC		
+		db $39,$3a,$9f,$4e,$5c,0
+		db $97,$97,0
+		db $ff						;end marker	
 
 
 packed_msg_list	db 0			;First message marker
@@ -323,23 +331,23 @@ packed_msg_list	db 0			;First message marker
 		db $62,$8c,$21,0		;$06 Not A File (FS error code 06)
 		db $21,$64,$8d,$65,0	;$07 File Length Is Zero (FS error code 07)
 		db $0a,$66,$67,$68,0	;$08 Address out of range (FS error code 08)
-		db $21,$99,$69,$6a,0	;$09 File Name Already Exists (FS error code 09)
+		db $07,$69,$6a,0		;$09 Filename Already Exists (FS error code 09)
 		db $69,$6b,$6c,0		;$0a Already at root (FS error code 0a)
 
 		db $72,$73,0		;$0b Unknown command (OS error code 01)
 		db $87,$75,0		;$0c Invalid Hex (OS error code 02)
-		db $76,$21,$99,0		;$0d No file name (OS error code 03)
+		db $76,$07,0		;$0d No filename (OS error code 03)
 
 		db $87,$60,0		;$0e Invalid Volume (OS error code 04)
 		db $79,$74,0		;$0f Checksum bad (OS error code 05)
-		db $9a,$7a,0		;$10 [Space] Bytes Loaded (OS error code 06)
+bytes_loaded_msg	db $9a,$7a,0		;$10 [Space] Bytes Loaded (OS error code 06, but no longer used as error return)
 		db $7b,$7c,0		;$11 Comms error (OS error code 07)
 		db $74,$7d,0		;$12 Bad arguments (OS error code 08)
 
 format_err_msg	db $62,$7f,0		;$13 not FAT16 (OS error code 09)
 
 		db $80,$81,$82,0		;$14 serial time out (OS error code 0a)
-		db $21,$99,$83,$84,0	;$15 file name too long (OS error code 0b)
+		db $07,$83,$84,0		;$15 filename too long (OS error code 0b)
 		db $76,$26,$0a,0		;$16 no start address (OS error code 0c)
 		db $76,$21,$64,0		;$17 no file length (OS error code 0d)
 		db $2d,$77,0		;$18 save aborted (OS error code 0e)
@@ -359,14 +367,16 @@ ok_msg		db $89,0			;$20 ok (OS error code 16)
 		db $1d,$62,$63,0		;$23 Dir not found
 		db $77,0			;$24 aborted (OS error code 17)
 
-		db $21,$99,$6d,0		;$25 File name mismatch (FS error code 0c)
+		db $07,$6d,0		;$25 Filename mismatch (FS error code 0c)
 		db $8a,$50,$8b,0		;$26 OS RAM protected (OS error code 18)
 		db $6f,$71,$70,$6e,0	;$27 Data after EOF request (FS error code 0d)
 no_vols_msg	db $76,$36,$0		;$28 No Volumes
 none_found_msg	db $97,$a6,$63,$0		;$29 None Found
 		
 		db $2c,$77,0		;$2a "Receive Aborted" - Serial receive abort
-				
+		db $a9,$62,$63,0		;$2b "Envar not found"
+		db $a9,$21,$61,0		;$2c "Envar file full"
+			
 		db $ff			;END MARKER
 		
 
@@ -447,9 +457,9 @@ boot_drive	db 0
 
 current_volume	db 0
 	
-current_driver	db 0	;normally updated by the "change volume" routine
+current_driver	db 0		;normally updated by the "change volume" routine
 
-device_count	db 0	;IE: the number of devices that initialized
+device_count	db 0		;IE: the number of devices that initialized
 
 volume_count	db 0
 				
@@ -527,8 +537,9 @@ os_quiet_mode	db 0
 
 ;----------------------------------------------------------------------------------
 
+os_dir_block_cache  dw 0
+
 bank_pre_cmd	db 0
-script_fn		ds 13,0
 
 fs_drive_sel_cache	db 0		; used in format command
 
@@ -537,10 +548,8 @@ filesize_cache_msw	dw 0		; ""
 
 dir_pos_cache	dw 0		; for KJT routines store/restore dir position
 
-mouse_disp_x	dw 0		; mouse displacement (not absolute position)
-mouse_disp_y	dw 0
-old_mouse_disp_x	dw 0
-old_mouse_disp_y	dw 0
+ui_index		db 0
+ui_max_chars	db 0
 
 
 ;----- INTERRUPT RELATED ----------------------------------------------------------------

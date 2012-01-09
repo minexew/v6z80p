@@ -77,8 +77,7 @@ format_dev
 	pop hl
 	ld de,5
 	add hl,de
-	call os_print_string	;show hardware's name originally from get_id 
-	call os_new_line
+	call os_print_str_new_line	;show hardware's name originally from get_id 
 	call os_new_line
 	ld hl,form_dev_warn2
 	call show_packed_text_and_cr
@@ -123,28 +122,5 @@ confirm_yes
 	ret
 
 
-show_packed_text_and_cr
-
-	call os_show_packed_text
-	call os_new_line
-	ret
-			
 ;------------------------------------------------------------------------------------------------
 
-form_dev_warn1
-
-	db $27,$28,$36,$40,$97,$97,0			;"Warning! all volumes on"
-
-form_dev_warn2
-
-	db $52,$46,$7e,$98,$9e,$a2,$a3,$a5,$97,0	;"will be lost. Enter YES to Continue"
-
-formatting_txt
-
-	db 11,11,"Formatting.. ",0
-
-default_label	
-
-	db "FLOS_DISK",0
-	
-;------------------------------------------------------------------------------------------------
