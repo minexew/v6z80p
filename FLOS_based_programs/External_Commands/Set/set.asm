@@ -1,135 +1,54 @@
 
-; App: Set - set environment variable - v1.02 By Phil @ retroleum
-; Usage: set "var_name" "var_value" (if no parameters supplied, en_vars are listed)
+; App: SET.EXE Sets environment variables - v1.03 By Phil @ retroleum
+; Usage: set var_name var_value (if no parameters supplied, en_vars are listed)
 ;
+; Var_value can a string (in quotes) or a hex number or another envar name
+; in brackets. Alternatively, var_value can be + (inc value) - (dec value)
+; # (delete envar)
+; 
+;-------------------------------------------------------------------------------------
 ; Changes
+;
+; 1.03 - Allow Envar data to be ascii string (4 chars in quotes)
+;        "+" and "-" parameters to inc or dec value
+;        "#" to delete the Envar
+;        "=" allowed IE: "SET hats = 25"
+;        Allow envar to be copy of other envar: EG: "SET HATS (CATS)"
+;        Returns error codes $12 and $1f as appropriate
 ;
 ; 1.02 - Fixed bug - when listing EnvVars - first zero encountered stopped list 
 ; 1.01 - Env vars with % prefix are displayed as paths (and not allowed to be set)
 
+
 ;======================================================================================
-; Standard header for OSCA and FLOS
+; Standard equates for OSCA and FLOS
 ;======================================================================================
 
 include "kernal_jump_table.asm"
 include "osca_hardware_equates.asm"
 include "system_equates.asm"
 
-;======================================================================================
-; Program Location File Header:
-; FLOS v568+ will use this data to load the program a specific location
-; Earlier versions of FLOS will ignore it and load the program to $5000
-;======================================================================================
+;--------------------------------------------------------------------------------------
+; Header code - Force program load location and test FLOS version.
+;--------------------------------------------------------------------------------------
 
 my_location	equ $f000
 my_bank		equ $0e
+include 		"force_load_location.asm"
 
+required_flos	equ $594
+include 		"test_flos_version.asm"
 
-	org my_location	; desired load address
-	
-load_loc	db $ed,$00	; header ID (Invalid Z80 instruction)
-	jr exec_addr	; jump over remaining header data
-	dw load_loc	; location file should load to
-	db my_bank	; upper bank the file should load to
-	db 0		; dont truncate the program load
-
-exec_addr	
-
-
-;=======================================================================================	
-; Location Check:
-; As an earlier version of FLOS may have loaded the program, or it has
-; simply been loaded into memory somwhere as a binary file we can check to
-; see if it is in the desired location before the main code attempts to run.
-;=======================================================================================
-
-	push hl		; Tests to see if code is located in the correct place to run
-	ld hl,sector_buffer	; use sector buffer location 0 for the test routine
-	ld a,(hl)		; preserve the byte that was there
-	ld (hl),$c9	; place a RET instruction there	
-	call sector_buffer	; Call the RET, PC of true_loc is pushed on stack and returns back here
-true_loc	ld (hl),a		; put the preserved byte back where RET was placed
-	ld ix,0		
-	add ix,sp		; get SP in IX
-	ld l,(ix-2)	; HL = PC of true_loc from stack (load_loc + 8 + 11)
-	ld h,(ix-1)
-	ld de,true_loc-load_loc
-	xor a
-	sbc hl,de		; HL = actual location that program was loaded to
-	push hl
-	pop ix		
-	ld e,(ix+4)
-	ld d,(ix+5)	; DE = address where program is SUPPOSED to be located
-	xor a
-	sbc hl,de		; are we in the right place?
-	pop hl	
-	jr z,loc_ok	
-	push ix		; No, so show an error message (using relative addressing)
-	pop hl
-	ld de,locer_txt-load_loc
-	add hl,de
-	call kjt_print_string
-	xor a	
-	ret
-
-locer_txt	db "Program cannot run from this location.",11,0	
-
-loc_ok	
-
-
-;=======================================================================================		
-;  Main Code starts here
-;=======================================================================================
-
-
-
-;--------- Test FLOS version -----------------------------------------------------------
-
-
-required_flos equ $575
-
-
-	push hl
-	call kjt_get_version	
-	ld de,required_flos 	
-	xor a
-	sbc hl,de
-	pop hl
-	jr nc,flos_ok
-	ld hl,old_flos_txt
-	call kjt_print_string
-	ld hl,hex_txt
-	push hl
-	ld a,d
-	call kjt_hex_byte_to_ascii
-	ld a,e
-	call kjt_hex_byte_to_ascii
-	pop hl
-	inc hl
-	call kjt_print_string
-	xor a
-	ret
-
-old_flos_txt
-
-	db "Program requires FLOS v",0
-hex_txt	db "----+",11,11,0
-
-flos_ok
-
-
-;-------- Parse command line arguments -------------------------------------------------
+;---------------------------------------------------------------------------------------
 	
 
-fnd_para1	ld a,(hl)			; examine argument text, if encounter 0: give up
+	ld (args_pointer),hl
+
+	ld a,(hl)			; examine argument text, if none show envars
 	or a			
 	jp z,show_vars
-	cp " "			; ignore leading spaces...
-	jr nz,para1_ok
-	inc hl
-	jr fnd_para1
-
-para1_ok	push hl
+	
+	push hl
 	ld de,var_name
 	ld b,4
 evnclp	ld a,(hl)
@@ -144,24 +63,116 @@ evncdone	pop hl
 	cp "%"
 	jp z,bad_name
 
-fnd_spc	inc hl
-	ld a,(hl)			; locate next space
-	or a
-	jp z,missing_value
-	cp " "
-	jr nz,fnd_spc
-
-fnd_para2	ld a,(hl)			; examine argument text, if encounter 0: give up
-	or a			
-	jp z,missing_value
-	cp " "			; ignore leading spaces...
-	jr nz,para2_ok
-	inc hl
-	jr fnd_para2
-
-para2_ok				
+	call next_arg	
 
 ;------------------------------------------------------------------------------------------------------------
+
+	ld a,(hl)			;if "=" skip to next arg
+	cp "="	
+	call z,next_arg
+	
+	ld a,(hl)			;if var data is in quotes, treat as ASCII string (4 bytes max)
+	cp $22
+	jr nz,not_text
+	
+	ld b,4
+	ld de,var_data
+textloop	inc hl
+	ld a,(hl)
+	cp $22
+	jp z,got_evd
+	ld (de),a
+	inc de
+	djnz textloop
+	jp got_evd
+
+;------------------------------------------------------------------------------------------------------------
+
+not_text	cp "#"				;remove envar?
+	jr nz,not_delete
+	
+	ld hl,var_name
+	call kjt_delete_envar
+	ret
+	
+;-------------------------------------------------------------------------------------------------------------
+
+not_delete
+
+	cp "-"				;dec envar value?
+	jr nz,not_dec
+	
+	ld hl,var_name
+	call kjt_get_envar
+	ret nz
+	ld de,var_data
+	ld bc,4
+	ldir
+	
+	ld hl,var_data
+	ld b,4
+declp	ld a,(hl)
+	sub 1
+	ld (hl),a
+	jr nc,incdecend
+	inc hl
+	djnz declp
+	
+incdecend	ld hl,var_name
+	ld de,var_data
+	call kjt_set_envar
+	ret
+	
+
+;-------------------------------------------------------------------------------------------------------------	
+
+not_dec	cp "+"				;inc envar value?
+	jr nz,not_inc
+	
+	ld hl,var_name
+	call kjt_get_envar
+	ret nz
+	ld de,var_data
+	ld bc,4
+	ldir
+	
+	ld hl,var_data
+	ld b,4
+inclp	inc (hl)
+	jr nz,incdecend
+	inc hl
+	djnz inclp
+	jr incdecend
+		
+;-------------------------------------------------------------------------------------------------------------
+
+not_inc	cp "("				;copy envar value?
+	jr nz,not_copy
+	inc hl
+	ld de,var_copy
+	ld b,4
+cename	ld a,(hl)	
+	cp ")"
+	jr z,cendone
+	ld (de),a
+	inc hl
+	inc de
+	djnz cename
+	
+cendone	ld hl,var_copy
+	call kjt_get_envar
+	ret nz
+	ld bc,4
+	ld de,var_data
+	ldir
+	ld hl,var_name
+	ld de,var_data
+	call kjt_set_envar
+	ret
+
+;--------------------------------------------------------------------------------------------------------------
+
+not_copy
 
 	ld b,8			; convert ascii to long word
 lp4	ld a,(hl)
@@ -199,10 +210,8 @@ rotquad	add hl,hl
 got_evd	ld hl,var_name		;set the environment variable
 	ld de,var_data
 	call kjt_set_envar
-	ret z
-	ld hl,no_room_txt
-	jp err_quit
-
+	ret
+	
 ;------------------------------------------------------------------------------------------------------------
 
 	
@@ -213,8 +222,7 @@ show_vars
 	
 	ld hl,fake_var_txt
 	call kjt_get_envar		;just get start of list and max vars count
-	ld b,a
-	
+		
 lp2	push bc	
 	ld a,(hl)
 	or a
@@ -294,15 +302,14 @@ show_assign
 ;------------------------------------------------------------------------------------------------------------
 	
 missing_value
-
-	ld hl,missing_value_txt
-err_quit	call kjt_print_string
-	xor a
+	
+	ld a,$1f
+	or a
 	ret
 
-
-bad_name	ld hl,badname_txt
-	jr err_quit
+bad_name	ld a,$12
+	or a
+	ret
 	
 ;-------------------------------------------------------------------------------------------
 
@@ -397,11 +404,34 @@ text_buffer ds max_chars+8,0
 
 ;-------------------------------------------------------------------------------------------
 
-var_name	ds 5,0
-var_data  ds 5,0
+next_arg	ld hl,(args_pointer)
+	call fnextarg
+	ld (args_pointer),hl
+	ret
+	
+fnextarg	inc hl
+	ld a,(hl)			; locate next arg, ZF is NOT set if found
+	or a
+	ret z
+	cp " "
+	jr nz,fnextarg
+nxtarg2	inc hl
+	ld a,(hl)
+	cp " "
+	ret nz
+	or a
+	ret z
+	jr nxtarg2
+	
+;-------------------------------------------------------------------------------------------
+
+args_pointer	dw 0
+	
+var_name		ds 5,0
+var_data  	ds 5,0
+var_copy		ds 5,0
 
 missing_value_txt	db "No value given for variable.",11,11,0
-no_room_txt	db "Not enough space for variable.",11,11,0
 
 hex_output_txt	db " = $xxxxxxxx",11,0
 
@@ -418,6 +448,6 @@ orig_volume  	db 0
 new_line_txt	db 11,0
 
 equals_txt	db " = ",0
-		
+	
 ;-------------------------------------------------------------------------------------------
 
