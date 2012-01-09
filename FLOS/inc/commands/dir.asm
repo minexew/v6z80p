@@ -8,8 +8,7 @@ os_cmd_dir
 	ret nz
 	
 	call div_line
-	call fs_get_current_dir_name		;show dir name
-	ret c
+	call os_get_current_dir_name		;show dir name
 	ret nz
 	call os_print_string
 	call fs_get_dir_block		;if at root also show volume label
@@ -21,14 +20,12 @@ os_cmd_dir
 dcmdnr	call os_new_line
 	
 nrootdir	call div_line
-	call fs_goto_first_dir_entry
-	ret c
+	call os_goto_first_dir_entry
 	jr nz,os_dlr
 	xor a
 	ld (os_linecount),a
 	
-os_dfllp	call fs_get_dir_entry		;line list loop starts here
-	ret c
+os_dfllp	call os_get_dir_entry		;line list loop starts here
 	jr nz,os_dlr			;end of dir?
 	push bc
 	call os_print_string		;show filename
@@ -58,7 +55,7 @@ os_deif	ld hl,os_hex_prefix_txt		;its a file - write length next to name
 os_dpl	call os_print_string
 	call os_new_line
 	
-	call fs_goto_next_dir_entry
+	call os_goto_next_dir_entry
 	jr nz,os_dlr			;end of dir?
 	call os_count_lines
 	ld a,"y"
@@ -66,8 +63,8 @@ os_dpl	call os_print_string
 	jr z,os_dfllp
 	
 os_dlr	call div_line			;now show remaining disk space
-	call fs_calc_free_space		;hl:de = free space in kb
-	ret c	
+	call os_calc_free_space		;hl:de = free space in kb
+	ret nz	
 
 	ld c,"K"				;if > 1024KB, show as MB
 dir_getr	ld a,d
@@ -102,8 +99,4 @@ div_line	ld bc,$132d			;2d = "-"
 
 ;-----------------------------------------------------------------------
 
-dir_txt		db "[DIR]",0
-xb_spare_txt	db "xB Free",11,0
-
-;-----------------------------------------------------------------------
 	

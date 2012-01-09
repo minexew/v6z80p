@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"f" fill memory command. V6.04
+;"f" fill memory command. V6.05
 ;-----------------------------------------------------------------------
 
 os_cmd_f			
@@ -10,10 +10,7 @@ os_cmd_f
 	jp z,os_no_args_error
 	ld c,e			;c = fill byte
 	
-	ld hl,(cmdop_end_address)	;check range is ok
-	ld de,(cmdop_start_address)
-	xor a			;clear carry
-	sbc hl,de
+	call test_range_valid
 	jp c,os_range_error		;abort if end addr <= start addr
 
 	ld a,c			;get fill byte in A

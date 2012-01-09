@@ -1,6 +1,10 @@
 ;-----------------------------------------------------------------------
-;"c" - Copy memory command. V6.04
+;"c" - Copy memory command. V6.05
 ;-----------------------------------------------------------------------
+
+copy_dest_address	equ scratch_pad
+copy_dest_bank	equ scratch_pad+2
+
 
 os_cmd_c
 

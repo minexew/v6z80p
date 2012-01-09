@@ -120,9 +120,12 @@ qualklist	db $2f,$27,$59,$11,$1f,$14,$12
 
 mouse_irq_code
 
-	push af			; buffers the movement packet bytes
-	push bc			; on the 3 byte, absolute mouse location and
-	push de			; button registers are updated 
+; buffers the movement packet bytes. On the 3rd byte, the
+; mouse location and button registers are updated 
+
+	push af			
+	push bc			
+	push de			
 	push hl
 	
 	ld a,(use_mouse)		; mouse allowed to call IRQ code?
@@ -152,8 +155,8 @@ mouse_irq_code
 	dec d
 mxsignpos	ld a,(mouse_packet+1)
 	ld e,a
-	ld hl,(mouse_disp_x)
-	add hl,de
+	ld hl,(mouse_disp_x)	
+	add hl,de			; add mouse displacement to displacement total
 	ld (mouse_disp_x),hl
 	ld hl,(mouse_pos_x)
 	add hl,de			; add mouse displacement to absolute pointer pos

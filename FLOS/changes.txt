@@ -2,6 +2,71 @@
 FLOS version info:
 ------------------
 
+v5.94 - 9/1/12
+
+	- FAT16 code updated (v118) - Loading files now 2x-3x faster
+          
+	- Added flow control to scripts (Uses "GOTO" Envar and 4-char max labels)
+     
+	- All commands set the Envar "ERR" on exit (with their exit error code from A
+	  in [7:0] of the envar / hardware error in [8:15] from B, if applicable)
+
+	- If a program returns with zero flag not set and A = $80+, no error text is shown
+
+	- H command can now search memory for text strings (in quotes)
+	
+	- Home key now positions cursor at left side in UI
+
+	- Page-Up key now positions cursor at top / left in UI
+	
+	- Page-Down key now positions cursors on new line at bottom in UI
+
+	- CD command no longer incorrectly displays "/" immediately after VOLx: or after
+	  last dir of list. Also now allows volume in command string EG: "CD VOL0:DEMOS/BOING"
+
+	- kjt_compare_files is no longer case sensitive
+
+	- CTRL + keypress no longer produces ASCII char (scancodes are same though)
+
+	- LB command no longer returns error $10 when *successful* (would be confusing
+	  with "ERR" envar)
+
+	- Error codes $2b (Envar not found" and $2c "envar file full" added for kernal
+	  envar routines (KJT_SET_ENVAR and KJT_GET_ENVAR)
+
+	- No internal commands return to OS with Carry set to indicate a hardware error.
+	  (FS_x calls switched to OS_x versions)
+	
+
+	Optimization: 
+
+	 ? Command now only shows a list of commands - for full info use external HELP command. 
+	
+	 Packed message dictionary cleared of unneeded entries (could be optimized further)
+
+	 CTRL+C abort code for script exit simplified.
+
+	 Envar search now uses os_compare_files (no longer case sensitive)
+
+	 Scratch_pad used for symbol table vars used in "h" and "c" commands
+		
+	 All mouse vars are now in symbol table
+	  
+	 All script variables are now in symbol table
+
+	 Entire symbol work var page is cleared on FLOS start 
+
+	 Font  - uses 128char wide font source file (with 96-127 blank) instead of
+	 reorganizing 96 char wide font.
+
+	 Video set-up, clear vram, etc.
+            
+            
+	
+Previous changes:
+-----------------
+
+
 5.93 - 02/01/12:
 
 	Added support for "programmable" function keys. When F1-F9 is pressed
@@ -25,11 +90,6 @@ FLOS version info:
 	Optimization: "Max_bank" converted from variable to absolute label
 
 	Optimization: decimal print routine (dir now shows free space in KB/MB)
-
-
-
-Previous changes:
------------------
 
 
 5.92 - 14/12/11:
@@ -82,7 +142,7 @@ Previous changes:
 
 5.85 - 13/08/11: Bugfix: Previously, when disks were formatted (by Windows) without a label,
                  garbage was displayed as the disk name and FLOS would crash after a DIR.
-                 Now, the disk label from the partition table is used (normall "NO NAME")
+                 Now, the disk label from the partition table is used (normal "NO NAME")
                  if no label is specified.
 
 5.84 - 01/08/11 : When a program loads, IY now points to its filelength (4 bytes)
@@ -453,7 +513,4 @@ Previous changes:
                  Many other transparent changes and optimizations.
 
 	  
-                 Known issues with FAT16 FS version:
-                 -----------------------------------
-                 CD command without args does not show file path on FAT16 disks.
- 
+      

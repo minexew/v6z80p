@@ -42,10 +42,15 @@ os_lbnao	ld hl,(lb_load_addr)		;load the file
 	ld a,(lb_load_bank)
 	ld b,a
 	call os_force_load
+	jr z,lb_fl_ok
+	cp $1b				;if FS error $1b = EOF, change to appropriate message: $27  
 	ret nz
+	ld a,$27				
+	or a
+	ret
+	
 
-
-	ld de,filesize_cache_msw		
+lb_fl_ok	ld de,filesize_cache_msw		
 show_bl	ld hl,os_hex_prefix_txt		;show "$"
 	call os_print_string	
 	ld hl,output_line
@@ -55,8 +60,9 @@ show_bl	ld hl,os_hex_prefix_txt		;show "$"
 	ld b,5				;skip leading zeros
 	call os_print_output_line_skip_zeroes	;show hex figures 
 	
-	ld a,$10				;show " bytes loaded" return message
-	or a
+	ld hl,bytes_loaded_msg		;show " bytes loaded" return message
+	call show_packed_text_and_cr
+	xor a
 	ret
 	
 ;-----------------------------------------------------------------------------------------------

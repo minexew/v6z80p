@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"cd" - Change Dir command. V6.06
+;"cd" - Change Dir command. V6.08
 ;-----------------------------------------------------------------------
 
 os_cmd_cd	
@@ -73,8 +73,11 @@ cd_no_assign
 	call os_change_volume
 	ret nz			; error if new volume is invalid
 	call kjt_root_dir		; go to new drive's root block as drive has changed
-	jr cd_mol			; look for additional paths in args
-
+	ld hl,(os_args_start_lo)
+	cp " "
+	jr nz,cd_mollp		; look for additional paths in args
+	xor a
+	ret
 
 cd_nchvol	call fs_get_dir_block
 	ld (original_dir_cd_cmd),de
@@ -124,13 +127,21 @@ lp1	push bc
 	
 shdir_lp	pop de
 	push bc
+	push de
 	call kjt_set_dir_cluster
 	call kjt_get_dir_name
 	call kjt_print_string
+	pop de				;dont show "/" if root dir (VOLx)
+	ld a,d
+	or e
+	pop bc
+	jr z,no_dirsl
+	ld a,c				;dont show "/" if last dir of list
+	dec a
+	jr z,no_dirsl
 	ld a,$2f				;2f = "/"
 	call os_print_char
-	pop bc
-	dec c
+no_dirsl	dec c
 	jr nz,shdir_lp
 
 	call os_new_line	
