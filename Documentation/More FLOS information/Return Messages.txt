@@ -54,4 +54,8 @@ $26 - OS RAM protected
 $27 - Data after EOF request
 $28 - No Volumes
 $29 - None Found
-$2a - Receive aborted	
+$2a - Receive aborted
+$2b - Unknown Envar
+$2c - Envar list full	
+
+$80+ = Silent, unspecified errors (No text is shown by FLOS, but "ERR" envar is set)
