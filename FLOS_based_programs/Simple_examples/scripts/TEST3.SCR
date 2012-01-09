@@ -1,0 +1,7 @@
+fileinfo # somefile.txt
+if err = 0 goto ok
+echo somefile.txt does not exist
+goto END
+[OK]
+echo somefile.txt exists
+[END]
