@@ -1,11 +1,11 @@
-List of FLOS kernal calls - last updated 02-01-2012 for FLOS v593
+List of FLOS kernal calls - last updated 09-01-2012 for FLOS v594
 
 File System Routines:
 
 kjt_check_volume_format  - Checks if current volume is formatted to FAT16.
 kjt_change_volume - Selects drives VOL0: to VOL7:
 kjt_get_volume_info - Returns data about the volumes mounted
-kjt_format_device -Formats entire disk (or card) to FAT16
+kjt_format_device -Formats entire SD card to FAT16
 kjt_make_dir -Creates a new sub directory in current directory
 kjt_change_dir - Change to subdirectory
 kjt_parent_dir -Move up a directory level
@@ -38,6 +38,7 @@ Low-Level Sector Access Routines:
 kjt_read_sector - Loads 512 byte sector to the sector buffer
 kjt_write_sector -Writes 512 byte sector to the current device
 kjt_file_sector_list - To list the disk sectors that files occupy
+kjt_get_sector_read_addr - Returns data and pointers allowing sector buffer relocation etc.
 
 Kernal Serial Comms Routines:
 
@@ -92,7 +93,7 @@ Kernal Misc Routines:
 
 kjt_hex_byte_to_ascii - Make ASCII version of a hex byte
 kjt_ascii_to_hex_word - Converts text hex number to real hex word
-kjt_dont_store_registers – Stops the OS updating the stored register values on exit
+kjt_dont_store_registers - Stops the OS updating the stored register values on exit
 kjt_get_version - Returns OS and hardware ID numbers
 kjt_compare_strings - Compares two ASCII strings
 kjt_bchl_memfill - Fill memory with value in accumulator
@@ -715,13 +716,14 @@ A = Device to access (normally 0)
 Output Registers:
 
  HL = Address of sector read routine
- DE = Location of the LSB of the 32bit LBA variable
- BC = Location of the sector buffer location variable 
+ DE = Address of the LSB of the 32bit LBA variable
+ BC = Address of the sector buffer location variable 
 
+Notes: 
 
-Note: 
+This routine can be used to allow programs to read sectors directly to an arbitrary location in memory (IE: A program can write to the sector LBA and sector buffer location variables, and then call the low-level sector read routine using the data obtained).
 
-The sector buffer location is automatically reset to the location that the OS requires whenever a filesystem routine is called (this includes the KJT read/write sector calls above.) Similarly, altering the LBA variable manually should not affect the filesystem.
+ The sector buffer location is automatically reset to the location that the OS requires whenever a filesystem routine is called (this includes the KJT read/write sector calls above.) Similarly, altering the LBA variable manually should not affect normal operation of the filesystem.
 
 
 
@@ -1518,8 +1520,7 @@ Trashes: BC
 
 kjt_compare_strings
 
-Action: Compares two ASCII strings 
-
+Action: Compares two ASCII strings (not case sensitive)
 Input Registers  :
 
  DE = address of string 1
@@ -1534,7 +1535,6 @@ Notes:
 * Compare fails if string lengths are different unless count is reached first.
 * Original HL/DE values are preserved.
 
-Trashes: A
 
 
 --------------------------------------------------------------------------------
@@ -1605,7 +1605,7 @@ Input Registers:
 HL = name of variable (4 chars max, zero-termination required if less than 4 chars)
 DE = address of data for variable (4 bytes)
 
-Output Registers: Zero Flag = set if all OK, not set if no space for new variable
+Output Registers: Zero Flag = set if all OK, not set if no space for new variable (A = $2c)
 
 
 --------------------------------------------------------------------------------
@@ -1621,7 +1621,7 @@ HL = name of variable (4 chars max, zero-termination required if less than 4 cha
 Output Registers:
 
 If zero Flag = Set : all OK,  HL = address of data for variable (4 bytes)
-If Zero Flag = Not set: variable was not found, HL = address of envar list, A = max entries
+If Zero Flag = Not set: variable was not found, (A = $2b, hl = location of envar list, b = max envars)
                 
 
 --------------------------------------------------------------------------------
