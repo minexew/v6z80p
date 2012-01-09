@@ -1,16 +1,5 @@
-; Demonstrates the file header that forces FLOS to load a program to
-; an arbitary location (instread of $5000) - also shows how to test
-; that the program is in the correct location.
-
-
-;---Standard source header for OSCA and FLOS ------------------------------------------
-
-include "kernal_jump_table.asm"	; essential equates
-include "OSCA_hardware_equates.asm"	; ""	""
-include "system_equates.asm"		; ""	""
-
-;--------------------------------------------------------------------------------------
-
+; Forces FLOS to load a program to an arbitary location (instread of $5000)
+; and tests that the program is in the correct location.
 
 ;======================================================================================
 ; Program Location File Header:
@@ -18,8 +7,7 @@ include "system_equates.asm"		; ""	""
 ; Earlier versions of FLOS will ignore it and load the program to $5000
 ;======================================================================================
 
-my_location	equ $f000
-my_bank		equ $0e
+;set "my_location" and "my_bank"
 
 
 	org my_location	; desired load address
@@ -76,18 +64,3 @@ loc_ok
 
 
 ;=======================================================================================		
-;         User's Program begins here
-;=======================================================================================
-
-	
-	ld hl,message_txt
-	call kjt_print_string
-	xor a
-	ret
-	
-message_txt
-
-	db "Hello! This is a test program.",11,0
-		
-		
-;========================================================================================
