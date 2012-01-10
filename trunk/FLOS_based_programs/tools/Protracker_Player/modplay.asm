@@ -1,11 +1,14 @@
 ;=======================================================================================
 ;
-; COMMAND LINE PROTRACKER PLAYER FOR FLOS V1.03 by Phil Ruston & Daniel Illgen
+; COMMAND LINE PROTRACKER PLAYER FOR FLOS V1.04 by Phil Ruston & Daniel Illgen
 ;
-; Usage: modplay [songname]
+; Usage: modplay [?] songname
 ;
 ; Max pattern file size = around 36K
 ; Max sample file size = 128K
+;
+; V1.04 - If "?" is first arg, show raster time.
+;         Quit using normal FLOS error for file not found, load errors ($80 for others)
 ;
 ; V1.03 - included direct mod-file loading (By Daniel Illgen)
 ;       - tests for outsize pattern and sample data
@@ -32,12 +35,24 @@ fnd_para	ld a,(hl)			; find actual argument text, if encounter 0
 	or a			; then show use
 	jr nz,fn_ok
 	
-	ld hl,nfn_text
+no_fn	ld hl,nfn_text
 	call kjt_print_string
 	xor a
 	ret
 
-fn_ok	ld de,modu_filename		; create extended filename
+fn_ok	cp "?"
+	jr nz,no_rast
+	ld a,1
+	ld (show_raster),a
+findnarg	inc hl
+	ld a,(hl)
+	or a
+	jr z,no_fn
+	cp $20
+	jr z,findnarg
+	
+
+no_rast	ld de,modu_filename		; create extended filename
 cpyfn	ld a,(hl)
 	or a
 	jr z,modex
@@ -61,14 +76,15 @@ modexlp	ld a,(hl)
 
 modexdone
 	
-	ld hl,mload_text
+	ld hl,modu_filename		; find module
+	call kjt_find_file
+	ret nz
+
+	ld hl,mload_text		; show "loading.."
 	call kjt_print_string
 	ld hl,modu_filename	
 	call kjt_print_string
-	
-	ld hl,modu_filename		; load pattern data
-	call kjt_find_file
-	jp nz,load_problem
+
 
 	ld (filelen),iy		; note the module's filelength
 	ld (filelenhi),ix
@@ -78,7 +94,7 @@ modexdone
 	ld b,0
 	ld hl,music_module
 	call kjt_force_load		; load the first 1084 bytes of the module
-	jp nz,load_problem
+	ret nz
 
 	ld hl,music_module+952	; find highest used pattern in order to locate 
 	ld b,128			; the address where samples start
@@ -123,14 +139,14 @@ ptl	inc hl
 
 	ld hl,modu_filename		; load pattern data
 	call kjt_find_file
-	jp nz,load_problem
+	ret nz
 	ld iy,(pattlen)
 	ld ix,0
 	call kjt_set_load_length
 	ld b,0
 	ld hl,music_module
 	call kjt_force_load
-	jp nz,load_problem
+	ret nz
 		
 	ld iy,(samplelen)		; load samples data
 	ld ix,(samplelenhi)
@@ -138,7 +154,7 @@ ptl	inc hl
 	ld b,3			; bank 3 (audio ram base)
 	ld hl,$8000		; address to load to 
 	call kjt_force_load
-	jp nz,load_problem
+	ret nz
 	
 	ld hl,0
 	ld (force_sample_base),hl	
@@ -147,6 +163,13 @@ ptl	inc hl
 	ld hl,playing_text
 	call kjt_print_string
 
+	call kjt_get_colours
+	inc hl
+	inc hl
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	ld (orig_border_colour),de
 	
 ;--------- Main loop ---------------------------------------------------------------------	
 	
@@ -164,15 +187,15 @@ wait_bord	ld a,(vreg_read)		; wait until raster on screen so we can see how much
 	jr z,wait_bord
 
 	ld hl,$0f0 		; border colour = green
-	ld (palette),hl
+	call change_border
 	call update_sound_hardware	; update OSCA sound hardware
 
 	ld hl,$f00 		; border colour = red
-	ld (palette),hl
+	call change_border
 	call play_tracker		; main z80 tracker code
 
-	ld hl,$00a		; border colour = blue 
-	ld (palette),hl
+	ld hl,(orig_border_colour)	; border colour = blue 
+	call change_border
 	call kjt_get_key		; non-waiting key press test
 	or a
 	jr z,wvrtstart		; loop if no key pressed
@@ -182,23 +205,25 @@ wait_bord	ld a,(vreg_read)		; wait until raster on screen so we can see how much
 	xor a			; and quit
 	ret
 	
+;--------------------------------------------------------------------------------------------
 
+change_border
+
+	ld a,(show_raster)
+	or a
+	ret z
+	ld (palette),hl
+	ret
+	
 ;---------------------------------------------------------------------------------------------------	
 
-load_problem	
-
-	ld hl,load_error_text+2
-	call kjt_hex_byte_to_ascii
-	ld hl,load_error_text
-	call kjt_print_string
-	xor a
-	ret
 
 pattern_too_big
 
 	ld hl,pattern_error_text
 	call kjt_print_string
-	xor a
+	ld a,$80
+	or a
 	ret
 
 
@@ -206,16 +231,19 @@ samples_too_big
 
 	ld hl,samples_error_text
 	call kjt_print_string
-	xor a
+	ld a,$80
+	or a
 	ret
 
 			
 ;---------------------------------------------------------------------------------------------------
 
-nfn_text		db "Modplay version 1.03",11,"Usage: Modplay [modname]",11,0
+show_raster	db 0
+orig_border_colour	dw 0
+
+nfn_text		db "Modplay version 1.04",11,"Usage: Modplay [modname]",11,0
 mod_ext         	db ".MOD",0
 
-load_error_text	db 11,"$xx - loading error!",11,0
 mload_text	db 11,"Loading module: ",0
 playing_text	db 11,"Playing tune. Any key to quit.",11,11,0
 pattern_error_text	db 11,"Pattern data is too big!",11,11,0
