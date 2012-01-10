@@ -26,6 +26,9 @@ include 		"test_flos_version.asm"
 ; Actual program starts here..
 ;------------------------------------------------------------------------------------------------
 
+window_cols	equ 40
+window_rows	equ 25
+
 
 fnd_para	ld a,(hl)			; examine argument text, if encounter 0: give up
 	or a			
