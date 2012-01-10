@@ -1,0 +1,14 @@
+
+CD - Change Directory (or show path)
+
+Usage:
+
+CD ..             (go to parent dir)
+CD /              (go to root dir)
+CD subdir         (change to subdir)
+CD VOLn:          (change volume)
+CD VOLn:hats/caps (change vol & subdir)
+CD %xyz           (change to assigned)
+
+No parameters: Show current path.
+

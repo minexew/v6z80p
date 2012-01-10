@@ -1,0 +1,6 @@
+
+VERS - Shows the OS and Hardware
+version numbers.
+
+Usage: VERS (no args)
+

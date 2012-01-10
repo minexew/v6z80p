@@ -1,0 +1,12 @@
+
+G - Goto location (IE: Call Z80 code)
+
+Usage: G address 
+
+Notes:
+
+HL is set to the first non-space
+character after the address.
+
+"G 0" resets the system.
+

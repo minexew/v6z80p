@@ -1,0 +1,17 @@
+
+M - Show memory as hex bytes
+
+Usage: M [address]
+
+Notes:
+
+If address is omitted, the display
+will continue from the previous
+location.
+
+The displayed data can be edited and
+when Enter is pressed, updated in
+memory. (This is because each line
+is displayed with the ":" command
+prefix)
+

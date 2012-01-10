@@ -1,0 +1,17 @@
+
+T - Show memory as ASCII text
+
+Usage: T [address]
+
+Notes: 
+
+The displayed text can be edited,
+and Enter pressed to update it in
+memory.
+
+If "address" is omitted, the listing
+continues from the previous address.
+
+ASCII characters below 32 are shown
+as pipes (|).
+

@@ -1,0 +1,5 @@
+
+DIR - Show Directory Listing
+
+Usage: DIR (no args)
+

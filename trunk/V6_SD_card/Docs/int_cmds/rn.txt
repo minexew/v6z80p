@@ -1,0 +1,5 @@
+
+RN - Rename a file/directory
+
+Usage: RN orig_name new_name
+

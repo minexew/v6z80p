@@ -1,0 +1,6 @@
+
+C - Copy bytes in memory (from the
+currently selected bank)
+	
+Usage: C start end dest [dest bank]
+

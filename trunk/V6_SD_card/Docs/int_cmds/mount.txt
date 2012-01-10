@@ -1,0 +1,10 @@
+
+MOUNT - Rescans for connected drives
+
+Usage: MOUNT (no args)
+
+Notes:
+
+This removes any dir assignments
+in the environment variables list.
+

@@ -1,0 +1,10 @@
+
+H - Hunt memory for hex bytes / text.
+
+Usage: H start end byte [b2 b3 ..]
+       H start end "string"
+
+Notes:
+
+String seach is not case sensitive.
+

@@ -1,0 +1,17 @@
+
+SB - Save bytes from RAM to currently
+selected drive
+
+Usage: SB filename addr length [bank]
+
+Notes:
+
+If the file exists already, a prompt
+to append data is displayed.
+
+No path is allowed in the filename.
+
+When the length + address extends
+beyond address $FFFF, bytes are
+fetched from the next bank(s)
+

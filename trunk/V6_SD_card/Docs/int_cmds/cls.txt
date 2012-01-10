@@ -1,0 +1,5 @@
+
+CLS - Clear OS screen
+
+Usage: CLS (no args)
+
