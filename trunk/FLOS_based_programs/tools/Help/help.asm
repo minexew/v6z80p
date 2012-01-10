@@ -331,7 +331,7 @@ div_line
 
 docs_txt		db "docs",0
 
-cmds_txt		db "cmds",0
+cmds_txt		db "int_cmds",0
 
 no_doc_dir_txt	db 11,"Cannot find 'DOCS' dir in root.",11,0
 
