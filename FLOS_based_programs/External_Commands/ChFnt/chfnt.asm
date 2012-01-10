@@ -34,16 +34,11 @@ include 		"test_flos_version.asm"
 ;  Look for associated file
 ;-----------------------------------------------------------------------------------------------	
 	
-fnd_param	ld a,(hl)				;scan arguments string for filename
+fnd_param	ld a,(hl)				;if args = 0, show use
     	or a    
     	jp z,no_param
-    	cp " "          
-    	jr nz,param_ok
-skp_spc 	inc hl
-    	jr fnd_param
-    
-  
-param_ok	call kjt_store_dir_position
+
+	call kjt_store_dir_position
 	ld (filename_loc),hl
 	call kjt_find_file			;does file exist in current dir?
 	jr c,hw_err

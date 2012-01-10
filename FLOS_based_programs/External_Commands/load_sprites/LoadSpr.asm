@@ -29,23 +29,11 @@ buffer_size equ 512
 
 ;-------- Parse command line arguments ---------------------------------------------------------
 
-	ld de,$5000		; if being run from G command, HL which is normally
-	xor a			; the argument string will be $5000
-	sbc hl,de
-	jr nz,argok
-	ld hl,test_args		; if so, use a test filename defined in this source
-	ld de,0
-
-argok	add hl,de
-fnd_para	ld a,(hl)			; examine argument text, if encounter 0: give up
+	ld a,(hl)			; examine argument text, if encounter 0: show use
 	or a
 	jp z,show_use
-	cp " "			; ignore leading spaces...
-	jr nz,fn_ok
-skp_spc	inc hl
-	jr fnd_para
 
-fn_ok	ld de,filename		; copy args to working filename string
+	ld de,filename		; copy args to working filename string
 	ld b,16
 fnclp	ld a,(hl)
 	or a
