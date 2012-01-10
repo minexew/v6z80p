@@ -1,0 +1,13 @@
+
+FORMAT - FAT16 formats *entire device*
+
+Usage: FORMAT device_name
+
+EG: FORMAT SD_CARD
+
+Notes:
+
+The entire device is formatted to
+FAT16 - no partition table is created.
+Use Disktool.exe to partition cards.
+

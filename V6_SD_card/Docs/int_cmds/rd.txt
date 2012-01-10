@@ -1,0 +1,8 @@
+
+RD - Remove directory
+
+Usage: RD sub_dir 
+
+Notes: The command cannot be used to
+erase files (use DEL for that).
+

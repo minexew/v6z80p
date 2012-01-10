@@ -1,0 +1,23 @@
+
+COLOUR - Changes the FLOS colour scheme
+
+Usage: COLOUR pen [pap] [bord] [curs] 
+
+pen = xy, where 'x' is the character's
+background colour and 'y' is the
+foreground colour from the following
+table:
+             
+0 - transparent 8 - white
+1 - black       9 - dark grey
+2 - blue        a - mid grey
+3 - red         b - light grey
+4 - magenta     c - orange
+5 - green       d - light blue
+6 - cyan        e - light green
+7 - yellow      f - brown
+
+[Pap], [bord] and [curs] are 12 bit
+$RGB values for the paper, border
+and cursor colours.
+

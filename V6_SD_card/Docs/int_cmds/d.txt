@@ -1,0 +1,12 @@
+
+D - Disassemble Z80 code
+
+Usage: D start [end]
+
+Notes:
+
+To aid debugging, it is possible to
+cursor up to a line of code, edit
+the hex bytes and press enter to
+update the disassembly listing.
+

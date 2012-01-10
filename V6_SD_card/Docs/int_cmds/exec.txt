@@ -1,0 +1,8 @@
+
+EXEC - Execute a script 
+
+Usage: EXEC filename
+
+Notes: Scripts cannot execute other
+scripts.
+

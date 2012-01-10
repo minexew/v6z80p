@@ -1,0 +1,9 @@
+
+R - Show CPU registers
+
+Usage: R (no args)
+
+Notes: The register values are updated
+when external programs return to FLOS
+or when there's an NMI exception.
+

@@ -1,0 +1,13 @@
+
+LB - Loads bytes to RAM from currently
+selected drive / dir.
+
+Usage: LB filename address [bank]
+
+Notes:
+
+No path is allowed in the filename.
+When the loaded data goes beyond
+address $FFFF, bytes continue to
+load into the next bank(s)
+

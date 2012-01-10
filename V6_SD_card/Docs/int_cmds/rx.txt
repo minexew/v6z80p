@@ -1,0 +1,22 @@
+
+RX - Receive data from serial comms
+port. places it in RAM and optionally
+executes it as code. 
+
+Usage: RX filename address [bank]   
+                         
+Notes:
+
+If filename is "*" whatever file is
+sent is accepted.
+
+If filename is "!", the file is
+downloaded and immediately run (no
+other arguments are used). If the file
+being downloaded has a FLOS location
+header, it is loaded to the address
+and bank specified in the header (but
+any truncation info in the header is
+ignored). HL is set to the first
+non-space character after the "!"
+

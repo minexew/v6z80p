@@ -1,0 +1,10 @@
+
+DEL - Delete File
+
+Usage:
+
+DEL filename 
+
+Notes: Must be a file, not a dir.
+Use RD to remove dirs.
+

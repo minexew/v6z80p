@@ -1,0 +1,24 @@
+
+B - Bank select 
+
+Pages in one of the fifteen 32KB
+sysRAM banks at Z80 address space
+$8000-$FFFF
+
+Usage: B n 
+
+Where n = 0 to E
+
+EG:
+
+"Bank 0" pages in sysRAM $08000-$0FFFF
+"Bank 1" pages in sysRAM $10000-$17FFF
+"Bank 2" pages in sysRAM $18000-$1FFFF
+
+Notes:
+	
+FLOS does not allow sysRAM $0-$07fff
+to be paged into $8000-$ffff (though
+this can be achieved with direct
+writes to the ports.)
+
