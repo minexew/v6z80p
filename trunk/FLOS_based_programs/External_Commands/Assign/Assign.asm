@@ -38,15 +38,10 @@ include 		"test_flos_version.asm"
 	ld (var_data+3),a
 	pop hl
 
-fnd_para1	ld a,(hl)			; examine name argument text, if encounter 0: give up
+	ld a,(hl)			; examine name argument text, if 0: show use
 	or a			
 	jp z,no_args
-	cp " "			; ignore leading spaces...
-	jr nz,para1_ok
-	inc hl
-	jr fnd_para1
-
-para1_ok	ld a,(hl)
+	
 	cp "%"
 	jp z,inv_proxy
 	push hl

@@ -24,15 +24,11 @@ include 		"test_flos_version.asm"
 ; Actual program starts here..
 ;------------------------------------------------------------------------------------------------
 
-fnd_param	ld a,(hl)			; examine argument text, if encounter 0: give up
+	ld a,(hl)			; examine argument text, if 0: show use
 	or a			
 	jr z,no_param
-	cp " "			; ignore leading spaces...
-	jr nz,par_ok
-skp_spc	inc hl
-	jr fnd_param
 
-par_ok	ld (args_start),hl
+	ld (args_start),hl
 	ld de,baudslow_txt		;what baud rate was requested?
 	ld b,5
 	call kjt_compare_strings

@@ -34,14 +34,11 @@ req_hw_version	equ $600
 ;  Look for argument
 ;-----------------------------------------------------------------------------------------------	
 	
-fnd_param	ld a,(hl)				;scan arguments string for filename
+fnd_param	ld a,(hl)				;if args = 0, show use
     	or a    
-    	jp z,no_param
-    	cp " "          
     	jr nz,param_ok
-skp_spc 	inc hl
-    	jr fnd_param
-no_param	ld hl,showuse_txt
+    
+    	ld hl,showuse_txt
 	call kjt_print_string
 	xor a
 	ret
