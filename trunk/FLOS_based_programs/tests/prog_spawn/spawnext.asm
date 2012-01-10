@@ -29,6 +29,6 @@ include "system_equates.asm"		; ""	""
 	
 test_txt	db 11,11,"This program has run and quit.. ",11,0
 
-command_txt db "textedit walnuts.txt",0
+command_txt db "edit walnuts.txt",0
 
 ;--------------------------------------------------------------------------------------
