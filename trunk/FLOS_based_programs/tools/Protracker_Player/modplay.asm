@@ -29,14 +29,10 @@ include "system_equates.asm"
 ;--------- Load and init -------------------------------------------------------------------------
 
 fnd_para	ld a,(hl)			; find actual argument text, if encounter 0
-	or a			; then give up
-	jr z,no_fn
-	cp " "			
+	or a			; then show use
 	jr nz,fn_ok
-skp_spc	inc hl
-	jr fnd_para
 	
-no_fn	ld hl,nfn_text
+	ld hl,nfn_text
 	call kjt_print_string
 	xor a
 	ret

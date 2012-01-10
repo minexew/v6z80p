@@ -1,5 +1,5 @@
 
-; App: Shows .bmp pictures  - v1.01 By Phil '09
+; App: Shows .bmp pictures  - v1.02 By Phil '09
 ;
 ; Usage: showbmp [filename]
 ;
@@ -14,49 +14,20 @@ include "kernal_jump_table.asm"
 include "osca_hardware_equates.asm"
 include "system_equates.asm"
 
-
 	org $5000
 
-;--------- Test FLOS version ---------------------------------------------------------------------
-
-	push hl
-	call kjt_get_version		; check running under FLOS v541+ 
-	ld de,$547
-	xor a
-	sbc hl,de
-	jr nc,flos_ok
-	ld hl,old_flos_txt
-	call kjt_print_string
-	pop hl
-	xor a
-	ret
-
-old_flos_txt
-
-	db "Program requires FLOS v547+",11,11,0
+required_flos	equ $547
+include 		"test_flos_version.asm"
 
 	
 ;-------- Parse command line arguments ---------------------------------------------------------
 	
-flos_ok	pop hl
 
-	ld de,$5000		; if being run from G command, HL which is normally
-	xor a			; the argument string will be $5000
-	sbc hl,de
-	jr nz,argok
-	ld hl,test_fn
-	ld de,0
-	
-argok	add hl,de
-fnd_para	ld a,(hl)			; examine argument text, if encounter 0: give up
+	ld a,(hl)			; examine argument text, if encounter 0: show use
 	or a			
 	jp z,show_use
-	cp " "			; ignore leading spaces...
-	jr nz,fn_ok
-skp_spc	inc hl
-	jr fnd_para
 
-fn_ok	push hl			; copy args to working filename string
+	push hl			; copy args to working filename string
 	ld de,filename
 	ld b,16
 fnclp	ld a,(hl)
