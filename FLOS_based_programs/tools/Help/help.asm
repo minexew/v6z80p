@@ -107,7 +107,7 @@ fncdone	ex de,hl
 
 	ld hl,cmds_txt		; go to /cmds subdir if possible
 	call kjt_change_dir
-	jr nz,doc_dir_nf
+	jr nz,nodocf
 	
 	ld hl,filename		; does filename exist?
 	call kjt_open_file
