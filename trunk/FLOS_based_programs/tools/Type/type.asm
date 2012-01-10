@@ -27,6 +27,10 @@ include 		"test_flos_version.asm"
 ;------------------------------------------------------------------------------------------------
 
 
+window_rows equ 25
+window_cols equ 40
+
+
 fnd_para	ld a,(hl)			; examine argument text, if encounter 0: give up
 	or a			
 	jr nz,fn_ok
