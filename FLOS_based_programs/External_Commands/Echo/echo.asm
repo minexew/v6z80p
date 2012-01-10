@@ -2,13 +2,6 @@
 ; ECHO.EXE - Shows a line of text v1.02
 ; Usage: echo.exe Text_to_display
 
-;---Standard header for OSCA and FLOS ----------------------------------------------------------
-
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
-
-
 ;======================================================================================
 ; Standard equates for OSCA and FLOS
 ;======================================================================================
