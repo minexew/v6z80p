@@ -1,5 +1,5 @@
 ;-------------------------------
-;Kernal jump table for FLOS v593
+;Kernal jump table for FLOS v595
 ;-------------------------------
 
 os_start equ $1000
@@ -96,3 +96,5 @@ kjt_get_sector_read_addr	equ os_start + $103	 ; added in v588
 kjt_get_key_buffer		equ os_start + $106  ; added in v591
 kjt_get_colours		equ os_start + $109	 ; added in v593
 kjt_set_colours		equ os_start + $10c	 ; added in v593
+kjt_patch_font		equ os_start + $10f  ; added in v595
+
