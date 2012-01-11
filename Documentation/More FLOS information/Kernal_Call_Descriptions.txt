@@ -1,4 +1,4 @@
-List of FLOS kernal calls - last updated 09-01-2012 for FLOS v594
+List of FLOS kernal calls - last updated 10-01-2012 for FLOS v595
 
 File System Routines:
 
@@ -78,6 +78,7 @@ kjt_get_charmap_addr_xy - Returns the charmap address of coordinates x,y
 kjt_wait_vrt - Wait for vertical retrace (IE: last scanline of display)
 kjt_get_colours - Returns RGB values of the FLOS border, paper and cursor and the location of the pen colour list
 kjt_set_colours - Sets FLOS border, paper and cursor colours and writes to the pen colour list
+kjt_patch_font - Allows easy (and individual) user defined characters in the FLOS font.
 
 Kernal Memory Management Routines:
 
@@ -1448,6 +1449,20 @@ Input Registers  : none
 Output Registers : none
 
 Trashes: A
+
+
+--------------------------------------------------------------------------------
+
+kjt_patch_font
+ 
+Action: Change an individual character in the FLOS font.
+
+Input registers:
+
+A = char number (must be 32-159)
+HL = address of new character pattern (8 bytes)
+
+Output registers:  None
 
 
 --------------------------------------------------------------------------------
