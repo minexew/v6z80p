@@ -381,7 +381,13 @@ ds_end	push de
 
 notrutxt	ld hl,(last_full)			;position of trailing "/"
 	inc hl
-nxtdlev	ld (hl),0				;replace with zero (stop print)
+nxtdlev	ld a,b
+	cp 1
+	jr nz,notlast
+	dec hl
+	ld (hl),0
+	jr dnbacklp
+notlast	ld (hl),0				;replace with zero (stop print)
 	dec hl
 dnbacklp	dec hl
 	ld a,(hl)
