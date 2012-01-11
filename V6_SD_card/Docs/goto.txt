@@ -1,0 +1,12 @@
+
+GOTO.EXE - Causes a jump within
+scripts (IE: sets the GOTO envar)
+
+Use: GOTO label
+
+Where ‘label’ is a 4 character ASCII
+label within a script.
+
+This command is essentially the same
+as: "SET GOTO label"
+

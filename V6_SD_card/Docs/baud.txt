@@ -1,0 +1,8 @@
+
+BAUD.EXE - Sets the BAUD rate used in FLOS
+
+Use: BAUD speed
+
+'speed' is 115200 or 57600
+(default Baud rate is 115200)
+

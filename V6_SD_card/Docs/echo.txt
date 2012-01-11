@@ -1,0 +1,5 @@
+
+ECHO.EXE - Displays a line of text.
+
+Use: ECHO text to display
+

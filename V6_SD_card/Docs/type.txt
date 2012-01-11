@@ -1,0 +1,7 @@
+
+TYPE - Displays simple text files.
+
+Use: TYPE filename.txt
+
+
+

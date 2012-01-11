@@ -1,0 +1,8 @@
+
+MOUSE.EXE - Activate the mouse driver
+
+Use: MOUSE (no parameters)
+
+Notes: If a mouse is detected it calls
+the kernal routine "kjt_enable_mouse".
+

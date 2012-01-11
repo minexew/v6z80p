@@ -1,0 +1,37 @@
+
+SET.EXE - Sets / deletes / adjusts
+environment variables
+
+Use: SET abcd (=) value
+
+Where: abcd is the 4 character
+ascii name for the envar.
+
+= can be omitted if desired.
+
+value is either:
+
+ A 32 bit max hex value string 
+ EG: 1234AAFF
+
+ A 4 character max string in quotes
+ EG: "BEEP"
+
+ Another envar name in round brackets.
+ EG: (NAME)
+
+ + To increment the value of the envar
+
+ - To decrement the value of the envar
+
+ # To delete the envar if it exists.
+
+If no arguments are given, the current
+environment variables are listed.
+
+Examples: SET HATS = "CATS"
+          SET BEAN = 12345678
+          SET BEAN -
+          SET HATS #
+          SET BLAH = (HATS)
+

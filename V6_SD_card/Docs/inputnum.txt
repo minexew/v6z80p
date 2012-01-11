@@ -1,0 +1,7 @@
+
+INPUTNUM.EXE - Get user input (hex
+number) and apply to an environment
+variable.
+	
+Use: INPUTNUM envar
+

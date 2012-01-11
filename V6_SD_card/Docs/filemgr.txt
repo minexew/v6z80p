@@ -1,0 +1,30 @@
+
+FILEMGR.EXE - A GUI filemanager
+
+Use: FILEMGR (no args)
+
+Keys:
+-----
+
+TAB - selects between upper panels.
+Left panel is for the source directory
+right panel is for the destination
+directory. 
+
+SPACE - Highlight files for an
+operation on the source side (only).
+
+CTRL - activate the lower buttons and
+then press LEFT, RIGHT or TAB to cycle
+through them, ENTER to choose an option.
+
+ESC - quit any requester (or press
+ENTER on CANCEL Button provided)
+
+Notes:
+ 
+When you select "make a new directory"
+(or RX) the panel that is the target
+for the operation is that which was
+active before the buttons were selected.
+

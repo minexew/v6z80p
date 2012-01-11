@@ -1,4 +1,6 @@
 
+ASM.EXE - Z80 assembler
+
 Use: ASM source.asm %INCDIR1 %INCDIR2 
 
 Produces a binary file (same name as
