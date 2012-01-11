@@ -1,0 +1,7 @@
+
+STEREO.EXE - Sets the audio mixer to
+the default split mode: 2 channels
+left, 2 channels right.
+
+Use: STEREO (no args)
+

@@ -1,0 +1,7 @@
+
+MONO.EXE - Sets the audio mixer to
+mono mode: all 4 channels sent to
+both left and right.
+
+Use: MONO (no args)
+

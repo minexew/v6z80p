@@ -1,0 +1,13 @@
+
+SHOWBMP.EXE - Displays .bmp format
+image files.
+
+Use: SHOWBMP filename
+
+Limitations:
+
+The picture must be Windows format
+.bmp, 256 colour mode, uncompressed.
+Width must be multiple of x pixels.
+Max dimensions 368x256.
+
