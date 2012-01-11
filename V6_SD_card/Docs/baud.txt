@@ -1,5 +1,5 @@
 
-BAUD.EXE - Sets the BAUD rate used in FLOS
+BAUD.EXE - Sets the RS232 BAUD rate
 
 Use: BAUD speed
 

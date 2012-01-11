@@ -16,7 +16,8 @@ operation on the source side (only).
 
 CTRL - activate the lower buttons and
 then press LEFT, RIGHT or TAB to cycle
-through them, ENTER to choose an option.
+through them, ENTER to choose an
+option.
 
 ESC - quit any requester (or press
 ENTER on CANCEL Button provided)
@@ -26,5 +27,6 @@ Notes:
 When you select "make a new directory"
 (or RX) the panel that is the target
 for the operation is that which was
-active before the buttons were selected.
+active before the buttons were
+selected.
 

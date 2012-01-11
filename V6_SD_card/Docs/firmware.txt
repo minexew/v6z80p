@@ -1,10 +1,12 @@
 
-FIRMWARE.EXE - Writes to EEPROM "wholesale"
+FIRMWARE.EXE - Writes to EEPROM
+"wholesale"
 
 Use: FIRMWARE file.bin [start_block]
 
-If the start_block is not specified it'll
-start writing from EEPROM block 0.
+If the start_block is not specified 
+it'll start writing from EEPROM block
+0.
 
 USE WITH CARE!
 ---------------

@@ -1,5 +1,5 @@
 
-IF.EXE - Main script control function.
+IF.EXE - Main script control function
 
 Use: IF xxxx cond yyyy GOTO zzzz
 
