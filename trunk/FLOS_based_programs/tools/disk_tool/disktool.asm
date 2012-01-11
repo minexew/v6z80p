@@ -1,9 +1,11 @@
 ; ****************************************************************************
-; * DISK TOOL (PARTION/FORMATTER) V0.06 by P.Ruston '08 - '11 	       *
+; * DISK TOOL (PARTION/FORMATTER) V0.07 by P.Ruston '08 - '11 	       *
 ; ****************************************************************************
 
-; Changes: v0.06 - fixed for FLOS v593 (kjt_get_input_string limiter)
-
+; Changes: v0.07 - restarts FLOS on exit
+;
+; v0.06 - fixed for FLOS v593 (kjt_get_input_string limiter)
+;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
 include "kernal_jump_table.asm"
@@ -232,8 +234,7 @@ waitkey	call kjt_wait_key_press
 quit	call new_line
 	call new_line
 	xor a
-	call kjt_mount_volumes
-	xor a
+	ld a,$ff				; restart FLOS so remount drives / COMMANDS assign is set up
 	ret
 	
 ;---------------------------------------------------------------------------------------------------
@@ -1021,7 +1022,7 @@ mbr_data		incbin "mbr_data.bin"
 
 app_banner
 
-	db "  DISK TOOL V0.06 by Phil Ruston 2011",11
+	db "  DISK TOOL V0.07 by Phil Ruston 2011",11
 	db "  ===================================",11,11,0
 	
 
@@ -1111,7 +1112,7 @@ menu_txt		db "Options:",11
 		db "2  : Delete last partition",11
 		db "3  : Format a partition",11
 		db "4  : Remount devices",11
-		db "ESC: Quit",0
+		db "ESC: Quit & Restart FLOS",0
 		
 
 
