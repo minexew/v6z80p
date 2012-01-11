@@ -1,0 +1,17 @@
+
+FIRMWARE.EXE - Writes to EEPROM "wholesale"
+
+Use: FIRMWARE file.bin [start_block]
+
+If the start_block is not specified it'll
+start writing from EEPROM block 0.
+
+USE WITH CARE!
+---------------
+
+This app write data from a file to the
+EEPROM with 64KB granularity. It should
+be compatible will all versions of FLOS.
+But if possible, use EEPROM.EXE in
+preference as its safer and more elegant.
+

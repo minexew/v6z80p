@@ -1,0 +1,6 @@
+
+VGA50.EXE - Sets the VGA mode to 50Hz
+(a non-standard mode)
+
+Use: VGA50 (no args)
+

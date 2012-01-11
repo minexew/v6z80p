@@ -1,0 +1,11 @@
+
+LCD.EXE - Line Cop Disassemble
+
+Use: LCD linecop_address
+
+"linecop_address" is in the range
+0-FFFE and refers to the LineCop
+accessible area of system RAM
+from $70000 onwards. (The least
+significant bit is ignored)
+

@@ -1,0 +1,5 @@
+
+BOOT.EXE - Reconfigure the FPGA
+
+Use: BOOT slot
+
