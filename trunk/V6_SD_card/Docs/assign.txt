@@ -1,0 +1,11 @@
+
+ASSIGN.EXE  - Assigns a directory to
+an environment variable
+
+Use: ASSIGN xyz [path]
+
+'xyz' is the name of the path "proxy"
+which will have a "%" prefix. If the
+path is omitted then the current 
+folder is assigned.
+

@@ -1,0 +1,14 @@
+
+FILEINFO.EXE - Retuns file length /
+load address, sets the Envar "FSIZ"
+
+Use: FILEINFO (#) filename
+
+If # is included, the operation is
+carried out silently (any FLOS
+error message is also muted to $80)
+
+A load and bank address is only
+shown if the file is a program with
+the location header.
+

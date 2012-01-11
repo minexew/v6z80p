@@ -1,0 +1,29 @@
+
+CHFNT.EXE - Changes the OS font
+
+Use: CHFNT fontfile
+
+Chfnt looks in the current directory
+and then in the root/fonts directory
+for the font file.
+
+FONT FILE DESCRIPTION:
+
+Fonts are 768 byte single-bitplane
+bitmap files, dimensions:
+96 bytes x 8 lines, covering the
+definitions for ASCII characters
+32-127. The chfnt command converts
+the data into the format required
+by the FLOS character plotting
+system and the data is stored in
+video RAM.
+
+(There is space internally for 32
+additional user-defined characters
+(printable via non-standard ASCII
+codes 128-159), though currently
+the font must be patched using
+the kernal call KJT_PATCH_FONT
+if these characters are to be used.)
+

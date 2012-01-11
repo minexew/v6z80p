@@ -1,0 +1,27 @@
+
+KEYMAP.EXE - Change the keymap
+
+Use: KEYMAP keymap_file
+
+Keymap looks in the current directory
+and then in the root/keymaps directory
+for the keymap file. The currently
+available keymap list is
+
+UK.bin - UK (default)
+US.bin - USA
+DE.bin - Germany
+IT.bin - Italy
+PT.bin - Portugal
+
+KEYMAP FILE DESCRIPTION:
+
+Keymap files are "PS/2 set 2"
+scancode-to-ASCII translation tables.
+They can contain two or three "banks"
+of the translation table: one for
+unshifted keys, one for shifted keys
+and optionally one for Alt-modified
+keys. Each bank is 98 bytes long,
+covering scancodes $00-$61
+

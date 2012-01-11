@@ -1,0 +1,19 @@
+
+IF.EXE - Main script control function.
+
+Use: IF xxxx cond yyyy GOTO zzzz
+
+Where xxxx is an envar
+
+cond is "=" or "<>" for maths/strings
+or "<" or ">" for maths only. 
+
+yyyy = an immediate hex value, the
+value of another Envar in brackets
+or a 4-char string in quotes "yyyy"
+
+zzzz = a 4 char label
+
+EG: IF ERR > 0 GOTO FAIL
+    IF STR = "THIS" GOTO THAT	
+

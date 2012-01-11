@@ -1,0 +1,7 @@
+
+INPUTSTR.EXE - Get user input (4 chars
+max string) and apply to an environment
+variable.
+	
+Use: INPUTSTR envar
+

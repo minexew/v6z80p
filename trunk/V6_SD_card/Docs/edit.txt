@@ -1,4 +1,6 @@
 
+EDIT.EXE - Simple text editor
+
 Use: EDIT [filename] [-G hex_number]
 
 Parameters are optional. If no
