@@ -1,5 +1,5 @@
 
-; ECHO.EXE - Shows a line of text v1.02
+; ECHO.EXE - Shows a line of text v1.03
 ; Usage: echo.exe Text_to_display
 
 ;======================================================================================
@@ -26,14 +26,14 @@ include 		"test_flos_version.asm"
 ; Actual program starts here..
 ;------------------------------------------------------------------------------------------------
 
-					;home cursor
-	call kjt_get_cursor_position
+					
+	call kjt_get_cursor_position		;home cursor
 	ld b,0
 shchlp	call kjt_set_cursor_position
 	jr nz,ldone
 	ld a,(hl)
-	or a
-	jr z,ldone
+	cp 32
+	jr c,ldone
 	call kjt_plot_char
 	inc hl
 	inc b
