@@ -36,6 +36,10 @@ rep_char_txt	db "x",0
 
 err_txt		db "ERR",0
 
+key_txt		db "%KEY",0
+
+ex_path_txt	db "%EX0",0
+
 formatting_txt	db 11,11,"Formatting.. ",0
 default_label	db "FLOS_DISK",0
 
@@ -71,7 +75,7 @@ dictionary	db 0,"DEBUG:"		;01
 		db 0,"MISC:"		;05
 		db 0,"-----"		;06
 		db 0,"Filename"		;07
-		db 0,""			;08
+		db 0,"MBR"		;08
 		db 0,""			;09
 		db 0,"Address"		;0a
 		db 0,""			;0b
@@ -323,60 +327,58 @@ packed_cmd_list	db $97,0
 
 packed_msg_list	db 0			;First message marker
 		
-		db $60,$61,0		;$01 Volume Full (FS error code 01)
-		db $21,$62,$63,0		;$02 File Not Found (FS error code 02)
-		db $1d,$61,0		;$03 Dir Full (FS error code 03)
-		db $62,$8c,$1d,0		;$04 Not A Dir (FS error code 04) 
-		db $1d,$8d,$62,$8e,0	;$05 Dir Is Not Empty (FS error code 05)
-		db $62,$8c,$21,0		;$06 Not A File (FS error code 06)
-		db $21,$64,$8d,$65,0	;$07 File Length Is Zero (FS error code 07)
-		db $0a,$66,$67,$68,0	;$08 Address out of range (FS error code 08)
-		db $07,$69,$6a,0		;$09 Filename Already Exists (FS error code 09)
-		db $69,$6b,$6c,0		;$0a Already at root (FS error code 0a)
+		db $60,$61,0		;$01 Volume Full
+		db $21,$62,$63,0		;$02 File Not Found
+		db $1d,$61,0		;$03 Dir Full
+		db $62,$8c,$1d,0		;$04 Not A Dir 
+		db $1d,$8d,$62,$8e,0	;$05 Dir Is Not Empty
+		db $62,$8c,$21,0		;$06 Not A File
+		db $21,$64,$8d,$65,0	;$07 File Length Is Zero
+		
+		db $0a,$66,$67,$68,0	;$08 Address out of Range
+		db $07,$69,$6a,0		;$09 Filename Already Exists
+		db $69,$6b,$6c,0		;$0a Already at root
+		db $72,$73,0		;$0b Unknown command
+		db $87,$75,0		;$0c Invalid Hex
+		db $76,$07,0		;$0d No filename
+		db $87,$60,0		;$0e Invalid Volume
+		db $79,$74,0		;$0f Checksum bad
 
-		db $72,$73,0		;$0b Unknown command (OS error code 01)
-		db $87,$75,0		;$0c Invalid Hex (OS error code 02)
-		db $76,$07,0		;$0d No filename (OS error code 03)
+bytes_loaded_msg	db $9a,$7a,0		;$10 [Space] Bytes Loaded
+		db $7b,$7c,0		;$11 Comms error
+		db $74,$7d,0		;$12 Bad arguments
+format_err_msg	db $62,$7f,0		;$13 not FAT16
+		db $80,$81,$82,0		;$14 serial time out
+		db $07,$83,$84,0		;$15 filename too long 
+		db $76,$26,$0a,0		;$16 no start address
+		db $76,$21,$64,0		;$17 no file length
 
-		db $87,$60,0		;$0e Invalid Volume (OS error code 04)
-		db $79,$74,0		;$0f Checksum bad (OS error code 05)
-bytes_loaded_msg	db $9a,$7a,0		;$10 [Space] Bytes Loaded (OS error code 06, but no longer used as error return)
-		db $7b,$7c,0		;$11 Comms error (OS error code 07)
-		db $74,$7d,0		;$12 Bad arguments (OS error code 08)
+		db $2d,$77,0		;$18 save aborted
+		db $2d,$7c,$6b,$85,0	;$19 save error at destination
+		db $0c,$90,$86,0		;$1a bank ** selected
+		db $6f,$71,$70,$6e,0	;$1b Data after EOF request
+		db $76,$8f,$0a,0		;$1c no end address
+		db $76,$85,$0a,0		;$1d no destination address
+		db $74,$68,0		;$1e bad range
+		db $88,$7d,0		;$1f missing arguments
 
-format_err_msg	db $62,$7f,0		;$13 not FAT16 (OS error code 09)
-
-		db $80,$81,$82,0		;$14 serial time out (OS error code 0a)
-		db $07,$83,$84,0		;$15 filename too long (OS error code 0b)
-		db $76,$26,$0a,0		;$16 no start address (OS error code 0c)
-		db $76,$21,$64,0		;$17 no file length (OS error code 0d)
-		db $2d,$77,0		;$18 save aborted (OS error code 0e)
-		db $2d,$7c,$6b,$85,0	;$19 save error at destination (OS error code 0f)
-		db $0c,$90,$86,0		;$1a bank ** selected (OS error code 10)
-		db $87,$0c,0		;$1b invalid bank (OS error code 11)
-		db $76,$8f,$0a,0		;$1c no end address (OS error code 12)
-		db $76,$85,$0a,0		;$1d no destination address (OS error code 13)
-
-		db $74,$68,0		;$1e bad range (OS error code 14)
-		db $88,$7d,0		;$1f missing arguments (OS error code 15)
-ok_msg		db $89,0			;$20 ok (OS error code 16)
-
-		db $87,$60,0		;$21 Invalid Volume
+ok_msg		db $89,0			;$20 OK
+		db $87,$0c,0		;$21 invalid bank
 		db $1a,$62,$78,0		;$22 Device not present
-
 		db $1d,$62,$63,0		;$23 Dir not found
-		db $77,0			;$24 aborted (OS error code 17)
+		db $87,$67,$1d,0		;$24 End of Dir
+		db $07,$6d,0		;$25 Filename mismatch
+		db $8a,$50,$8b,0		;$26 OS RAM protected)
+		db $92,0			;$27 ? (NOT USED)
 
-		db $07,$6d,0		;$25 Filename mismatch (FS error code 0c)
-		db $8a,$50,$8b,0		;$26 OS RAM protected (OS error code 18)
-		db $6f,$71,$70,$6e,0	;$27 Data after EOF request (FS error code 0d)
 no_vols_msg	db $76,$36,$0		;$28 No Volumes
 none_found_msg	db $97,$a6,$63,$0		;$29 None Found
+		db $2c,$77,0		;$2a Receive Aborted - Serial receive abort
+		db $a9,$62,$63,0		;$2b Envar not found
+		db $a9,$21,$61,0		;$2c Envar file full
+		db $77,0			;$2d Aborted
+		db $76,$08,0		;$2e No MBR
 		
-		db $2c,$77,0		;$2a "Receive Aborted" - Serial receive abort
-		db $a9,$62,$63,0		;$2b "Envar not found"
-		db $a9,$21,$61,0		;$2c "Envar file full"
-			
 		db $ff			;END MARKER
 		
 
@@ -415,8 +417,6 @@ shifted_keymap	db                     $7e	;$0e-$0e	;shifted
 
 function_key_list	db $05,$06,$04,$0c,$03,$0b,$83,$0a,$01	;scancodes for F1->F9
 		
-keymaps_txt	db "KEYMAPS",0
-
 fkey_filename	db "Fx.CMD",0
 	
 	
@@ -538,6 +538,9 @@ os_quiet_mode	db 0
 ;----------------------------------------------------------------------------------
 
 os_dir_block_cache  dw 0
+os_vol_cache	db 0
+
+envar_data	db 0,0,0,0
 
 bank_pre_cmd	db 0
 
