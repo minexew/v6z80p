@@ -12,6 +12,10 @@ v5.96 - 11/1/12
 		   needs to be set with BOOT_RUN.SCR if required (otherwise only
 		   the current directory is scanned) EG: "ASSIGN KEY KEYMAPS"
 
+	- Changed: Error codes from kernal calls should now match message list codes.
+
+
+
 
 Previous changes:
 -----------------
