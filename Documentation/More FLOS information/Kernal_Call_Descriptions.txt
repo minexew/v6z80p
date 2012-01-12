@@ -1,4 +1,4 @@
-List of FLOS kernal calls - last updated 10-01-2012 for FLOS v595
+List of FLOS kernal calls - last updated 12-01-2012 for FLOS v596
 
 File System Routines:
 
@@ -152,27 +152,24 @@ Most of the file system kernal calls return one of these standard error codes:
   If the zero flag is set, the operation was a success.
   If the zero flag is not set, there was an error. A = error code:
 
-    $00 - Hardware error: B contains the device's H/W error code (If B = 0 it timed out).
-    $01 - Disk full
-    $02 - File not found
-    $03 - (Root) dir table is full
-    $04 - Directory requested is actually a file
-    $05 - Cant delete dir, it is not empty
-    $06 - Not a file
-    $07 - File length is zero
-    $08 - File too big (IE: Memory address out of range)
-    $09 - Filename already exists
-    $0a - Already at root directory
-    $0e - Invalid filename
-    $13 - Unknown/incorrect disk format
-    $1b - Requested bytes beyond EOF
-    $1e - Bad range (sector out of range)
-    $21 - Invalid disk 
-    $22 - Device not present        
-    $23 - Directory not found
-    $24 - End of directory list
-    $25 - Device does not use MBR
-    $26 - Cant find volume label
+ $01 - disk full
+ $02 - file not found 
+ $03 - (root) dir table is full 
+ $04 - directory requested is actually a file
+ $05 - cant delete dir, it is not empty
+ $06 - not a file
+ $07 - file length is zero
+ $08 - address error (file too big for memory)
+ $09 - filename already exists
+ $0a - already at root directory
+ $0b - directory not found
+ $0e - invalid volume
+ $13 - unknown/incorrect disk format
+ $1b - requested bytes beyond end of file
+ $22 - device not present        
+ $23 - directory not found             
+ $24 - end of directory list
+ $2e - device does not use MBR
 
 
 --------------------------------------------------------------------------------
