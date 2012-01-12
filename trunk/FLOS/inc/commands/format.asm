@@ -108,7 +108,7 @@ form_err
 	
 	
 ab_form	call os_new_line
-	ld a,$24			;ERROR $24 - Format aborted	
+	ld a,$2d			;ERROR $2d - aborted	
 	or a
 	ret
 	

@@ -33,7 +33,8 @@ cd_nual	cp $2f
 	
 cd_nogor	cp "%"				; "%" char = go assigned dir
 	jr nz,cd_no_assign
-	call kjt_get_envar
+
+cd_envar	call kjt_get_envar
 	jr z,cd_evok
 	ld a,$23
 	or a

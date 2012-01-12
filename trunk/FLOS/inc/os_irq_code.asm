@@ -89,10 +89,10 @@ kbhok2	ld a,(key_mod_flags)	; also record qualifier status in buffer
 	inc a
 	and 15
 	ld (key_buf_wr_idx),a	; advance the buffer location
-	
+		
 kirq_done	ld a,%00000001
 	out (sys_clear_irq_flags),a	; clear keyboard interrupt flag
-	
+
 	pop bc
 	pop hl
 	pop af
