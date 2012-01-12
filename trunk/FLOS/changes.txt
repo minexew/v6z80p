@@ -2,6 +2,35 @@
 FLOS version info:
 ------------------
 
+v5.96 - 11/1/12
+
+	- Changed: The path to run executables is now based the environment variables
+		   "%EX0" to "%EX9". "%EX0" is set by default to "VOL0:COMMANDS".
+
+	- Changed: The path to Function key commands is based on the environment
+		   variable "%KEY" - this is NOT automatically set by FLOS and
+		   needs to be set with BOOT_RUN.SCR if required (otherwise only
+		   the current directory is scanned) EG: "ASSIGN KEY KEYMAPS"
+
+
+Previous changes:
+-----------------
+
+
+v5.95 - 10/1/12 (unreleased)
+
+	- Fixed: Spawn-program-on-exit feature (v594 messed up HL).
+
+        - Fixed: Set commander feature - Commander prog now always runs even if
+                 FLOS completely restarts. Hold CTRL to abort and cancel commander
+                 upon reboot.
+
+	- Added: KJT_FONT_PATCH - allows easy user-defined chars at CHR 32-159
+
+
+
+
+
 v5.94 - 9/1/12
 
 	- FAT16 code updated (v118) - Loading files now 2x-3x faster
@@ -63,8 +92,6 @@ v5.94 - 9/1/12
             
             
 	
-Previous changes:
------------------
 
 
 5.93 - 02/01/12:
