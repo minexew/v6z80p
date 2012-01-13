@@ -1,0 +1,9 @@
+
+MODPLAY - Plays Protracker format tunes.
+
+Use: MODPLAY filename
+
+Notes:
+
+Total samples in module must be < 128KB
+
