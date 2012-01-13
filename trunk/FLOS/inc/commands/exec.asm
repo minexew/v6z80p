@@ -1,8 +1,9 @@
 ;-----------------------------------------------------------------------
-;"exec" - execute script V6.02
+;"exec" - execute script V6.03
 ;
 ;Changes:
 ;
+;6.03 - Set load length = 24bit (optimized)
 ;6.02 - Support for loop (via GOTO envar and [xxxx] labels)
 ;6.01 - abort with CRTL + C
 ;
@@ -69,9 +70,9 @@ scrp_flp	ld (hl),a
 	ret nz
 	call fs_update_dir_block		;return to dir selected prior to script
 	
-	ld ix,0
-	ld iy,OS_window_cols		;only load enough chars for one line 
-	call os_set_load_length
+	xor a
+	ld hl,OS_window_cols		;only load enough chars for one line 
+	call set_loadlength24
 	ld iy,(script_file_offset)		;index from start of file
 	call os_set_file_pointer
 		

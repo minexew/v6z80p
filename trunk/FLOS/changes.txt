@@ -1,6 +1,21 @@
 
 FLOS version info:
 ------------------
+v5.97 - 13/1/12
+
+
+	- Added:  When a program is run: A = volume, DE = dir block it loaded from.
+		  This allows programs to retrieve external files from the same dir
+		  as they loaded from (important now that there is more than one
+		  "executables" path.
+	          (Note: If the program was started via G or RX !, A/DE are the current
+		  vol+dir)
+
+
+Previous changes:
+-----------------
+
+
 
 v5.96 - 11/1/12
 
@@ -17,8 +32,6 @@ v5.96 - 11/1/12
 
 
 
-Previous changes:
------------------
 
 
 v5.95 - 10/1/12 (unreleased)

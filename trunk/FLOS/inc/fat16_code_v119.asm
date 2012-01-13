@@ -50,7 +50,6 @@
 ;                   $08 - file too big for memory
 ;		$09 - filename already exists
 ;		$0a - already at root directory
-;                   $0b - directory not found
 ;		$0e - invalid volume
 ;		$13 - unknown/incorrect disk format
 ;		$1b - requested bytes beyond EOF
