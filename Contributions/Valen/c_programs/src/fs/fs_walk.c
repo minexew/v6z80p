@@ -55,7 +55,7 @@ changelog
 
 
 
-#define OS_VERSION_REQ  0x590           // OS version req. to run this program
+#define OS_VERSION_REQ  0x597           // OS version req. to run this program
 #define FLOS_START_ADDR 0x1000
 
 
@@ -87,6 +87,37 @@ byte bufCatalog[DIRBUF_LEN];        // main buffer
 
 word numStrings;        // 
 
+FLOS_PROGRAM_PARAMS* prog_params;
+FLOS_VOLUME_INFO*   volume_info;
+WORD                original_cluster;
+void Goto_SourceDirAndVolume(void)
+{
+    FLOS_PrintStringLFCR("Program file volume and cluster: ");
+    PrintWORD(prog_params->volume, 16); FLOS_PrintString(" ");
+    PrintWORD(prog_params->dir_cluster, 16); FLOS_PrintStringLFCR("");
+
+    if(!FLOS_ChangeVolume(prog_params->volume)) {
+        FLOS_PrintStringLFCR("FLOS_ChangeVolume FAILED!");
+        FLOS_ExitToFLOS();
+    }
+    FLOS_SetDirCluster(prog_params->dir_cluster);
+}
+
+void Restore_CurrentDirAndVolume(void)
+{
+    FLOS_PrintStringLFCR("Current volume and cluster: ");
+    //PrintWORD((WORD)volume_info->mount_list,        16); FLOS_PrintStringLFCR("");
+    //PrintWORD(volume_info->number_volumes_mounted,  16); FLOS_PrintStringLFCR("");
+    PrintWORD(volume_info->current_volume,  16); FLOS_PrintString(" ");
+    PrintWORD(original_cluster,             16); FLOS_PrintStringLFCR("");
+
+    if(!FLOS_ChangeVolume(volume_info->current_volume)) {
+        FLOS_PrintStringLFCR("FLOS_ChangeVolume FAILED!");
+        FLOS_ExitToFLOS();
+    }
+    FLOS_SetDirCluster(volume_info->current_volume);
+}
+
 int main (void)
 {
 
@@ -99,6 +130,15 @@ int main (void)
         FLOS_PrintStringLFCR("+ req. to run this program");
         return NO_REBOOT;
     }
+
+    prog_params = FLOS_GetProgramParams();
+    volume_info = FLOS_GetVolumeInfo();
+    original_cluster = FLOS_GetDirCluster();
+
+
+    Goto_SourceDirAndVolume();
+    Restore_CurrentDirAndVolume();
+    return NO_REBOOT;
 
     FLOS_StoreDirPosition();
     if(!load_config_file()) {
@@ -142,6 +182,7 @@ int main (void)
     FLOS_SetCommander("");
     return NO_REBOOT;
 }
+
 
 
 void fill_ListView_by_entries_from_current_dir(void)

@@ -51,7 +51,7 @@ BOOL Display_LoadChunkyFont(void);
 void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress);
 void Display_SetPalette(void);
 //void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddress, BYTE fontColor);
-
+void Display_SetBytes(void);
 
 #define PF_A       0
 #define PF_B       1
@@ -195,13 +195,15 @@ BOOL Display_InitFont(void)
 
     // make 15 fonts, with color index 1 to 15
     destVideoAddress = 0;
-//    for(colorIndex=1; colorIndex<16; colorIndex++) {
-//        Display_CreateChunkyFont(colorIndex, destVideoAddress);
-//        destVideoAddress += FONT_8x8_SIZE;
-//    }
+    for(colorIndex=1; colorIndex<2; colorIndex++) {
+        Display_CreateChunkyFont(colorIndex, destVideoAddress);
+        destVideoAddress += FONT_8x8_SIZE;
+    }
 
-    if(!Display_LoadChunkyFont())
-        return FALSE;
+//    if(!Display_LoadChunkyFont())
+//        return FALSE;
+
+    Display_SetBytes();
 
     // Make 15 tiles, with color index 1 to 15 (will be used as background tiles)
     // Put in video memory right after fonts.
@@ -358,7 +360,7 @@ BOOL Display_LoadFont(void)
     FLOS_StoreDirPosition();
     FLOS_RootDir();
     FLOS_ChangeDir("FONTS");
-    if(!/*load_file_to_buffer*/FileOp_LoadFileToBuffer("PHILFONT.FNT", 0, fontBuffer, 0x300, 0))
+    if(!FileOp_LoadFileToBuffer("PHILFONT.FNT", 0, fontBuffer, 0x300, 0))
         return FALSE;
     FLOS_RestoreDirPosition();
 
@@ -391,6 +393,68 @@ void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddre
 
 }
 */
+
+void Display_SetBytes(void)
+{
+
+    BYTE* pFont = (BYTE*)VIDEO_BASE;
+//    BYTE bytePixel;
+//    WORD i;
+    BYTE video_page = 0, fontColor = 1;
+
+    PAGE_IN_VIDEO_RAM();
+    SET_VIDEO_PAGE(video_page);
+
+
+        while(video_page < 12) {
+            // modify pixel
+            *pFont = (*pFont + fontColor);
+            pFont++;
+            if(pFont >= (BYTE*)VIDEO_BASE + 0x2000) {
+                pFont = (BYTE*)VIDEO_BASE;
+                video_page++;
+                SET_VIDEO_PAGE(video_page);
+            }
+        }
+
+    PAGE_OUT_VIDEO_RAM();
+
+}
+
+void Display_CloneChunkyFont_WithBlitter(void)
+{
+}
+
+#define VIDEO_ADDR      unsigned short
+
+void DoBlit(void)
+{
+    VIDEO_ADDR addr_src = 0;
+    BYTE i;
+
+    for(i=0; i<15; i++) {
+        mm__blit_src_loc = addr_src << 3;
+        mm__blit_src_msb = addr_src >> 13;
+        mm__blit_src_mod = 0;
+
+        mm__blit_dst_loc = 0;
+        mm__blit_dst_msb = 0;
+        mm__blit_dst_mod = 0;
+
+        mm__blit_misc = BLITTER_MISC_ASCENDING_MODE;
+        mm__blit_height = 96 - 1;
+        mm__blit_width  = 8*8 - 1;
+
+        BEGINASM();
+        nop
+        nop
+        ENDASM();
+
+        while(mm__vreg_read & BLITTER_LINEDRAW_BUSY);
+
+        addr_src += (FONT_8x8_SIZE >> 3);
+    }
+}
 
 // 16 primary colors
 const WORD myPalette[] = {

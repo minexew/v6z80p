@@ -8,7 +8,7 @@
 
 #include <string.h>
 
-#include "video_mode.h"
+#include "base_lib/video_mode.h"
 
 // Setup display window size
 void VideoMode_SetupDisplayWindowSize(byte window_x_start,  byte window_x_stop,

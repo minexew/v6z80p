@@ -63,6 +63,21 @@ include "i__kernal_jump_table.asm"
         proxy__check_volume_format    ;start + $31
 
         proxy__change_volume    ;start + $34
+        PUSH_ALL_REGS
+; A = volume to select
+        GET_I_DATA a
+        call kjt_change_volume
+        ld e,0                  ; status = failed
+        jr nz,failed22
+        ld e,1                  ; status = ok
+failed22
+
+        ld ix, I_DATA
+                                     ; e = result code
+        SET_I_DATA e
+        POP_ALL_REGS
+        ret
+        
 
         proxy__check_disk_available    ;start + $37 ; no longer used
         PUSH_ALL_REGS
@@ -75,6 +90,16 @@ include "i__kernal_jump_table.asm"
 
 
         proxy__get_volume_info      ;start + $3a
+        PUSH_ALL_REGS
+        call kjt_get_volume_info    ; function don't return result code 
+        ld ix, I_DATA
+; HL = address of volume mount list
+; B = Number of volumes mounted
+; A = currently Selected volume
+        SET_I_DATA l, h, b, a
+        POP_ALL_REGS
+        ret
+        
         proxy__format_device               ;start + $3d
         proxy__make_dir             ;start + $40
         PUSH_ALL_REGS
@@ -532,8 +557,26 @@ failed20
 
         proxy__write_sysram_flat   ;   start + $e5 (added in v570)
         proxy__get_mouse_disp		  ;   start + $e8 (added in v571)
-        proxy__get_dir_cluster		  ;   start + $eb (added in v572)
+        
+        proxy__get_dir_cluster		  ;   start + $eb (added in v572)      
+       PUSH_ALL_REGS
+        call kjt_get_dir_cluster    ; function don't return result code 
+
+        ld ix, I_DATA
+; DE = cluster pointed at by current directory
+        SET_I_DATA e, d
+        POP_ALL_REGS
+        ret
+       
+        
         proxy__set_dir_cluster		  ;   start + $ee (added in v572)
+        PUSH_ALL_REGS
+; DE = desired cluster number to be used as current dir        
+        GET_I_DATA e, d
+        call kjt_set_dir_cluster      ; function don't return result code 
+        POP_ALL_REGS
+        ret
+        
         proxy__rename_file		  ;   start + $f1 (added in v572)
         proxy__set_envar		  ;   start + $f4 (added in v575)
         proxy__get_envar		  ;   start + $f7 (added in v572)

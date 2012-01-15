@@ -13,6 +13,9 @@
         ;
 
 init:
+	ld (_flos_prog_vol),a                 ;when programs start, A = volume.
+	ld (_flos_prog_dir),de                ;DE = dir cluster. store these values.
+	
         ; save ptr to command line args (hl)
         push hl
         ld de,#0x5000             ; if being run from G command, HL which is normally
@@ -87,7 +90,10 @@ flos_sp::
 
 _flos_cmdline::
          .ds 2
-
+_flos_prog_vol::
+	 .ds 1
+_flos_prog_dir::
+	 .ds 2
 
 
 _flos_spawn_cmd::
