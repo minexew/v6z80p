@@ -40,3 +40,11 @@ void DiagMessage(const char* pMsg, const char* pFilename)
     FLOS_PrintString(PS_LFCR);
     
 }
+
+void PrintWORD(WORD w, BYTE radix)
+{
+    BYTE buffer[30];
+
+    _uitoa(w, buffer, radix);
+    FLOS_PrintString(buffer);
+}

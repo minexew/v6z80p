@@ -110,6 +110,16 @@ typedef struct {
     word PosX, PosY; 
 } MouseStatus;
 
+typedef struct {
+    BYTE volume;                // Prog volume
+    WORD dir_cluster;           // Prog dir cluster
+} FLOS_PROGRAM_PARAMS;
+
+typedef struct {                    
+    BYTE* mount_list;                // address of volume mount list
+    BYTE  number_volumes_mounted;    // Number of volumes mounted
+    BYTE  current_volume;            // currently Selected volume
+} FLOS_VOLUME_INFO;
 
 // ----------------------------------------------------------------------
 V6Z80P_EXTERN byte FLOS_GetLastError(void); 
@@ -121,6 +131,10 @@ V6Z80P_EXTERN void FLOS_RootDir(void);
 V6Z80P_EXTERN BOOL FLOS_DeleteDir(const char* pDirName);
 V6Z80P_EXTERN void FLOS_StoreDirPosition(void);
 V6Z80P_EXTERN void FLOS_RestoreDirPosition(void);
+V6Z80P_EXTERN WORD FLOS_GetDirCluster(void);
+V6Z80P_EXTERN void FLOS_SetDirCluster(WORD cluster);
+V6Z80P_EXTERN FLOS_VOLUME_INFO* FLOS_GetVolumeInfo(void);
+V6Z80P_EXTERN BOOL FLOS_ChangeVolume(BYTE volume);
 
 V6Z80P_EXTERN dword FLOS_GetTotalSectors(void);
 V6Z80P_EXTERN BOOL FLOS_FindFile(FLOS_FILE* const pFile, const char* pFileName);
@@ -165,6 +179,7 @@ V6Z80P_EXTERN byte FLOS_ReadSysramFlat(const dword address);
 V6Z80P_EXTERN void FLOS_PrintStringLFCR(const char* string);
 
 V6Z80P_EXTERN char* FLOS_GetCmdLine(void);
+V6Z80P_EXTERN FLOS_PROGRAM_PARAMS* FLOS_GetProgramParams(void);
 V6Z80P_EXTERN BOOL FLOS_SetSpawnCmdLine(const char* line);
 
 V6Z80P_EXTERN void FLOS_ExitToFLOS(void);

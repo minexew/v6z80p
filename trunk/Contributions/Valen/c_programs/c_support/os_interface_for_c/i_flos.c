@@ -14,6 +14,10 @@
 
 
 extern char* flos_cmdline;
+extern unsigned char  flos_prog_vol;
+extern unsigned short flos_prog_dir;
+extern char* flos_cmdline;
+
 extern char  flos_spawn_cmd[SPAWN_CMD_LINE_BUFFER_LEN];
 
 
@@ -59,6 +63,14 @@ char* FLOS_GetCmdLine(void)
     return flos_cmdline;
 }
 
+// We copy extern vars flos_prog_vol and flos_prog_dir, to our struct.
+FLOS_PROGRAM_PARAMS* FLOS_GetProgramParams(void)
+{
+    static FLOS_PROGRAM_PARAMS params;          // (there is only one instance of FLOS_PROGRAM_PARAMS)
+    params.volume      = flos_prog_vol;
+    params.dir_cluster = flos_prog_dir;
+    return &params;
+}
 
 // Set spawn command line (which executed by FLOS at program exit)
 BOOL FLOS_SetSpawnCmdLine(const char* line)
