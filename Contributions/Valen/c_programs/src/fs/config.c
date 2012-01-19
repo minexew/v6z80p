@@ -121,12 +121,12 @@ BOOL load_config_file(void)
 {
     init_config_file_parser();
 
-    FLOS_RootDir();
+    /*FLOS_RootDir();
     if(!FLOS_ChangeDir(CONFIG_FILE_DIR))
     {
         FLOS_PrintStringLFCR("Failed to cahange dir to /" CONFIG_FILE_DIR);
         return FALSE;
-    }
+    }*/
 
     memset(config_file_buffer, 0, CONFIG_FILE_MAX_SIZE);
     if(!FileOp_LoadFileToBuffer("FS.CFG", 0, config_file_buffer, CONFIG_FILE_MAX_SIZE, 0))

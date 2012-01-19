@@ -19,6 +19,8 @@ changelog
 0.015
 - adapted to SDCC 3.0.6 (minor issue)
 - use FLOS_SetCommander()
+0.016
+- adapted to FLOS597
 
 -------------
 */
@@ -90,10 +92,11 @@ word numStrings;        //
 FLOS_PROGRAM_PARAMS* prog_params;
 FLOS_VOLUME_INFO*   volume_info;
 WORD                original_cluster;
-void Goto_SourceDirAndVolume(void)
+BYTE                original_volume;
+void DiskService_GotoSourceDirAndVolume(void)
 {
-    FLOS_PrintStringLFCR("Program file volume and cluster: ");
-    PrintWORD(prog_params->volume, 16); FLOS_PrintString(" ");
+    FLOS_PrintStringLFCR("Executable file volume and cluster: ");
+    PrintWORD(prog_params->volume,      16); FLOS_PrintString(" ");
     PrintWORD(prog_params->dir_cluster, 16); FLOS_PrintStringLFCR("");
 
     if(!FLOS_ChangeVolume(prog_params->volume)) {
@@ -103,19 +106,28 @@ void Goto_SourceDirAndVolume(void)
     FLOS_SetDirCluster(prog_params->dir_cluster);
 }
 
-void Restore_CurrentDirAndVolume(void)
+void DiskService_StoreCurrentDirAndVolume(void)
 {
-    FLOS_PrintStringLFCR("Current volume and cluster: ");
+    prog_params = FLOS_GetProgramParams();
+    volume_info = FLOS_GetVolumeInfo();
+
+    original_cluster = FLOS_GetDirCluster();
+    original_volume  = volume_info->current_volume;
+}
+
+void DiskService_RestoreCurrentDirAndVolume(void)
+{
+    FLOS_PrintStringLFCR("Original volume and cluster: ");
     //PrintWORD((WORD)volume_info->mount_list,        16); FLOS_PrintStringLFCR("");
     //PrintWORD(volume_info->number_volumes_mounted,  16); FLOS_PrintStringLFCR("");
-    PrintWORD(volume_info->current_volume,  16); FLOS_PrintString(" ");
+    PrintWORD(original_volume,              16); FLOS_PrintString(" ");
     PrintWORD(original_cluster,             16); FLOS_PrintStringLFCR("");
 
-    if(!FLOS_ChangeVolume(volume_info->current_volume)) {
+    if(!FLOS_ChangeVolume(original_volume)) {
         FLOS_PrintStringLFCR("FLOS_ChangeVolume FAILED!");
         FLOS_ExitToFLOS();
     }
-    FLOS_SetDirCluster(volume_info->current_volume);
+    FLOS_SetDirCluster(original_cluster);
 }
 
 int main (void)
@@ -131,14 +143,10 @@ int main (void)
         return NO_REBOOT;
     }
 
-    prog_params = FLOS_GetProgramParams();
-    volume_info = FLOS_GetVolumeInfo();
-    original_cluster = FLOS_GetDirCluster();
+    DiskService_StoreCurrentDirAndVolume();
 
 
-    Goto_SourceDirAndVolume();
-    Restore_CurrentDirAndVolume();
-    return NO_REBOOT;
+    DiskService_GotoSourceDirAndVolume();
 
     FLOS_StoreDirPosition();
     if(!load_config_file()) {
@@ -147,6 +155,8 @@ int main (void)
     }
     FLOS_RestoreDirPosition();
 
+    DiskService_RestoreCurrentDirAndVolume();
+    //return NO_REBOOT;
 
     MarkFrameTime(0x00f);
     if(!Display_InitVideoMode())
