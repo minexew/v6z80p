@@ -176,7 +176,7 @@ BOOL request_to_exit_and_execute_command_with_filename(const char* command, cons
 
 BOOL f1_pressed(void)
 {
-    GUI_MessageBox("FS-WALK v0.017", "Info", 1, 1, 20, 4+2);
+    GUI_MessageBox("FS-WALK v0.016", "Info", 1, 1, 20, 4+2);
     ListView_Update(&lview);
     return TRUE;
 }
@@ -188,7 +188,7 @@ BOOL f3_pressed(void)
 
 BOOL f4_pressed(void)
 {
-    return ExecuteCommandWithSelectedItem("TEXTEDIT ");
+    return ExecuteCommandWithSelectedItem("EDIT ");
 }
 
 BOOL ExecuteCommandWithSelectedItem(const char* strCommand)

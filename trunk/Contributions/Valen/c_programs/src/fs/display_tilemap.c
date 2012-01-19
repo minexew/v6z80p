@@ -76,14 +76,14 @@ BYTE fontBuffer[0x300];
 // public functions -------------------
 BOOL Display_InitVideoMode(void)
 {
-    // load font
-//    if(!Display_LoadFont()) {
-//        FLOS_PrintStringLFCR("Load font failed!");
-//        return FALSE;
-//    }
+    // load bitmap font
+    if(!Display_LoadFont()) {
+        FLOS_PrintStringLFCR("Load font failed!");
+        return FALSE;
+    }
     MarkFrameTime(2);
     // disable hardware data fetching from video memory, because we want write to video memory at highest speed
-    //DISABLE_NON_SPRITE_VIDEO;
+    DISABLE_NON_SPRITE_VIDEO;
 
     // load font and copy it to video memory
     if(!Display_InitFont()) {
@@ -195,7 +195,7 @@ BOOL Display_InitFont(void)
 
     // make 15 fonts, with color index 1 to 15
     destVideoAddress = 0;
-    for(colorIndex=1; colorIndex<2; colorIndex++) {
+    for(colorIndex=1; colorIndex<16; colorIndex++) {
         Display_CreateChunkyFont(colorIndex, destVideoAddress);
         destVideoAddress += FONT_8x8_SIZE;
     }
@@ -203,7 +203,7 @@ BOOL Display_InitFont(void)
 //    if(!Display_LoadChunkyFont())
 //        return FALSE;
 
-    Display_SetBytes();
+    //Display_SetBytes();
 
     // Make 15 tiles, with color index 1 to 15 (will be used as background tiles)
     // Put in video memory right after fonts.
