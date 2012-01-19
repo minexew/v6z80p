@@ -1,0 +1,10 @@
+
+COMP.EXE - Compares two files
+
+Use: COMP file1 file2
+
+Notes:
+
+Sets the "ERR" envar to $80 if the 
+files are not the same.
+
