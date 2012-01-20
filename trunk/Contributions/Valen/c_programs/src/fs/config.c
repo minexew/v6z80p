@@ -15,10 +15,11 @@
 
 
 #include <string.h>
+#include <stdio.h>
 
 #include "config.h"
 
-#define CONFIG_FILE_MAX_SIZE            1024
+#define CONFIG_FILE_MAX_SIZE            1024U
 #define CONFIG_FILE_DIR                 "COMMANDS"
 #define CONFIG_FILE_MAX_EXT_ACTIONS     64
 
@@ -119,6 +120,8 @@ void init_config_file_parser(void) {
 // public
 BOOL load_config_file(void)
 {
+    DWORD size;
+    BYTE  tmpStr[40];
     init_config_file_parser();
 
     /*FLOS_RootDir();
@@ -128,8 +131,15 @@ BOOL load_config_file(void)
         return FALSE;
     }*/
 
+    size = FileOp_GetFileSize("FS.CFG");
+    sprintf(tmpStr, "Config file size: %i", size); FLOS_PrintStringLFCR(tmpStr);
+    if(size == -1)
+        return FALSE;
+    if(size >= CONFIG_FILE_MAX_SIZE)
+        return FALSE;
+
     memset(config_file_buffer, 0, CONFIG_FILE_MAX_SIZE);
-    if(!FileOp_LoadFileToBuffer("FS.CFG", 0, config_file_buffer, CONFIG_FILE_MAX_SIZE, 0))
+    if(!FileOp_LoadFileToBuffer("FS.CFG", 0, config_file_buffer, size, 0))
         return FALSE;
 
 
