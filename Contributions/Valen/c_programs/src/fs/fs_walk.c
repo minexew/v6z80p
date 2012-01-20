@@ -21,6 +21,8 @@ changelog
 - use FLOS_SetCommander()
 0.016
 - adapted to FLOS597
+0.017
+- adapted to FLOS598
 
 -------------
 */

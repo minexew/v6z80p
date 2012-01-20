@@ -13,6 +13,18 @@
 #include "base_lib/file_operations.h"
 
 
+
+DWORD FileOp_GetFileSize(char *pFilename)
+{
+    FLOS_FILE myFile;
+
+    if(!FileOp_FLOS_FindFile(&myFile, pFilename)) {
+       return -1;
+    }
+
+    return myFile.size;
+}
+
 BOOL FileOp_LoadFileToBuffer(char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
 {
     FLOS_FILE myFile;
@@ -22,6 +34,7 @@ BOOL FileOp_LoadFileToBuffer(char *pFilename, dword file_offset, byte* buf, dwor
     if(!r) {
        return FALSE;
     }
+
 
     FLOS_SetLoadLength(len);
     FLOS_SetFilePointer(file_offset);
