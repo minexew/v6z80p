@@ -1,0 +1,8 @@
+
+FILETX.EXE - Sends a file from
+current dir to external system
+via Serial Link protocol.
+
+Use: FILETX filename
+
+
