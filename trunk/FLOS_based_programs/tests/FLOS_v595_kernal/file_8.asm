@@ -1,4 +1,4 @@
-; Reads 1 byte at a time from start of file (to 1024 bytes)
+; Reads a 2 x 40 byte section of file
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
@@ -20,33 +20,28 @@ include "system_equates.asm"
 	ret nz
 	
 	ld ix,0
-	ld iy,0
-	call kjt_set_file_pointer
-	
-nxt_ld	ld ix,0
-	ld iy,1
+	ld iy,40
 	call kjt_set_load_length
 	
-	ld hl,(ld_addr)
+	ld hl,$8000
 	ld b,0
 	call kjt_read_from_file
-	ret nz
 	
-	ld hl,(ld_addr)
-	inc hl
-	ld (ld_addr),hl
+	ld ix,0
+	ld iy,40
+	call kjt_set_file_pointer
+	call kjt_set_load_length
 	
-	ld de,$8201
-	xor a
-	sbc hl,de
-	jr nz,nxt_ld
+	ld hl,$8100
+	ld b,0
+	call kjt_read_from_file
 	xor a
 	ret
 	
 
 ld_addr	dw 0
 	
-filename	db "testfile.bin",0
+filename	db "test1.scr",0
 
 msg	db "Testing file read",11,0
 

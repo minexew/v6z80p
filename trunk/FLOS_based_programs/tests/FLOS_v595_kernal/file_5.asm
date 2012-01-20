@@ -1,5 +1,4 @@
-; Read too many bytes - should say "Invalid bank", due to
-; mismatch of kernal retuen error codes and message list.
+; Set Filepointer $2000 bytes into file, load $2000 bytes
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
@@ -21,11 +20,11 @@ include "system_equates.asm"
 	ret nz
 	
 	ld ix,0
-	ld iy,0
+	ld iy,$2000
 	call kjt_set_file_pointer
 	
 nxt_ld	ld ix,0
-	ld iy,$ffff
+	ld iy,$2000
 	call kjt_set_load_length
 	
 	ld hl,(ld_addr)
