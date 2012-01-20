@@ -4,6 +4,10 @@ serially to the current dir
 
 Use: FILERX (no args)
 
-If the file exists, a prompt to
-overwrite it is displayed.
+Notes:
+
+This was formerly called "SERCOPY"
+
+If a file exists at dest, a prompt
+to overwrite it is displayed.
 
