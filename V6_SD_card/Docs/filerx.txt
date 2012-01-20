@@ -1,0 +1,9 @@
+
+FILERX.EXE - Copies a file sent
+serially to the current dir
+
+Use: FILERX (no args)
+
+If the file exists, a prompt to
+overwrite it is displayed.
+
