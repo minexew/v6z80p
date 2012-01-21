@@ -98,8 +98,8 @@ sloop	push bc
 	ld hl,(file_size+2)
 	sbc hl,bc
 	ld (file_size+2),hl
-	jr c,file_sent		; if carry or size, send is complete
 	pop bc
+	jr c,file_sent		; if carry or size, send is complete
 	ld a,h
 	or l
 	or d
