@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"f" fill memory command. V6.05
+;"f" fill memory command. V6.07
 ;-----------------------------------------------------------------------
 
 os_cmd_f			
@@ -20,10 +20,7 @@ os_cmd_f
 	ex de,hl			;get start address in HL
 	call os_bchl_memfill
 
-ret_ok_msg
-
-	ld a,$20			;OK completion message
-	or a
-	ret
+	jp ok_ret			;OK completion message
+	
 
 ;-----------------------------------------------------------------------

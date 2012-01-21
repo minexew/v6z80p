@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"H" - Hunt in memory command V6.08
+;"H" - Hunt in memory command V6.09
 ;-----------------------------------------------------------------------
 
 find_hexstringascii equ scratch_pad
@@ -85,7 +85,7 @@ nofmatch	pop de
 	inc de
 	jr nz,fndloop1
 	
-h_end	jp ret_ok_msg		;OK completion message
+h_end	jp ok_ret			;OK completion message
 
 
 ;---------------------------------------------------------------------------------------------------

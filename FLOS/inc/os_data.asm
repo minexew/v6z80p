@@ -355,7 +355,7 @@ format_err_msg	db $62,$7f,0		;$13 not FAT16
 
 		db $2d,$77,0		;$18 save aborted
 		db $2d,$7c,$6b,$85,0	;$19 save error at destination
-		db $0c,$90,$86,0		;$1a bank ** selected
+bank_msg		db $0c,$90,$86,0		;$1a bank ** selected
 		db $6f,$71,$70,$6e,0	;$1b Data after EOF request
 		db $76,$8f,$0a,0		;$1c no end address
 		db $76,$85,$0a,0		;$1d no destination address

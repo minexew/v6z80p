@@ -1,6 +1,31 @@
 
 FLOS version info:
 ------------------
+
+v5.98 - 20/01/12
+
+	Bugfix	- File read routine was not returning "Data after EOF requested" $1B error
+	           (a bug introduced in v594)
+	
+	Bugfix	- when a function key is pressed, the string has characters < ASCII 32 are stripped
+		   from the end (now uses the script line load subroutine)
+ 
+	Bugfix	- kjt_root_dir clears flags and A on return ("CD /" was returning random
+ 		   error messages)
+
+	Changed - volume label from MOUNT and DIR is now shown in brackets (so it doesn't look like
+		  a subdirectory)
+
+	Changed - All internal commands now return a zero "error" code following a successful operation.
+		  (Previously "B" returned $1A for "Bank n selected", and "C","F","H","SB" returned
+		  $20 for "OK". This was for convenience but would now be confusing with the "ERR" envar.)
+
+	Optimized - Serial routines.
+
+
+Previous changes:
+-----------------
+
 v5.97 - 13/1/12
 
 
@@ -12,8 +37,6 @@ v5.97 - 13/1/12
 		  vol+dir)
 
 
-Previous changes:
------------------
 
 
 
@@ -42,7 +65,7 @@ v5.95 - 10/1/12 (unreleased)
                  FLOS completely restarts. Hold CTRL to abort and cancel commander
                  upon reboot.
 
-	- Added: KJT_FONT_PATCH - allows easy user-defined chars at CHR 32-159
+	- Added: KJT_PATCH_FONT - allows easy user-defined chars at CHR 32-159
 
 
 

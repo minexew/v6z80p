@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-; "dir" - show directory command. v6.06
+; "dir" - show directory command. v6.07
 ;-----------------------------------------------------------------------
 
 os_cmd_dir
@@ -14,10 +14,9 @@ os_cmd_dir
 	call fs_get_dir_block		;if at root also show volume label
 	ld a,d
 	or e
-	jr nz,dcmdnr
-	call fs_get_volume_label
-	call os_print_string
-dcmdnr	call os_new_line
+	call z,show_vol_label
+
+	call os_new_line
 	
 nrootdir	call div_line
 	call os_goto_first_dir_entry

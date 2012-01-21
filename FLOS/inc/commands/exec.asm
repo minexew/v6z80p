@@ -1,8 +1,9 @@
 ;-----------------------------------------------------------------------
-;"exec" - execute script V6.03
+;"exec" - execute script V6.04
 ;
 ;Changes:
 ;
+;6.04 - Made load script line a subroutine so it can be used by programmable F-keys
 ;6.03 - Set load length = 24bit (optimized)
 ;6.02 - Support for loop (via GOTO envar and [xxxx] labels)
 ;6.01 - abort with CRTL + C
@@ -50,57 +51,21 @@ scrp_loop
 	
 noskip_script
 
-	ld hl,script_buffer			;clear script buffer and command string		
-	ld de,commandstring
-	ld b,OS_window_cols+1
-	ld a,$20				;fill 'em with spaces
-scrp_flp	ld (hl),a
-	ld (de),a
-	inc hl
-	inc de
-	djnz scrp_flp
-	
 	call fs_get_dir_block		;store current dir
 	push de
 	ld de,(script_dir)			;return to dir that contains the script
 	call fs_update_dir_block
 	ld hl,script_fn			;locate the script file - this needs to be done every
 	call os_find_file			;script line as external commands will have opened files
-	pop de
-	ret nz
-	call fs_update_dir_block		;return to dir selected prior to script
-	
-	xor a
-	ld hl,OS_window_cols		;only load enough chars for one line 
-	call set_loadlength24
-	ld iy,(script_file_offset)		;index from start of file
-	call os_set_file_pointer
-		
-	ld hl,script_buffer			;load in part of the script	
-	ld b,0
-	call os_force_load			
-	jr z,scrp_ok			;file system error?
-	cp $1b			
-	ret nz				;We dont mind if attempted to load beyond end of file
-	
-scrp_ok	ld iy,(script_file_offset)
-	ld hl,script_buffer			;copy ascii from script buffer to command string
-	ld de,commandstring
-	ld b,OS_window_cols
-scrp_cmd	ld a,(hl)
-	cp $20
-	jr c,scrp_eol
-	ld (de),a
-	inc hl
-	inc de
-	inc iy
-	djnz scrp_cmd
-scrp_eol	xor a
-	ld (de),a				;null terminate command string 
+	jr nz,scr_ferr
+	call script_load_line
+	jr nz,scr_ferr
 	ld (script_file_offset),iy
 	ld (script_buffer_offset),hl
-
-			
+	pop de
+	call fs_update_dir_block		;go back to dir before script file
+	
+	
 	ld a,(commandstring)		;Is this line a label?
 	cp "["
 	jr nz,scr_norm
@@ -152,7 +117,13 @@ scrp_gnc	ld (script_file_offset),iy		;update file offset and loop
 	jp scrp_loop	
 
 
+;-----------------------------------------------------------------------------------------------
 
+scr_ferr	pop de
+	call fs_update_dir_block		;return to dir selected prior to script
+	xor a
+	ret
+	
 ;-----------------------------------------------------------------------------------------------
 	
 scr_end	call scr_test_goto			;was a goto still outstanding at end of script?
@@ -181,5 +152,50 @@ scr_test_goto
 
 goto_txt	db "GOTO",0
 
+
 ;------------------------------------------------------------------------------------------------
+
+script_load_line
 	
+	ld hl,script_buffer			;clear script buffer and command string		
+	ld de,commandstring
+	ld b,OS_window_cols+1
+	ld a,$20				;fill 'em with spaces
+scrp_flp	ld (hl),0
+	ld (de),a
+	inc hl
+	inc de
+	djnz scrp_flp
+	
+	xor a
+	ld hl,OS_window_cols		;only load enough chars for one line 
+	call set_loadlength24
+	ld ix,0
+	ld iy,(script_file_offset)		;index from start of file
+	call os_set_file_pointer
+
+	ld hl,script_buffer			;load in part of the script	
+	ld b,0
+	call os_force_load			
+	jr z,scrp_ok			;file system error?
+	cp $1b			
+	ret nz				;We dont mind if attempted to load beyond end of file
+	
+scrp_ok	ld iy,(script_file_offset)
+	ld hl,script_buffer			;copy ascii from script buffer to command string
+	ld de,commandstring
+	ld b,OS_window_cols
+scrp_cmd	ld a,(hl)
+	cp $20
+	jr c,scrp_eol
+	ld (de),a
+	inc hl
+	inc de
+	inc iy
+	djnz scrp_cmd
+scrp_eol	xor a
+	ld (de),a	
+	ret
+
+;------------------------------------------------------------------------------------------------
+			
