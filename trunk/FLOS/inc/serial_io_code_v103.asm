@@ -1,11 +1,13 @@
-;---------- RS232 File Transfer Routines V6.02 ------------------------------------------------
+;---------- RS232 File Transfer Routines V1.03 ------------------------------------------------
 ;
-;  v6.02 - If bit 7 is set in A, when calling serial_get_header is called
+;  v1.03 - Some optimization
+;
+;  v1.02 - If bit 7 is set in A, when calling serial_get_header is called
 ;          the wait will be aborted if ESC is pressed. If bit 6 is set, Enter
 ;          key will escape (also).
-;        - Some optimizations.
+;        - Some optimization.
 ;
-;  v6.01 - The load bank and address is now set by "serial_receive_file"
+;  v1.01 - The load bank and address is now set by "serial_receive_file"
 ;          it made no sense for the get header routine to do this.
 ;          This has necessitated changing the RX command code and any
 ;          external apps that use the KJT routines.
@@ -20,75 +22,70 @@
 ; HL = Filename ("*" if dont care)
 ;  A = Time out in seconds
 ;
-; Return code in A: $00 = OK, $08 = memory address out of range, $14 = time out error
-;                   $25 = Filename mismatch, $0f = checksum bad, $11 = header reception error
-;
-; if all OK (A=0), IX returns = location of serial file header
+; ZF set / A =0 if all OK and IX returns = location of serial file header
+; Else:
+; Error code in A: $08 = memory address out of range, $14 = time out error
+;                  $25 = Filename mismatch, $0f = checksum bad, $11 = header reception error
+; 
 ;-----------------------------------------------------------------------------------------
 	
 
 serial_get_header
 
+	call serial_gh_main
+	ret nc
+	push af
+	call s_badack
+	pop af
+	or a		
+	ret
+	
+
+serial_gh_main
+
 	ld (serial_timeout),a		; set timeout value
 	ld (serial_fn_addr),hl
 
 	call s_getblock			; gets a block in buffer / test its checksum
-	jr nc,s_gbfhok
-	push af				; carry set = there was an error (code in A)
-	call s_badack			; tell the sender that the header was rejected
-	pop af
-	ret
+	ret c				; carry set = there was an error (code in A)
 	
-s_gbfhok	ld hl,serial_headertag		; Check to make sure its tagged as a header block
+	ld hl,serial_headertag		; Check to make sure its tagged as a header block
 	ld de,sector_buffer+20		; check ASCII chars 
 	ld b,12
 	call os_compare_strings
-	jr nc,s_nfhdr
-	ld b,256-32			; bytes 32-256 should be zero
+hdrbad	ld a,$11
+	ccf
+	ret c				; return with error $11 if header ID string is bad
 	ld hl,sector_buffer+32
+	ld b,256-32			; bytes 32-256 should be zero
 s_chdr	ld a,(hl)
 	inc hl
 	or a
-	jr nz,s_nfhdr
+	jr nz,hdrbad
 	djnz s_chdr
-	jr s_fhcsok
-	
-s_nfhdr	call s_badack			; tell sender to abort the file part
-	ld a,$11
-	ret
-		
-s_fhcsok	ld hl,(sector_buffer+16)		; copy file details 
-	ld (serial_fileheader+16),hl
-	ld hl,(sector_buffer+18)		
-	ld (serial_fileheader+18),hl
+
+	ld hl,sector_buffer+16		; copy length value to fileheader 
+	ld de,serial_fileheader+16
+	ld bc,4
+	ldir				
 
 	ld hl,sector_buffer
-	ld de,serial_fileheader		; Convert filename to uppercase	
-	ld b,16				; if necessary (for string compare)
-s_tuclp	ld a,(hl)				; and compare filenames
-	or a
-	jr z,s_ffhswz	
-	call os_uppercasify
+	ld de,serial_fileheader		; copy filename to fileheader
+	ld b,16				
+	call os_copy_ascii_run
+	xor a
 	ld (de),a
-	inc hl
-	inc de
-	djnz s_tuclp
-	jr s_tucdone
-s_ffhswz	ld (de),a
-	inc de
-	djnz s_ffhswz		
 	
-s_tucdone	ld hl,(serial_fn_addr)		; is this the right filename?
+	ld hl,(serial_fn_addr)		; is this the right filename?
 	ld a,(hl)
 	cp "*"
 	jr z,s_rffns			; if requested filename = wildcard, skip compare
 	ld de,serial_fileheader
 	ld b,16
 	call os_compare_strings
-	jr c,s_rffns
-s_rfnbad	call s_badack
-	ld a,$25				; Error: Filename doesn't match
-	ret
+	ld a,$25				; Error $25 - Filename doesn't match
+	ccf 
+	ret c
 	
 s_rffns	ld ix,serial_fileheader		; ix = start of serial file header
 	xor a
@@ -96,11 +93,6 @@ s_rffns	ld ix,serial_fileheader		; ix = start of serial file header
 
 
 
-s_set_load_addr
-
-	ret
-	
-	
 ;-----------------------------------------------------------------------------------------
 ; .-------------------.
 ; ! Receive file data !
@@ -133,10 +125,11 @@ serial_receive_file
 
 	ld ix,(serial_address)
 	ld de,(serial_fileheader+16)
-	ld hl,(serial_fileheader+18)
+	ld hl,(serial_fileheader+18)		; HL:DE = file length
 s_gbloop	call s_getblock
 	jr c,s_qgbl
-	ld c,0				; copy buffer to actual location
+
+	ld c,0				; copy bytes from serial buffer to actual location
 	ld iy,sector_buffer
 s_rfloop	ld a,(iy)
 	ld (ix),a				; put byte at memory location
@@ -152,31 +145,27 @@ s_rfmb	ld a,e
 	jr z,s_rfabr			; if zero, last byte
 	push bc
 	ld bc,1
-	add ix,bc				;next mem address
+	add ix,bc				; next mem address
 	pop bc
 	jr nc,s_nbt
-	call os_incbank			;overflow from $FFFF, next bank!
-	or a				
-	jr z,s_rfbok
-	ld a,$08				;mem addr out of range error				
-	jr s_qgbl
-s_rfbok	ld ix,$8000
-s_nbt	inc iy
+	call os_incbank			; overflow from $FFFF, goto next bank
+	jr nz,s_qgbl				
+	ld ix,$8000			; loop around to $8000			
+s_nbt	inc iy	
 	dec c
 	jr nz,s_rfloop
-	call s_goodack			;send OK ("ready for next block")
+	call s_goodack			; send OK ("ready for next block")
 	jr s_gbloop
 
 s_rfabr	call s_goodack			; final block's "OK" ack
-	call os_restorebank			; all done
-	ld ix,serial_fileheader		; ix = start of serial file header
-	xor a
-	ret
+	call os_restorebank			
+	jr s_rffns			; ix = start of serial file header on exit
 
 s_qgbl	push af
 	call s_badack
 	call os_restorebank
 	pop af
+	or a
 	ret
 
 ;-----------------------------------------------------------------------------------------
@@ -186,31 +175,14 @@ s_getblock
 	push hl
 	push de
 	push bc
+
 	ld hl,sector_buffer			; load a block of 256 bytes
 	ld b,0
-	exx
-	ld hl,$ffff			; CRC checksum
-	exx
 s_lgb	call receive_serial_byte
 	jr c,s_gberr			; timed out if carry = 1	
 	ld (hl),a
-	exx
-	xor h				; do CRC calculation		
-	ld h,a			
-	ld b,8
-rxcrcbyte	add hl,hl
-	jr nc,rxcrcnext
-	ld a,h
-	xor 10h
-	ld h,a
-	ld a,l
-	xor 21h
-	ld l,a
-rxcrcnext	djnz rxcrcbyte
-	exx
 	inc hl
 	djnz s_lgb
-	exx				; hl = calculated CRC
 
 	call receive_serial_byte		; get 2 more bytes - block checksum in bc
 	jr c,s_gberr
@@ -218,13 +190,19 @@ rxcrcnext	djnz rxcrcbyte
 	call receive_serial_byte
 	jr c,s_gberr		
 	ld b,a
-	
-	xor a				; compare checksum
+
+	push bc				; make and compare checksum
+	ld de,sector_buffer
+	ld c,0
+	call crc_checksum
+	pop bc
+	xor a				
 	sbc hl,bc
 	jr z,s_gberr
 
 	ld a,$0f				;A=$0f : bad checksum
 	scf
+
 s_gberr	pop bc
 	pop de
 	pop hl
@@ -258,10 +236,17 @@ s_badack	push bc
 ;    B   = Bank number that file starts in
 ;   IX   = Start address
 
-; Return code in A: $00 = OK, $08 = memory address out of range, $11 = comms error
+; ZF set / A = OK if all OK, else:
+; Return code in A: $08 = memory address out of range, $11 = comms error
 ;                   $07 = Save length is zero
 
 serial_send_file
+
+	call ser_send_main
+	or a
+	ret
+	
+ser_send_main
 
 	ld a,1				; Set timeout at about 1 second
 	ld (serial_timeout),a
@@ -276,24 +261,17 @@ serial_send_file
 	or d
 	or e
 	jr nz,s_flok
-	xor a
 	ld a,7				; Error! Save request = 0 bytes
 	ret
 
 s_flok	push hl				; clear the header	
 	ld hl,serial_fileheader
-	ld bc,16
-	call os_bchl_memclear
+	ld c,16
+	call os_chl_memclear_short
 	pop hl				; fill in filename
 	ld de,serial_fileheader
 	ld b,16
-s_fncpy	ld a,(hl)
-	or a
-	jr z,s_fncpyd
-	ld (de),a
-	inc de
-	inc hl
-	djnz s_fncpy
+	call os_copy_ascii_run
 
 s_fncpyd	ld hl,serial_fileheader		; send file header
 	ld de,32
@@ -310,7 +288,7 @@ s_fncpyd	ld hl,serial_fileheader		; send file header
 	ld de,(serial_fileheader+16)		; length of file lo word
 	ld bc,(serial_fileheader+18)		; length of file hi word
 s_sbloop	call s_makeblock			; make a file block
-	jr c,s_rerr
+	jr nz,s_rerr
 	call s_sendblock			; send the file block
 	jr c,s_rerr	
 	call s_waitack			; wait to receive "OK" acknowledge
@@ -319,7 +297,6 @@ s_sbloop	call s_makeblock			; make a file block
 	or d
 	or c
 	jr nz,s_sbloop			; was last byte of file in this block?
-	xor a
 s_rerr	push af
 	call os_restorebank
 	pop af
@@ -327,14 +304,15 @@ s_rerr	push af
 
 ;-------------------------------------------------------------------------------------------
 
-
 s_makeblock
+
+; set ix = src addr, c:de = byte count, a = 0 / ZF set on return if all ok
 	
 	push bc
 	push hl
 	push de
-	ld hl,sector_buffer			; make a block
-	ld bc,256				; set ix = src addr, c:de = byte count, a = 0 on return if all ok
+	ld hl,sector_buffer			
+	ld bc,256				
 	call os_bchl_memclear		 
 	pop de
 	pop hl
@@ -345,33 +323,28 @@ s_makeblock
 s_sloop	ld a,(hl)
 	ld (iy),a
 
-	ld a,$ff				; dec byte count
-	dec e					
-	cp e
-	jr nz,s_nol
-	dec d
-	cp d
+	dec de				; dec c:de byte count
+	ld a,d
+	and e
+	inc a
 	jr nz,s_nol
 	dec c
 s_nol	ld a,e
 	or d
 	or c
-	jr z,s_mbend
+	ret z
 
-	inc iy				; next address
+	inc iy				; next address - check memory limit
 	inc hl
 	ld a,h
 	or l
 	jr nz,s_sbok
+	ld h,$80
 	call os_incbank			
-	or a				
-	jr z,s_sovlp
-	ld a,$08				; Error! Memory address out of range
-	scf
-	ret
-s_sovlp	ld hl,$8000
+	ret nz
+	
 s_sbok	djnz s_sloop
-s_mbend	xor a
+	xor a
 	ret
 
 
@@ -384,12 +357,11 @@ s_sendblock
 	push de				;sends a 256 byte block and its 2 byte checksum
 	push bc				
 	ld hl,sector_buffer			
-	ld e,0
+	ld b,0
 s_sblklp	ld a,(hl)
 	call send_serial_byte
 	inc hl
-	dec e
-	jr nz,s_sblklp
+	djnz s_sblklp
 	ld de,sector_buffer
 	ld c,0
 	call crc_checksum
@@ -414,8 +386,7 @@ s_waitack
 	call receive_serial_byte
 	jr c,s_popall
 	ld c,a
-	ld h,"O"
-	ld l,"K"
+	ld hl,$4f4b			; "OK" ASCII chars
 	xor a
 	sbc hl,bc				; zero flag set on return if OK received
 	jr z,s_popall
@@ -429,6 +400,11 @@ s_waitack
 ;---------------------------------------------------------------------------------------	
 ; Low level routines
 ;---------------------------------------------------------------------------------------
+
+
+ext_receive_serial_byte
+
+	ld (serial_timeout),a
 
 
 receive_serial_byte

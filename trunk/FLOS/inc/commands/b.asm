@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------------------
-;'B' for Bank Selection command. V6.02
+;'B' for Bank Selection command. V6.03
 ;------------------------------------------------------------------------------------------
 
 os_cmd_b	
@@ -16,9 +16,8 @@ os_cmd_b
 shwbnk	call os_getbank		;show bank msg 
 shwbnk2	ld hl,hex_byte_txt
 	call hexbyte_to_ascii
-	ld a,$1a
-	or a
-	ret
+	ld hl,bank_msg
+	jp show_packed_text_and_cr	;no point calling, use routine's RET as return
 	
 ;-----------------------------------------------------------------------------------------
 

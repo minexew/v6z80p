@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"RX" - Receive binary file via serial port command. V6.05
+;"RX" - Receive binary file via serial port command. V6.06
 ;-----------------------------------------------------------------------
 ;
 ;  6.05 - Added "RX !" to download and run.
@@ -14,12 +14,8 @@ os_cmd_rx:
 	or a
 	jp z,os_no_fn_error
 
-	push hl			;clear serial filename area
-	ld hl,serial_filename
-	ld bc,16
-	call os_bchl_memclear
-	pop hl
-
+	call clear_serial_filename
+	
 	ld a,(hl)			;If args = "!", RX and run requested.
 	cp "!"
 	jr nz,not_rx_run
@@ -70,16 +66,14 @@ serl_dfb	ld b,e
 	call os_show_packed_text
 	
 
-	ld hl,serial_filename	;filename location in HL
-	ld a,$80			;no time out / escape key active
+	ld hl,serial_filename	; filename location in HL
+	ld a,$80			; no time out / escape key active
 	call serial_get_header	
-	or a
-	ret nz			;if a = 0 on return, header was OK
+	ret nz			
 	ld hl,ser_rec2_msg
 	call os_show_packed_text
 	call serial_receive_file
-	or a			;if a = 0 on return, file load was OK
-	ret nz			;"or" clears carry flag
+	ret nz			
 
 	ld de,serial_fileheader+18
 	jp show_bl		; show bytes loaded (use end of LB routine)
@@ -93,10 +87,9 @@ rx_run	ld hl,ser_rec_msg
 
 	ld hl,serial_filename
 	ld (hl),"*"
-	ld a,$80			;no time out / escape key active
+	ld a,$80			; no time out / escape key active
 	call serial_get_header
-	or a
-	ret nz			;if a = 0 on return, header was OK
+	ret nz			
 	
 	ld hl,ser_rec2_msg
 	call os_show_packed_text
@@ -179,5 +172,17 @@ call_rx
 
 	ld ix,(serial_address)
 	jp (ix)
+	
+;----------------------------------------------------------------------------------------------
+
+
+clear_serial_filename
+
+	push hl			;clear serial filename area
+	ld hl,serial_filename
+	ld c,16
+	call os_chl_memclear_short
+	pop hl
+	ret
 	
 ;----------------------------------------------------------------------------------------------

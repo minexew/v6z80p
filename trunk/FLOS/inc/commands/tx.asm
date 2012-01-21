@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"TX" - Transmit binary file via serial port command. V6.01
+;"TX" - Transmit binary file via serial port command. V6.03
 ;-----------------------------------------------------------------------
 
 os_cmd_tx:
@@ -7,13 +7,9 @@ os_cmd_tx:
 	ld a,(hl)			;check args exist
 	or a
 	jp z,os_no_fn_error
-
-	push hl			;clear serial filename area
-	ld hl,serial_filename
-	ld bc,16
-	call os_bchl_memclear
-	pop hl
-
+	
+	call clear_serial_filename
+	
 	ld b,16			;max chars to copy
 	ld de,serial_filename
 	call os_copy_ascii_run	;(hl)->(de) until space or zero, or count = 0
@@ -78,10 +74,8 @@ sers_dfb	ld b,e
 	ld hl,serial_filename	;filename location in HL
 	ld ix,(fs_z80_address)
 	call serial_send_file
-	or a			;if a = 0 on return, load was OK
 	ret nz			
-
-	jp ret_ok_msg		;return with ok msg
+	jp ok_ret			;return with ok msg
 
 sers_fsb	pop hl
 	jp os_no_filesize

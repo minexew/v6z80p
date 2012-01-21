@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"c" - Copy memory command. V6.05
+;"c" - Copy memory command. V6.06
 ;-----------------------------------------------------------------------
 
 copy_dest_address	equ scratch_pad
@@ -41,15 +41,15 @@ bfcopylp	call os_restorebank
 	or c
 	jr nz,bfcopylp
 	call os_restorebank
-	jr copydone	
+	jr ok_ret	
 	
 copytsb	call set_copy_regs		;straightforward copy - no bank flipping	
 	jp c,os_range_error		;abort if end addr <= start addr
 	ldir
 
-copydone	ld a,$20			;completion message
-	or a
-	ret
+ok_ret	ld hl,ok_msg		;"OK" message
+	jp show_packed_text_and_cr	; no point calling, use routine's RET for return
+	
 
 
 ;-----------------------------------------------------------------------

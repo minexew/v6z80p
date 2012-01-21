@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"SB" - Save binary file command. V6.03
+;"SB" - Save binary file command. V6.04
 ;-----------------------------------------------------------------------
 
 os_cmd_sb
@@ -82,10 +82,8 @@ os_sfapp	ld hl,(sb_save_name_addr)
 	ld b,a
 	call kjt_write_bytes_to_file
 	ret nz	
-	jp ret_ok_msg			;return with ok msg
+	jp ok_ret				;return with ok msg
 	
-	
-
 	
 ;-------------------------------------------------------------------------------------------------
 
