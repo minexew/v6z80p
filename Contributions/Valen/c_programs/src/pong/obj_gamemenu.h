@@ -20,6 +20,7 @@ void GameObjGameMenu_Draw(GameObjGameMenu* this);
 
 
 
+#ifdef UNFINISHED_CODE
 // *************************************
 // Game object: GameMenuTxt
 
@@ -51,7 +52,7 @@ typedef struct {
     BYTE        key_index;
 
 } Ipol;
-
+#endif  // UNFINISHED_CODE
 
 
 #endif /* OBJ_GAMEMENU_H */

@@ -425,7 +425,7 @@ void Display_CloneChunkyFont_WithBlitter(void)
 {
 }
 
-#define VIDEO_ADDR      unsigned short
+
 
 void DoBlit(void)
 {

@@ -25,6 +25,10 @@ typedef unsigned short FIXED88;         // fixed point 8.8
 
 typedef unsigned char  BOOL;
 
+
+// 16 high bits from full 19 bits  (Can address 512KB of video RAM. Step: 8 bytes.)
+typedef unsigned short VIDEO_ADDR;
+
 #define FALSE   0
 #define TRUE    1
 

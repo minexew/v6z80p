@@ -11,7 +11,9 @@
 #include "math.h"
 #include "pong.h"
 
+#ifdef UNFINISHED_CODE
 GameObjMenuTxt objMenuTxt[2];
+#endif  // UNFINISHED_CODE
 
 void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y)
 {
@@ -27,10 +29,12 @@ void GameObjGameMenu_Init(GameObjGameMenu* this, int x, int y)
     this->gobj.pMoveFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Move);
     this->gobj.pDrawFunc = CAST_GAME_OBJ_FUNC_PTR_TO_CORRECT_TYPE(&GameObjGameMenu_Draw);
 
+#ifdef UNFINISHED_CODE
     // init menu txt objects
     objMenuTxt[0].gobj.in_use = TRUE;
     GameObjMenuTxt_Init(&objMenuTxt[0], 100, 100);
     PoolGameObj_AddObjToActiveObjects(&objMenuTxt[0].gobj);
+#endif  // UNFINISHED_CODE
 }
 
 void GameObjGameMenu_Move(GameObjGameMenu* this)
@@ -82,8 +86,9 @@ void GameObjGameMenu_Draw(GameObjGameMenu* this)
 // -----------------------------------------
 
 
+#ifdef UNFINISHED_CODE
 // **************************
-// display sprite 'PRESS FIRE TO START'
+// display sprite 'PRESS FIRE TO START' and animate matte color
 
 
 
@@ -201,3 +206,5 @@ void Ipol_Compute(Ipol* this)
 {
     this;
 }
+
+#endif  // UNFINISHED_CODE

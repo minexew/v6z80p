@@ -183,5 +183,6 @@ V6Z80P_EXTERN FLOS_PROGRAM_PARAMS* FLOS_GetProgramParams(void);
 V6Z80P_EXTERN BOOL FLOS_SetSpawnCmdLine(const char* line);
 
 V6Z80P_EXTERN void FLOS_ExitToFLOS(void);
+V6Z80P_EXTERN void FLOS_ExitToFLOS_SpawnCmd(void);
 
 #endif /* I_FLOS_H */

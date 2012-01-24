@@ -40,6 +40,7 @@ byte Keyboard_GetLastTypedScanCode(void);
 
 void irq_handler() NAKED;
 void install_irq_handler(void);
+void deinstall_irq_handler(void);
 
 
 

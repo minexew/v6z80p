@@ -10,6 +10,12 @@
 
 #include "disk_io.h"
 #include "util.h"
+#include "keyboard.h"
+#include "background.h"     // for Game_RestoreFLOSVIdeoRam();
+
+struct tag_disk_io{
+    const char* pFilename;
+} disk_io;
 
 BOOL load_file_to_buffer(const char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
 {
@@ -35,13 +41,49 @@ BOOL load_file_to_buffer(const char *pFilename, dword file_offset, byte* buf, dw
 }
 
 
+/*#define DI_HALT() \
+    BEGINASM();   \
+        di        \
+        halt      \
+    ENDASM();
+*/
+
+
+
+void ShowDiskErrorAndStopProgramExecution(const char* strErr, const char* pFilename)
+{
+//    BYTE asciicode, scancode;
+
+    FLOS_FlosDisplay();
+    Game_RestoreFLOSVIdeoRam();
+
+    DiagMessage(strErr, pFilename);
+    FLOS_PrintStringLFCR("Exiting to FLOS...");     //               Press a key to reboot... ");
+
+    deinstall_irq_handler();
+//    FLOS_WaitKeyPress(&asciicode, &scancode);
+//    5FLOS_SetSpawnCmdLine("dir");
+//    flos_spawn_cmd[0] = 'D'; flos_spawn_cmd[1] = 'I';flos_spawn_cmd[2] = 'R';flos_spawn_cmd[3] = 0;
+//    FLOS_ExitToFLOS_SpawnCmd();
+
+    FLOS_ExitToFLOS();
+
+    //DI_HALT();
+//    BEGINASM();
+//        jp 0
+//    ENDASM();
+}
+
 // wrappers for FLOS funcs, with added diagnostic output
 BOOL diag__FLOS_FindFile(FLOS_FILE* const pFile, const char* pFilename)
 {
     BOOL r;
 
     BEGIN_DISK_OPERATION();
+    disk_io.pFilename = pFilename;
     r = FLOS_FindFile(pFile, pFilename);
+    if(!r)
+        ShowDiskErrorAndStopProgramExecution("FindFile FAILED: ", pFilename);
     END_DISK_OPERATION(r);
     if(!r) {
        DiagMessage("FindFile failed: ", pFilename);
@@ -57,6 +99,14 @@ BOOL diag__FLOS_ForceLoad(const byte* address, const byte bank)
 
     BEGIN_DISK_OPERATION();
     r = FLOS_ForceLoad(address, bank);
+
+    // quick fix for FLOS598+  Check for error code 1B and ignore it
+    if(!r && FLOS_GetLastError() == 0x1B) {
+        r = TRUE;
+    }
+
+    if(!r)
+        ShowDiskErrorAndStopProgramExecution("ForceLoad FAILED: ", disk_io.pFilename);
     END_DISK_OPERATION(r);
     if(!r) {
        DiagMessage("ForceLoad failed: ", "");
@@ -160,5 +210,5 @@ void DiskIO_VisualizeDiskError(void)
         color ^= 0xf00;
     }
 
-    //FLOS_FlosDisplay();
+
 }
