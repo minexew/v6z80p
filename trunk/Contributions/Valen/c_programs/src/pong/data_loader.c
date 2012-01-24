@@ -27,7 +27,10 @@ static const LoadTilesDescription tilesLevel[] = {
 };
 // srpites menu
 static const LoadFileDescription spritesMenu[] = {
-    {SPRITES_FILENAME_MENUTXT, 0, 1}, {NULL, 0, 0}
+#ifdef UNFINISHED_CODE
+    {SPRITES_FILENAME_MENUTXT, 0, 1},
+#endif  // UNFINISHED_CODE
+    {NULL, 0, 0}
 };
 // srpites level
 static const LoadFileDescription spritesLevel[] = {

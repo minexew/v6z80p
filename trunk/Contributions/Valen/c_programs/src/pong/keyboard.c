@@ -141,14 +141,27 @@ void irq_handler() NAKED
 
 }
 
+WORD original_irq_handler;
 void install_irq_handler(void)
 {
     word *p;
 
     DI();
     p  = (word*)IRQ_VECTOR;
+
+    original_irq_handler = *p;
+
     *p = (word)&irq_handler;
     io__sys_irq_enable = 0x81;      // enable: master irq, keyb
     EI();
 }
 
+void deinstall_irq_handler(void)
+{
+    word *p;
+
+    DI();
+    p  = (word*)IRQ_VECTOR;
+    *p = original_irq_handler;
+    EI();
+}

@@ -18,4 +18,7 @@ void ChunkLoader_Init(const char* pFilename, byte* buf, byte bank);
 BOOL ChunkLoader_LoadChunk(void);
 BOOL ChunkLoader_IsDone(void);
 
+// private
+void ShowDiskErrorAndStopProgramExecution(const char* strErr, const char* pFilename);
+
 #endif /* DISK_IO_H */

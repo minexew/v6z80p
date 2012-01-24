@@ -5,7 +5,7 @@
 
 
 
-void DiagMessage(char* pMsg, const char* pFilename);
+void DiagMessage(const char* pMsg, const char* pFilename);
 BOOL Util_LoadPalette(const char* pFilename);
 void Sys_ClearIRQFlags(byte flags);
 byte GetR(void)  __naked;

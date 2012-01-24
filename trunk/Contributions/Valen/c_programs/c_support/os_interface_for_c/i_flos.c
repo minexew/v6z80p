@@ -47,6 +47,15 @@ void FLOS_ExitToFLOS(void)
 }
 
 
+// Stop execution of program and exit to FLOS immediately 
+void FLOS_ExitToFLOS_SpawnCmd(void) 
+{
+    BEGINASM()
+    ld   a,#SPAWN_COMMAND        ; program exit code is fe (spawn command)
+    ld   l,a      
+    jp   _exit
+    ENDASM()
+}
 
 // Helpers --------------------------------------
 void FLOS_PrintStringLFCR(const char* string)

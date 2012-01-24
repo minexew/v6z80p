@@ -2,6 +2,8 @@
 #include <OSCA_hardware_equates.h>
 #include <macros.h>
 
+#include <base_lib/blit.h>
+
 //#include <stdlib.h>
 #include <string.h>
 
@@ -108,3 +110,29 @@ void Background_InitTilemap(word firstTileDef)
     PAGE_OUT_VIDEO_RAM();
 }
 
+
+void Game_StoreFLOSVIdeoRam(void)
+{
+    BLITTER_PARAMS bp;
+    memset(&bp, 0, sizeof(bp));
+
+    bp.src_addr  = VRAM_ADDR_FLOS_AREA >> 3;
+    bp.dest_addr = VRAM_ADDR_STORE_FLOS >> 3;
+    bp.width     = 255;
+    bp.height    = 255;
+    bp.misc      = BLITTER_MISC_ASCENDING_MODE;
+    DoBlit(&bp);
+}
+
+void Game_RestoreFLOSVIdeoRam(void)
+{
+    BLITTER_PARAMS bp;
+    memset(&bp, 0, sizeof(bp));
+
+    bp.src_addr  = VRAM_ADDR_STORE_FLOS >> 3;
+    bp.dest_addr = VRAM_ADDR_FLOS_AREA >> 3;
+    bp.width     = 255;
+    bp.height    = 255;
+    bp.misc      = BLITTER_MISC_ASCENDING_MODE;
+    DoBlit(&bp);
+}

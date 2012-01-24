@@ -1,15 +1,19 @@
 /*
-PONG v0.04
+PONG v0.05
 
-Valen 2009,2010,2011
+Valen 2009, 2010, 2011, 2012
 -------------
 
-- originaly was developed with 2.9.7
-- adopted for 3.0.6 #6969
+TODO: Need fix for 60Hz video mode. Call the pong code always at 50Hz, in both 50Hz and 60Hz videomodes.
 
-
-TODO: Need fix for 60Hz video mode. Call the pong code at 50Hz, in both 50Hz and 60Hz videomodes.
-
+v0.04:
+- initial version
+- was developed with SDCC 2.9.7
+v0.05:
+- major code refactoring (one .h file for one .c file)
+- adapted for SDCC 3.0.6 #6969
+- adapted for FLOS598+ (FLOS now produce correct 1B (EOF) error code)
+- added disk error diagnostic (Gracefully exits to FLOS:  restore FLOS display and font and print error.)
 */
 
 
@@ -343,6 +347,8 @@ void Game_InitLevelBegining(void)
 }
 
 
+
+
 int main (void)
 {
 
@@ -358,6 +364,8 @@ int main (void)
 
     if(!Debug_CheckCurrentBank())
         return NO_REBOOT; 
+
+    Game_StoreFLOSVIdeoRam();
 
     initgraph();
     Game_SetReg_SprCtrl(SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE);

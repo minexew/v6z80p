@@ -17,13 +17,13 @@
 #include "disk_io.h"
 
 
-void DiagMessage(char* pMsg, const char* pFilename)
+void DiagMessage(const char* pMsg, const char* pFilename)
 {
     byte err;
 
     err = FLOS_GetLastError();
 
-    if(game.isFLOSVideoMode) {
+//    if(game.isFLOSVideoMode) {
         /*FLOS_FlosDisplay();
         game.isFLOSVideoMode = TRUE;*/
 
@@ -34,7 +34,7 @@ void DiagMessage(char* pMsg, const char* pFilename)
         _uitoa(err, buffer, 16);
         FLOS_PrintString(buffer);
         FLOS_PrintString(PS_LFCR);
-    }
+//    }
 
 
 
