@@ -5,10 +5,8 @@ Import('v6_prj')
 
 env_lib = v6_prj.env
 
-obj = env_lib.Object(  ['video_mode.c', 'sprites.c', 'keyboard.c', 'mouse.c', 'timer.c',
-                        'file_operations.c', 
-                        'assert_v6.c',
-                        'utils.c', 'blit.c'], 
+obj = env_lib.Object(  [ Glob('*.c')
+                       ], 
         CCFLAGS     = env_lib['CCFLAGS'] + ['--std-sdcc89', '--opt-code-size' ]  )
 obj[0].my_progress_message = '-------------  Misc lib: Compile C to object files ---------'
 
