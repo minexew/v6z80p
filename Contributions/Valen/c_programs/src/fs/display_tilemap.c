@@ -18,6 +18,7 @@
 #include <base_lib/video_mode.h>
 #include <base_lib/assert_v6.h>
 #include <base_lib/file_operations.h>
+#include <base_lib/blit.h>
 
 #include <string.h>
 
@@ -40,7 +41,7 @@
 #define Y_WINDOW_STOP                 0xC
 
 
-
+#define FONT_8x8_SIZE   (96UL*8*8)        // chunky font size
 
 void Display_PrintChar(BYTE c);
 BOOL Display_InitFont(void);
@@ -51,7 +52,8 @@ BOOL Display_LoadChunkyFont(void);
 void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress);
 void Display_SetPalette(void);
 //void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddress, BYTE fontColor);
-void Display_SetBytes(void);
+void Display_CloneChunkyFont_WithBlitter(void);
+void Display_SetFontPixelColors(void);
 
 #define PF_A       0
 #define PF_B       1
@@ -187,27 +189,28 @@ void TileMap_PutTileToTilemap(BYTE playfieldNumber, BYTE x, BYTE y, WORD tileNum
 }
 
 
-#define FONT_8x8_SIZE   (96*8*8)
+
 BOOL Display_InitFont(void)
 {
-    DWORD destVideoAddress, fontVideoAddress;
+    DWORD destVideoAddress;
     BYTE colorIndex;
 
     // make 15 fonts, with color index 1 to 15
     destVideoAddress = 0;
-    for(colorIndex=1; colorIndex<16; colorIndex++) {
+    for(colorIndex=1; colorIndex<2; colorIndex++) {
         Display_CreateChunkyFont(colorIndex, destVideoAddress);
         destVideoAddress += FONT_8x8_SIZE;
     }
 
 //    if(!Display_LoadChunkyFont())
 //        return FALSE;
+    Display_CloneChunkyFont_WithBlitter();
 
-    //Display_SetBytes();
+    Display_SetFontPixelColors();
 
     // Make 15 tiles, with color index 1 to 15 (will be used as background tiles)
     // Put in video memory right after fonts.
-    fontVideoAddress = 0;
+    destVideoAddress = FONT_8x8_SIZE * 15;
     for(colorIndex=1; colorIndex<16; colorIndex++) {
         Display_FillTile8x8(colorIndex, destVideoAddress);
         destVideoAddress += 8*8;
@@ -394,28 +397,39 @@ void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddre
 }
 */
 
-void Display_SetBytes(void)
+// This func is optimized for speed.
+void Display_SetFontPixelColors(void)
 {
 
     BYTE* pFont = (BYTE*)VIDEO_BASE;
 //    BYTE bytePixel;
 //    WORD i;
-    BYTE video_page = 0, fontColor = 1;
+
+    static BYTE fontColor = 1;
+    static BYTE video_page = 0;
+    /*static*/ WORD counter = 0;
 
     PAGE_IN_VIDEO_RAM();
     SET_VIDEO_PAGE(video_page);
 
-
-        while(video_page < 12) {
-            // modify pixel
-            *pFont = (*pFont + fontColor);
-            pFont++;
-            if(pFont >= (BYTE*)VIDEO_BASE + 0x2000) {
-                pFont = (BYTE*)VIDEO_BASE;
-                video_page++;
-                SET_VIDEO_PAGE(video_page);
-            }
+    while(video_page < 12) {
+        // modify pixel
+        if(*pFont)
+            *pFont = fontColor;           // if pixel is not zero, set pixel to font color
+        pFont++;
+        if(pFont >= (BYTE*)VIDEO_BASE + 0x2000) {
+            pFont = (BYTE*)VIDEO_BASE;
+            video_page++;                // inc video page
+            SET_VIDEO_PAGE(video_page);
         }
+
+        counter++;
+        if(counter >= (WORD)FONT_8x8_SIZE) {
+            counter = 0;
+            fontColor++;   // inc font color
+        }
+
+    }
 
     PAGE_OUT_VIDEO_RAM();
 
@@ -423,38 +437,26 @@ void Display_SetBytes(void)
 
 void Display_CloneChunkyFont_WithBlitter(void)
 {
-}
-
-
-
-void DoBlit(void)
-{
-    VIDEO_ADDR addr_src = 0;
     BYTE i;
+    BLITTER_PARAMS bp;
+    memset(&bp, 0, sizeof(bp));
 
-    for(i=0; i<15; i++) {
-        mm__blit_src_loc = addr_src << 3;
-        mm__blit_src_msb = addr_src >> 13;
-        mm__blit_src_mod = 0;
+    bp.src_addr  = 0;
+    bp.dest_addr = FONT_8x8_SIZE >> 3;
+    bp.width     = 256 - 1;
+    bp.height    = 24  - 1;
+    bp.misc      = BLITTER_MISC_ASCENDING_MODE;
 
-        mm__blit_dst_loc = 0;
-        mm__blit_dst_msb = 0;
-        mm__blit_dst_mod = 0;
 
-        mm__blit_misc = BLITTER_MISC_ASCENDING_MODE;
-        mm__blit_height = 96 - 1;
-        mm__blit_width  = 8*8 - 1;
-
-        BEGINASM();
-        nop
-        nop
-        ENDASM();
-
-        while(mm__vreg_read & BLITTER_LINEDRAW_BUSY);
-
-        addr_src += (FONT_8x8_SIZE >> 3);
+    for(i=0; i<15-1; i++) {
+        DoBlit(&bp);
+//        bp.src_addr  += FONT_8x8_SIZE >> 3;
+        bp.dest_addr += FONT_8x8_SIZE >> 3;
     }
 }
+
+
+
 
 // 16 primary colors
 const WORD myPalette[] = {

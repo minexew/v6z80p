@@ -1,3 +1,5 @@
+//
+
 #ifdef DEBUG
 void _assert_v6(char *expr, const char *filename, unsigned int linenumber)
 {
