@@ -8,10 +8,8 @@ v6_prj.stack    = '0xffff'
 env = v6_prj.env.Clone()
 #env['CPPPATH'] =  env['CPPPATH']    + [v6_prj.basedir + 'c_support/misc_lib/']
 
-objs = env.Object(   ['list_view.c', 'config.c', 'user_actions.c', 'os_onexit.c',
-                    'display_tilemap.c', 'display_flos.c',
-                    'os_cmd.c',
-                    'fs_walk.c', ], 
+objs = env.Object(   [ Glob('*.c')
+                     ], 
 #        CPPPATH     = 
         CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-size'],  
         CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]        # define OWN_SP is realy need only for main file

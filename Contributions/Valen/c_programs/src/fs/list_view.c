@@ -14,6 +14,8 @@
 
 #include "display.h"
 #include "list_view.h"
+#include "current_dir_full_name.h"
+#include "fs_walk.h"
 
 
 //#include <base_lib/video_mode.h>
@@ -85,6 +87,7 @@ void ListView_Update(ListView* this) {
     }//while
 
     ListView_update_own_textfield(this);
+
 }
 
 word ListView_GetNumItems(ListView* this) {
@@ -104,6 +107,9 @@ void ListView_Init(ListView* this)
 {
     this->firstVisibleIndex = 0;
     this->firstVisibleStr = this->strArr;
+
+    this->currentDirFullName = SetupCurrentDirFullName();
+    ListView_update_own_textfield_DirFullName(this);
 }
 
 char* ListView_GetItem(ListView* this, word itemIndex)
@@ -171,5 +177,29 @@ void ListView_update_own_textfield(ListView* this)
     Display_PrintString(buffer);
 
     Display_PrintString(" entries");
+
+}
+
+void ListView_update_own_textfield_DirFullName(ListView* this)
+{
+//    word numitems;
+//    BYTE buffer[32];
+    BYTE i;
+
+    // pos to one line above listview window
+    Display_SetCursorPos(this->x, this->y - 1);
+    // erase old string
+    for(i=0; i<SCREEN_WIDTH/8 - 1; i++)
+        Display_PrintString(" ");
+    // print string
+    Display_SetCursorPos(this->x, this->y - 1);
+    Display_PrintString(this->currentDirFullName);
+
+
+//    numitems = ListView_GetNumItems(this);
+//    _uitoa(numitems, buffer, 10);
+//    Display_PrintString(buffer);
+
+//    Display_PrintString(" entries");
 
 }

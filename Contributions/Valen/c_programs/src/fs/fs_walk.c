@@ -24,6 +24,8 @@ changelog
 0.017
 - adapted to FLOS598
 0.018
+- startup time now is about 2 sec (was 4.5 sec)
+  Font generation function is optimizied.
 -------------
 */
 
@@ -91,6 +93,8 @@ byte bufCatalog[DIRBUF_LEN];        // main buffer
 
 
 word numStrings;        // 
+
+
 
 
 int main (void)
@@ -321,3 +325,6 @@ void DisplayString(BYTE x, BYTE y, BYTE pen, const char* str) {
     Display_SetPen(pen); Display_PrintString(str);
 
 }
+
+
+

@@ -16,6 +16,8 @@ typedef struct  {
 // private
    word        firstVisibleIndex;
    const char* firstVisibleStr;
+
+   BYTE        *currentDirFullName;
 } ListView;
 
 
@@ -35,6 +37,7 @@ void  ListView_check_visible_part(ListView* this);
 char* ListView_get_item_by_index(ListView* this, word itemIndex);
 
 void ListView_update_own_textfield(ListView* this);
+void ListView_update_own_textfield_DirFullName(ListView* this);
 
 
 #endif /* LIST_VIEW_H */
