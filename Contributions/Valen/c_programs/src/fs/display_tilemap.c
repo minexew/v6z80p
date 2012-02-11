@@ -47,7 +47,7 @@ void Display_PrintChar(BYTE c);
 BOOL Display_InitFont(void);
 BOOL Display_LoadFont(void);
 void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress);
-BOOL Display_LoadChunkyFont(void);
+//BOOL Display_LoadChunkyFont(void);
 //void Display_SetNonZeroBytesToValue(BYTE value, WORD dataVideoAddress);
 void Display_FillTile8x8(BYTE colorIndex, DWORD videoAddress);
 void Display_SetPalette(void);
@@ -204,7 +204,10 @@ BOOL Display_InitFont(void)
 
 //    if(!Display_LoadChunkyFont())
 //        return FALSE;
+
+    // make 14 fonts from 1 font (just copy original font to new font locations, with blitter)
     Display_CloneChunkyFont_WithBlitter();
+    // Total fonts now is: 15 (but all with same color index)
 
     Display_SetFontPixelColors();
 
@@ -274,7 +277,7 @@ void Display_CreateChunkyFont(BYTE fontColor, DWORD fontVideoAddress)
 //
 //
 //
-
+/*
 BYTE buf8K[8 * 1024];
 BOOL Display_LoadChunkyFont(void)
 {
@@ -306,7 +309,7 @@ BOOL Display_LoadChunkyFont(void)
 
     return TRUE;
 }
-
+*/
 
 
 
@@ -357,7 +360,7 @@ void Display_PrintChar(BYTE c)
 }
 
 
-
+// load planar font (1 bit per pixel)
 BOOL Display_LoadFont(void)
 {
     FLOS_StoreDirPosition();
@@ -398,16 +401,16 @@ void Display_CloneChunkyFont(DWORD srcFontVideoAddress, DWORD destFontVideoAddre
 */
 
 // This func is optimized for speed.
+// TODO: in real, there are 12,5 video pages, not 12
 void Display_SetFontPixelColors(void)
 {
 
     BYTE* pFont = (BYTE*)VIDEO_BASE;
-//    BYTE bytePixel;
-//    WORD i;
+    WORD counter = 0;
 
     static BYTE fontColor = 1;
     static BYTE video_page = 0;
-    /*static*/ WORD counter = 0;
+
 
     PAGE_IN_VIDEO_RAM();
     SET_VIDEO_PAGE(video_page);
