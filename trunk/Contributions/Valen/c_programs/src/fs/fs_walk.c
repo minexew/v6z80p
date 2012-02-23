@@ -26,6 +26,8 @@ changelog
 0.018
 - startup time now is about 2 sec (was 4.5 sec)
   Font generation function is optimizied.
+- current dir full name is displayed on screen
+0.019
 -------------
 */
 
@@ -51,6 +53,7 @@ changelog
 #include "list_view.h"
 #include "user_actions.h"
 #include "os_cmd.h"
+#include "current_dir_full_name.h"
 
 #define EXTERN_FS_WALK
 #include "fs_walk.h"
@@ -89,18 +92,8 @@ ListView lview;
 // ---- buffer for list of dir entries ----
 byte bufCatalog[DIRBUF_LEN];        // main buffer
 
-
-
-
-word numStrings;        // 
-
-
-
-
 int main (void)
 {
-
-    tmp1 = bufCatalog;
 
     if(!check_OS_version()) {
         FLOS_PrintString("FLOS v");
@@ -134,12 +127,6 @@ int main (void)
     clear_keyboard_buffer();
     FLOS_SetCommander("FS.EXE");    // set FS as commander application
 
-    // ---
-    lview.width = 24; lview.height = 23;
-    lview.x = 1;      lview.y = 1;
-//    lview.width = 20; lview.height = 5;
-//    lview.x = 1;      lview.y = 1;
-
 
     fill_ListView_by_entries_from_current_dir();
     DisplayHelpString();
@@ -164,7 +151,10 @@ int main (void)
 
 void fill_ListView_by_entries_from_current_dir(void)
 {
-    char* mybuf;
+
+    ListView_Init(&lview);
+    ListView_SetPosAndSize(&lview, 1, 1, 24, 23);
+
 
     Display_SetPen(PEN_DEFAULT);
     // clear list view area
@@ -172,17 +162,15 @@ void fill_ListView_by_entries_from_current_dir(void)
     // clear txt area ("xxxx entries")
     clear_area(lview.x, lview.y + lview.height, lview.width, 1);
 
-    // reset string (buffer) len to zero
-    tmp1[0] = 0;
 
-    numStrings = do_dir();
-    mybuf = tmp1;       
 
-    lview.strArr = mybuf; 
-    lview.numItems = numStrings;
-    lview.selectedIndex = 0;
-    ListView_Init(&lview);
+    ListView_SetWorkBuffer(&lview, bufCatalog, sizeof(bufCatalog));
+    FillListView();
     ListView_Update(&lview);
+
+    //
+    CurrentDirFullName_Setup();
+    CurrentDirFullName_UpdateText();
 
 }
 

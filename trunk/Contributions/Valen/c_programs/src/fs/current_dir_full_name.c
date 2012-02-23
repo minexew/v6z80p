@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "display.h"
+#include "list_view.h"
 #include "current_dir_full_name.h"
 
 
@@ -19,8 +20,9 @@
 
 
 
-BYTE currentDirFullName[SCREEN_WIDTH/8 - 1];        // string
-BYTE* SetupCurrentDirFullName(void)
+BYTE        currentDirFullName[SCREEN_WIDTH/8 - 1];        // string
+const char* ptrCurrentDirFullName;
+BYTE* CurrentDirFullName_Setup(void)
 {
     const char* dir_name;
     WORD        dir_name_len;
@@ -44,5 +46,28 @@ BYTE* SetupCurrentDirFullName(void)
 
 
     FLOS_RestoreDirPosition();
+
+    ptrCurrentDirFullName = dest;
     return dest;
+}
+
+
+
+extern ListView lview;
+void CurrentDirFullName_UpdateText(void)
+{
+    BYTE i;
+    ListView* listView = &lview;
+
+
+    // pos to one line above listview window
+    Display_SetCursorPos(listView->x, listView->y - 1);
+    // erase old string
+    for(i=0; i<SCREEN_WIDTH/8 - 1; i++)
+        Display_PrintString(" ");
+    // print string
+    Display_SetCursorPos(listView->x, listView->y - 1);
+    Display_PrintString(ptrCurrentDirFullName);
+
+
 }

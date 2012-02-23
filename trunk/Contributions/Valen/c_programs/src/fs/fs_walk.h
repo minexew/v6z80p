@@ -10,7 +10,7 @@
 
 #define DIRBUF_LEN     1024*2
 
-EXTERN_FS_WALK BYTE* tmp1;
+
 
 
 void fill_ListView_by_entries_from_current_dir(void);
