@@ -23,7 +23,10 @@
 
 #include "fs_walk.h"
 #include "display.h"
+#include "list_view.h"
 #include "os_cmd.h"
+
+extern ListView lview;
 
 // --- Internal ---------------------------------------
 // init
@@ -33,7 +36,7 @@
 word split_string_to_many_strings(void);
 
 
-word do_dir(void)
+word FillListView(void)
 {
     byte str[40+1];
     FLOS_DIR_ENTRY e;
@@ -41,14 +44,18 @@ word do_dir(void)
 
     BYTE buffer[32];
 
+
+
     // iterate through current dir entries  (FLOS v537+)
     FLOS_DirListFirstEntry();
     while(1) {
+//        memset(str, 0, sizeof(str));
         str[0] = 0;
+
         FLOS_DirListGetEntry(&e);
         if(e.err_code == END_OF_DIR) break;
 
-        if( e.pFilename[0]=='.' && e.pFilename[1]==0 && e.file_flag == 1) {
+        if( e.pFilename[0]=='.' && e.pFilename[1]==0 && e.file_flag == 1) {     // if filename is . just omit it
             FLOS_DirListNextEntry();
             continue;
         }
@@ -68,20 +75,20 @@ word do_dir(void)
             _ultoa(e.len, buffer, 16);
             strcat(str, buffer);
         }
-        strcat(str, PS_LFCR);
+//        strcat(str, PS_LFCR);
 
 
-        // check, if there a free space in dir buffer
-        if( (strlen(tmp1) + 32) < DIRBUF_LEN )
-            strcat(tmp1, str);
-        else
-            break;
+        if(!ListView_AddItem(&lview, str)) {
+            return 0;
+        }
+
 
         if(FLOS_DirListNextEntry() == END_OF_DIR) break;
 
     }
 
-    return split_string_to_many_strings();
+
+    return 0;       //split_string_to_many_strings();
     
 }
 
@@ -89,7 +96,7 @@ word do_dir(void)
 
 
 
-
+/*
 // Replace all LFCR codes to 0
 word split_string_to_many_strings(void) {
     word i, len, num = 0;
@@ -104,7 +111,7 @@ word split_string_to_many_strings(void) {
 
     return num;
 }
-
+*/
 
 
 void PrintMessage(const char* str)

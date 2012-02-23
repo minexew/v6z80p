@@ -189,13 +189,14 @@ void TileMap_PutTileToTilemap(BYTE playfieldNumber, BYTE x, BYTE y, WORD tileNum
 }
 
 
-
+// Make 15 fonts, with color index 1 to 15.
+// VRAM ADDR: 0 - (FONT_SIZE*15)
 BOOL Display_InitFont(void)
 {
     DWORD destVideoAddress;
     BYTE colorIndex;
 
-    // make 15 fonts, with color index 1 to 15
+    // make 1 chunky font, with color index 1
     destVideoAddress = 0;
     for(colorIndex=1; colorIndex<2; colorIndex++) {
         Display_CreateChunkyFont(colorIndex, destVideoAddress);

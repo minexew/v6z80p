@@ -2,4 +2,4 @@
 // init
 
 //
-word do_dir(void);
+word FillListView(void);
