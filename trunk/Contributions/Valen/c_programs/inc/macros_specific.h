@@ -3,7 +3,7 @@
 
 // compiler specific
 
-#ifdef SDCC
+#if defined(__SDCC) || defined(SDCC)
 #define ASM_PREFIX		#
 #define NAKED   		__naked
 #define	BEGINASM()              __asm
@@ -16,7 +16,7 @@
 #endif
 
 
-#ifdef SDCC
+#if defined(__SDCC) || defined(SDCC)
 #define PUSH_ALL_REGS()                       \
         push af                               \
         push bc                               \
@@ -52,7 +52,7 @@
 
 
 
-#ifdef SDCC
+#if defined(__SDCC) || defined(SDCC)
 #define DI()     __asm          \
                  di             \
                  __endasm;
@@ -66,8 +66,8 @@
 
 
 
-# ifdef S_SPLINT_S
-# endif //S_SPLINT_S
+#ifdef S_SPLINT_S
+#endif //S_SPLINT_S
 
 
 #endif /* MACROS_SPECIFIC_H */
