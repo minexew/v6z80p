@@ -2,6 +2,17 @@
 FLOS version info:
 ------------------
 
+v5.99 - 09/03/12
+
+	Added - kjt_kjt_get_fs_vars_location
+	Added - kjt_continue_load
+	Added - kjt_set_load_address
+
+
+
+Previous changes:
+-----------------
+
 v5.98 - 20/01/12
 
 	Bugfix	- File read routine was not returning "Data after EOF requested" $1B error
@@ -23,8 +34,7 @@ v5.98 - 20/01/12
 	Optimized - Serial routines.
 
 
-Previous changes:
------------------
+
 
 v5.97 - 13/1/12
 
