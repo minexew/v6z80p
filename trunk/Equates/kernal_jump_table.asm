@@ -97,4 +97,6 @@ kjt_get_key_buffer		equ os_start + $106  ; added in v591
 kjt_get_colours		equ os_start + $109	 ; added in v593
 kjt_set_colours		equ os_start + $10c	 ; added in v593
 kjt_patch_font		equ os_start + $10f  ; added in v595
-
+kjt_get_fs_vars_location	equ os_start + $112  ; added in v599
+kjt_continue_file_read	equ os_start + $115  ; added in v599
+kjt_set_load_address	equ os_start + $118  ; added in v599
