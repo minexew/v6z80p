@@ -4,9 +4,9 @@ scripts (IE: sets the GOTO envar)
 
 Use: GOTO label
 
-Where ‘label’ is a 4 character ASCII
+Where "label" is a 4 character ASCII
 label within a script.
 
-This command is essentially the same
+This command is really just the same
 as: "SET GOTO label"
 
