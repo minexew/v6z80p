@@ -543,6 +543,7 @@ os_vol_cache	db 0
 envar_data	db 0,0,0,0
 
 bank_pre_cmd	db 0
+exe_bank		db 0
 
 fs_drive_sel_cache	db 0		; used in format command
 
