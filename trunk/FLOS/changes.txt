@@ -2,6 +2,13 @@
 FLOS version info:
 ------------------
 
+v6.00 - 06/05/12
+
+	Fixed:  When an executable file was loaded - and the load rolled over $FFFF into
+                a new bank, the  active bank was not being reset to that which the program
+                required at start-up.
+
+
 v5.99 - 09/03/12
 
 	Added - kjt_kjt_get_fs_vars_location
