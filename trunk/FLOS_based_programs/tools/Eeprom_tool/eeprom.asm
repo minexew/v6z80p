@@ -1,5 +1,5 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.19 - P.Ruston '08 - '12    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.20 - P.Ruston '08 - '12    *
 ; ****************************************************************************
 ;
 ; V1.20 - fixed for FLOS v593 (call to KJT_GET_INPUT_STRING)
