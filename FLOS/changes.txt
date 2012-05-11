@@ -1,6 +1,15 @@
 
-FLOS version info:
-------------------
+Current FLOS version:
+---------------------
+
+V6.01 - 11/05/12
+
+        Fixed:  When a file with name longer than 15 characters was sent to FLOS via
+                the serial link, the file transfer length was being corrupted.
+
+
+Previous changes:
+-----------------
 
 v6.00 - 06/05/12
 
@@ -17,8 +26,6 @@ v5.99 - 09/03/12
 
 
 
-Previous changes:
------------------
 
 v5.98 - 20/01/12
 
