@@ -1,0 +1,15 @@
+
+EMU.EXE - Emulator config launcher
+
+(Replaces GOSPEC.EXE)
+
+Currently used to start Alessandro's
+cycle perfect Spectrum emulators.
+(A simple "BOOT n" is not sufficient
+as files such as the Spectrum ROM
+need to be pre-loaded into the
+V6Z80P's memory).
+
+Use: EMU (no parameters)
+
+
