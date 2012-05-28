@@ -7,7 +7,7 @@ There are two main Spectrum Emulators for the V6Z80P:
    version of the V6Z80P (using eeprom.exe) from the FPGA_CFG/PHIL folder. 
 
    I.O. on this emulator is limited to the loading of .sna files such as those
-   provided in the "48snaps" and "128snaps" folders. 
+   provided in the "software/48snaps" and "software/128snaps" folders. 
   
    This emulator requires the files "BOOTCODE.BIN", "ZXSPEC48.ROM" and "ZXSPE128.ROM"
    in the [ROOT]:Spectrum directory of the SD Card.
@@ -15,14 +15,20 @@ There are two main Spectrum Emulators for the V6Z80P:
    You can launch this emulator with the FLOS command "BOOT [n]" (where [n] is the
    slot number where the config file was installed)
 
+   For full documentation see the V6Z80P project folder:
+
+   "Alternative_Configs/Phil/Spectrum_Emulator"
+
+
+
 
 
 2. Alessandro's cycle-perfect Spectrum 48 / 128 emulator for the V6Z80P v1.1 only (it
    requires clocking features only available on this board). Install the
    latest version of the config files free slots with eeprom.exe and launch
-   the emulator with the FLOS command EMU.EXE 
+   the emulator with the FLOS command EMU.EXE
 
-   This emulator can load .tap files (with the normal spectrum LOAD instruction)
+   This emulator can load .tap files (with the normal Spectrum LOAD instruction)
    and also includes the ZXMMC+ expansion system, allowing programs like Residos
    to be installed (which can load and save files to the SD card etc).
    
@@ -32,8 +38,10 @@ There are two main Spectrum Emulators for the V6Z80P:
    of your SD Card).
 
    The emulator also requires the files "ZXSPEC48.ROM" and "ZXPSE128.ROM" in the
-   [ROOT]:SPECTRUM directory of the SD CARD (this is loaded by the EMU.EXE command.)
+   "[ROOT]:Spectrum" directory of the SD CARD (this is loaded by the EMU.EXE command.)
         
-   For full documentation see the V6Z80P project folder: Alternative_Configs/Alessandro
+   For full documentation see the V6Z80P project folder:
+
+   "Alternative_Configs/Alessandro/Cycle_Exact_Spectrum_Emulator"
 
 
