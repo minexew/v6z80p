@@ -8,28 +8,28 @@ There are two main Spectrum Emulators for the V6Z80P:
    I.O. on this emulator is limited to the loading of .sna files. You can launch
    this emulator with the FLOS command "BOOT [slot]"
 
-   This emulator requires the files BOOTCODE.BIN, ZXSPEC48.ROM and ZXSPE128.ROM
+   This emulator requires the files "BOOTCODE.BIN", "ZXSPEC48.ROM" and "ZXSPE128.ROM"
    in the [ROOT]:Spectrum directory of the SD Card and 
 
 
 
-2. Alessandro's cycle-perfect Spectrum 48 emulator for the V6Z80P v1.1 only (it
+2. Alessandro's cycle-perfect Spectrum 48 / 128 emulator for the V6Z80P v1.1 only (it
    requires clocking features only available on this board). Install the
-   latest version to a free slot with eeprom.exe and the launch the emulator
-   with the FLOS command GOSPEC.EXE 
+   latest version of the config files free slots with eeprom.exe and launch
+   the emulator with the FLOS command EMU.EXE 
 
    This emulator can load .tap files (with the normal spectrum LOAD instruction)
    and also includes the ZXMMC+ expansion system, allowing programs like Residos
-   to be installed (which can load and save files to the SD card, start snapshots etc).
+   to be installed (which can load and save files to the SD card etc).
    
    Additionally, the emulator is able to start from a previously saved RESIDOS.NVR file,
-   which removes the need to manually install Residos each time. Use option 3 of
-   GOSPEC.EXE to load a RESIDOS.NVR file - it should be in the root directory of your
-   SD Card).
+   which removes the need to manually install Residos each time. Use the relevent option
+   of EMU.EXE to load a RESIDOS.NVR file - it should be in the [ROOT]:Spectrum directory
+   of your SD Card).
 
-   The emulator also requires the file "ZXSPEC48.ROM" in the [ROOT]:SPECTRUM directory
-   of the SD CARD (this is loaded by FLOS's GOSPEC.EXE command.)
+   The emulator also requires the files "ZXSPEC48.ROM" and "ZXPSE128.ROM" in the
+   [ROOT]:SPECTRUM directory of the SD CARD (this is loaded by the EMU.EXE command.)
         
-   For full info see the V6Z80P project folder: Alternative_Configs/Alessandro
+   For full documentation see the V6Z80P project folder: Alternative_Configs/Alessandro
 
 
