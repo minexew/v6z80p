@@ -12,4 +12,10 @@ V6Z80P's memory).
 
 Use: EMU (no parameters)
 
+Notes:
 
+The settings (slots used, currently
+selected emulator) are saved in a
+file called emu.cfg in a root folder
+named SETTINGS (both are created if
+necessary).
