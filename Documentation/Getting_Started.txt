@@ -52,8 +52,8 @@ FLOS is a simple command line operating system / memory monitor similar to that
 used by freezer cartridges on the 80s home computers. In some ways it behaves like a
 more modern DOS in that disk-based programs can be executed simply by entering
 their filenames. The usual commands are present (show memory as hex, disassemble,
-load and save bytes to RAM etc) - a full list with parameter requirements is
-available by entering "?" 
+load and save bytes to RAM etc) - a list of internal commands is available by
+entering "?" (for details use the command "HELP (command_name)"
 
 FLOS uses the FAT16 file system and loads from a file on the root of the SD card
 (or from the onboard EEPROM). Naturally, it can be replaced with any arbitary code
@@ -95,11 +95,8 @@ The onboard EEPROM can store multiple FPGA configurations in what (for simplicit
 are called "slots". On power-up, the FPGA starts from whichever is the "Active Slot". 
 As supplied, OSCA for 50Hz PAL TVs in Slot 1 and OSCA for 60Hz NTSC TVs is in Slot2.
 
-On newer boards (V6+ v1.1) slot 3 contains Alessandro Dorigatti's Cycle Perfect
-Spectrum 48 Emulator - this is run via the FLOS command "GOSPEC". 
-
-My own (inaccurate) Spectrum 128 emulator (PAL and NTSC versions) is the slots
-following on.
+(Depending on the date of production, other slots may have been preloaded with
+Spectrum Emulators.)
 
 All the configs supplied support VGA output.
 
@@ -119,7 +116,7 @@ OSCA manual: Documentation\Manuals\OSCA_hardware_manual.doc
 PCB tech manual:  Documentation\Manuals\PCB_technical_manual.doc
 
 
-Online documentation / main project archive: http://wiki.retroleum.co.uk
+Online documentation & link to main project archive: http://wiki.retroleum.co.uk
 
 
 
