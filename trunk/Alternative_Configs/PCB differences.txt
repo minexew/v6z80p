@@ -93,3 +93,13 @@ instead of SOIC-8
 
 The PCB mounting holes are in different locations.
 
+
+V6Z80P+ v1.1b
+-------------
+
+SD card connector type changed to push-push type (difficulty in sourcing original).
+
+Removed "OSC SEL" switch (CPU clock is now always sourced from FPGA)
+
+Wider pads to accomdate SOIC-W 8-pin style EEPROM (PIC code now supports SST25VF chips also).
+
