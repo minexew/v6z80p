@@ -28,7 +28,7 @@ Visible differences between boards
 Installing an FPGA config onto the EEPROM
 -----------------------------------------
 
-1. [Optional: Copy the relevant FPGA config *.bin file to the SD card.
+1. [Optional: Copy the relevant FPGA config *.bin file to the SD card.]
 
 2. Boot into FLOS.
 
