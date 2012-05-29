@@ -36,7 +36,7 @@ There are now only 2 spare IO port header pins.
 
 There are alternative (SMT) footprints for the onboard EEPROM.
 
-As the pin conenctions to the FPGA were changed, a different config
+As the pin connections to the FPGA were changed, a different config
 file must be used for this board (which handles the different pin-outs,
 CPU A14, etc)
 
@@ -65,7 +65,7 @@ gate plus timing crystal. There is also a footprint for a 7x5mm SMT
 3.3v oscillator module on the underside of the PCB for the GCLK3 input
 (which also still goes to a header pin, as does GCLK2).
 
-A phsysical switch* controls the CPU clock selection in the following way:
+A physical switch* controls the CPU clock selection in the following way:
 In the up position, input A to the 74HCT08 AND gate (which outputs the
 level-shifted CPU clock signal) comes direct from the main 16MHz oscillator.
 In this case, AND input B (from pin 75 of the FPGA) should normally be pulled up. 
@@ -76,11 +76,11 @@ through - and if desired, gate - whichever GCLK signal is required for the
 project).
 
 (* The switch was included for 100% OSCA compatibility using the
-V6Z80P plus config files (up position). However, if alternative
+V6Z80P plus v1.0 config files (up position). However, if alternative
 CPU clocks are being used, it is more convenient to just leave the
 switch in the down position and use the special V6Z80Plus V1.1
-OSCA config file - this is the same as the V6Z8op+ 1.0 config except
-it loops the 16MHz system clock through the FPGA to pin75.)
+OSCA config files - this config is the same as the V6Z80p+ 1.0 
+except it loops the 16MHz system clock through the FPGA to pin75.)
 
 The Comms socket has reverted back to being a 4-pin mini DIN (same pin
 out as original V6Z80p)
