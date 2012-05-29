@@ -29,7 +29,10 @@ Credits:
 --------
 
 PCB design, OSCA FPGA architecture, FLOS Operating System and revelent
-apps by Phil Ruston 2008-2011
+apps by Phil Ruston 2008-2012
 
 The FLOS "Disassemble" command uses the excellent "DISZ80" routine
 by John Kerr 1987.
+
+The cycle-perfect Spectrum Emulator configs for the V6Z80P V1.1 board
+were made by Alessandro Dorigatti 2011-2012.
