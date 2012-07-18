@@ -1,6 +1,9 @@
-; EDIT.EXE v0.01 for FLOS by Phil Ruston 2011 (to replace TEXTEDIT.EXE)
+; EDIT.EXE v0.02 for FLOS by Phil Ruston 2011 (to replace TEXTEDIT.EXE)
 ; ---------------------------------------------------------------------
-;
+
+; V0.02 - New requester code for FLOS 6.02
+; V0.01 - First release
+
 ; Use: EDIT [filename] [-G hex_number]
 ;
 ; If no filename is supplied, a new document called "NEW.TXT" is created.
@@ -38,6 +41,9 @@ include "osca_hardware_equates.asm"
 include "system_equates.asm"
 
 	org $5000
+
+required_flos	equ $602
+include 		"test_flos_version.asm"
 
 ;-----------------------------------------------------------------------------------------------
 
@@ -818,11 +824,11 @@ cposok	ld b,a			;draw cursor at extreme right if end of a line
 	ld c,a
 	call kjt_set_cursor_position
 	
-	ld hl,$c00		;cursor image = block (for insert mode)
+	ld hl,$1000		;cursor image = block (for insert mode)
 	ld a,(mode_bits)
 	and 1
 	jr nz,block_cur
-	ld hl,$43f		;normal underscore cursor
+	ld hl,$085f		;normal underscore cursor
 block_cur	call kjt_draw_cursor
 	ret
 	
