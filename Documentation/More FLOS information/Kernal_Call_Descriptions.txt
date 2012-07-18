@@ -1,1656 +1,1549 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-<head>
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-  <title>FLOS Kernal Calls</title>
-</head>
+List of FLOS kernal calls - last updated 16-07-2012 for FLOS v602
 
-<body>
-<span style="text-decoration: underline; font-weight: bold;">List of FLOS kernal calls - last updated 08-03-2012 for FLOS v599</span><br>
-<br>
-<span style="text-decoration: underline;">File System Routines:</span><br>
-<br>
-<span style="font-weight: bold;"><a href="#kjt_check_volume_format">kjt_check_volume_format</a> </span>&nbsp;- Checks if current volume is formatted to FAT16.<br>
-<a href="#kjt_change_volume"><span style="font-weight: bold;">kjt_change_volume</span></a> - Selects drives VOL0: to VOL7:<br>
-<a href="#kjt_get_volume_info"><span style="font-weight: bold;">kjt_get_volume_info</span></a> - Returns data about the volumes mounted<br>
-<a href="#kjt_format_device"><span style="font-weight: bold;">kjt_format_device</span></a> -Formats entire SD card to FAT16<br>
-<a href="#kjt_make_dir"><span style="font-weight: bold;">kjt_make_dir</span></a> -Creates a new sub directory in current directory<br>
-<a href="#kjt_change_dir"><span style="font-weight: bold;">kjt_change_dir</span></a> - Change to subdirectory<br>
-<a href="#kjt_parent_dir"><span style="font-weight: bold;">kjt_parent_dir</span></a> -Move up a directory level<br>
-<a href="#kjt_root_dir"><span style="font-weight: bold;">kjt_root_dir</span></a> -Go to root directory of drive<br>
-<a href="#kjt_delete_dir"><span style="font-weight: bold;">kjt_delete_dir</span></a> - Deletes an (empty) directory<br>
-<a href="#kjt_erase_file"><span style="font-weight: bold;">kjt_erase_file</span></a> -Deletes a file<br>
-<a href="#kjt_get_total_sectors"><span style="font-weight: bold;">kjt_get_total_sectors</span></a> - Returns total sectors on current volume<br>
-<span style="font-weight: bold;"><a href="#kjt_load_file">kjt_load_file</a> </span>- Loads a file in its entirety from disk to RAM<br>
-<a href="#kjt_save_file"><span style="font-weight: bold;">kjt_save_file</span> </a>- Creates and saves a file from RAM to disk<br>
-<a href="#kjt_open_file"><span style="font-weight: bold;">kjt_open_file</span></a> - Looks for a file on current disk, resets file pointer etc<br>
-<a href="#kjt_set_file_pointer"><span style="font-weight: bold;">kjt_set_file_pointer</span></a> - Moves the read point from the start of a file<br>
-<a href="#kjt_set_read_length"><span style="font-weight: bold;">kjt_set_read_length</span></a> - Sets the read length of a file transfer to a certain value<br>
-<a href="#kjt_read_from_file"><span style="font-weight: bold;">kjt_read_from_file</span></a> - Reads data from the opened file to RAM<br>
-<a href="#kjt_create_file"><span style="font-weight: bold;">kjt_create_file</span> </a>-Makes a new file stub.<br>
-<a href="#kjt_write_to_file"><span style="font-weight: bold;">kjt_write_to_file</span></a> - Appends new data to an existing file.<br>
-<a href="#kjt_dir_list_first_entry"><span style="font-weight: bold;">kjt_dir_list_first_entry</span></a>&nbsp;- Find first entry in current directory.<br>
-<a href="#kjt_dir_list_get_entry"><span style="font-weight: bold;">kjt_dir_list_get_entry</span></a> - Returns data from directory list (see output registers)<br>
-<a href="#kjt_dir_list_next_entry"><span style="font-weight: bold;">kjt_dir_list_next_entry</span> </a>- Moves directory list pointer to the next entry<br>
-<a href="#kjt_get_dir_name"><span style="font-weight: bold;">kjt_get_dir_name</span></a> - Returns the name of the current directory.<br>
-<a href="#kjt_mount_volumes"><span style="font-weight: bold;">kjt_mount_volumes</span></a> - Initializes the attached disk list.<br>
-<a href="#kjt_store_dir_position"><span style="font-weight: bold;">kjt_store_dir_position</span></a> - Internally remembers the current directory position.<br>
-<a href="#kjt_restore_dir_position"><span style="font-weight: bold;">kjt_restore_dir_position</span></a>&nbsp; - Restores directory to that stored by above.<br>
-<a href="#kjt_get_device_info"><span style="font-weight: bold;">kjt_get_device_info</span></a>&nbsp; - Returns info about the storage devices.<br>
-<a href="#kjt_get_dir_cluster"><span style="font-weight: bold;">kjt_get_dir_cluster</span> </a>- Returns the cluster address of the current dir<br>
-<a href="#kjt_set_dir_cluster"><span style="font-weight: bold;">kjt_set_dir_cluster</span></a> - Sets the dir from a cluster address<br>
-<a href="#kjt_rename_file"><span style="font-weight: bold;">kjt_rename_file</span></a> - Renames files and directories<br>
-<a href="#kjt_get_fs_vars_location_"><span style="text-decoration: underline;"><span style="font-weight: bold;">kjt_get_fs_vars_location</span></span></a> - Returns address of&nbsp;Filesystem's control variables<br>
-<a style="font-weight: bold;" href="#kjt_restore_fs_vars_"></a><a style="font-weight: bold;" href="#kjt_continue_file_read">kjt_continue_file_read</a> - Same as KJT_READ_FROM_FILE except this does not set the load address/bank (uses working values instead)<br>
-<a style="font-weight: bold;" href="#kjt_set_load_address">kjt_set_load_addres</a><a style="font-weight: bold;" href="#kjt_set_load_address"><span style="font-weight: bold;">s</span></a> - Specifies the load address and bank for a file read (when using KJT_continue_file_read)<br>
-<br>
-<span style="text-decoration: underline;">Low-Level Sector Access Routines:</span><br>
-<br>
-<a href="#kjt_read_sector"><span style="font-weight: bold;">kjt_read_sector</span></a> - Loads 512 byte sector to the sector buffer<br>
-<a href="#kjt_write_sector"><span style="font-weight: bold;">kjt_write_sector</span></a> -Writes 512 byte sector to the current device<br>
-<a href="#kjt_file_sector_list"><span style="font-weight: bold;">kjt_file_sector_list</span></a> - To list the disk sectors that files occupy<br>
-<span style="font-weight: bold;"><a href="#kjt_get_sector_read_addr">kjt_get_sector_read_addr</a> - </span>Returns data and pointers allowing&nbsp;sector buffer relocation etc.<span style="font-weight: bold;"><br>
-<br>
-</span><span style="text-decoration: underline;">Kernal Serial Comms Routines:</span><br>
-<br>
-<a href="#kjt_serial_receive_header"><span style="font-weight: bold;">kjt_serial_receive_header</span></a> - Waits for a file header from serial port<br>
-<a href="#kjt_serial_receive_file"><span style="font-weight: bold;">kjt_serial_receive_file</span></a> - Receives serial file data<br>
-<a href="#kjt_serial_send_file"><span style="font-weight: bold;">kjt_serial_send_file</span></a> - Sends a file to serial port (Serial Link App format)<br>
-<a href="#kjt_serial_rx_byte"><span style="font-weight: bold;">kjt_serial_rx_byte</span></a> - Wait for a byte from serial port<br>
-<a href="#kjt_serial_tx_byte"><span style="font-weight: bold;">kjt_serial_tx_byte</span></a> - Send a byte to serial port<br>
-<br>
-<span style="text-decoration: underline;">Kernal Keyboard And Mouse Routines</span><br>
-<br>
-<a href="#kjt_wait_key_press"><span style="font-weight: bold;">kjt_wait_key_press</span></a> - Pauses until a key is pressed<br>
-<span style="font-weight: bold;"><a href="#kjt_get_key">kjt_get_key</a> </span>- Returns value of key, if one has been pressed (does not wait)<br>
-<span style="font-weight: bold;"><a href="#kjt_get_key_mod_flags">kjt_get_key_mod_flags</a> </span>- Returns status of the shift, ctrl, alt etc keys<br>
-<a href="#kjt_enable_mouse"><span style="font-weight: bold;">kjt_enable_mouse</span></a> - Activates mouse driver (enables IRQ etc).<br>
-<a href="#kjt_get_mouse_position"><span style="font-weight: bold;">kjt_get_mouse_position</span></a> - Returns absolute mouse position and button data<br>
-<a href="#kjt_get_mouse_motion_"><span style="font-weight: bold;">kjt_get_mouse_motion</span></a> - Returns relative mouse displacement<br>
-<a href="#kjt_keyboard_irq_code"><span style="font-weight: bold;">kjt_keyboard_irq_code</span></a> - Allows external apps to invoke FLOS keybaord IRQ code<br>
-<a href="#kjt_mouse_irq_code"><span style="font-weight: bold;">kjt_mouse_irq_code</span></a> - Allows external apps to invoke FLOS mouse IRQ code<br>
-<a href="#kjt_get_key_buffer"><span style="font-weight: bold;">kjt_get_key_buffer</span></a> - Allows monitoring of the keyboard without affecting the buffer.<br>
-<br>
-<span style="text-decoration: underline;">Kernal Text and Display Routines</span><br>
-<br>
-<a href="#kjt_print_string"><span style="font-weight: bold;">kjt_print_string</span></a> - Prints ASCII text string at the current cursor position<br>
-<a href="#kjt_clear_screen"><span style="font-weight: bold;">kjt_clear_screen</span></a> - Clears OS screen and sets cursor position to top left (0,0)<br>
-<a href="#kjt_plot_char"><span style="font-weight: bold;">kjt_plot_char</span> </a>- Prints character at given coords using current pen colours<br>
-<a href="#kjt_set_pen"><span style="font-weight: bold;">kjt_set_pen</span></a> - Changes current pen colour<br>
-<span style="font-weight: bold;"><a href="#kjt_get_pen_">kjt_get_pen</a> </span>- Returns current pen colour<br>
-<a href="#kjt_background_colours"><span style="font-weight: bold;"></span></a><span style="font-weight: bold;"><a href="#kjt_draw_cursor">kjt_draw_cursor</a> </span>- Draws (or removes) the cursor at the current cursor position<br>
-<a href="#kjt_get_input_string"><span style="font-weight: bold;">kjt_get_input_string</span></a> - Waits for user to enter a string of characters<br>
-<span style="font-weight: bold;"><a href="#kjt_set_cursor_position">kjt_set_cursor_position</a> </span>- Repositions the text printing (cursor) position<br>
-<a href="#kjt_get_cursor_position"><span style="font-weight: bold;">kjt_get_cursor_position</span></a> - Returns the current cursor position<br>
-<a href="#kjt_scroll_up"><span style="font-weight: bold;">kjt_scroll_up</span></a> - Scrolls the screen (and character map) up a line.<br>
-<span style="font-weight: bold;"><a href="#kjt_flos_display">kjt_flos_display</a> </span>- Restores the video registers to the state used by the OS. <br>
-<a href="#kjt_get_display_size"><span style="font-weight: bold;">kjt_get_display_size</span></a> -Returns size of OS_window<br>
-<a href="#kjt_get_charmap_addr_xy"><span style="font-weight: bold;">kjt_get_charmap_addr_xy</span></a> - Returns the charmap address of coordinates x,y<br>
-<span style="font-weight: bold;"><a href="#kjt_wait_vrt">kjt_wait_vrt</a> </span>- Wait for vertical retrace (IE: last scanline of display)<br>
-<a style="font-weight: bold;" href="#kjt_get_colours">kjt_get_colours</a> - Returns RGB values of the FLOS border, paper and cursor and the location of the pen colour list<br>
-<a style="font-weight: bold;" href="#kjt_set_colours_">kjt_set_colours</a> - Sets FLOS border, paper and cursor colours and writes to&nbsp;the pen colour list<br>
-<a href="#kjt_patch_font"><span style="font-weight: bold;">kjt_patch_font</span></a> - Allows easy (and individual) user defined characters in the FLOS font.<br>
-<br style="text-decoration: underline;">
-<span style="text-decoration: underline;">Kernal Memory Management Routines:</span><br>
-<br>
-<a href="#kjt_set_bank"><span style="font-weight: bold;">kjt_set_bank</span></a> - Switches the upper RAM page to a specific bank<br>
-<a href="#kjt_get_bank"><span style="font-weight: bold;">kjt_get_bank</span></a> - Returns the current bank number in A<br>
-<a href="#kjt_inc_bank"><span style="font-weight: bold;">kjt_inc_bank</span></a> - Change to the next bank<br>
-<a href="#kjt_page_in_video"><span style="font-weight: bold;">kjt_page_in_video</span></a> - Pages video memory into $2000-$3FFF<br>
-<a href="#kjt_page_out_video"><span style="font-weight: bold;">kjt_page_out_video</span></a> - Pages system memory into $2000-$3FFF<br>
-<a href="#kjt_read_sysram_flat"><span style="font-weight: bold;">kjt_read_sysram_flat</span></a> - read flat system memory location (E:HL) into A<br>
-<span style="font-weight: bold;"><a href="#kjt_write_sysram_flat">kjt_write_sysram_flat</a> </span>- write A into flat system memory location (E:HL)<br>
-<br>
-<span style="text-decoration: underline;">Kernal Misc Routines:</span><br>
-<br>
-<span style="font-weight: bold;"><a href="#kjt_hex_byte_to_ascii">kjt_hex_byte_to_ascii</a>&nbsp;</span>- Make ASCII version of a hex byte<br>
-<span style="font-weight: bold;"><a href="#kjt_ascii_to_hex_word">kjt_ascii_to_hex_word</a> </span>- Converts text hex number to real hex word<br>
-<a href="#kjt_dont_store_registers"><span style="font-weight: bold;">kjt_dont_store_registers</span></a> - Stops the OS updating the stored register values on exit<br>
-<a href="#kjt_get_version"><span style="font-weight: bold;">kjt_get_version</span></a> - Returns OS and hardware ID numbers<br>
-<a href="#kjt_compare_strings"><span style="font-weight: bold;">kjt_compare_strings</span></a> - Compares two ASCII strings<br>
-<span style="font-weight: bold;"><a href="#kjt_bchl_memfill_">kjt_bchl_memfill</a> </span>- Fill memory with value in accumulator<br>
-<a href="#kjt_timer_wait_"><span style="font-weight: bold;">kjt_timer_wait</span> </a>- Waits n periods of 16 microseconds and returns<br>
-<span style="font-weight: bold;"><a href="#kjt_set_commander">kjt_set_commander</a> </span>- Specifies a command string to be run when programs exit<br>
-<br>
-<span style="text-decoration: underline;">Environment Variable Routines:</span><br>
-<br>
-<span style="font-weight: bold;"><a href="#kjt_set_envar">kjt_set_envar</a>&nbsp;</span>&nbsp;&nbsp; - Sets/updates an environment variable<br>
-<a href="#kjt_get_envar"><span style="font-weight: bold;">kjt_get_envar</span></a>&nbsp;&nbsp;&nbsp; - Gets (address of) value of an environment variable<br>
-<span style="font-weight: bold;"><a href="#kjt_delete_envar">kjt_delete_envar</a> </span>- Deletes an environment variable<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;">FILE SYSTEM RELATED CALLS - &nbsp;Some Details:<br>
-<hr style="width: 100%; height: 2px;"><br>
-There are two ways to load a file, a simple single-call approach and a more flexible random-access approach.<br>
-<br>
-To
-load a file simply, set HL to a zero terminated ASCII filename string,
-IX to the destination address and B to the destination bank, then call
-"kjt_load_file" - check the return code - see table below - if the zero flag is set,
-everything is OK.<br>
-<br>
-The more flexible way to load file data is as
-follows: Set HL to a zero terminated ASCII filename string and call
-"kjt_open_file". If the zero flag is set on return, the file was found
-the length of the file will be in IX:IY (if the zero flag is not set,
-check the error code flags).<br>
-<br>
-Next, the following two routines can be called *if required*<br>
-<br>
-&nbsp;*
-"kjt_set_file_pointer" - this allows data to be read from anywhere
-within a file, instead of right from the start. Registers required:<br>
-<br>
-&nbsp;&nbsp;&nbsp; IX:IY = Offset in bytes from start of file. &nbsp;&nbsp; &nbsp;<br>
-<br>
-<br>
-&nbsp;* "kjt_set_read_length" - allows the length of transfer to be set.&nbsp;Registers required:<br>
-&nbsp; &nbsp;<br>
-&nbsp;&nbsp;&nbsp; IX:IY = Bytes to load. <br>
-<br>
-<br>
-Finally, "kjt_read_from_file" should be called to transfer the data to memory.<br>
-<br>
-&nbsp; Registers required:<br>
-&nbsp; &nbsp;<br>
-&nbsp;&nbsp; HL = Load address.<br>
-&nbsp;&nbsp; B&nbsp; = Bank of load address.<br>
-<br>
-Again, on return, if the zero flag is set then the operation completed OK.<br>
-<br>
-The
-file pointer is automatically incremented by the number of bytes
-transferred, therefore it is not necessary call "kjt_set_file_pointer"
-each time if&nbsp;chunks of a file are required sequentially.
-Attempting to read beyond the end of a file will return an error (code
-$1B). The load length MUST be set for each read (and load address and bank set
-appropriately each call). <br>
-<br>
-To maintain speed, a fresh seek from
-the start of the file is not performed each time "kjt_read_from_file"
-is called unless the file pointer has been changed. Internal variables
-must be maintained, therefore do not perform any other &nbsp;disk /
-serial operations (or anything that changes the sector buffer) between
-successive calls to this routine.<br>
-<br>
-Whenever a disk file transfer reaches address $FFFF, it wraps around to $8000 and continues on into the next bank. <br>
-<br>
-Most of the file system kernal calls return one of these standard error codes:<br>
-<br>
-&nbsp; If the zero flag is set, the operation was a success.<br>
-&nbsp; If the zero flag is not set, there was an error. A = error code:<br>
-<br>
-&nbsp;$01 - disk full<br>
-&nbsp;$02 - file not found <br>
-&nbsp;$03 - (root) dir table is full <br>
-&nbsp;$04 - directory requested is actually a file<br>
-&nbsp;$05 - cant delete dir, it is not empty<br>
-&nbsp;$06 - not a file<br>
-&nbsp;$07 - file length is zero<br>
-&nbsp;$08 - address error (file too big for memory)<br>
-&nbsp;$09 - filename already exists<br>
-&nbsp;$0a - already at root directory<br>
-&nbsp;$0e - invalid volume<br>
-&nbsp;$13 - unknown/incorrect disk format<br>
-&nbsp;$1b - requested bytes beyond end of file<br>
-&nbsp;$22 - device not present&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
-&nbsp;$23 - directory not found&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;$24 - end of directory list<br>
-&nbsp;$2e - device does not use MBR<br>
-<br>
-<br>
-<span style="text-decoration: underline;">Advanced:</span><br>
-<br>
-In FLOS v599 the following routines were added to allow external programs to hook into the filesystem variables<br>
-used by FLOS.<span style="text-decoration: underline;"></span><br>
-<span style="text-decoration: underline;"><span style="font-weight: bold;"><br>
-<a href="#kjt_get_fs_vars_location_">kjt_get_fs_vars_location</a></span></span><a href="#kjt_get_fs_vars_location_"> </a><br>
-<br>
-The data at this location (see link for format) can be backed up and restored by a user program, allowing multiple<br>
-open files to managed etc.<br>
-<br>
-Notes:<br>
-<br>
-When restoring altered variable data, the first byte "fs_filepointer_valid" should always be cleared so that<br>
-filesystem correctly re-seeks from the start of files.<br>
-<br>
-The current volume number&nbsp;must be handled seperarately if files on multiple volumes are to be handled.<br>
-<br>
-<br>
-<br>
-Additionally, the following two new routines were addedt:<br>
-<br>
-<a style="font-weight: bold;" href="Kernal_Call_Descriptions.html#kjt_continue_file_read">kjt_continue_file_read</a> <br>
-<a style="font-weight: bold;" href="Kernal_Call_Descriptions.html#kjt_set_load_address">kjt_set_load_addres</a><a style="font-weight: bold;" href="Kernal_Call_Descriptions.html#kjt_set_load_address"><span style="font-weight: bold;">s</span></a> <br>
-<br>
-The normal file read call KJT_READ_FROM_FILE&nbsp;requires the bank and address to be specified, which<br>
-may be a nuisance when working with multiple files.With the KJT_CONTINUE_FILE_READ routine, the<br>
-file bytes are written to address from the end of the last read operation. KJT_SET_LOAD_ADDRESS sets<br>
-the address and bank to a specified value.<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;">&nbsp;<br>
-<span style="font-weight: bold;"><a name="kjt_check_volume_format"></a>&nbsp;kjt_check_volume_format</span><br>
-<br>
-Action: Checks if current volume is available and formatted to FAT16<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : Standard error codes <br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_change_volume"></a>&nbsp;kjt_change_volume</span><br>
-<br>
-Action: Selects a new volume<br>
-<br>
-Input Registers&nbsp; : A = volume to select<br>
-<br>
-Output Registers :&nbsp; Standard error codes <br>
-<br>
-Notes: Will not allow a change to an invalid Volume (non-FAT16 etc)<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_format_device"></a>&nbsp;kjt_format_device</span><br>
-<br>
-Action: Formats a device (entire drive as single partition, no MBR)<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-A&nbsp; = Device to format<br>
-HL = Disk label ascii <br>
-<br>
-Output Registers : Standard error codes <br>
-<br>
-Notes: It is highly recommended that "kjt_mount_volumes" is called after this routine.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_make_dir"></a>kjt_make_dir</span><br>
-<br>
-Action: Creates a new sub directory in current directory<br>
-<br>
-Input Registers:<br>
-<br>
-HL = zero terminated dir name<br>
-<br>
-Output Registers : Standard error codes <br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_change_dir"></a><br>
-<span style="font-weight: bold;">&nbsp;kjt_change_dir</span><br>
-<br>
-Action: Change to subdirectory<br>
-<br>
-Input Registers:<br>
-<br>
-HL = zero terminated dir name<br>
-<br>
-Output Registers : Standard error codes <br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_parent_dir"></a>kjt_parent_dir</span><br>
-<br>
-Action: Move up a directory level<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : Standard error codes<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_root_dir"></a>&nbsp;kjt_root_dir</span><br>
-<br>
-Action: Go to root directory of drive<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : Standard error codes<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_delete_dir"></a>kjt_delete_dir</span><br>
-<br>
-Action: Deletes an (empty) directory<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = zero terminated dir name<br>
-<br>
-Output Registers : Standard error codes<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_erase_file"></a>kjt_erase_file</span><br>
-<br>
-Action: Deletes a file<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = zero terminated file name<br>
-<br>
-Output Registers : Standard error codes<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-<span style="font-weight: bold;"><a name="kjt_get_total_sectors"></a>kjt_get_total_sectors</span><br>
-<br>
-Action: Returns total sectors on current volume<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers :<br>
-<br>
-C:DE = number of sectors<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><br>
-<a name="kjt_load_file"></a>kjt_load_file</span><br>
-<br>
-Action: Loads the specified file in its entirity to the specifed address.<br>
-<br>
-Input registers:<br>
-<br>
-IX&nbsp;&nbsp; = address to load to<br>
-B&nbsp;&nbsp;&nbsp; = bank to load to<br>
-HL&nbsp;&nbsp; = zero terminated filename<br>
-<br>
-Output registers: Standard error codes <br>
-<br>
-Notes:<br>
-<br>
-This
-routine both opens a file and reads all the data to RAM - for more
-flexibility use "kjt_open_file", "kjt_set_file_pointer",
-"kjt_set_read_length" and "kjt_read_file_data"<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_save_file"></a>kjt_save_file</span><br>
-<br>
-Action: Saves a file to current disk / directory.<br>
-<br>
-Input registers:<br>
-<br>
-IX&nbsp;&nbsp; = Source data start address<br>
-B&nbsp;&nbsp;&nbsp; = bank to save data from<br>
-C:DE = number of bytes to save<br>
-HL&nbsp;&nbsp; = zero terminated filename<br>
-<br>
-Output registers: Standard error codes <br>
-<br>
-Notes:<br>
-<br>
-This
-routine both creates a new file and saves data to it - it cannot be
-used append new data to an existing file (will return "file already
-exists" error if attempted).<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_open_file"></a>kjt_open_file</span><br>
-<br>
-Action: Looks for a file on current disk and sets internal registers ready&nbsp;for "kjt_read_from_file" call.<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = pointer to zero terminated filename to look for<br>
-<br>
-Output Registers :<br>
-<br>
-If the Zero Flag is set: All OK. Registers are:<br>
-<br>
-IX:IY = Length of file<br>
-DE&nbsp;&nbsp;&nbsp; = First disk cluster used by file<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-If zero flag is not set: standard error codes.<br>
-<br>
-Notes:&nbsp; File pointer is set to 0, default transfer length = total file size <br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_set_file_pointer"></a>kjt_set_file_pointer</span><br>
-<br>
-Action: Moves the read point from the start of a file<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-&nbsp;IX:IY = Offset in bytes from start of file.<br>
-<br>
-Output Registers :&nbsp; none<br>
-<br>
-Notes: Use after "kjt_open_file" (if required)<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_set_read_length"></a>kjt_set_read_length</span><br>
-<br>
-Action: Forces the read length of the file transfer to a certain value<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-IX:IY = Bytes to load<br>
-<br>
-Output Registers : none<br>
-<br>
-Notes: Use after kjt_find_file, if desired)<br>
-<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_read_from_file"></a>kjt_read_from_file</span><br>
-<br>
-Action:&nbsp; Loads data (from the previously opened file) to a specified address.<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = Destination address<br>
-B&nbsp; = Destination bank<br>
-<br>
-Output Registers : Standard error codes<br>
-<br>
-Notes:<br>
-<br>
-&nbsp;"kjt_open_file" MUST be called first before using this routine.<br>
-<br>
-Whenever a disk file transfer reaches address $FFFF, it wraps around to $8000 and continues onto the next bank. <br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_create_file"></a>kjt_create_file</span><br>
-<br>
-Action: Makes a file stub for a new file on current disk, current directory.<br>
-<br>
-Input Registers :<br>
-<br>
-HL = address of zero-terminated filename.<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-Output Registers : Standard error codes<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_write_to_file"></a>kjt_write_to_file</span><br>
-<br>
-Action: Appends new data to an existing file on current disk / directory.<br>
-<br>
-Input Registers:<br>
-<br>
-HL&nbsp;&nbsp; = null-terminated ascii filename of file to be appended to<br>
-IX&nbsp;&nbsp; = address of source data<br>
-B&nbsp;&nbsp;&nbsp; = bank of source data<br>
-C:DE = number of bytes to write<br>
-<br>
-Output Registers : Standard error codes &nbsp;<br>
-<br>
-Notes:<br>
-<br>
-Returns "file not found" error if the file has not been previously created &nbsp;with "kjt_create_file" or "kjt_save_file"<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_dir_list_first_entry"></a>kjt_dir_list_first_entry</span><br>
-<br>
-Action: Finds the first listing in a directory, returns info.<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers: If zero flag is set:<br>
-<br>
-HL&nbsp;&nbsp;&nbsp; = Location of null terminated filename string<br>
-IX:IY = Length of file (if applicable)<br>
-B&nbsp;&nbsp;&nbsp;&nbsp; = File flag (1 = directory, 0 = file)<br>
-<br>
-If zero flag is not set, standard error codes&nbsp; (EG: $24 = Reached end of directory)<br>
-<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_dir_list_get_entry"></a>kjt_dir_list_get_entry</span><br>
-<br>
-Action: Returns data about the entry at the current position in the directory list.<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers: If zero flag is set:<br>
-<br>
-HL&nbsp;&nbsp;&nbsp; = Location of null terminated filename string<br>
-IX:IY = Length of file (if applicable)<br>
-B&nbsp;&nbsp;&nbsp;&nbsp; = File flag (1 = directory, 0 = file)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-If zero flag is not set, standard error codes&nbsp;(EG: $24 = Reached end of directory)<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_dir_list_next_entry"></a>kjt_dir_list_next_entry</span><br>
-<br>
-Action: Moves the internal directory list pointer to the next entry and&nbsp;returns details about the entry found.<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers: If zero flag is set:<br>
-<br>
-HL&nbsp;&nbsp;&nbsp; = Location of null terminated filename string<br>
-IX:IY = Length of file (if applicable)<br>
-B&nbsp;&nbsp;&nbsp;&nbsp; = File flag (1 = directory, 0 = file)<br>
-<br>
-If zero flag is not set, standard error codes&nbsp; (EG: $24 = Reached end of directory)<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_dir_name"></a>kjt_get_dir_name</span><br>
-<br>
-Action: Returns ascii string of current dir name (null terminated)<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers :<br>
-<br>
-If zero flag set: HL = ascii string.<br>
-&nbsp;&nbsp;&nbsp; &nbsp;<br>
-If zero flag is not set, standard error codes<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_store_dir_position"></a>kjt_store_dir_position</span><br>
-<br>
-Action: Internally remembers the current directory position.<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers :None<br>
-<br>
-Notes: <br>
-<br>
-All flags and registers are preserved.<br>
-kjt_get_dir_cluster is more useful.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_restore_dir_position"></a>kjt_restore_dir_position</span><br>
-<br>
-Action: Restores the directory position to that set by "kjt_store_dir_position".<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers :None<br>
-<br>
-Notes:<br>
-<br>
-All flags and registers are preserved.<br>
-kjt_set_dir_cluster is more useful.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_mount_volumes"></a>kjt_mount_volumes</span><br>
-<br>
-Action: Reinitializes the drives and mount list<br>
-<br>
-Input registers:<br>
-<br>
-If A = 1, mount quietly (no text output)<br>
-<br>
-Output registers :None<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_volume_info"></a>kjt_get_volume_info</span><br>
-<br>
-Action: Returns info about the volumes mounted.<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers :<br>
-<br>
-HL = address of volume mount list&nbsp;&nbsp; &nbsp;<br>
-B = Number of volumes mounted<br>
-A = currently Selected volume<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><br>
-<a name="kjt_get_device_info"></a>kjt_get_device_info</span><br>
-<br>
-Action: Returns info from the device list.<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers :<br>
-<br>
-&nbsp;HL = address of device info table&nbsp;&nbsp; &nbsp;<br>
-&nbsp;DE = address of driver table<br>
-&nbsp;B =&nbsp; number of devices initialized <br>
-&nbsp;A = current active driver number<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_dir_cluster"></a>kjt_get_dir_cluster</span><br>
-<br>
-Action: Returns the location of the directory cluster<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers :<br>
-<br>
-DE = cluster pointed at by current directory<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
-&nbsp;&nbsp;
-<hr style="width: 100%; height: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-<span style="font-weight: bold;"><a name="kjt_set_dir_cluster"></a>kjt_set_dir_cluster</span><br style="font-weight: bold;">
-<br>
-Action: Sets the directory cluster (for use with above command)<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-DE = desired cluster number to be used as current dir<br>
-<br>
-Output Registers : None<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_rename_file"></a>kjt_rename_file</span><br>
-<br>
-Action: Rename files / folders.<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = Pointer to filename to change (null terminated ASCII)<br>
-DE = Pointer to replacement filename (null terminated ASCII)<br>
-<br>
-Output Registers : Standard error codes&nbsp;&nbsp; &nbsp;<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"></span><span style="font-weight: bold;"><a name="kjt_get_fs_vars_location_"></a>kjt_get_fs_vars_location</span><br>
-<br>
-Action: Sets HL to the address of the fiilesystem's control variables<span style="font-weight: bold;"></span>.<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : HL =&nbsp; location of the following data structure:<br>
-<br>
-&nbsp;$00 byte&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; - fs_filepointer_valid<br>
-&nbsp;$01 longword &nbsp;- fs_file_pointer<br>
-&nbsp;$05 longword &nbsp;- fs_file_length<br>
-&nbsp;$09 longword &nbsp;- fs_bytes_to_go<br>
-&nbsp;$0d word&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; - fs_file_start_cluster<br>
-&nbsp;$0f word&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; - fs_file_working_cluster<br>
-&nbsp;$11 word&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; - fs_z80_address<br>
-&nbsp;$13 byte &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; - fs_z80_bank<br>
-<br>
-Note: When restoring altered data, the first byte "fs_filepointer_valid" should always be cleared. This causes the<br>
-read operations to cleanly&nbsp; seek from the beginning
-of&nbsp;files&nbsp;when&nbsp;file transfer (re)commences. &nbsp;(Access will<br>
-be noticably slower than a single continuous load.)<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_continue_file_read"></a>kjt_continue_file_read</span><br>
-<br>
-Action: Same as KJT_READ_FROM_FILE except this does not set the load address/bank<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : Standard error codes&nbsp;&nbsp; &nbsp;<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_set_load_address"></a>kjt_set_load_address</span><br>
-<br>
-Action: Specifies the load address and bank for a file read (when using KJT_continue_file_read)<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = &nbsp;Z80 address where data should load<br>
-B &nbsp; = FLOS bank where data should load<br>
-<br>
-Output Registers : None&nbsp; &nbsp;<br>
-<br>
-<hr style="width: 100%; height: 2px;">Low-Level Disk Sector Access Routines<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_read_sector"></a>kjt_read_sector</span><br>
-<br>
-Action: Loads a 512 byte sector from the device and address selected to the sector buffer<br>
-<br>
-Input registers:<br>
-<br>
-A = Device number to access (normally 0)<br>
-BC:DE = absolute LBA address for desired sector<br>
-<br>
-Output registers: Standard error codes (relevant errrors: $1e, $22)<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_write_sector"></a>kjt_write_sector</span><br>
-<br>
-Action: Writes a 512 byte sector from the sector buffer to the device and address selected<br>
-<br>
-Input registers:<br>
-<br>
-A = Device number to access (normally 0)<br>
-BC:DE = absolute LBA address for desired sector<br>
-<br>
-Output registers: Standard error codes (relevant errrors: $1e, $22)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_file_sector_list"></a>kjt_file_sector_list</span><br>
-<br>
-Action: Retrieves the location of the (next) disk sector that a file occupies.<br>
-<br>
-Input registers:<br>
-<br>
-A&nbsp; = Sector offset (within current cluster)<br>
-DE = Cluster number<br>
-<br>
-Output registers:<br>
-<br>
-A&nbsp; = Next sector offset<br>
-DE = Updated cluster<br>
-HL = Memory address of LSB of 4 byte sector location<br>
-<br>
-How to use:<br>
-<br>
-To
-obtain the list of sectors that a file uses, first call "kjt_find_file"
-with the filename in HL as normal. On exit, DE will be equal the first
-cluster that the file occupies. Clear the accumulator (as we're
-starting at the first sector of this cluster), and call
-"kjt_file_sector_list". On return A and DE are updated to the values
-required for the next time the routine is called and HL points to the
-lowest significant byte of the sector address (LBA0). Next, copy the 4
-bytes from HL to HL+3 to your sector list buffer and loop around,
-calling "kjt_file_sector_list" for as many sectors as are used by the
-file (simply subtract 512 from a variable holding the file size every
-call until variable is = &lt; 0)<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_sector_read_addr"></a>kjt_get_sector_read_addr</span><br>
-<br>
-Action: Returns the address of the selected drive's sector read routine, also LBA variable and sector_location_variable<br>
-<br>
-Input Registers :<br>
-<br>
-A = Device to access (normally 0)<br>
-<br>
-Output Registers:<br>
-<br>
-&nbsp;HL = Address of sector read routine<br>
-&nbsp;DE = Address of the LSB of the 32bit LBA variable<br>
-&nbsp;BC = Address of the sector buffer location variable <br>
-<br>
-Notes: <br>
-<br>
-This routine can be used to allow programs to read sectors <span style="text-decoration: underline;">directly</span>
-to an arbitrary location in memory (IE: A program can write to the
-sector LBA and sector buffer location variables, and then call the
-low-level sector read routine using the data obtained).<br>
-<br>
-&nbsp;The
-sector buffer location is automatically reset to the location that the
-OS requires whenever a filesystem routine is called (this includes the
-KJT read/write sector calls above.) Similarly, altering the LBA
-variable manually should not affect normal operation of the filesystem.<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;">&nbsp;SERIAL I/O ROUTINES<br>
-<hr style="width: 100%; height: 2px;"><br>
-As
-with the disk routines, whenever a serial file transfer command reaches
-address $FFFF, it wraps around to $8000 and continues onto the next
-bank.<br>
-<br>
-The Serial Header Format:<br>
-<br>
-$00 - $0F: ASCII filename<br>
-$10 - $11: Length of file (low word)<br>
-$12 - $13: Length of file (high word)<br>
-$14 - $1F: ASCII "Z80P.FHEADER" (12 chars)<br>
-$20 - $FF: All must be zero<br>
-<br>
-(All words are in normal Z80 little-endian format)<br>
-<br>
-Serial transfer format:<br>
-<br>
-Bytes
-from the file are sent in 256 byte packets followed by a 2 byte
-checksum word. The checksum calculation is described as a "standard
-CRC-CCITT that uses polynomial $1021". It produces a 16 bit output. The
-Z80 code (slow, unoptimized) to generate it is as follows:<br>
-<br>
-crc_checksum<br>
-<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; ld
-hl,$ffff&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; makes checksum in
-HL, src addr = DE, length = C bytes<br>
-crcloop&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ld a,(de)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; xor
-h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; ld
-h,a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ld b,8<br>
-crcbyte&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; add hl,hl<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; jr nc,crcnext<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ld a,h<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; xor 10h<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ld h,a<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ld a,l<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; xor 21h&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ld l,a<br>
-crcnext&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; djnz crcbyte<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; inc de<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; dec c&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; jr nz,crcloop<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ret<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_serial_receive_header"></a><br>
-<span style="font-weight: bold;">kjt_serial_receive_header</span><br>
-<br>
-Action: Waits for a file header from serial port.<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-&nbsp;HL = Location of filename<br>
-&nbsp;A&nbsp; = Time allowed in seconds before give up waiting<br>
-<br>
-Output Registers :<br>
-<br>
-Zero Flag: If set, all OK<br>
-IX = location of serial file header (details below)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-If Zero Flag is NOT set, A = serial error code.<br>
-<br>
-A = $07 : Save length is zero<br>
-A = $08 : File too big (IE: Memory address out of range)<br>
-A = $0f : Checksum bad<br>
-A = $11 : Comms error<br>
-A = $14 : Time out error<br>
-A&nbsp;= $25 : Filename mismatch&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-A = $2A : Aborted with ESC key<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-Note: Filename can be "*" if any file is to be accepted.<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_serial_receive_file"></a>kjt_serial_receive_file</span><br>
-<br>
-Action: Receives serial file data <br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = Address to load file to<br>
-B&nbsp; = Bank to load file into <br>
-<br>
-Output Registers :<br>
-<br>
-Zero Flag: If set, all OK<br>
-<br>
-IX = location of of serial file header<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-If Zero Flag is NOT set, A = serial error code.<br>
-<br>
-A&nbsp;= $07 : Save length is zero<br>
-A = $08 : File too big (IE: Memory address out of range)<br>
-A = $0f : Checksum bad<br>
-A = $11 : Comms error<br>
-A = $14 : Time out error<br>
-A = $25 : Filename mismatch<br>
-<br>
-Note: "kjt_serial_receive_header" MUST be called before this routine!<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_serial_send_file"></a>kjt_serial_send_file</span><br>
-<br>
-Action: Sends a file to serial port (Serial Link App format)<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL&nbsp;&nbsp;&nbsp;&nbsp; = filename<br>
-C:DE&nbsp;&nbsp; = length of file<br>
-B&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = Bank number that file starts in<br>
-IX&nbsp;&nbsp;&nbsp;&nbsp; = Start address<br>
-<br>
-Output Registers : Zero flag, set if all OK.<br>
-<br>
-If zero flag not set, A = serial error code.<br>
-<br>
-A = $07 : Save length is zero<br>
-A&nbsp;= $08 : File too big (IE: Memory address out of range)<br>
-A = $0f : Checksum bad<br>
-A = $11 : Comms error<br>
-A = $14 : Time out error<br>
-A = $25 : Filename mismatch<br>
-<br>
-<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><br>
-<a name="kjt_serial_rx_byte"></a>kjt_serial_rx_byte</span><br>
-<br>
-Action: Wait for a byte from serial port<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-&nbsp;A.&nbsp; Bits: [0:5] = max time to wait in seconds<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [6] = If set, the wait can be aborted with the ENTER key<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;[7] = If set, the wait can be aborted with ESCAPE key<br>
-<br>
-Output Registers : If Carry flag is clear all OK, A = byte received.<br>
-&nbsp; <br>
-If Carry flag is set, error code in A as follows:<br>
-<br>
-A = $14 - Timed out<br>
-A = $2A - Aborted with key.<br>
-<br>
-Notes: All registers except A preserved<br>
-<br>
-<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><br>
-<a name="kjt_serial_tx_byte"></a>kjt_serial_tx_byte</span><br>
-<br>
-Action: Send a byte to serial port<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers : A = byte to send<br>
-<br>
-Notes: All registers except A preserved.<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;">KEYBOARD AND MOUSE ROUTINES&nbsp;<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_wait_key_press"></a>kjt_wait_key_press</span><br>
-<br>
-Action: Pauses until a key is pressed<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers :<br>
-<br>
-A = Scancode of key pressed<br>
-&nbsp;B = ASCII code (B=$00 if no valid ascii char equivalent.)<br>
-<br>
-Notes: ASCII code is modified by shift / Alt key status<br>
-<br>
-<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><br>
-<a name="kjt_get_key"></a>kjt_get_key</span><br>
-<br>
-Action: Returns value of key, if one has been pressed (does not wait)<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers :<br>
-<br>
-&nbsp;A = Scancode of key pressed (A = $00 if no key pressed)<br>
-&nbsp;B = ASCII code (B=$00 if no valid ascii char equivalent.)<br>
-<br>
-Notes: ASCII code is modified by shift / Alt key status<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_key_mod_flags"></a>kjt_get_key_mod_flags</span><br>
-<br>
-Action: Returns current status of key modifiers<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : A, bits<br>
-<br>
-[0] - left shift<br>
-[1] - left/right ctrl<br>
-[2] - left GUI<br>
-[3] - left/right alt<br>
-[4] - right shift<br>
-[5] - right GUI<br>
-[6] - Apps<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_keyboard_irq_code"></a>kjt_keyboard_irq_code</span><br>
-<br>
-Action: Keyboard IRQ handler.<br>
-<br>
-When
-a custom interrupt handler is set up but kernal-based keyboard handling
-is required, this routine can be called when the keyboard IRQ flag is
-set <br>
-The above kernal keyboard routines will then still work. (The call clears the relevant IRQ flag).<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_enable_mouse"></a>kjt_enable_mouse</span><br>
-<br>
-Action: Activates mouse pointer (called by MOUSE.EXE) and sets x/y boundaries<br>
-<br>
-Input Registers&nbsp; : <br>
-<br>
-HL = Window size X<br>
-DE = Window size Y<br>
-<br>
-Output Registers : None<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_mouse_position"></a>kjt_get_mouse_position</span><br>
-<br>
-Action: Returns absolute mouse position and button data<br>
-<br>
-Input Registers&nbsp; : none <br>
-<br>
-Output Registers : Zero Flag - If not set, the mouse driver was not enabled, otherwise:<br>
-<br>
-HL = x coordinate<br>
-DE = y coordinate<br>
-A = buttons status<br>
-<br>
-The x and y coordinates cannot overflow from the boundaries set with &nbsp;"kjt_enable_mouse"<br>
-<br>
-(Note:
-the mouse driver is currently somewhat primative - it may become out of
-sync with the three-byte packets that the mouse sends if say,<br>
-interrupts are disabled)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_mouse_motion_"></a>kjt_get_mouse_motion </span><br>
-<br>
-Action: Returns relative mouse motion and button data. <br>
-<br>
-Input Registers&nbsp; : none <br>
-<br>
-Output Registers : Zero Flag: if not set, the mouse driver was not enabled, Otherwise:<br>
-<br>
-HL = x motion since last called<br>
-DE = y motion since last called<br>
-A = buttons status<br>
-<br>
-(Note:
-the mouse driver is currently somewhat primative - it may become out of
-sync with the three-byte packets that the mouse sends if say,<br>
-interrupts are disabled)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
-<hr style="width: 100%; height: 2px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-<span style="font-weight: bold;"><a name="kjt_mouse_irq_code"></a>kjt_mouse_irq_code</span><br>
-<br>
-Action: Mouse IRQ handler<br>
-<br>
-When
-a custom interrupt handler is set up but kernal-based mouse handling is
-required, this routine can be called when the mouse IRQ flag is set.<br>
-The above kernal mouse routines will then still work. (The call clears the relevant IRQ flag).<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_key_buffer"></a>kjt_get_key_buffer</span><br>
-<br>
-Action: Returns values for monitoring the keyboard buffer<br>
-<br>
-Input Registers: None<br>
-<br>
-Output Registers:<br>
-<br>
-HL&nbsp; = Location of the keyboard buffer WRITE index variable (The actual keyboard buffer starts 32 bytes lower in memory)<br>
-A = The value of the keyboard READ index variable.<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-Notes: On return, if A = (HL) no key has been pressed (IE: the keyboard buffer is empty)<br>
-<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-<hr style="width: 100%; height: 2px;">&nbsp;MEMORY MANAGEMENT ROUTINES&nbsp;<br>
-<hr style="width: 100%; height: 2px;"><br>
-Under
-FLOS, Z80 Address space $5000-$FFFF is available for user programs.
-FLOS allows the upper 32KB of Z80 address space ($8000-$FFFF) to be
-paged. 15 pages of system RAM&nbsp;can appear in this region, starting
-at system RAM address $08000 (FLOS does not normally allow the first
-32KB of system RAM to be paged into $8000-$FFFF). Therefore, when using
-the KJT routines for bank management, the figures are as follows:<br>
-<br>
-<span style="text-decoration: underline;">Bank | &nbsp;SYSTEM RAM&nbsp; |&nbsp; Z80 ADDRESS</span><br>
-<br>
-$00 = $08000-$0ffff @ $8000-$ffff<br>
-$01 = $10000-$17fff @ $8000-$ffff<br>
-$02 = $18000-$1ffff @ $8000-$ffff<br>
-$03 = $20000-$27fff @ $8000-$ffff<br>
-$04 = $28000-$2ffff @ $8000-$ffff<br>
-$05 = $30000-$37fff @ $8000-$ffff<br>
-$06 = $38000-$3ffff @ $8000-$ffff<br>
-$07 = $40000-$47fff @ $8000-$ffff<br>
-$08 = $48000-$4ffff @ $8000-$ffff<br>
-$09 = $50000-$57fff @ $8000-$ffff<br>
-$0a = $58000-$5ffff @ $8000-$ffff<br>
-$0b = $60000-$67fff @ $8000-$ffff<br>
-$0c = $68000-$6ffff @ $8000-$ffff<br>
-$0d = $70000-$77fff @ $8000-$ffff<br>
-$0e = $78000-$7ffff @ $8000-$ffff<br>
-<br>
-(You
-may have noticed that the figures are different to the values used if
-writing directly to the bank selection hardware port: sys_mem_select).<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_set_bank"></a>kjt_set_bank</span><br>
-<br>
-Action: Changes the currently selected upper RAM page<br>
-<br>
-Input Registers&nbsp; : <br>
-<br>
-A = bank number $00 to $0e<br>
-<br>
-Output Registers : none<br>
-<br>
-Trashes: A<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_get_bank"></a><br>
-<span style="font-weight: bold;">&nbsp;kjt_get_bank</span><br>
-<br>
-Action: Returns the upper bank number in A<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers :<br>
-<br>
-A = current bank number ($00 to $0e)<br>
-<br>
-Trashes: none<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_inc_bank"></a><br>
-<span style="font-weight: bold;">kjt_inc_bank</span><br>
-<br>
-Action: change to the next bank<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers :<br>
-<br>
-&nbsp;If Zero flag set: all OK,<br>
-&nbsp;If Zero is not set: A = $08 - bank out of range<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_page_in_video"></a>kjt_page_in_video</span><br>
-<br>
-Action: Pages 8KB of video memory specified by (hardware register vreg_vidpage) into Z80 address space $2000-$3FFF. <br>
-<br>
-CAUTION: This area is used by part of FLOS so ideally no other FLOS call should be made until&nbsp;<span style="font-weight: bold;">kjt_page_out_video</span> is called.<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers : none<br>
-<br>
-Trashes: A<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_page_out_video"></a><br>
-<span style="font-weight: bold;">kjt_page_out_video</span><br>
-<br>
-Action: Pages normal system memory (part of the FLOS!) back into $2000-$3FFF<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers : none<br>
-<br>
-Trashes: A<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_read_sysram_flat"></a>kjt_read_sysram_flat</span><br>
-<br>
-Action: Reads system memory in a flat, linear addressing mode<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-E:HL = $00000 - $7FFFF (address to read)<br>
-<br>
-Output Registers :<br>
-<br>
-A (byte read from address)<br>
-<br>
-Trashes: BC,DE,HL<br>
-<br>
-Notes: &nbsp;<br>
-<br>
-*
-The routine saves and restores the current bank setting around the
-read&nbsp;so make sure any interrupt service routine is in unpaged
-memory (&lt;$8000)<br>
-&nbsp; or disable interrupts to avoid problems.<br>
-<br>
-* As this routine is very slow, only use if convenience is more important than speed.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_write_sysram_flat"></a>kjt_write_sysram_flat</span><br>
-<br>
-Action: Writes to system memory in a flat, linear addressing mode<br>
-<br>
-Input Registers&nbsp; <br>
-<br>
-E:HL = $00000 - $7FFFF (address to write),<br>
-A = byte to write<br>
-<br>
-Output Registers : None (but see below)<br>
-<br>
-Trashes: BC, DE, HL<br>
-<br>
-Notes: &nbsp;<br>
-<br>
-*
-The routine saves and restores the current bank setting around the
-write&nbsp; so make sure any interrupt service routine is in unpaged
-memory (&lt;$8000)<br>
-&nbsp; or disable interrupts to avoid problems.<br>
-<br>
-* As this routine is not fast, only use if convenience is more important than speed.<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;">&nbsp;KERNAL TEXT AND DISPLAY ROUTINES&nbsp;<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_print_string"></a>kjt_print_string</span><br>
-<br>
-Action: Prints ASCII text string at cursor position<br>
-<br>
-Input Registers : HL address of string (zero terminated)<br>
-<br>
-Output Registers: None<br>
-<br>
-Notes:<br>
-<br>
-ASCII Char $0a = line feed<br>
-ASCII Char $0d = carriage return<br>
-ASCII Char $0b = Line Feed and Carriage return<br>
-<br>
-HL returns pointing to the zero byte at end of the string<br>
-<br>
-All other registers are preserved by this routine.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_clear_screen"></a>kjt_clear_screen</span><br>
-<br>
-Action: clears OS screen and set cursor position to top left (0,0)<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : None<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_plot_char"></a>kjt_plot_char</span><br>
-<br>
-Action: Prints ASCII character at supplied coordinates using current pen colours<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-A = ASCII character<br>
-B = x coord<br>
-C = y coord<br>
-<br>
-Output Registers : None<br>
-<br>
-Notes: <br>
-<br>
-Plot_char does not change the current cursor position.<br>
-If a coordinate is outside the window, it is taken as zero<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_pen_"></a>kjt_get_pen </span><br>
-<br>
-Action: Returns current pen colour<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers :<br>
-<br>
-A = $nm where "n" is the background and "m" is the foreground colour (see colour table below)<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br style="font-weight: bold;">
-<span style="font-weight: bold;"><a name="kjt_set_pen"></a>kjt_set_pen</span><br>
-<br>
-Action: Changes current pen colour<br>
-<br>
-Input Registers&nbsp; : A = $nm where "n" is the background and "m" is the foreground colour <br>
-<br>
-Available (default) colours:<br>
-<br>
-0 - transparent (shows UI "paper" colour)<br>
-1 - black<br>
-2 - blue<br>
-3 - red<br>
-4 - magenta<br>
-5 - green<br>
-6 - cyan<br>
-7 - yellow<br>
-8 - white<br>
-9 - dark grey<br>
-a - mid grey<br>
-b - light grey<br>
-c - orange<br>
-d - light blue<br>
-e - light green<br>
-f - brown<br>
-<br>
-Output Registers : None<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_get_colours"></a><span style="font-weight: bold;">kjt_get_colours</span><br>
-<br>
-Action: Returns the location of the FLOS colour list.<br>
-<br>
-Input registers: none<br>
-<br>
-Output
-registers: &nbsp;HL = location of colour list: 18&nbsp;words (RGB
-values). Note: FLOS stores its colour list under the hardware registers
-so system memory needs to paged into that region if <span style="font-weight: bold; text-decoration: underline;">writing</span>
-directly to the address returned from this call. (Simply reading the
-list poses no such problem). In all cases, kjt_set_colours needs to be
-called to actually change the palette (unless writing directly to the Hardware
-Palette Registers)<br>
-<br>
-$00 - Paper <br>
-$02 - Border<br>
-$04 - Cursor<br>
-$06 - 15 pen colours starting with pen 1<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<a name="kjt_set_colours_"></a><span style="font-weight: bold;">kjt_set_colours </span><br>
-<br>
-Action: Sets FLOS border, paper and cursor colours and updates the pen colour list<br>
-<br>
-Input registers: HL = location of the&nbsp;colour palette list (18 RGB words)<br>
-<br>
-$00 - Paper <br>
-$02 - Border<br>
-$04 - Cursor<br>
-$06 - 15 pen colours starting with pen 1<br>
-<br>
-Output registers: Input registers are trashed.<br>
-<br>
-Notes:<br>
-<br>
-Changes persist until FLOS restarts (whereas any changes made with the FLOS&nbsp;command "COLOUR" are permanent until reset)<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_draw_cursor"></a>kjt_draw_cursor</span><br>
-<br>
-Action: Draws (or removes) the cursor at the current cursor position<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = offset of cursor char image in VRAM font area.<br>
-<br>
-EG: <br>
-<br>
-HL = $0000 : delete the cursor<br>
-HL = $043f : underscore cursor ($400-$45f are ASCII chars 32-95)<br>
-HL=&nbsp; $0c00 : solid block cursor<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-Output Registers : None<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_get_input_string"></a><br>
-<span style="font-weight: bold;">kjt_get_input_string</span><br>
-<br>
-Action: waits for user to enter a string of characters followed by Enter (characters appear on screen)<br>
-<br>
-Input Registers&nbsp; : A - maximum characters allowed (set to 255 if dont care) - Added in FLOS v593<br>
-<br>
-Output Registers :<br>
-<br>
-HL = string location (zero terminated)<br>
-A&nbsp; = number of characters of entered string (zero if aborted by pressing ESCAPE)<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_set_cursor_position"></a><br>
-<span style="font-weight: bold;">kjt_set_cursor_position</span><br>
-<br>
-Action: Repositions the text printing (cursor) position. If a coordinate is out of range it will be set to 0.<br>
-<br>
-Input Registers :<br>
-<br>
-B = X coord<br>
-C = Y coord<br>
-<br>
-Output Registers:<br>
-<br>
-&nbsp;Zero flag set if all OK<br>
-&nbsp;If zero flag not set: Invalid coordinates<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_flos_display"></a>kjt_flos_display</span><br>
-<br>
-Action:
-Restores the video registers to the state used by the OS. Can be called
-by FLOS based programs that change the display mode etc, meaning the OS
-does not have to be complete restarted on program exit.<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers: None<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><span style="font-weight: bold;"><a name="kjt_get_cursor_position"></a>kjt_get_cursor_pos</span>ition</span><br>
-<br>
-Action: Returns the current cursor position<br>
-<br>
-Input Registers : None<br>
-<br>
-Output registers :<br>
-<br>
-B= x coord<br>
-C =y coord<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_scroll_up"></a>kjt_scroll_up</span><br>
-<br>
-Action: Scrolls the screen (and character map) up a line, inserting a blank line at the bottom of the screen.<br>
-<br>
-Input Registers : None<br>
-<br>
-Output registers : None<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_display_size"></a>kjt_get_display_size</span><br>
-<br>
-Returns size of OS_window.<br>
-<br>
-Input registers: None<br>
-<br>
-Output registers:<br>
-<br>
-B= x coord<br>
-C =y coord<br>
-<br>
-Notes: All other registers preserved.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_charmap_addr_xy"></a>&nbsp;kjt_get_charmap_addr_xy</span><br>
-<br>
-Action: Returns the charmap address of the character at coordinates x,y<br>
-<br>
-Input registers :<br>
-<br>
-B= x coord<br>
-C =y coord<br>
-<br>
-Output registers: HL = character map address of coords<br>
-<br>
-Notes: All other registers are preserved.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_wait_vrt"></a><br>
-<span style="font-weight: bold;">kjt_wait_vrt</span><br>
-<br>
-Action: Wait for last scanline of display<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers : none<br>
-<br>
-Trashes: A<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<a style="font-weight: bold;" name="kjt_patch_font"></a><span style="font-weight: bold;">kjt_patch_font</span><br>
-&nbsp;<br>
-Action: Change an individual character in the FLOS font.<br>
-<br>
-Input registers:<br>
-<br>
-A = char number (must be 32-159)<br>
-HL = address of new character pattern (8 bytes)<br>
-<br>
-Output registers: &nbsp;None<br>
-<br>
-<hr style="width: 100%; height: 2px;">MISC KERNAL ROUTINES<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_hex_byte_to_ascii"></a><br style="font-weight: bold;">
-<span style="font-weight: bold;">&nbsp;kjt_hex_byte_to_ascii</span><br>
-<br>
-Action: puts ASCII version of the hex byte value in A at HL (two chars), HL=HL+2<br>
-<br>
-Input Registers&nbsp; : A<br>
-<br>
-Output Registers : none (HL=HL+2)<br>
-<br>
-Trashes: A <br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_ascii_to_hex_word"></a>kjt_ascii_to_hex_word</span><br>
-<br>
-Action: converts text string version of hex number at HL (1 to 4 chars) to actual hex word in DE<br>
-<br>
-Input Registers&nbsp; : <br>
-<br>
-HL = source text (scans for first non-zero character)<br>
-<br>
-Output Registers :<br>
-<br>
-DE = result<br>
-<br>
-A = $00 : OK<br>
-A = $0c : Bad chars for hex<br>
-A = $1F : No chars found<br>
-<br>
-Trashes: HL<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_dont_store_registers"></a>kjt_dont_store_registers</span><br>
-<br>
-Action: Prevents the OS from noting the register values when a program exits and returns to OS.<br>
-<br>
-Input Registers&nbsp; : None<br>
-<br>
-Output Registers : None<br>
-<br>
-Trashes: A<br>
-<br>
-<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><a name="kjt_get_version"></a><br>
-kjt_get_version</span><br>
-<br>
-Action: Returns OS and hardware ID numbers<br>
-<br>
-Input Registers&nbsp; : none<br>
-<br>
-Output Registers :<br>
-<br>
-&nbsp;HL = OS version word<br>
-&nbsp;DE = Hardware version word<br>
-<br>
-Trashes: BC<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_compare_strings"></a><br>
-<span style="font-weight: bold;">kjt_compare_strings</span><br style="font-weight: bold;">
-<br>
-Action: Compares two ASCII strings (not case sensitive)<br>
-Input Registers&nbsp; :<br>
-<br>
-&nbsp;DE = address of string 1<br>
-&nbsp;HL = address of string 2<br>
-&nbsp;B&nbsp; = maximum number characters to compare<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-Output Registers : Carry flag: Only set if strings are the same.<br>
-<br>
-Notes:<br>
-<br>
-* Both strings should be zero terminated.<br>
-* Compare fails if string lengths are different unless count is reached first.<br>
-* Original HL/DE values are preserved.<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_bchl_memfill_"></a>kjt_bchl_memfill</span><br>
-<br>
-Action: Fill memory with value in accumulator<br>
-<br>
-Input Registers&nbsp; :<br>
-<br>
-HL = start address<br>
-BC = number of bytes to write<br>
-A = value to write<br>
-<br>
-Output Registers : none<br>
-<br>
-Notes: <br>
-<br>
-Does NOT overflow from $FFFF into next bank.<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-Trashes: HL, BC, A<br>
-<br>
-<hr style="width: 100%; height: 2px;"><a name="kjt_timer_wait_"></a><br>
-<span style="font-weight: bold;">kjt_timer_wait </span><br>
-<br>
-Action: Waits n x 16 microseconds and returns.<br>
-<br>
-Input Registers: A = number of 16 microsecond periods to wait<br>
-<br>
-Output Registers: None (A is trashed)<br>
-<br>
-Note: Preserves all other registers.<br>
-<br>
-<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><br>
-<a name="kjt_set_commander"></a>kjt_set_commander</span><br>
-<br>
-Action: Sets a "permanent" command string that is to be launched when progams exit<br>
-<br>
-Input Registers:<br>
-<br>
-HL = location of command string (40 chars max)<br>
-<br>
-Output Registers: None<br>
-<br>
-Notes: <br>
-<br>
-*
-The "commander program" will run on when a program exits back to FLOS
-unless that program specifically&nbsp; tells FLOS to launch some other
-program (with A=$FE on exit). In this case, the commander program
-will&nbsp;eventually launch when control is passed back to the FLOS CLI
-(IE: A &lt;&gt; $FE on exit)<br>
-<br>
-* To remove the commander string, point HL at a null string (a zero btyte in memory) and call the routine.<br>
-<br>
-<br>
-<hr style="width: 100%; height: 2px;">ENVIRONMENT VARIABLE RELATED CALLS&nbsp;<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_set_envar"></a>kjt_set_envar</span><br>
-<br>
-Action: Sets an environment variable (or updates a variable if it already exists)<br>
-<br>
-Input Registers:<br>
-<br>
-HL = name of variable (4 chars max, zero-termination required if less than 4 chars)<br>
-DE = address of data for variable (4 bytes)<br>
-<br>
-Output Registers: Zero Flag = set if all OK, not set if no space for new variable (A = $2c)<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_get_envar"></a>kjt_get_envar</span><br>
-<br>
-Action: gets (address of) value of an environment variable<br>
-<br>
-Input Registers :<br>
-<br>
-HL = name of variable (4 chars max, zero-termination required if less than 4 chars)<br>
-&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
-Output Registers:<br>
-<br>
-If zero Flag = Set : all OK,&nbsp; HL = address of data for variable (4 bytes)<br>
-If Zero Flag = Not set: variable was not found, (A = $2b, hl = location of envar list, b = max envars)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
-<hr style="width: 100%; height: 2px;"><br>
-<span style="font-weight: bold;"><a name="kjt_delete_envar"></a>&nbsp;kjt_delete_envar</span><br>
-<br>
-Action: deletes an environment variable<br>
-<br>
-Input Registers :<br>
-<br>
-HL = name of variable (4 chars max, zero-termination required if less than 4 chars)<br>
-<br>
-Output Registers:<br>
-<br>
-Zero flag = set if all OK, not set if named variable not found<br>
-<br>
-<hr style="width: 100%; height: 2px;"><br>
-<br>
-<span style="font-weight: bold;"></span><br>
-<br>
-</body>
-</html>
+File System Routines:
+
+kjt_check_volume_format  - Checks if current volume is formatted to FAT16.
+kjt_change_volume - Selects drives VOL0: to VOL7:
+kjt_get_volume_info - Returns data about the volumes mounted
+kjt_format_device -Formats entire SD card to FAT16
+kjt_make_dir -Creates a new sub directory in current directory
+kjt_change_dir - Change to subdirectory
+kjt_parent_dir -Move up a directory level
+kjt_root_dir -Go to root directory of drive
+kjt_delete_dir - Deletes an (empty) directory
+kjt_erase_file -Deletes a file
+kjt_get_total_sectors - Returns total sectors on current volume
+kjt_load_file - Loads a file in its entirety from disk to RAM
+kjt_save_file - Creates and saves a file from RAM to disk
+kjt_open_file - Looks for a file on current disk, resets file pointer etc
+kjt_set_file_pointer - Moves the read point from the start of a file
+kjt_set_read_length - Sets the read length of a file transfer to a certain value
+kjt_read_from_file - Reads data from the opened file to RAM
+kjt_create_file -Makes a new file stub.
+kjt_write_to_file - Appends new data to an existing file.
+kjt_dir_list_first_entry - Find first entry in current directory.
+kjt_dir_list_get_entry - Returns data from directory list (see output registers)
+kjt_dir_list_next_entry - Moves directory list pointer to the next entry
+kjt_get_dir_name - Returns the name of the current directory.
+kjt_mount_volumes - Initializes the attached disk list.
+kjt_store_dir_position - Internally remembers the current directory position.
+kjt_restore_dir_position  - Restores directory to that stored by above.
+kjt_get_device_info  - Returns info about the storage devices.
+kjt_get_dir_cluster - Returns the cluster address of the current dir
+kjt_set_dir_cluster - Sets the dir from a cluster address
+kjt_rename_file - Renames files and directories
+kjt_get_fs_vars_location - Returns address of Filesystem's control variables
+kjt_continue_file_read - Same as KJT_READ_FROM_FILE except this does not set the load address/bank (uses working values instead)
+kjt_set_load_address - Specifies the load address and bank for a file read (when using KJT_continue_file_read)
+
+Low-Level Sector Access Routines:
+
+kjt_read_sector - Loads 512 byte sector to the sector buffer
+kjt_write_sector -Writes 512 byte sector to the current device
+kjt_file_sector_list - To list the disk sectors that files occupy
+kjt_get_sector_read_addr - Returns data and pointers allowing sector buffer relocation etc.
+
+Kernal Serial Comms Routines:
+
+kjt_serial_receive_header - Waits for a file header from serial port
+kjt_serial_receive_file - Receives serial file data
+kjt_serial_send_file - Sends a file to serial port (Serial Link App format)
+kjt_serial_rx_byte - Wait for a byte from serial port
+kjt_serial_tx_byte - Send a byte to serial port
+
+Kernal Keyboard And Mouse Routines
+
+kjt_wait_key_press - Pauses until a key is pressed
+kjt_get_key - Returns value of key, if one has been pressed (does not wait)
+kjt_get_key_mod_flags - Returns status of the shift, ctrl, alt etc keys
+kjt_enable_mouse - Activates mouse driver (enables IRQ etc).
+kjt_get_mouse_position - Returns absolute mouse position and button data
+kjt_get_mouse_motion - Returns relative mouse displacement
+kjt_keyboard_irq_code - Allows external apps to invoke FLOS keybaord IRQ code
+kjt_mouse_irq_code - Allows external apps to invoke FLOS mouse IRQ code
+kjt_get_key_buffer - Allows monitoring of the keyboard without affecting the buffer.
+
+Kernal Text and Display Routines
+
+kjt_print_string - Prints ASCII text string at the current cursor position
+kjt_clear_screen - Clears OS screen and sets cursor position to top left (0,0)
+kjt_plot_char - Prints character at given coords using current pen colours
+kjt_set_pen - Changes current pen colour
+kjt_get_pen - Returns current pen colour
+kjt_draw_cursor - Draws (or removes) the cursor at the current cursor position
+kjt_get_input_string - Waits for user to enter a string of characters
+kjt_set_cursor_position - Repositions the text printing (cursor) position
+kjt_get_cursor_position - Returns the current cursor position
+kjt_scroll_up - Scrolls the screen (and character map) up a line.
+kjt_flos_display - Restores the video registers to the state used by the OS.
+kjt_get_display_size -Returns size of OS_window
+kjt_get_charmap_addr_xy - Returns the charmap address of coordinates x,y
+kjt_wait_vrt - Wait for vertical retrace (IE: last scanline of display)
+kjt_get_colours - Returns RGB values of the FLOS border, paper and cursor and the location of the pen colour list
+kjt_set_colours - Sets FLOS border, paper and cursor colours and writes to the pen colour list
+kjt_patch_font - Allows easy (and individual) user defined characters in the FLOS font.
+
+Kernal Memory Management Routines:
+
+kjt_set_bank - Switches the upper RAM page to a specific bank
+kjt_get_bank - Returns the current bank number in A
+kjt_inc_bank - Change to the next bank
+kjt_page_in_video - Pages video memory into $2000-$3FFF
+kjt_page_out_video - Pages system memory into $2000-$3FFF
+kjt_read_sysram_flat - read flat system memory location (E:HL) into A
+kjt_write_sysram_flat - write A into flat system memory location (E:HL)
+
+Kernal Misc Routines:
+
+kjt_hex_byte_to_ascii - Make ASCII version of a hex byte
+kjt_ascii_to_hex_word - Converts text hex number to real hex word
+kjt_dont_store_registers - Stops the OS updating the stored register values on exit
+kjt_get_version - Returns OS and hardware ID numbers
+kjt_compare_strings - Compares two ASCII strings
+kjt_bchl_memfill - Fill memory with value in accumulator
+kjt_timer_wait - Waits n periods of 16 microseconds and returns
+kjt_set_commander - Specifies a command string to be run when programs exit
+
+Environment Variable Routines:
+
+kjt_set_envar    - Sets/updates an environment variable
+kjt_get_envar    - Gets (address of) value of an environment variable
+kjt_delete_envar - Deletes an environment variable
+
+
+FILE SYSTEM RELATED CALLS -  Some Details:
+
+There are two ways to load a file, a simple single-call approach and a more flexible random-access approach.
+
+To load a file simply, set HL to a zero terminated ASCII filename string, IX to the destination address and B to the destination bank, then call "kjt_load_file" - check the return code - see table below - if the zero flag is set, everything is OK.
+
+The more flexible way to load file data is as follows: Set HL to a zero terminated ASCII filename string and call "kjt_open_file". If the zero flag is set on return, the file was found the length of the file will be in IX:IY (if the zero flag is not set, check the error code flags).
+
+Next, the following two routines can be called *if required*
+
+ * "kjt_set_file_pointer" - this allows data to be read from anywhere within a file, instead of right from the start. Registers required:
+
+    IX:IY = Offset in bytes from start of file.     
+
+
+ * "kjt_set_read_length" - allows the length of transfer to be set. Registers required:
+   
+    IX:IY = Bytes to load.
+
+
+Finally, "kjt_read_from_file" should be called to transfer the data to memory.
+
+  Registers required:
+   
+   HL = Load address.
+   B  = Bank of load address.
+
+Again, on return, if the zero flag is set then the operation completed OK.
+
+The file pointer is automatically incremented by the number of bytes transferred, therefore it is not necessary call "kjt_set_file_pointer" each time if chunks of a file are required sequentially. Attempting to read beyond the end of a file will return an error (code $1B). The load length MUST be set for each read (and load address and bank set appropriately each call).
+
+To maintain speed, a fresh seek from the start of the file is not performed each time "kjt_read_from_file" is called unless the file pointer has been changed. Internal variables must be maintained, therefore do not perform any other  disk / serial operations (or anything that changes the sector buffer) between successive calls to this routine.
+
+Whenever a disk file transfer reaches address $FFFF, it wraps around to $8000 and continues on into the next bank.
+
+Most of the file system kernal calls return one of these standard error codes:
+
+  If the zero flag is set, the operation was a success.
+  If the zero flag is not set, there was an error. A = error code:
+
+ $01 - disk full
+ $02 - file not found
+ $03 - (root) dir table is full
+ $04 - directory requested is actually a file
+ $05 - cant delete dir, it is not empty
+ $06 - not a file
+ $07 - file length is zero
+ $08 - address error (file too big for memory)
+ $09 - filename already exists
+ $0a - already at root directory
+ $0e - invalid volume
+ $13 - unknown/incorrect disk format
+ $1b - requested bytes beyond end of file
+ $22 - device not present       
+ $23 - directory not found            
+ $24 - end of directory list
+ $2e - device does not use MBR
+
+
+Advanced:
+
+In FLOS v599 the following routines were added to allow external programs to hook into the filesystem variables
+used by FLOS.
+
+kjt_get_fs_vars_location
+
+The data at this location (see link for format) can be backed up and restored by a user program, allowing multiple
+open files to managed etc.
+
+Notes:
+
+When restoring altered variable data, the first byte "fs_filepointer_valid" should always be cleared so that
+filesystem correctly re-seeks from the start of files.
+
+The current volume number must be handled seperarately if files on multiple volumes are to be handled.
+
+
+
+Additionally, the following two new routines were addedt:
+
+kjt_continue_file_read
+kjt_set_load_address
+
+The normal file read call KJT_READ_FROM_FILE requires the bank and address to be specified, which
+may be a nuisance when working with multiple files.With the KJT_CONTINUE_FILE_READ routine, the
+file bytes are written to address from the end of the last read operation. KJT_SET_LOAD_ADDRESS sets
+the address and bank to a specified value.
+
+
+ 
+ kjt_check_volume_format
+
+Action: Checks if current volume is available and formatted to FAT16
+
+Input Registers  : None
+
+Output Registers : Standard error codes
+
+
+ kjt_change_volume
+
+Action: Selects a new volume
+
+Input Registers  : A = volume to select
+
+Output Registers :  Standard error codes
+
+Notes: Will not allow a change to an invalid Volume (non-FAT16 etc)
+
+
+
+ kjt_format_device
+
+Action: Formats a device (entire drive as single partition, no MBR)
+
+Input Registers  :
+
+A  = Device to format
+HL = Disk label ascii
+
+Output Registers : Standard error codes
+
+Notes: It is highly recommended that "kjt_mount_volumes" is called after this routine.
+
+
+kjt_make_dir
+
+Action: Creates a new sub directory in current directory
+
+Input Registers:
+
+HL = zero terminated dir name
+
+Output Registers : Standard error codes
+
+
+ kjt_change_dir
+
+Action: Change to subdirectory
+
+Input Registers:
+
+HL = zero terminated dir name
+
+Output Registers : Standard error codes
+
+
+
+kjt_parent_dir
+
+Action: Move up a directory level
+
+Input Registers  : None
+
+Output Registers : Standard error codes
+
+
+
+ kjt_root_dir
+
+Action: Go to root directory of drive
+
+Input Registers  : None
+
+Output Registers : Standard error codes
+
+
+
+kjt_delete_dir
+
+Action: Deletes an (empty) directory
+
+Input Registers  :
+
+HL = zero terminated dir name
+
+Output Registers : Standard error codes
+
+
+
+kjt_erase_file
+
+Action: Deletes a file
+
+Input Registers  :
+
+HL = zero terminated file name
+
+Output Registers : Standard error codes
+
+
+          
+kjt_get_total_sectors
+
+Action: Returns total sectors on current volume
+
+Input Registers  : none
+
+Output Registers :
+
+C:DE = number of sectors
+
+
+
+kjt_load_file
+
+Action: Loads the specified file in its entirity to the specifed address.
+
+Input registers:
+
+IX   = address to load to
+B    = bank to load to
+HL   = zero terminated filename
+
+Output registers: Standard error codes
+
+Notes:
+
+This routine both opens a file and reads all the data to RAM - for more flexibility use "kjt_open_file", "kjt_set_file_pointer", "kjt_set_read_length" and "kjt_read_file_data"
+
+
+
+kjt_save_file
+
+Action: Saves a file to current disk / directory.
+
+Input registers:
+
+IX   = Source data start address
+B    = bank to save data from
+C:DE = number of bytes to save
+HL   = zero terminated filename
+
+Output registers: Standard error codes
+
+Notes:
+
+This routine both creates a new file and saves data to it - it cannot be used append new data to an existing file (will return "file already exists" error if attempted).
+
+
+
+kjt_open_file
+
+Action: Looks for a file on current disk and sets internal registers ready for "kjt_read_from_file" call.
+
+Input Registers  :
+
+HL = pointer to zero terminated filename to look for
+
+Output Registers :
+
+If the Zero Flag is set: All OK. Registers are:
+
+IX:IY = Length of file
+DE    = First disk cluster used by file
+                   
+If zero flag is not set: standard error codes.
+
+Notes:  File pointer is set to 0, default transfer length = total file size
+
+
+
+kjt_set_file_pointer
+
+Action: Moves the read point from the start of a file
+
+Input Registers  :
+
+ IX:IY = Offset in bytes from start of file.
+
+Output Registers :  none
+
+Notes: Use after "kjt_open_file" (if required)
+
+
+
+kjt_set_read_length
+
+Action: Forces the read length of the file transfer to a certain value
+
+Input Registers  :
+
+IX:IY = Bytes to load
+
+Output Registers : none
+
+Notes: Use after kjt_find_file, if desired)
+
+
+
+
+kjt_read_from_file
+
+Action:  Loads data (from the previously opened file) to a specified address.
+
+Input Registers  :
+
+HL = Destination address
+B  = Destination bank
+
+Output Registers : Standard error codes
+
+Notes:
+
+ "kjt_open_file" MUST be called first before using this routine.
+
+Whenever a disk file transfer reaches address $FFFF, it wraps around to $8000 and continues onto the next bank.
+
+
+kjt_create_file
+
+Action: Makes a file stub for a new file on current disk, current directory.
+
+Input Registers :
+
+HL = address of zero-terminated filename.
+              
+Output Registers : Standard error codes
+
+
+kjt_write_to_file
+
+Action: Appends new data to an existing file on current disk / directory.
+
+Input Registers:
+
+HL   = null-terminated ascii filename of file to be appended to
+IX   = address of source data
+B    = bank of source data
+C:DE = number of bytes to write
+
+Output Registers : Standard error codes  
+
+Notes:
+
+Returns "file not found" error if the file has not been previously created  with "kjt_create_file" or "kjt_save_file"
+
+
+
+kjt_dir_list_first_entry
+
+Action: Finds the first listing in a directory, returns info.
+
+Input registers: None
+
+Output registers: If zero flag is set:
+
+HL    = Location of null terminated filename string
+IX:IY = Length of file (if applicable)
+B     = File flag (1 = directory, 0 = file)
+
+If zero flag is not set, standard error codes  (EG: $24 = Reached end of directory)
+
+      
+
+kjt_dir_list_get_entry
+
+Action: Returns data about the entry at the current position in the directory list.
+
+Input registers: None
+
+Output registers: If zero flag is set:
+
+HL    = Location of null terminated filename string
+IX:IY = Length of file (if applicable)
+B     = File flag (1 = directory, 0 = file)
+         
+If zero flag is not set, standard error codes (EG: $24 = Reached end of directory)
+
+
+
+kjt_dir_list_next_entry
+
+Action: Moves the internal directory list pointer to the next entry and returns details about the entry found.
+
+Input registers: None
+
+Output registers: If zero flag is set:
+
+HL    = Location of null terminated filename string
+IX:IY = Length of file (if applicable)
+B     = File flag (1 = directory, 0 = file)
+
+If zero flag is not set, standard error codes  (EG: $24 = Reached end of directory)
+
+
+kjt_get_dir_name
+
+Action: Returns ascii string of current dir name (null terminated)
+
+Input registers: None
+
+Output registers :
+
+If zero flag set: HL = ascii string.
+     
+If zero flag is not set, standard error codes
+
+
+
+kjt_store_dir_position
+
+Action: Internally remembers the current directory position.
+
+Input registers: None
+
+Output registers :None
+
+Notes:
+
+All flags and registers are preserved.
+kjt_get_dir_cluster is more useful.
+
+
+kjt_restore_dir_position
+
+Action: Restores the directory position to that set by "kjt_store_dir_position".
+
+Input registers: None
+
+Output registers :None
+
+Notes:
+
+All flags and registers are preserved.
+kjt_set_dir_cluster is more useful.
+
+
+kjt_mount_volumes
+
+Action: Reinitializes the drives and mount list
+
+Input registers:
+
+If A = 1, mount quietly (no text output)
+
+Output registers :None
+
+
+
+kjt_get_volume_info
+
+Action: Returns info about the volumes mounted.
+
+Input Registers  : None
+
+Output Registers :
+
+HL = address of volume mount list    
+B = Number of volumes mounted
+A = currently Selected volume
+
+
+
+kjt_get_device_info
+
+Action: Returns info from the device list.
+
+Input Registers  : None
+
+Output Registers :
+
+ HL = address of device info table    
+ DE = address of driver table
+ B =  number of devices initialized
+ A = current active driver number
+
+
+
+kjt_get_dir_cluster
+
+Action: Returns the location of the directory cluster
+
+Input Registers  : None
+
+Output Registers :
+
+DE = cluster pointed at by current directory
+           
+                   
+kjt_set_dir_cluster
+
+Action: Sets the directory cluster (for use with above command)
+
+Input Registers  :
+
+DE = desired cluster number to be used as current dir
+
+Output Registers : None
+           
+
+kjt_rename_file
+
+Action: Rename files / folders.
+
+Input Registers  :
+
+HL = Pointer to filename to change (null terminated ASCII)
+DE = Pointer to replacement filename (null terminated ASCII)
+
+Output Registers : Standard error codes    
+
+
+kjt_get_fs_vars_location
+
+Action: Sets HL to the address of the fiilesystem's control variables.
+
+Input Registers  : None
+
+Output Registers : HL =  location of the following data structure:
+
+ $00 byte          - fs_filepointer_valid
+ $01 longword  - fs_file_pointer
+ $05 longword  - fs_file_length
+ $09 longword  - fs_bytes_to_go
+ $0d word        - fs_file_start_cluster
+ $0f word         - fs_file_working_cluster
+ $11 word        - fs_z80_address
+ $13 byte          - fs_z80_bank
+
+Note: When restoring altered data, the first byte "fs_filepointer_valid" should always be cleared. This causes the
+read operations to cleanly  seek from the beginning of files when file transfer (re)commences.  (Access will
+be noticably slower than a single continuous load.)
+
+
+kjt_continue_file_read
+
+Action: Same as KJT_READ_FROM_FILE except this does not set the load address/bank
+
+Input Registers  : None
+
+Output Registers : Standard error codes    
+
+
+kjt_set_load_address
+
+Action: Specifies the load address and bank for a file read (when using KJT_continue_file_read)
+
+Input Registers  :
+
+HL =  Z80 address where data should load
+B   = FLOS bank where data should load
+
+Output Registers : None   
+
+Low-Level Disk Sector Access Routines
+
+kjt_read_sector
+
+Action: Loads a 512 byte sector from the device and address selected to the sector buffer
+
+Input registers:
+
+A = Device number to access (normally 0)
+BC:DE = absolute LBA address for desired sector
+
+Output registers: Standard error codes (relevant errrors: $1e, $22)
+
+
+
+kjt_write_sector
+
+Action: Writes a 512 byte sector from the sector buffer to the device and address selected
+
+Input registers:
+
+A = Device number to access (normally 0)
+BC:DE = absolute LBA address for desired sector
+
+Output registers: Standard error codes (relevant errrors: $1e, $22)
+                     
+
+
+kjt_file_sector_list
+
+Action: Retrieves the location of the (next) disk sector that a file occupies.
+
+Input registers:
+
+A  = Sector offset (within current cluster)
+DE = Cluster number
+
+Output registers:
+
+A  = Next sector offset
+DE = Updated cluster
+HL = Memory address of LSB of 4 byte sector location
+
+How to use:
+
+To obtain the list of sectors that a file uses, first call "kjt_find_file" with the filename in HL as normal. On exit, DE will be equal the first cluster that the file occupies. Clear the accumulator (as we're starting at the first sector of this cluster), and call "kjt_file_sector_list". On return A and DE are updated to the values required for the next time the routine is called and HL points to the lowest significant byte of the sector address (LBA0). Next, copy the 4 bytes from HL to HL+3 to your sector list buffer and loop around, calling "kjt_file_sector_list" for as many sectors as are used by the file (simply subtract 512 from a variable holding the file size every call until variable is = < 0)
+
+
+kjt_get_sector_read_addr
+
+Action: Returns the address of the selected drive's sector read routine, also LBA variable and sector_location_variable
+
+Input Registers :
+
+A = Device to access (normally 0)
+
+Output Registers:
+
+ HL = Address of sector read routine
+ DE = Address of the LSB of the 32bit LBA variable
+ BC = Address of the sector buffer location variable
+
+Notes:
+
+This routine can be used to allow programs to read sectors directly to an arbitrary location in memory (IE: A program can write to the sector LBA and sector buffer location variables, and then call the low-level sector read routine using the data obtained).
+
+ The sector buffer location is automatically reset to the location that the OS requires whenever a filesystem routine is called (this includes the KJT read/write sector calls above.) Similarly, altering the LBA variable manually should not affect normal operation of the filesystem.
+
+
+ SERIAL I/O ROUTINES
+
+As with the disk routines, whenever a serial file transfer command reaches address $FFFF, it wraps around to $8000 and continues onto the next bank.
+
+The Serial Header Format:
+
+$00 - $0F: ASCII filename
+$10 - $11: Length of file (low word)
+$12 - $13: Length of file (high word)
+$14 - $1F: ASCII "Z80P.FHEADER" (12 chars)
+$20 - $FF: All must be zero
+
+(All words are in normal Z80 little-endian format)
+
+Serial transfer format:
+
+Bytes from the file are sent in 256 byte packets followed by a 2 byte checksum word. The checksum calculation is described as a "standard CRC-CCITT that uses polynomial $1021". It produces a 16 bit output. The Z80 code (slow, unoptimized) to generate it is as follows:
+
+crc_checksum
+
+                    ld hl,$ffff        ; makes checksum in HL, src addr = DE, length = C bytes
+crcloop        ld a,(de)           
+                    xor h           
+                    ld h,a           
+                    ld b,8
+crcbyte        add hl,hl
+                    jr nc,crcnext
+                    ld a,h
+                    xor 10h
+                    ld h,a
+                    ld a,l
+                    xor 21h  
+                    ld l,a
+crcnext        djnz crcbyte
+                    inc de
+                    dec c  
+                    jr nz,crcloop
+                    ret
+
+
+
+kjt_serial_receive_header
+
+Action: Waits for a file header from serial port.
+
+Input Registers  :
+
+ HL = Location of filename
+ A  = Bits 5:0 Waiting time in seconds before time out error.
+         Bit 6 = Abort with Enter Key
+         Bit 7 = Abort with ESC Key
+
+Output Registers :
+
+Zero Flag: If set, all OK
+IX = location of serial file header (details above)
+                  
+If Zero Flag is NOT set, A = serial error code.
+
+A = $07 : Save length is zero
+A = $08 : File too big (IE: Memory address out of range)
+A = $0f : Checksum bad
+A = $11 : Comms error
+A = $14 : Time out error
+A = $25 : Filename mismatch        
+A = $2A : Aborted with ESC / Enter key
+            
+Note: Filename can be "*" if any file is to be accepted.
+
+
+
+kjt_serial_receive_file
+
+Action: Receives serial file data
+
+Input Registers  :
+
+HL = Address to load file to
+B  = Bank to load file into
+
+Output Registers :
+
+Zero Flag: If set, all OK
+
+IX = location of of serial file header
+                    
+If Zero Flag is NOT set, A = serial error code.
+
+A = $07 : Save length is zero
+A = $08 : File too big (IE: Memory address out of range)
+A = $0f : Checksum bad
+A = $11 : Comms error
+A = $14 : Time out error
+A = $25 : Filename mismatch
+
+Note: "kjt_serial_receive_header" MUST be called before this routine!
+
+
+kjt_serial_send_file
+
+Action: Sends a file to serial port (Serial Link App format)
+
+Input Registers  :
+
+HL     = filename
+C:DE   = length of file
+B      = Bank number that file starts in
+IX     = Start address
+
+Output Registers : Zero flag, set if all OK.
+
+If zero flag not set, A = serial error code.
+
+A = $07 : Save length is zero
+A = $08 : File too big (IE: Memory address out of range)
+A = $0f : Checksum bad
+A = $11 : Comms error
+A = $14 : Time out error
+A = $25 : Filename mismatch
+
+
+kjt_serial_rx_byte
+
+Action: Wait for a byte from serial port
+
+Input Registers  :
+
+ A.  Bits: [0:5] = max time to wait in seconds
+              [6] = If set, the wait can be aborted with the ENTER key
+              [7] = If set, the wait can be aborted with ESCAPE key
+
+Output Registers : If Carry flag is clear all OK, A = byte received.
+ 
+If Carry flag is set, error code in A as follows:
+
+A = $14 - Timed out
+A = $2A - Aborted with key.
+
+Notes: All registers except A preserved
+
+
+kjt_serial_tx_byte
+
+Action: Send a byte to serial port
+
+Input Registers  : none
+
+Output Registers : A = byte to send
+
+Notes: All registers except A preserved.
+
+
+KEYBOARD AND MOUSE ROUTINES 
+
+kjt_wait_key_press
+
+Action: Pauses until a key is pressed (and returns value)
+
+Input Registers  : None
+
+Output Registers :
+
+A = Scancode of key pressed
+ B = ASCII code (B=$00 if no valid ascii char equivalent.)
+
+Notes: ASCII code is modified by shift / Alt key status
+
+
+kjt_get_key
+
+Action: Returns value of key, if one has been pressed (does not wait)
+
+Input Registers  : None
+
+Output Registers :
+
+ A = Scancode of key pressed (A = $00 if no key pressed)
+ B = ASCII code (B=$00 if no valid ascii char equivalent.)
+
+Notes: ASCII code is modified by shift / Alt key status
+
+
+kjt_get_key_mod_flags
+
+Action: Returns current status of key modifiers
+
+Input Registers  : None
+
+Output Registers : A, bits
+
+[0] - left shift
+[1] - left/right ctrl
+[2] - left GUI
+[3] - left/right alt
+[4] - right shift
+[5] - right GUI
+[6] - Apps
+
+
+kjt_keyboard_irq_code
+
+Action: Keyboard IRQ handler.
+
+When a custom interrupt handler is set up but kernal-based keyboard handling is required, this routine can be called when the keyboard IRQ flag is set
+The above kernal keyboard routines will then still work. (The call clears the relevant IRQ flag).
+
+
+
+kjt_enable_mouse
+
+Action: Activates mouse pointer (called by MOUSE.EXE) and sets x/y boundaries
+
+Input Registers  :
+
+HL = Window size X
+DE = Window size Y
+
+Output Registers : None
+
+
+kjt_get_mouse_position
+
+Action: Returns absolute mouse position and button data
+
+Input Registers  : none
+
+Output Registers : Zero Flag - If not set, the mouse driver was not enabled, otherwise:
+
+HL = x coordinate
+DE = y coordinate
+A = buttons status
+
+The x and y coordinates cannot overflow from the boundaries set with  "kjt_enable_mouse"
+
+(Note: the mouse driver is currently somewhat primative - it may become out of sync with the three-byte packets that the mouse sends if say,
+interrupts are disabled)
+                   
+
+kjt_get_mouse_motion
+
+Action: Returns relative mouse motion and button data.
+
+Input Registers  : none
+
+Output Registers : Zero Flag: if not set, the mouse driver was not enabled, Otherwise:
+
+HL = x motion since last called
+DE = y motion since last called
+A = buttons status
+
+(Note: the mouse driver is currently somewhat primative - it may become out of sync with the three-byte packets that the mouse sends if say,
+interrupts are disabled)
+                  
+kjt_mouse_irq_code
+
+Action: Mouse IRQ handler
+
+When a custom interrupt handler is set up but kernal-based mouse handling is required, this routine can be called when the mouse IRQ flag is set.
+The above kernal mouse routines will then still work. (The call clears the relevant IRQ flag).
+
+
+kjt_get_key_buffer
+
+Action: Returns values for monitoring the keyboard buffer
+
+Input Registers: None
+
+Output Registers:
+
+HL  = Location of the keyboard buffer WRITE index variable (The actual keyboard buffer starts 32 bytes lower in memory)
+A = The value of the keyboard READ index variable.
+        
+Notes: On return, if A = (HL) no key has been pressed (IE: the keyboard buffer is empty)
+
+        
+ MEMORY MANAGEMENT ROUTINES 
+
+Under FLOS, Z80 Address space $5000-$FFFF is available for user programs. FLOS allows the upper 32KB of Z80 address space ($8000-$FFFF) to be paged. 15 pages of system RAM can appear in this region, starting at system RAM address $08000 (FLOS does not normally allow the first 32KB of system RAM to be paged into $8000-$FFFF). Therefore, when using the KJT routines for bank management, the figures are as follows:
+
+Bank |  SYSTEM RAM  |  Z80 ADDRESS
+
+$00 = $08000-$0ffff @ $8000-$ffff
+$01 = $10000-$17fff @ $8000-$ffff
+$02 = $18000-$1ffff @ $8000-$ffff
+$03 = $20000-$27fff @ $8000-$ffff
+$04 = $28000-$2ffff @ $8000-$ffff
+$05 = $30000-$37fff @ $8000-$ffff
+$06 = $38000-$3ffff @ $8000-$ffff
+$07 = $40000-$47fff @ $8000-$ffff
+$08 = $48000-$4ffff @ $8000-$ffff
+$09 = $50000-$57fff @ $8000-$ffff
+$0a = $58000-$5ffff @ $8000-$ffff
+$0b = $60000-$67fff @ $8000-$ffff
+$0c = $68000-$6ffff @ $8000-$ffff
+$0d = $70000-$77fff @ $8000-$ffff
+$0e = $78000-$7ffff @ $8000-$ffff
+
+(You may have noticed that the figures are different to the values used if writing directly to the bank selection hardware port: sys_mem_select).
+
+
+kjt_set_bank
+
+Action: Changes the currently selected upper RAM page
+
+Input Registers  :
+
+A = bank number $00 to $0e
+
+Output Registers : none
+
+Trashes: A
+
+
+ kjt_get_bank
+
+Action: Returns the upper bank number in A
+
+Input Registers  : none
+
+Output Registers :
+
+A = current bank number ($00 to $0e)
+
+Trashes: none
+
+
+kjt_inc_bank
+
+Action: change to the next bank
+
+Input Registers  : none
+
+Output Registers :
+
+ If Zero flag set: all OK,
+ If Zero is not set: A = $08 - bank out of range
+
+
+kjt_page_in_video
+
+Action: Pages 8KB of video memory specified by (hardware register vreg_vidpage) into Z80 address space $2000-$3FFF.
+
+CAUTION: This area is used by part of FLOS so ideally no other FLOS call should be made until kjt_page_out_video is called.
+
+Input Registers  : none
+
+Output Registers : none
+
+Trashes: A
+
+
+kjt_page_out_video
+
+Action: Pages normal system memory (part of the FLOS!) back into $2000-$3FFF
+
+Input Registers  : none
+
+Output Registers : none
+
+Trashes: A
+
+
+kjt_read_sysram_flat
+
+Action: Reads system memory in a flat, linear addressing mode
+
+Input Registers  :
+
+E:HL = $00000 - $7FFFF (address to read)
+
+Output Registers :
+
+A (byte read from address)
+
+Trashes: BC,DE,HL
+
+Notes:  
+
+* The routine saves and restores the current bank setting around the read so make sure any interrupt service routine is in unpaged memory (<$8000)
+  or disable interrupts to avoid problems.
+
+* As this routine is very slow, only use if convenience is more important than speed.
+
+
+kjt_write_sysram_flat
+
+Action: Writes to system memory in a flat, linear addressing mode
+
+Input Registers 
+
+E:HL = $00000 - $7FFFF (address to write),
+A = byte to write
+
+Output Registers : None (but see below)
+
+Trashes: BC, DE, HL
+
+Notes:  
+
+* The routine saves and restores the current bank setting around the write  so make sure any interrupt service routine is in unpaged memory (<$8000)
+  or disable interrupts to avoid problems.
+
+* As this routine is not fast, only use if convenience is more important than speed.
+
+
+ KERNAL TEXT AND DISPLAY ROUTINES 
+
+kjt_print_string
+
+Action: Prints ASCII text string at cursor position
+
+Input Registers : HL address of string (zero terminated)
+
+Output Registers: None
+
+Notes:
+
+ASCII Char $0a = line feed
+ASCII Char $0d = carriage return
+ASCII Char $0b = Line Feed and Carriage return
+
+HL returns pointing to the zero byte at end of the string
+
+All other registers are preserved by this routine.
+
+
+kjt_clear_screen
+
+Action: clears OS screen and set cursor position to top left (0,0)
+
+Input Registers  : None
+
+Output Registers : None
+
+
+kjt_plot_char
+
+Action: Prints ASCII character at supplied coordinates using current pen colours
+
+Input Registers  :
+
+A = ASCII character
+B = x coord
+C = y coord
+
+Output Registers : None
+
+Notes:
+
+Plot_char does not change the current cursor position.
+If a coordinate is outside the window, it is taken as zero
+
+
+kjt_get_pen
+
+Action: Returns current pen colour
+
+Input Registers  : None
+
+Output Registers :
+
+A = $nm where "n" is the background and "m" is the foreground colour (see colour table below)
+
+
+
+kjt_set_pen
+
+Action: Changes current pen colour
+
+Input Registers  : A = $nm where "n" is the background and "m" is the foreground colour
+
+Available (default) colours:
+
+0 - transparent (shows UI "paper" colour)
+1 - black
+2 - blue
+3 - red
+4 - magenta
+5 - green
+6 - cyan
+7 - yellow
+8 - white
+9 - dark grey
+a - mid grey
+b - light grey
+c - orange
+d - light blue
+e - light green
+f - brown
+
+Output Registers : None
+
+
+kjt_get_colours
+
+Action: Returns the location of the FLOS colour list.
+
+Input registers: none
+
+Output registers:  HL = location of colour list: 18 words (RGB values). Note: FLOS stores its colour list under the hardware registers so system memory needs to paged into that region if writing directly to the address returned from this call. (Simply reading the list poses no such problem). In all cases, kjt_set_colours needs to be called to actually change the palette (unless writing directly to the Hardware Palette Registers)
+
+$00 - Paper
+$02 - Border
+$04 - Cursor
+$06 - 15 pen colours starting with pen 1
+
+
+kjt_set_colours
+
+Action: Sets FLOS border, paper and cursor colours and updates the pen colour list
+
+Input registers: HL = location of the colour palette list (18 RGB words)
+
+$00 - Paper
+$02 - Border
+$04 - Cursor
+$06 - 15 pen colours starting with pen 1
+
+Output registers: Input registers are trashed.
+
+Notes:
+
+Changes persist until FLOS restarts (whereas any changes made with the FLOS command "COLOUR" are permanent until reset)
+
+
+kjt_draw_cursor
+
+Action: Draws (or removes) the cursor at the current cursor position
+
+Input Registers  :
+
+HL = Offset of cursor char image within VRAM font data:
+
+$0000 - $07FF = All zeroes
+$0800 - $0FFF = Raster font image (256 horizontal bytes * 8 vertical bytes)
+$1000 - $17FF = As above but with the bits inverted
+$1800 - $1FFF = All ones
+
+EG:
+
+HL = $0000 : No data, IE: Delete the cursor
+HL = $085f  : underscore cursor ($800-$8ff = top line of  ASCII chars 0-255)
+HL=  $1800 : Solid block cursor
+         
+Output Registers : None
+
+
+kjt_get_input_string
+
+Action: waits for user to enter a string of characters followed by Enter (characters appear on screen)
+
+Input Registers  : A - maximum characters allowed (set to 255 if dont care) - Added in FLOS v593
+
+Output Registers :
+
+HL = string location (zero terminated)
+A  = number of characters of entered string (zero if aborted by pressing ESCAPE)
+
+
+
+kjt_set_cursor_position
+
+Action: Repositions the text printing (cursor) position. If a coordinate is out of range it will be set to 0.
+
+Input Registers :
+
+B = X coord
+C = Y coord
+
+Output Registers:
+
+ Zero flag set if all OK
+ If zero flag not set: Invalid coordinates
+
+
+
+kjt_flos_display
+
+Action: Restores the video registers to the state used by the OS. Can be called by FLOS based programs that change the display mode etc, meaning the OS does not have to be complete restarted on program exit.
+
+Input registers: None
+
+Output registers: None
+
+
+kjt_get_cursor_position
+
+Action: Returns the current cursor position
+
+Input Registers : None
+
+Output registers :
+
+B= x coord
+C =y coord
+
+
+kjt_scroll_up
+
+Action: Scrolls the screen (and character map) up a line, inserting a blank line at the bottom of the screen.
+
+Input Registers : None
+
+Output registers : None
+
+
+kjt_get_display_size
+
+Returns size of OS_window.
+
+Input registers: None
+
+Output registers:
+
+B= x coord
+C =y coord
+
+Notes: All other registers preserved.
+
+
+ kjt_get_charmap_addr_xy
+
+Action: Returns the charmap address of the character at coordinates x,y
+
+Input registers :
+
+B= x coord
+C =y coord
+
+Output registers: HL = character map address of coords
+
+Notes: All other registers are preserved.
+
+
+kjt_wait_vrt
+
+Action: Wait for last scanline of display
+
+Input Registers  : none
+
+Output Registers : none
+
+Trashes: A
+
+
+kjt_patch_font
+ 
+Action: Change an individual character in the FLOS font.
+
+Input registers:
+
+A = char number (must be 0-255, but note: Some chars < 32 are unprintable using "kjt_print_string")
+HL = address of new character pattern (8 bytes)
+
+Output registers:  None
+
+MISC KERNAL ROUTINES
+
+ kjt_hex_byte_to_ascii
+
+Action: puts ASCII version of the hex byte value in A at HL (two chars), HL=HL+2
+
+Input Registers  : A
+
+Output Registers : none (HL=HL+2)
+
+Trashes: A
+
+
+kjt_ascii_to_hex_word
+
+Action: converts text string version of hex number at HL (1 to 4 chars) to actual hex word in DE
+
+Input Registers  :
+
+HL = source text (scans for first non-zero character)
+
+Output Registers :
+
+DE = result
+
+A = $00 : OK
+A = $0c : Bad chars for hex
+A = $1F : No chars found
+
+Trashes: HL
+
+
+kjt_dont_store_registers
+
+Action: Prevents the OS from noting the register values when a program exits and returns to OS.
+
+Input Registers  : None
+
+Output Registers : None
+
+Trashes: A
+
+
+kjt_get_version
+
+Action: Returns OS and hardware ID numbers
+
+Input Registers  : none
+
+Output Registers :
+
+ HL = OS version word
+ DE = Hardware version word
+
+Trashes: BC
+
+
+kjt_compare_strings
+
+Action: Compares two ASCII strings (not case sensitive)
+Input Registers  :
+
+ DE = address of string 1
+ HL = address of string 2
+ B  = maximum number characters to compare
+                    
+Output Registers : Carry flag: Only set if strings are the same.
+
+Notes:
+
+* Both strings should be zero terminated.
+* Compare fails if string lengths are different unless count is reached first.
+* Original HL/DE values are preserved.
+
+
+
+kjt_bchl_memfill
+
+Action: Fill memory with value in accumulator
+
+Input Registers  :
+
+HL = start address
+BC = number of bytes to write
+A = value to write
+
+Output Registers : none
+
+Notes:
+
+Does NOT overflow from $FFFF into next bank.
+       
+Trashes: HL, BC, A
+
+
+kjt_timer_wait
+
+Action: Waits n x 16 microseconds and returns.
+
+Input Registers: A = number of 16 microsecond periods to wait
+
+Output Registers: None (A is trashed)
+
+Note: Preserves all other registers.
+
+
+kjt_set_commander
+
+Action: Sets a "permanent" command string that is to be launched when progams exit
+
+Input Registers:
+
+HL = location of command string (40 chars max)
+
+Output Registers: None
+
+Notes:
+
+* The "commander program" will run on when a program exits back to FLOS unless that program specifically  tells FLOS to launch some other program (with A=$FE on exit). In this case, the commander program will eventually launch when control is passed back to the FLOS CLI (IE: A <> $FE on exit)
+
+* To remove the commander string, point HL at a null string (a zero btyte in memory) and call the routine.
+
+
+ENVIRONMENT VARIABLE RELATED CALLS 
+
+kjt_set_envar
+
+Action: Sets an environment variable (or updates a variable if it already exists)
+
+Input Registers:
+
+HL = name of variable (4 chars max, zero-termination required if less than 4 chars)
+DE = address of data for variable (4 bytes)
+
+Output Registers: Zero Flag = set if all OK, not set if no space for new variable (A = $2c)
+
+
+kjt_get_envar
+
+Action: gets (address of) value of an environment variable
+
+Input Registers :
+
+HL = name of variable (4 chars max, zero-termination required if less than 4 chars)
+        
+Output Registers:
+
+If zero Flag = Set : all OK,  HL = address of data for variable (4 bytes)
+If Zero Flag = Not set: variable was not found, (A = $2b, hl = location of envar list, b = max envars)
+                
+
+ kjt_delete_envar
+
+Action: deletes an environment variable
+
+Input Registers :
+
+HL = name of variable (4 chars max, zero-termination required if less than 4 chars)
+
+Output Registers:
+
+Zero flag = set if all OK, not set if named variable not found
+
+
+
+
