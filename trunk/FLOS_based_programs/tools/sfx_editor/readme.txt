@@ -10,6 +10,8 @@ use in the user's own programs.
 Changes:
 --------
 
+0.25 - Uses newer window drawing code (FLOS 6.02 required)
+
 0.24 - Improved text input in script Editor.
      - Fixed error reporting in script editor.
 

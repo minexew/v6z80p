@@ -1,6 +1,25 @@
 ;****************************************************
-; FLOS File Manager by Phil @ Retroleum.co.uk - V0.03
+; FLOS File Manager by Phil @ Retroleum.co.uk - V0.04
 ;****************************************************
+
+;Updates:
+;--------
+
+;V0.04 - Uses new window draw code (FLOS 6.02+)
+;
+;v0.03 - Added "RX" button to receive files via Serial Link, requires Serial Link 2.8
+;        for complete compatibility (EG: Handling file overwrite)
+;
+;      - Fixed path display code (was inserting "/../" when not needed)
+;
+;      - Tab swaps panels, CTRL selects buttons.
+;
+;      - Improved text entry code.
+;
+;      - Fixed unhandled attempts at copying a file with same name as a dir
+;
+;      - Tests if MOVE has deleted the folder FLOS was originally in (back to root on exit)
+
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------------
 
@@ -9,6 +28,12 @@ include "osca_hardware_equates.asm"
 include "system_equates.asm"
 
 	org $5000
+
+
+;--------- Test FLOS version ---------------------------------------------------------------------
+
+required_flos	equ $602
+include 		"test_flos_version.asm"
 
 ;-----------------------------------------------------------------------------------------------
 
@@ -23,30 +48,16 @@ box_select_colour		equ $80	; white / blue
 file_buffer_length	 	equ $8000
 file_buffer_bank 		equ 0
 
-window_cols	equ 40
-window_rows	equ 25
+window_cols		equ 40
+window_rows		equ 25
 
-;--------- Test FLOS version ---------------------------------------------------------------------
-
-	
-	call kjt_get_version		; check running under required FLOS version 
-	ld de,$577
-	xor a
-	sbc hl,de
-	jr nc,flos_ok
-	ld hl,old_flos_txt
-	call kjt_print_string
-	xor a
-	ret
-
-old_flos_txt
-
-	db "Program requires FLOS v577+",11,11,0
-	
-flos_ok	
 
 ;--------------------------------------------------------------------------------------------
-
+	
+	call w_backup_display
+	call kjt_get_cursor_position
+	ld (orig_cursor),bc
+	
 	call kjt_get_volume_info
 	ld (original_volume),a
 	call kjt_get_dir_cluster
@@ -65,7 +76,7 @@ begin	call kjt_get_dir_cluster
 	call go_src_folder
 	
 ;-----------------------------------------------------------------------------------------------
-
+	
 redraw_all
 
 	call clear_selection_list
@@ -209,7 +220,7 @@ text_input_loop
 curpok	add a,b
 	ld b,a
 	call kjt_set_cursor_position		
-	ld hl,$0c00
+	ld hl,$1000
 	call kjt_draw_cursor		;draw cursor
 
 no_cursor_draw
@@ -1732,7 +1743,9 @@ req0_esc_pressed
 	ld de,(original_cluster)
 	call kjt_set_dir_cluster
 	
-	call kjt_clear_screen
+	call w_restore_display
+	ld bc,(orig_cursor)
+	call kjt_set_cursor_position
 	xor a
 	ret
 
@@ -3056,6 +3069,8 @@ dir_level_list	ds 256,0		;max 128 directory levels allowed
 
 text_input_coord_base	dw 0
 max_cursor		db 0
+
+orig_cursor	dw 0
 
 ;---------------------------------------------------------------------------------------------
 

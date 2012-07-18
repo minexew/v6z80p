@@ -2,6 +2,7 @@
 ; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.20 - P.Ruston '08 - '12    *
 ; ****************************************************************************
 ;
+; V1.21 - newer requester code - requires FLOS 6.02
 ; V1.20 - fixed for FLOS v593 (call to KJT_GET_INPUT_STRING)
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
@@ -12,53 +13,21 @@ include "system_equates.asm"
 
 	org $5000
 
+
+;--------------------------------------------------------------------------
+; Check hardware / OS versions are appropriate for code
+;--------------------------------------------------------------------------
+
+required_osca	equ $652
+include 		"test_osca_version.asm"
+
+required_flos	equ $602
+include 		"test_flos_version.asm"
+
+
 ;-------- CONSTANTS ----------------------------------------------------------
 
 data_buffer 	equ $8000 ; Dont change this
-
-req_hw_version	equ $652
-
-;--------------------------------------------------------------------------
-; Check hardware revision is appropriate for code
-;--------------------------------------------------------------------------
-
-	call kjt_get_version
-	ld hl,req_hw_version-1
-	xor a
-	sbc hl,de
-	jr c,hw_vers_ok
-	ld hl,bad_hw_vers
-	call kjt_print_string
-	xor a
-	ret
-	
-bad_hw_vers
-
-	db 11,"Program requires hardware version v652+",11,11,0
-	
-hw_vers_ok
-
-;--------------------------------------------------------------------------------
-; Check FLOS version
-;-------------------------------------------------------------------------------
-
-	call kjt_get_version		
-	ld de,$560
-	xor a
-	sbc hl,de
-	jr nc,flos_ok
-	
-	ld hl,old_flos_txt
-	call kjt_print_string
-	xor a
-	ret
-
-old_flos_txt
-
-	db "Program requires FLOS v560+",11,11,0
-
-flos_ok	
-
 
 ;-------- INIT -----------------------------------------------------------------
 
@@ -166,7 +135,7 @@ fbloop	push bc
 	pop bc
 	djnz fbloop
 
-	call charmap_backup
+	
 retrylr	ld b,8
 	ld c,2
 	xor a
@@ -197,13 +166,11 @@ ldreq_ok1	call copy_filename
 	xor a
 	sbc hl,bc
 	jr z,flen_ok
-flenerr	call charmap_restore
-	ld hl,cfg_file_error_text
+flenerr	ld hl,cfg_file_error_text
 	jp do_end
 
 	
-flen_ok	call charmap_restore
-	ld hl,loading_txt
+flen_ok	ld hl,loading_txt
 	call kjt_print_string
 
 	ld hl,data_buffer		;load address
@@ -226,13 +193,16 @@ sdownload	ld l,(ix+18)		;check serial file header
 	push ix
 	pop hl 
 	call copy_filename
+	call receiving_requester
 	ld hl,data_buffer		; load address
 	ld b,0			; bank 0
 	call kjt_serial_receive_file	; download the file
+	push af
+	call w_restore_display
+	pop af
 	jp nz,serial_error
 
-cfgloaded	call charmap_restore
-	ld a,0			; is it a Xilinx cfg file?
+cfgloaded	ld a,0			; is it a Xilinx cfg file?
 	call kjt_forcebank
 	ld hl,data_buffer
 	ld de,cfg_id
@@ -334,19 +304,16 @@ do_end	call kjt_print_string
 
 load_error
 
-	call charmap_restore
 	ld hl,load_error_text	; serial comms problem
 	jr do_end
 	
 serial_error
 
-	call charmap_restore
 	ld hl,serial_error_text	; serial comms problem
 	jr do_end
 
 
-too_big	call charmap_restore
-	ld hl,file_too_big_text	; file too big
+too_big	ld hl,file_too_big_text	; file too big
 	jr do_end
 
 write_error
@@ -1119,7 +1086,7 @@ time_out_err
 obtain_new_data
 
 
-	call charmap_backup
+	
 retry_lr2	ld b,8
 	ld c,2
 	xor a				;requester 0 - load
@@ -1158,8 +1125,7 @@ fsok40	push iy
 fsbad2	ld hl,addr_error_text
 	jp od_bexit
 
-flen_ok2	call charmap_restore	
-	ld hl,loading_txt
+flen_ok2	ld hl,loading_txt
 	call kjt_print_string
 	ld hl,(dload_address)		;data load address
 	ld a,(dload_bank)			;data bank
@@ -1189,12 +1155,15 @@ fsok4	ld l,(ix+16)
 	jr nc,dfile_ok
 	jp fsbad2
 	
-dfile_ok	ld hl,(dload_address)		; load address
+dfile_ok	call receiving_requester
+	ld hl,(dload_address)		; load address
 	ld a,(dload_bank)
 	ld b,a				; load bank
 	call kjt_serial_receive_file		; download the file
+	push af
+	call w_restore_display
+	pop af
 	jr nz,ser_error
-	call charmap_restore
 	xor a	
 	ret
 
@@ -1208,8 +1177,7 @@ ser_error	ld hl,serial_error_txt
 od_abort	ld hl,abort_error_txt
 	jr od_bexit	
 
-od_bexit	call charmap_restore
-	xor a
+od_bexit	xor a
 	inc a
 	ret
 
@@ -1546,67 +1514,6 @@ cpyfndone	pop hl
 	ret
 	
 		
-
-
-charmap_backup
-
-	push bc
-	push de
-	push hl
-	call kjt_get_cursor_position
-	ld (backup_cursor_position),bc
-	ld bc,0
-	call kjt_get_charmap_addr_xy
-	ex de,hl
-	call kjt_get_display_size
-	dec b
-	dec c
-	call kjt_get_charmap_addr_xy
-	xor a
-	sbc hl,de
-	push hl
-	pop bc
-	inc bc
-	ex de,hl
-	ld de,charmap_image
-	ldir
-	pop hl
-	pop de
-	pop bc
-	ret
-	
-	
-	
-	
-charmap_restore
-
-	push bc
-	push de
-	push hl
-	call kjt_get_display_size
-	push bc
-	pop de
-	ld c,0
-	ld hl,charmap_image
-cmr_lp2	ld b,0
-cmr_lp1	ld a,(hl)
-	inc hl
-	call kjt_plot_char
-	inc b
-	ld a,b
-	cp d
-	jr nz,cmr_lp1
-	inc c
-	ld a,c
-	cp e
-	jr nz,cmr_lp2
-	ld bc,(backup_cursor_position)
-	call kjt_set_cursor_position
-	pop hl
-	pop de
-	pop bc
-	ret
-		
 ;----------------------------------------------------------------------------------------
 
 include "eeprom_routines.asm"
@@ -1619,7 +1526,7 @@ include "file_requesters_with_rs232.asm"
 
 
 start_text1	db 11," ************************************ ",11
-		db    " * V6Z80P ONBOARD EEPROM TOOL V1.20 * ",11
+		db    " * V6Z80P ONBOARD EEPROM TOOL V1.21 * ",11
 		db    " ************************************ ",11,0
 		
 start_text2	db 11
@@ -1675,19 +1582,16 @@ addr_error_text	db 11,"ERROR! File cannot overlap 64KB block",11,11
 erasing_blk_text	db 11,"Erasing block:"
 erase_blk_chars	db "xx..",11,0
 
-set_slot_text	db 11,11,"Which slot should the FPGA",11
-		db "configure from upon power up? ",0
+set_slot_text	db 11,11,"Enter the slot number from which the",11
+		db "FPGA is to configure at power up: ",0
 
 warning_2_text	db 11,11,"WARNING! You are changing the power",11
-		db "on configuration slot selection.",11
-		db "If the new config in the selected slot",11
-		db "offers no means of switching slots",11
-		db "(or is invalid) you will be stuck with",11
-		db "that selection. Testing the slot with",11
-		db "option [2] first is advised. It is",11
-		db "possible to manually reset the slot",11
-		db "pointer (see V6Z80P documentation) but",11
-		db "this should be treated as a last resort.",11 
+		db "on configuration slot selection.",11,11
+		db "If the config in the selected slot",11
+		db "offers no means of changing back you",11
+		db "will have to resort to manual slot",11
+		db "selection. For safety, test the config",11
+		db "slot with option [2] first.",11,11
 		
 		db "On power up the FPGA will now configure",11
 		db "from EEPROM slot "
@@ -1848,6 +1752,6 @@ page_buffer	ds 256,0
 
 backup_cursor_position	dw 0
 
-charmap_image		db 0	; dont put anything after this point and ensure
-				; there is room for a backup of the charmap between
-				; here and the work buffer at $8000
+last_byte			db 0	; ensure assembly ends before $8000 as the work buffer is there.
+
+;------------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@
 ; Changes:
 ; --------
 ;
+; v0.03 - Uses new requester code
 ; v0.02 - Manual saving of machine selection
 ; v0.01 - First release (previously called "gospec.exe")
 
@@ -23,6 +24,9 @@ include "osca_hardware_equates.asm"
 include "system_equates.asm"
 
 	org $5000
+
+required_flos	equ $602
+include 		"test_flos_version.asm"
 
 ;----------------------------------------------------------------------------------------------
 
@@ -62,8 +66,8 @@ lcfgbad	pop de
 ;----------------------------------------------------------------------------------------------
 	
 
-start	call kjt_clear_screen	
-	call update_vars_from_cfg_file
+start	call update_vars_from_cfg_file
+	call kjt_clear_screen
 	
 menu	call show_menu
 
@@ -94,7 +98,7 @@ option1	call reconfigure
 	
 option2	call load_tap_reconf
 	jr nz,error_menu
-	jr start
+	jr menu_wait			;no need to redraw menu, requester code replaces previous chars
 	
 option3	call residos_reconf 
 	jr nz,error_menu
@@ -1054,7 +1058,7 @@ filename_txt	ds 16,0
 bad_fn_txt	db 11,"Can't find that file.",11,11,0
 
 banner_txt	db "                              ",11
-		db "   Emulator Kickstart V0.02   ",11
+		db "   Emulator Kickstart V0.03   ",11
 		db "                              ",11,0
 	
 machine_txt	db 11,"Selected machine: ",11,11," ",0
@@ -1066,7 +1070,7 @@ menu_txt		db 11,11," 1. Reset/boot machine (BASIC).",11
 		db " 2. Load .tap /.bin file & boot.",11
 		db " 3. Boot into Residos (.nvr).",11
 		db " 4. Change selected machine.",11
-		db " 5. Change FPGA config slot.",11
+		db " 5. Set config slot for emulator.",11
 		db " 6. Set machine selection as default.",11,11
 
 		db " ESC - Quit to FLOS.",11,11,0
