@@ -1,6 +1,6 @@
 
 SHOWVRAM.EXE - Displays a section of
-Video RAM direct to the display, as
+Video RAM direct to the display as
 a single bitplane or in chunky mode.
 
 Start address, modulo, video mode and
