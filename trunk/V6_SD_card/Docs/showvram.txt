@@ -1,0 +1,19 @@
+
+SHOWVRAM.EXE - Displays a section of
+Video RAM direct to the display, as
+a single bitplane or in chunky mode.
+
+Start address, modulo, video mode and
+window size can be adjusted within
+the app using the standard Window
+controls:
+
+Tab = step through window elements
+
++/- = Inc/Dec value in current box
+
+ESC = Quit app (or just current data
+entry, as applicable)
+
+Other keys = Enter text direct to
+current window element.
