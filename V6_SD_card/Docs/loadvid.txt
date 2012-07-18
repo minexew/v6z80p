@@ -1,10 +1,7 @@
 
-LOADVID.EXE - Loads data to Video RAM
+LOADVID.EXE - Loads data to VRAM
 
-Use: LOADVID filename addr
+This command has been renamed to:
 
-"addr" is in the range 0-7FFFF
-
-(IE: A flat, linear address in Video
- RAM)
+LOADVRAM.EXE
 

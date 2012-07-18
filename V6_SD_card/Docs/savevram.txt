@@ -1,0 +1,17 @@
+
+SAVEVRAM.EXE - Saves data from Video RAM
+
+Use: SAVEVRAM filename address length
+
+"address" is in the range 0-7FFFF
+
+(IE: A flat, linear address in Video
+ RAM)
+
+"length" is in the range 1-7FFFF.
+
+Notes:
+
+An error is returned if "address" plus
+"length" is greater than $80000
+
