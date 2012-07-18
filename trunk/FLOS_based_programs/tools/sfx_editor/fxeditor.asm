@@ -26,8 +26,56 @@ marker_y		equ 136
 required_flos	equ $602
 include 		"test_flos_version.asm"
 
+;---------------------------------------------------------------------------------------
+
+	jp start_fxedit	;skip data that needs to be in unpaged RAM
+	
+;---------------------------------------------------------------------------------------
+
+
+my_linecoplist	
+
+	dw $c008		;wait for line $08
+	dw $8201		;set register $201 (vreg_victrl)
+	dw $0000		;write 0 to register (bitmap bitplane mode)
+	dw $c0b0		;wait for line $b0
+	dw $00a0		;write $80 to register (switch to chunky pixel mode)
+	dw $8243		;select register $243 (reset video counter)
+	dw $0000		;write $00, reset counter
+	dw $c1ff		;wait for line $1ff (end of list)
+
+
+	dw $c008		;wait for line $08
+	dw $8201		;set register $201 (vreg_victrl)
+	dw $0000		;write 0 to register (bitmap bitplane mode)
+	dw $c1ff		;wait for line $1ff (end of list)
+
+		
+end_my_linecoplist	db 0
+
+
+;-------------------------------------------------------------------------------------
+
+current_scancode	db 0
+current_asciicode	db 0
+mode		db 0	;0 = fx edit, 1 = wave edit
+current_fx	db 1
+current_wave	db 1
+del_indices	ds 8,0	;one index per mode
+input_string_offset db 0
+del_flag		db 0
+preview_mode	db "N"
+pen_colour  	db $38
+
+original_data	ds 32,0
+quit_txt		db 11,"Quit the SFX editor..",0
+
+original_cursor	dw 0
+
 ;---------------------------------------------------------------------------------------------
 	
+start_fxedit
+
 	call kjt_get_cursor_position
 	ld (original_cursor),bc
 	
@@ -247,7 +295,7 @@ lastcurs	add a,(ix)
 	ld b,a
 	ld c,(ix+1)	
 do_cursor	call kjt_set_cursor_position
-	ld hl,$c00
+	ld hl,$1000
 	call kjt_draw_cursor
 	ret
 	
@@ -780,7 +828,8 @@ yes_quit	call kjt_flos_display
 	call w_restore_display
 	ld bc,(original_cursor)
 	call kjt_set_cursor_position
-
+	call normal_video
+	
 	xor a
 	out (sys_audio_enable),a
 	ret
@@ -4207,28 +4256,6 @@ y_win_offset
 	include "fx_player.asm"
 
 	include "file_requesters.asm"
-	
-;---------------------------------------------------------------------------------------
-
-my_linecoplist	
-
-	dw $c008		;wait for line $08
-	dw $8201		;set register $201 (vreg_victrl)
-	dw $0000		;write 0 to register (bitmap bitplane mode)
-	dw $c0b0		;wait for line $b0
-	dw $00a0		;write $80 to register (switch to chunky pixel mode)
-	dw $8243		;select register $243 (reset video counter)
-	dw $0000		;write $00, reset counter
-	dw $c1ff		;wait for line $1ff (end of list)
-
-
-	dw $c008		;wait for line $08
-	dw $8201		;set register $201 (vreg_victrl)
-	dw $0000		;write 0 to register (bitmap bitplane mode)
-	dw $c1ff		;wait for line $1ff (end of list)
-
-		
-end_my_linecoplist	db 0
 
 ;---------------------------------------------------------------------------------------
 
@@ -4656,23 +4683,6 @@ loadsave_del	db 2,5
 		db $ff		
 		
 	
-;-------------------------------------------------------------------------------------
-
-current_scancode	db 0
-current_asciicode	db 0
-mode		db 0	;0 = fx edit, 1 = wave edit
-current_fx	db 1
-current_wave	db 1
-del_indices	ds 8,0	;one index per mode
-input_string_offset db 0
-del_flag		db 0
-preview_mode	db "N"
-pen_colour  	db $38
-
-original_data	ds 32,0
-quit_txt		db 11,"Quit the SFX editor..",0
-
-original_cursor	dw 0
 
 ;------------------------------------------------------------------------------------
 
