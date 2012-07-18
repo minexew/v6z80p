@@ -5,7 +5,7 @@
 ;--------- Test FLOS version -----------------------------------------------------------
 
 
-; set "required_flos" 
+; set "required_flos" label
 
 
 	push hl
@@ -17,7 +17,7 @@
 	jr nc,flos_ok
 	ld hl,old_flos_txt
 	call kjt_print_string
-	ld hl,hex_txt
+	ld hl,oshex_txt
 	push hl
 	ld a,d
 	call kjt_hex_byte_to_ascii
@@ -32,11 +32,9 @@
 old_flos_txt
 
 	db "Program requires FLOS v",0
-hex_txt	db "----+",11,11,0
+oshex_txt	db "----+",11,11,0
 
 
 flos_ok	
 
-;--------------------------------------------------------------------------------------
-; User's program goes below..
 ;--------------------------------------------------------------------------------------

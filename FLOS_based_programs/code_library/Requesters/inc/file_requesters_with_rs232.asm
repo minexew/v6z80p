@@ -2,8 +2,15 @@
 ; Library Code: FLOS File Requestors with RS232 RX/TX v0.04 By Phil Ruston
 ;--------------------------------------------------------------------------------
 ;
+; Requires FLOS v602
+;-------------------
+;
 ; Changes:
 ; --------
+;
+; 0.05 : Automatic backup/restore of display around load/save and error requesters
+;      : Cursor position is saved/restored around load/save and error requesters
+;
 ; 0.04 -  Added indirect window list location, renames old file to .bak when file exists
 ;
 ; 0.03 -  Added automatic "File not found" requester - disk load performs "kjt_find_file" on exit.
@@ -19,7 +26,9 @@
 ; "save_requester"
 ; "file_error_requester"
 ; "hw_error_requester"
-;
+; "sending_requester"
+; "receiving_requester"
+
 ;----------------------------------------------------------------------------------
 ;
 ;
@@ -110,7 +119,7 @@
 ;   A = file error code (shown as hex byte in requester)
 ;   There are no output registers.
 ;   Window will be located centrally based on Load/Save requester coordinates
-;
+;   
 ;----------------------------------------------------------------------------------
 ;
 ; "HW_ERROR_REQUESTER" DETAILS
@@ -118,9 +127,31 @@
 ;
 ;   No input / No output registers.
 ;   Window will be located centrally based on Load/Save requester coordinates
+; 
+;----------------------------------------------------------------------------------
+;
+; "SENDING_REQUESTER" DETAILS
+; ----------------------------
+;
+;  Simply shows a message box saying "Sending.."
+;  No input / No output registers.
+;  Window will be located centrally based on Load/Save requester coordinates
+;  Call "w_restore_display" to remove this requester after transfer
+;
+;----------------------------------------------------------------------------------
+;
+; "RECEIVING_REQUESTER" DETAILS
+; -----------------------------
+;
+;  Simply shows a message box saying "Receiving.."
+;  No input / No output registers.
+;  Window will be located centrally based on Load/Save requester coordinates  
+;  Call "w_restore_display" to remove this requester after transfer
 ;
 ;----------------------------------------------------------------------------------
 
+
+;--------------------------------------------------------------------------
 
 	include "window_draw_routines.asm"
 	include "window_support_routines.asm"
@@ -128,15 +159,42 @@
 ;--------------------------------------------------------------------------
 
 load_requester
-
+	
+	
+	call req_preamble
 	xor a				; window number 0 = load requester
-	jr req_tlsetup
+req_dolsr	call req_loadsave_req
+	push af
+	call w_restore_display
+	ld bc,(orig_cursor)
+	call kjt_set_cursor_position
+	pop af
+	ret
 	
 save_requester
 
-	ld a,1				; window number 1 = save requester
+	call req_preamble			; window number 1 = save requester
+	ld a,1
+	jr req_dolsr
 	
-req_tlsetup
+				
+req_preamble
+
+	push bc
+	call kjt_get_cursor_position
+	ld (orig_cursor),bc
+	pop bc
+	call w_backup_display
+	ret
+
+
+orig_cursor
+
+	dw 0
+
+;--------------------------------------------------------------------------
+
+req_loadsave_req
 	
 	call set_filereq_win_pointer
 	
@@ -237,24 +295,31 @@ req_esc_pressed
 	
 	ld a,(w_active_window)
 	cp 2
-	jp z,req_redsr			;"make new dir" aborted
+	jr z,req_redsr_short		;"make new dir" aborted
 	cp 3
-	jp z,req_redsr			;"dir already exists" window active
+	jr z,req_redsr_short		;"dir already exists" window active
 	cp 4
-	jp z,req_redsr			;"file already exists" window active
+	jr z,req_redsr_short		;"file already exists" window active
 	cp 5
-	jp z,req_redsr			; rs232 load active
+	jr z,req_redsr_short		; rs232 load active
 	cp 6
-	jp z,req_redsr			; rs232 save active
+	jr z,req_redsr_short		; rs232 save active
 	cp 9				
-	jp z,req_redsr			;"file not found" window active
+	jp z,req_redsr_short		;"file not found" window active
+	cp 10
+	jr z,req_redsr_short		;"serial error" window active
 	
 req_aborted
 
-	xor a				;"load" / "save" aborted, exist with A = $FF
+	xor a				;"load" / "save" aborted, exit with A = $FF
 	dec a				;and zero flag clear
 	ret
 
+
+req_redsr_short
+
+	jp req_redsr
+	
 ;------------------------------------------------------------------------------------------------
 
 req_rs232_exit
@@ -431,11 +496,13 @@ req_enter_pressed
 	cp 4
 	jp z,req_dofae			;4 = file already exists window?
 	cp 5
-	jp z,req_redsr			;5 = rs232 load active - cancel button pressed
+	jp z,req_redsr			;5 = rs232 load window active - cancel button pressed
 	cp 6
-	jp z,req_rs232save			;6 = rs232 save active - save/cancel button pressed
+	jp z,req_rs232save			;6 = rs232 save window active - save or cancel button pressed
 	cp 9
 	jp z,req_redsr
+	cp 10
+	jp z,req_redsr			;10 = serial error window active
 	jp req_loop
 
 	
@@ -663,10 +730,9 @@ req_rdytx	call kjt_get_charmap_addr_xy		; copy text from filename box to filenam
 
 req_rs232save
 
-	call w_get_element_selection		;if element 2 was active, save via rs232
-	cp 2				;else go back to main requester
+	call w_get_element_selection		;if element 1 was active, save via rs232
+	cp 1				;else go back to main requester
 	jp nz,req_redsr			
-	call req_rs232_say_sending
 	jp req_rs232_exit			
 
 
@@ -689,27 +755,40 @@ req_rx_tx
 	ld a,c				; retrieve y coord "" ""
 	add a,5				; add on centered offset
 	ld c,a
-	ld e,2				; set gadget selection = 0
+	ld e,1				; set gadget selection
 	ld a,5			
 	call req_draw_requester		; show "rs232 receive" window
-	call req_rs232_say_waiting
 	ld a,1
 	ld (req_rs232_waiting),a
 	
 req_rs232_header_wait
 
 	ld hl,req_any_filename_txt		; filename address of * wildcard
-	ld a,1				; time out = 1 second
+	ld a,%11000001			; time out = 1 second, abort with ESC or ENTER
 	call kjt_serial_receive_header
-	jr nz,req_rs232_nogo		; file header loaded ok?
-	call req_rs232_say_receiving
-	jp req_rs232_exit	
-
+	jp z,req_rs232_exit			; file header loaded ok?
+	
 req_rs232_nogo
 	
-	cp $14				; only a time-out error?
+	cp $2a
+	jp nz,req_nsesc
+	xor a
+	ld (req_rs232_waiting),a	
+	jp req_redsr
+	
+req_nsesc	cp $14				; just a time-out error?
 	jp z,req_loop
-	call req_rs232_say_error
+	
+	ld bc,(req_top_level_window_coords)	; show "serial error" window
+	ld a,b				; retrieve x coord of load requester
+	add a,3				; add on centered offset
+	ld b,a
+	ld a,c				; retrieve y coord "" ""
+	add a,5				; add on centered offset
+	ld c,a
+	ld e,1				; set gadget selection ("ok" button)
+	ld a,10				; set window 			
+	call req_draw_requester		; show "rs232 error" window
 	xor a
 	ld (req_rs232_waiting),a
 	jp req_loop
@@ -727,41 +806,11 @@ req_show_tx
 	ld a,c				; retrieve y coord "" ""
 	add a,5				; add on centered offset
 	ld c,a
-	ld e,2				; set gadget selection = 0
+	ld e,1				; set gadget selection = 1 
 	ld a,6			
 	call req_draw_requester		; show "rs232 send" window
-	call req_rs232_say_waiting
 	jp req_loop
 
-;----------------------------------------------------------------------------------------------
-
-req_rs232_say_waiting
-
-	ld a,1
-	ld hl,req_waiting_txt
-	call req_put_text_at_element
-	ret
-
-req_rs232_say_sending
-
-	ld a,1
-	ld hl,req_sending_txt
-	call req_put_text_at_element
-	ret
-	
-req_rs232_say_receiving
-
-	ld a,1
-	ld hl,req_receiving_txt
-	call req_put_text_at_element
-	ret
-	
-req_rs232_say_error
-
-	ld a,1
-	ld hl,req_serial_error_txt
-	call req_put_text_at_element
-	ret
 				
 ;----------------------------------------------------------------------------------------------
 
@@ -928,7 +977,7 @@ req_show_cursor
 	jr nz,req_cnmax
 	dec b				; keep the cursor at the end of the 
 req_cnmax	call kjt_set_cursor_position		; text box if necessary
-	ld hl,$c00
+	ld hl,$1800
 	call kjt_draw_cursor
 	ret
 	
@@ -948,6 +997,7 @@ req_draw_requester
 
 file_error_requester
 
+	call req_preamble
 	call set_filereq_win_pointer
 
 	push hl
@@ -970,7 +1020,8 @@ file_error_requester
 	jr req_disk_err_loop
 
 hw_error_requester
-	
+
+	call req_preamble	
 	call set_filereq_win_pointer
 	
 	push hl
@@ -1015,14 +1066,54 @@ req_de_pe	ld a,(w_active_window)		;is this the hardware error requester?
 	
 req_de_exit
 	
-	pop af
+	call w_restore_display
+	ld bc,(orig_cursor)
+	call kjt_set_cursor_position
+	
+req_exit	pop af
 	pop bc
 	pop de
 	pop hl
 	xor a
-	ret		
-
+	ret
+	
 ;--------------------------------------------------------------------------------------
+
+sending_requester
+
+	ld a,11
+	jr req_swin	
+
+receiving_requester
+
+	ld a,12
+req_swin	ld (req_winreq),a
+	
+	call req_preamble	
+	call set_filereq_win_pointer
+	
+	push hl
+	push de
+	push bc
+	push af
+	ld bc,(req_top_level_window_coords)
+	ld a,b
+	add a,3
+	ld b,a
+	ld a,c
+	add a,5
+	ld c,a
+	ld a,(req_winreq)
+	call draw_window
+	jr req_exit
+
+
+req_winreq
+
+	db 0
+	
+;--------------------------------------------------------------------------------------
+
 
 set_filereq_win_pointer
 
@@ -1046,7 +1137,10 @@ file_req_windows	dw win_inf_load		; Window 0
 		dw win_inf_file_error	; Window 7
 		dw win_inf_hw_error		; Window 8
 		dw win_fnf_error		; Window 9
-
+		dw win_serial_error		; Window 10
+		dw win_sending		; Window 11
+		dw win_receiving		; Window 12
+		
 ;------ Window Info -------------------------------------------------------------------
 
 win_inf_load	db 0,0			;0 - position on screen of frame (x,y) 
@@ -1132,31 +1226,28 @@ win_inf_overwrite	db 0,0
 		db 9,5
 		dw win_element_n
 		db 255
+	
 		
 win_inf_receive	db 0,0
-		db 18,7
+		db 18,6
 		db 0
 		db 0
-		db 3,1				;element 0
-		dw win_element_rs232rectxt
-		db 1,3				;element 1
-		dw win_element_rs232_status
-		db 6,5				;element 2
+		db 1,1				;element 0
+		dw win_element_rs232wait
+		db 6,4				;element 1
 		dw win_element_cancel
 		db 255
 
 
 win_inf_send	db 0,0
-		db 18,7
+		db 18,6
 		db 0
 		db 0
-		db 3,1				;element 0
-		dw win_element_rs232sendtxt
-		db 1,3				;element 1
-		dw win_element_rs232_status
-		db 2,5				;element 2
+		db 2,1				;element 0
+		dw win_element_rs232transfer
+		db 3,4				;element 1
 		dw win_element_send
-		db 11,5				;element 3
+		db 9,4				;element 2
 		dw win_element_cancel
 		db 255
 
@@ -1195,6 +1286,36 @@ win_fnf_error	db 0,0				;window for file not found
 		dw win_element_m
 		db 255
 
+
+win_serial_error	db 0,0				;window for file error  
+		db 18,6			
+		db 0			
+		db 0			
+		db 2,1			
+		dw win_serial_err_elem	
+		db 7,4
+		dw win_element_m
+		db 255
+
+
+win_sending	db 0,0				;window for file error  
+		db 15,5			
+		db 0			
+		db 0			
+		db 3,2			
+		dw win_sending_elem	
+		db 255
+
+
+win_receiving	db 0,0				;window for file error  
+		db 15,5			
+		db 0			
+		db 0			
+		db 2,2			
+		dw win_receiving_elem	
+		db 255
+
+		
 ;---- Window Elements ---------------------------------------------------------------------
 
 		
@@ -1287,44 +1408,36 @@ win_element_o	db 2
 		db 0
 		dw req_overwrite_txt
 
+
+
 win_element_rs232	db 0
 		db 5,1
 		db 1
 		db 0
-		dw req_rs232_txt
+		dw req_rs232_txt			;button
 		
 
-win_element_rs232rectxt
+win_element_rs232wait
 
 		db 2
-		db 13,1
+		db 15,1
 		db 0
 		db 0
-		dw req_rs232rec_txt
+		dw req_rs232wait_txt			
 
-win_element_rs232sendtxt
+win_element_rs232transfer
 
 		db 2
-		db 13,1
+		db 14,1
 		db 0
 		db 0
-		dw req_rs232send_txt
-
-		
-win_element_rs232_status
-
-		db 1
-		db 16,1
-		db 0
-		db 0
-		dw req_waiting_txt
-
+		dw req_rs232trans_txt
 
 win_element_send	db 0
 		db 4,1
 		db 1
 		db 0
-		dw req_send_txt
+		dw req_send_txt			;button
 	
 
 win_file_err_elem	db 2			
@@ -1346,7 +1459,24 @@ win_fnf_msg_elem	db 2
 		db 0
 		db 0
 		dw req_fnf_err_txt
-						
+
+win_serial_err_elem	db 2
+		db 14,1
+		db 0
+		db 0
+		dw req_serial_err_txt
+
+win_sending_elem	db 2
+		db 9,1
+		db 0
+		db 0
+		dw req_sending_txt
+		
+win_receiving_elem	db 2
+		db 11,1
+		db 0
+		db 0
+		dw req_receiving_txt							
 		
 req_dir_txt	db "DIR",0
 req_new_txt	db "NEW",0
@@ -1359,17 +1489,19 @@ req_alr_exists_txt	db "ALREADY",11,11," EXISTS!",0
 req_ok_txt	db "OK",0
 req_no_txt	db "NO",0
 req_overwrite_txt	db "FILE EXISTS",11,"OVERWRITE ?",0
-req_rs232_txt	db "RS232",0
-req_rs232rec_txt	db "RS232 RECEIVE",0
-req_rs232send_txt	db "RS232 SEND",0
-req_send_txt	db "SEND",0
 
 req_file_err_txt	db "   File Error!",11,11," The File System",11," Returned Error",11,"    Code:$"
 req_file_ercode_txt	db "xx",0
-
 req_hw_err_txt	db "Hardware Disk Error   Remount Drives?",0
-
 req_fnf_err_txt	db "File Not Found!",0
+
+req_rs232_txt	db "RS232",0
+req_rs232wait_txt	db "RS232 Waiting..",0
+req_rs232trans_txt	db "RS232 Transfer",0
+req_send_txt	db "SEND",0
+req_sending_txt	db "Sending..",0
+req_receiving_txt	db "Receiving..",0
+req_serial_err_txt	db "Serial Error!",0
 
 ;--------------------------------------------------------------------------------------
 
@@ -1387,11 +1519,6 @@ req_top_level_window_number	db 0
 req_dircurpos		dw 0
 req_fn_len		db "$xxxxxx",0
 req_ascii_input_mode	db 0
-
-req_waiting_txt		db "Waiting..",0
-req_sending_txt		db "Sending..",0
-req_receiving_txt		db "Receiving..",0
-req_serial_error_txt	db "Header error!",0
 
 req_any_filename_txt	db "*",0
 req_rs232_waiting		db 0

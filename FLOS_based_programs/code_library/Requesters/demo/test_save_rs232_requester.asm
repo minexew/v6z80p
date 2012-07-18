@@ -33,7 +33,6 @@ dsaveok	ld ix,data_to_save		; source address
 	call kjt_save_file		
 	jr c,hw_error
 	
-	call kjt_clear_screen
 	ld hl,saved_ok_txt
 	call kjt_print_string	
 	xor a
@@ -43,20 +42,17 @@ sav_error	or a			;if A =  0 the error was hardware related
 	jr z,hw_error		;if A <> 0 its a file system error 
 	push af	
 	call file_error_requester
-	call kjt_clear_screen
 	ld hl,save_error_txt
 	call kjt_print_string
 	pop af
 	ret
 		
-aborted	call kjt_clear_screen
-	ld hl,no_save_txt
+aborted	ld hl,no_save_txt
 	call kjt_print_string
 	xor a
 	ret
 
 hw_error	call hw_error_requester
-	call kjt_clear_screen
 	ld hl,hw_error_txt
 	call kjt_print_string
 	pop af
@@ -66,20 +62,22 @@ hw_error	call hw_error_requester
 
 rs232_save
 
+	call sending_requester
 	ld ix,data_to_save		; source address
 	ld b,0			; source bank
 	ld c,0			; bits 23:16 of length
 	ld de,18			; bits 15:0 of length
 	call kjt_serial_send_file	; HL has been set to the filename by requester routine
+	push af
+	call w_restore_display
+	pop af
 	jr nz,ser_error		; if ZeroFlag is not set, there was problem
-	call kjt_clear_screen
 	ld hl,rs232sent_txt
 	call kjt_print_string
 	xor a
 	ret
 	
 ser_error	push af
-	call kjt_clear_screen
 	ld hl,rs232_error_txt
 	call kjt_print_string
 	pop af

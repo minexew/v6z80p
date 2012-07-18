@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------
-; Window support routines v0.04 - by Phil Ruston
+; Window support routines v0.10 - by Phil Ruston 3-7-2010
 ;------------------------------------------------------------------------------
 ;
 ; These routines support the "Window_draw.asm" code, providing a framework of
@@ -89,6 +89,24 @@
 ;   Moves the element selection on top the next selectable element (and wraps around
 ;   if necessary)
 ;
+;
+; W_ASCII_TO_ASSOCIATED_DATA
+;
+;   Copies an ASCII string (source=HL) to the currently selected element's associated
+;   data area. Stops on encountering null char ($00) (or width of element filled).
+;
+;
+; W_SHOW_ASSOCIATED_TEXT
+;
+;   Updates the display with the "associated data" text string for the currently selected
+;   element.
+;
+;
+; W_GET_ASSOCIATED_DATA_LOCATION
+;
+;  Put address of the currently selected element's "associated data" in HL. If
+;  Zero flag is set on return, the element has no associated data.
+
 ;------------------------------------------------------------------------------
 ; ALL REGISTERS NOT INVOLVED IN PASSING INFO TO/FROM ROUTINES ARE PRESERVED
 ;------------------------------------------------------------------------------
@@ -309,6 +327,66 @@ w_nsel	inc a
 w_nsene	call w_get_selected_element_data_location
 	bit 0,(ix+3)			;is this element selectable?
 	jr z,w_nesinc
+	ret
+	
+;----------------------------------------------------------------------------------
+
+
+w_ascii_to_associated_data
+	
+	call w_get_selected_element_data_location	;Set HL to source
+	ld e,(ix+5)			
+	ld d,(ix+6)				;DE = location of associated data
+	ld a,d
+	or e
+	ret z
+
+	push de
+	ld b,(ix+1)				;width of element
+	ld a," "
+w_fadws	ld (de),a					;fill associated data area with spaces
+	inc de
+	djnz w_fadws
+	pop de
+	
+	ld b,(ix+1)				;width of element
+w_atadlp	ld a,(hl)
+	or a
+	ret z					;terminate if encounter null 
+	ld (de),a
+	inc hl
+	inc de
+	djnz w_atadlp
+	ret
+	
+;----------------------------------------------------------------------------------
+
+
+w_show_associated_text
+
+	call w_get_selected_element_data_location
+	call w_get_selected_element_coords 
+	call kjt_get_charmap_addr_xy
+	ld l,(ix+5)
+	ld h,(ix+6)
+	ld e,(ix+1)
+w_satlp	ld a,(hl)
+	call kjt_plot_char
+	inc hl
+	inc b
+	dec e
+	jr nz,w_satlp
+	ret
+	
+;----------------------------------------------------------------------------------
+
+w_get_associated_data_location
+
+	call w_get_selected_element_data_location
+	ld l,(ix+5)
+	ld h,(ix+6)
+	ld a,h
+	or l
 	ret
 	
 ;----------------------------------------------------------------------------------

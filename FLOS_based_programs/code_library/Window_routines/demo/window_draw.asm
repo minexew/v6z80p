@@ -2,7 +2,7 @@
 ; Demo of Support code for Window drawing routines
 ;-----------------------------------------------------------------------------
 ;
-;Requires FLOS v562
+;Requires FLOS v602
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
@@ -15,12 +15,17 @@ include "system_equates.asm"
 
 ;------------------------------------------------------------------------------
 	
+	call w_backup_display
+	
 	ld a,0			;window number
 	ld b,8			;x
 	ld c,2			;y
 	call draw_window		
 	
-quit	xor a
+	call kjt_wait_key_press	
+	
+	call w_restore_display
+	xor a
 	ret
 		
 ;---------------------------------------------------------------------------------
