@@ -302,7 +302,7 @@ addr_txt_loc	dw 0
 cr_txt		db 11,0
 
 use_txt		db "USAGE:",11
-		db "LOADVID Filename [VRAM Address]",11,0
+		db "LOADVRAM Filename [VRAM Address]",11,0
 
 load_error_txt	db "Load error - File not found?",11,0
 
