@@ -17,3 +17,4 @@ entry, as applicable)
 
 Other keys = Enter text direct to
 current window element.
+
