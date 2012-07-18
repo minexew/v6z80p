@@ -1,12 +1,16 @@
 ;--------------------------------------------------------------------------------
-; Library Code: FLOS File Requesters v0.25 - By Phil Ruston
+; Library Code: FLOS File Requesters v0.26 - By Phil Ruston
 ;--------------------------------------------------------------------------------
 ;
-; Requires FLOS v562
+; Requires FLOS v602
 ;-------------------
 ;
 ; Changes:
 ; --------
+;
+; 0.26: Automatic backup/restore of display around load/save and error requesters
+;     : Cursor position is saved/restored around load/save and error requesters
+;
 ; 0.25: When saving a file with existing filename: If user agrees to replace it, the
 ;       existing file is renamed to *.bak (any existing file with that name is deleted).
 ;       Added indirect window list location
@@ -123,14 +127,42 @@
 
 load_requester
 	
+	
+	call req_preamble
 	xor a				; window number 0 = load requester
-	jr req_tlsetup
+req_dolsr	call req_loadsave_req
+	push af
+	call w_restore_display
+	ld bc,(orig_cursor)
+	call kjt_set_cursor_position
+	pop af
+	ret
 	
 save_requester
 
-	ld a,1				; window number 1 = save requester
+	call req_preamble			; window number 1 = save requester
+	ld a,1
+	jr req_dolsr
 	
-req_tlsetup
+				
+req_preamble
+
+	push bc
+	call kjt_get_cursor_position
+	ld (orig_cursor),bc
+	pop bc
+	call w_backup_display
+	ret
+
+
+orig_cursor
+
+	dw 0
+	
+;-----------------------------------------------------------------------------------
+
+
+req_loadsave_req
 	
 	call set_filereq_win_pointer
 	
@@ -790,7 +822,7 @@ req_show_cursor
 	jr nz,req_cnmax
 	dec b				; keep the cursor at the end of the 
 req_cnmax	call kjt_set_cursor_position		; text box if necessary
-	ld hl,$c00
+	ld hl,$1800
 	call kjt_draw_cursor
 	ret
 	
@@ -809,7 +841,8 @@ req_draw_requester
 ;======== FILE ERROR REQUESTERS ========================================================
 
 file_error_requester
-	
+
+	call req_preamble
 	call set_filereq_win_pointer
 	push hl
 	push de
@@ -831,7 +864,8 @@ file_error_requester
 	jr req_disk_err_loop
 
 hw_error_requester
-	
+
+	call req_preamble	
 	call set_filereq_win_pointer
 	push hl
 	push de
@@ -875,6 +909,10 @@ req_de_pe	ld a,(w_active_window)		;is this the hardware error requester?
 	
 req_de_exit
 	
+	call w_restore_display
+	ld bc,(orig_cursor)
+	call kjt_set_cursor_position
+	
 	pop af
 	pop bc
 	pop de
@@ -886,8 +924,8 @@ req_de_exit
 
 set_filereq_win_pointer
 
-	push hl				; ensures window code is looking at the
-	ld hl,file_req_windows		; following window list
+	push hl				; ensures window draw code is looking at the
+	ld hl,file_req_windows		; file requester window list below
 	ld (w_list_loc),hl
 	pop hl
 	ret

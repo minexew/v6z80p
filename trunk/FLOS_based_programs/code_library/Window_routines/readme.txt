@@ -1,7 +1,7 @@
 Simple Window drawing and support code for FLOS - by Phil Ruston
 -----------------------------------------------------------------
 
-Last updated 03/03/2010.
+Last updated 02/07/2012 - Window draw code version 0.10
 
 The routines allow the user to create and operate simple windows
 (EG: requesters) with minimal effort. To use, please include
@@ -105,18 +105,28 @@ is defined as follows:
 Data structure for each unique element:
 ---------------------------------------
 
- Byte  0  : Element Type: 0=button, 1=data area, 2=info (text)
- Byte  1  : width of element
- Byte  2  : height of element 
- Byte  3  : Control bits
- Byte  4  : Event flag (currently unused)
- Bytes 5/6: (Word) address of "associated data"
+ Byte  0   : Element Type: 0=button, 1=data area, 2=info (text)
+ Byte  1   : width of element
+ Byte  2   : height of element 
+ Byte  3   : Control bits
+ Byte  4   : Event flag (currently unused)
+ Bytes 5/6 : (Word) address of "associated data" (set to zero if irrelevant)
+ Bytes 7-16: Element dependant (can be omitted if irrelevant) 
+ 
+The bits of the control byte (3) are mainly used in the window support code,
+and are described later. However, if an element is a data area and bit 2
+of the control byte is set ("accepts user input") then the "associated data"
+location address (bytes 5/6) points to the default text string that is to
+appear in the box. Note: The text string should be big enough for data area
+and be null-terminated.
 
-The bits of the control byte (3) are irrelevent when just drawing windows
-but are used in the window support code - they are described later. The
-word at offset 5 is an address lable that points to data relevent
-to the element type, EG: ASCII text for a button. If irrelevant, the word
-can be omitted.
+As mentioned, the word at offset 5 is an address label that points to data relevent
+to the  element type, EG: ASCII text for a button (or default data as stated above).
+If such data is irrelevant to an element type, the word should be set to 0 (for safety)
+but can be omitted if desired.
+
+Bytes 7-16 change meaning based on the element type. They play no part in the
+drawing of the window and can be omitted if irrelevant to the element type.
 
 -----------------------------------------------------------------------------
 
@@ -127,10 +137,28 @@ win_element_a	db 0		;0 = Element Type: 0 = A button
 		db 2,1		;1/2 = dimensions of element x,y
 		db 1		;3 = control bits
 		db 0		;4 = event flag (currently unused)
-		dw ok_txt	;5/6 = location of associated data
+		dw ok_txt		;5/6 = location of associated data
 
 ok_txt		db "OK",0	;The ASCII that goes in the button
 
+-----------------------------------------------------------------------------
+
+Notes:
+
+When "w_draw_window" is called, the window is drawn over anything on the display.
+If the original character map/attr maps are to be maintained, the following calls
+can assist:
+
+w_backup_display	- no arguments (pushes display to stack)
+w_restore_display	- no arguments (just pops the last display saved off the stack)
+
+(if the zero flag is not set on return, the stack is full, or empty in case of restore)
+
+w_restore_level_a	- Put the stack level required in A (0-2)
+
+These are called either side of "w_draw_window" (of course the user program can handle
+backup/restore itself if more flexibility is required). The above routines have a 3
+layer stack and place the data in VRAM at $1c800-$1dfff
 
 -----------------------------------------------------------------------------
 Window support code
@@ -154,10 +182,20 @@ bits (byte 3 of element descriptions) come into play. The bits are defined:
           the "associated data" variable.
 
      2  : This element can accept ASCII input from the keyboard. The routines
-          do not current act on this - at present it is merely an indicator
+          do not currently act on this - at present it is merely an indicator
           for parent programs.
 
-     3-7: currently unused.
+     3  : The data to be entered is to be interpreted as a signed 32 bit hex number.
+          When this bit is set, bytes 7-16 of the element data are required:
+	  
+	   Bytes 7-10: Double word, upper limit for numeric input (32 bit signed)
+ 	   Bytes 11-14:Double word, lower limit for numeric input (32 bit signed)
+ 	   Bytes 15/16:Displacement value for numeric data adjust (+/- keys)
+             (this value doubles several times when +/- key is held)
+           Byte 17    :Bit 0 = sign extend number entered by user to 32bit internal
+                      :Bit 1 = Skip leading zeroes when displaying number
+
+     4-7: currently unused.
 
 
 
@@ -249,6 +287,25 @@ W_LOCATE_ACTIVE_WINDOW
    if necessary)
 
 
+ W_ASCII_TO_ASSOCIATED_DATA
+
+   Copies an ASCII string (source=HL) to the currently selected element's associated
+   data area. Stops on encountering null char ($00) (or width of element filled).
+
+
+ W_SHOW_ASSOCIATED_TEXT
+
+   Updates the display with the "associated data" text string for the currently selected
+   element.
+
+
+ W_GET_ASSOCIATED_DATA_LOCATION
+
+  Put address of the currently selected element's "associated data" in HL. If
+  Zero flag is set on return, the element has no associated data.
+
+
+------------------------------------------------------------------------------------------
 
 EG: The first thing you may want to do after drawing a window is set the
 default active element. EG:
@@ -265,13 +322,7 @@ default active element. EG:
 
 Simple demo code for window drawing and support is provided in:
 
-FLOS_based_programs\code_library\_tests_and_demos
+FLOS_based_programs\code_library\Window_routines\demo
 
 -------------------------------------------------------------------------------------------
-
-Notes:
-
-Windows are drawn on top of anything on the display. If the original character
-map is to be restored after a window is finished with, the user's program must
-handle it.
 

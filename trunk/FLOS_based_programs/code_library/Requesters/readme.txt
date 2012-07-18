@@ -1,7 +1,7 @@
-FLOS Load and Save Requesters for user programs - By Phil Ruston 2010
----------------------------------------------------------------------
+FLOS Load and Save Requesters for user programs - By Phil Ruston
+----------------------------------------------------------------
 
-Requires FLOS v562+ / Last update 28-12-2011
+Requires FLOS v602+ / Last update 08-07-2012
 
 Purpose:
 ---------
@@ -138,13 +138,11 @@ The requester code expects a normal FLOS display, so if the host program uses a
 custom display mode, the routine KJT_FLOS_DISPLAY should be called prior to
 calling the requester.
 
-The requester code copies user defined characters to the FLOS font (ASCII 128-159)
+The requester code copies user defined characters to the FLOS font (ASCII 176-207)
 so user programs requiring their own characters here should restore them after
 using the requesters.
 
-Windows are drawn on top of anything on the display. If the original character
-map is to be restored after a window is finished with, the user's program must
-handle this.
+The current display is automatically saved and restored around the window requesters.
 
 If the user program wants to use the window draw/support code to make windows
 other than those used for the load/save requesters, it can set the variable

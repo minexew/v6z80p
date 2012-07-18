@@ -31,15 +31,13 @@ reqok	ld hl,load_buffer		; address to load data to - note: "kjt_find_file" has
 	call kjt_force_load
 	jr nz,load_error
 
-load_ok	call kjt_clear_screen
-	ld hl,loaded_ok_txt
+load_ok	ld hl,loaded_ok_txt
 	call kjt_print_string	
 	xor a
 	ret
 
 
-aborted	call kjt_clear_screen
-	ld hl,no_load_txt
+aborted	ld hl,no_load_txt
 	call kjt_print_string
 	xor a
 	ret
@@ -51,7 +49,6 @@ load_error
 	jr z,hw_error		;if A <> 0 its a file system error 
 	push af			
 	call file_error_requester
-	call kjt_clear_screen
 	ld hl,load_error_txt
 	call kjt_print_string
 	pop af
@@ -59,9 +56,8 @@ load_error
 
 
 hw_error	call hw_error_requester	;the user's program may loop back for another
-	call kjt_clear_screen	;attempt (following saying yes to a drive remount)
-	ld hl,hw_error_txt		;or just give up immediately, as is the case here.
-	call kjt_print_string
+	ld hl,hw_error_txt		;attempt (following saying yes to a drive remount)
+	call kjt_print_string	;or just give up immediately, as is the case here.
 	ret
 
 	

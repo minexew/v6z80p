@@ -32,14 +32,12 @@ reqok	ld ix,data_to_save		; source address
 	jr c,hw_error
 	jr nz,sav_error
 	
-	call kjt_clear_screen
 	ld hl,saved_ok_txt
 	call kjt_print_string	
 	xor a
 	ret
 
-aborted	call kjt_clear_screen
-	ld hl,no_save_txt
+aborted	ld hl,no_save_txt
 	call kjt_print_string
 	xor a
 	ret
@@ -48,14 +46,12 @@ sav_error	or a			;if A =  0 the error was hardware related
 	jr z,hw_error		;if A <> 0 its a file system error 
 	push af			
 	call file_error_requester
-	call kjt_clear_screen
 	ld hl,save_error_txt
 	call kjt_print_string
 	pop af
 	ret
 	
 hw_error	call hw_error_requester
-	call kjt_clear_screen
 	ld hl,hw_error_txt
 	call kjt_print_string
 	ret

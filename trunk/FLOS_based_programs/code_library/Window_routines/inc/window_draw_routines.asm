@@ -1,5 +1,5 @@
 ;-------------------------------------------------------------------------------
-; FLOS Character-based window drawing code v0.04 by Phil Ruston
+; FLOS Character-based window drawing code v0.10 by Phil Ruston
 ;-------------------------------------------------------------------------------
 ;
 ; Before calling "draw_window", set:
@@ -31,42 +31,35 @@ draw_window
 	ld (w_active_window),a
 	push bc
 	
-	ld a,%00001111		;copy window graphic chars to FLOS font
-	ld (vreg_vidpage),a		
-	call kjt_page_in_video			
-	ld hl,w_my_chars		
-	ld b,8
-	ld de,video_base+$460
-w_rorgflp	push bc
-	ld bc,32
+	ld hl,w_window_buffer	;clear window draw buffer
+	ld de,w_window_buffer+1
+	ld bc,0+(40*25)-1
+	ld (hl),0
 	ldir
-	ld bc,96
-	ex de,hl
-	add hl,bc
-	ex de,hl	
+	
+	ld hl,w_my_chars		;patch font chars 176-207 with custom window characters
+	ld a,176
+	ld b,32
+pafntlp	push hl
+	push bc
+	push af
+	call kjt_patch_font
+	pop af
+	inc a
 	pop bc
-	djnz w_rorgflp
-	ld bc,$400		
-	ld hl,video_base+$400
-	ld de,video_base+$800
-w_invloop	ld a,(hl)
-	cpl
-	ld (de),a
-	inc hl
-	inc de
-	dec bc
-	ld a,b
-	or c
-	jr nz,w_invloop
-	call kjt_page_out_video
-
-	call kjt_get_pen		
+	pop hl
+	ld de,8
+	add hl,de
+	djnz pafntlp
+		
+	call kjt_get_pen		;create inverse version of current pen	
 	ld (w_norm_pen),a
 	rrca
 	rrca
 	rrca
 	rrca
 	ld (w_inv_pen),a
+	ld (w_draw_pen),a		;use inverse pen for window frame
 	
 	ld hl,(w_list_loc)		;locate desired window info
 	ld a,(w_active_window)
@@ -99,11 +92,7 @@ w_lp2	ld e,1
 	jr z,w_lp1
 	ld e,(iy+2)		;x repetitions
 w_lp1	ld a,(hl)
-	sub $80			;plot as 0-$1f so reveal routine knows they're inverse "extra" chars
-	push hl
-	call kjt_get_charmap_addr_xy
-	ld (hl),a
-	pop hl
+	call w_char_to_buffer
 	inc b
 	dec e
 	jr nz,w_lp1
@@ -127,40 +116,34 @@ w_lp1	ld a,(hl)
 w_drw_glp	ld a,(iy+6)		;255 = end of element list
 	inc a
 	jr nz,w_neoe
+	pop iy			
 
-	ld a,(w_norm_pen)		
+	ld hl,w_window_buffer	;finally, reveal the completed window
+	ld ix,w_window_buffer+(40*25)
+	ld c,0			
+w_btdlp2	ld b,0	
+w_btdlp1	ld a,(hl)
+	or a
+	jr z,w_tchar		;slip char location if nothing there
+	ld e,a
+	ld a,(ix)
 	call kjt_set_pen
-	pop iy			;finally, reveal the completed window by actually plotting
-	ld c,(iy+1)		;the characters previously written to charmap. This is done to
-	ld e,(iy+3)		;avoid seeing the window being drawn an element at a time.
-	inc e
-	inc e
-w_revwlp2	ld b,(iy)
-	ld d,(iy+2)
-	inc d
-	inc d
-w_revwlp1	call kjt_get_charmap_addr_xy
-	ld a,(hl)
-	cp $20			;if the char plotted was < $20, its actually an extra char ($80-$9f)
-	jr c,w_inv		;that needs to be drawn in inverse (IE: the window outline)
-	cp $a0
-	jr c,w_notinv
-w_inv	add a,$80
-	push af
-	ld a,(w_inv_pen)
-	call kjt_set_pen
-	pop af
+	ld a,e
 	call kjt_plot_char
+w_tchar	inc hl
+	inc ix
+	inc b
+	ld a,b
+	cp 40
+	jr nz,w_btdlp1
+	inc c
+	ld a,c
+	cp 25
+	jr nz,w_btdlp2
+
 	ld a,(w_norm_pen)
 	call kjt_set_pen
-	jr w_nxtrch	
-w_notinv	call kjt_plot_char
-w_nxtrch	inc b
-	dec d
-	jr nz,w_revwlp1
-	inc c
-	dec e
-	jr nz,w_revwlp2
+	
 	pop af
 	pop bc
 	pop de
@@ -168,6 +151,8 @@ w_nxtrch	inc b
 	pop ix
 	pop iy
 	ret
+
+
 	
 w_neoe	ld l,(iy+8)		;location of element description	
 	ld h,(iy+9)
@@ -190,16 +175,40 @@ w_draw_button
 	ld hl,w_window_chars	;button chars (but same info as window chars)
 	ld de,w_button_swaplist
 	call w_gadget_draw
-	jp w_drw_tnv		;add the button text
+	jp w_drw_tnv		;add the button text (non-inverse text)
 
 	
 w_draw_data_area
 
 	ld hl,w_text_area_chars
 	ld de,w_text_area_swaplist
-
+	call w_gadget_draw		;if the data area can accept user input, check for default data
+	bit 2,(ix+3)
+	call nz,w_drw_tnv		;display default data
+	bit 3,(ix+3)
+	jr z,w_nincdec		;is the input area numeric?
+	ld a,(w_frame_y)		
+	add a,(iy+7)
+	inc a
+	ld c,a			;y position
+	ld a,(w_frame_x)
+	add a,(iy+6)
+	add a,(ix+1)		;max width
+	inc a
+	ld b,a			;x position
+	ld a,$ce
+	call w_char_to_buffer	;"+" gadget
+	inc b
+	ld a,$cf
+	call w_char_to_buffer	;"-" gadget
+w_nincdec	xor a
+	ret
+	
 w_gadget_draw	
-		
+	
+	ld a,(w_norm_pen)
+	ld (w_draw_pen),a
+	
 	ld (w_swap_list),de
 	ld a,(w_frame_y)		
 	add a,(iy+7)
@@ -222,13 +231,10 @@ w_gdlp2	ld e,1
 	ld e,(ix+1)		;x repetitions
 
 
-w_gdlp1	push hl			;find what char is at desired plot location
-	call kjt_get_charmap_addr_xy
-	ld a,(hl)
-	pop hl
-	cp $a0
+w_gdlp1	call w_get_buffer_char	;is there empty space at desired plot location?
+	cp $20		
 	jr z,w_norm_ch
-	exx			;not a blank char (inv space), find a suitable compensating char def
+	exx			;if not a find a suitable compensating char def
 	ld b,a			;b = char at location 
 	exx
 	ld a,(hl)
@@ -256,11 +262,8 @@ w_swchnx2	inc hl
 	
 w_norm_ch	ld a,(hl)
 w_gotswch	or a
-	jr z,w_skipch
-	push hl
-	call kjt_get_charmap_addr_xy
-	ld (hl),a
-	pop hl
+	call nz,w_char_to_buffer
+	
 w_skipch	inc b
 	dec e
 	jr nz,w_gdlp1
@@ -279,12 +282,15 @@ w_skipch	inc b
 	ret
 
 
+
+
 w_draw_text
-	
-	ld b,$80			;inverse
+
+	ld a,(w_inv_pen)		;inverse
 	jr w_drw_tgo
-w_drw_tnv	ld b,$0			;not inverse
-w_drw_tgo	exx
+w_drw_tnv	ld a,(w_norm_pen)		;not inverse
+w_drw_tgo	ld (w_draw_pen),a
+	
 	ld l,(ix+5)
 	ld h,(ix+6)		;HL = location of associated data (text)
 	ld a,(w_frame_y)		
@@ -303,13 +309,7 @@ w_drw_tl1	ld a,(hl)
 	jr z,w_drwtdun
 	cp 11
 	jr z,w_tcr
-	exx
-	add a,b			;element text appears in inverse video
-	exx
-	push hl
-	call kjt_get_charmap_addr_xy
-	ld (hl),a
-	pop hl
+	call w_char_to_buffer
 	inc b
 	dec e
 	jr nz,w_drw_tl1
@@ -319,38 +319,213 @@ w_tcr	inc c
 w_drwtdun	xor a
 	ret
 
+
+
+;---------------------------------------------------------------------------------
+
+w_char_to_buffer	
+	
+	push hl		
+	push de			;a = char, b = x, c = y
+	ld h,0			;current w_draw_pen value is used for attribute
+	ld l,c
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	push hl
+	add hl,hl
+	add hl,hl
+	pop de
+	add hl,de
+	ld d,0
+	ld e,b
+	add hl,de
+	ld de,w_window_buffer
+	add hl,de
+	ld (hl),a
+	ld de,40*25
+	add hl,de
+	ld a,(w_draw_pen)
+	ld (hl),a
+	pop de
+	pop hl
+	ret
+
+
+w_get_buffer_char
+
+	push hl
+	push de			;b = x, c = y, char returned in A
+	ld h,0			
+	ld l,c
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	push hl
+	add hl,hl
+	add hl,hl
+	pop de
+	add hl,de
+	ld d,0
+	ld e,b
+	add hl,de
+	ld de,w_window_buffer
+	add hl,de
+	ld a,(hl)
+	pop de
+	pop hl
+	ret
+
+;---------------------------------------------------------------------------------
+					
+w_backup_display
+	
+	push hl
+	push de
+	push bc
+	
+	ld a,(w_backup_stack)
+	cp 3
+	jr nz,w_budok
+	
+	or a
+w_quitpop	pop bc
+	pop de
+	pop hl
+	ret
+	
+w_budok	rlca
+	rlca
+	rlca
+	add a,$28
+	ld d,a
+	ld e,0
+	
+	ld bc,0
+	call kjt_get_charmap_addr_xy		;get start of charmap location
+	
+	ld a,$0e				;IE: $1c000/$2000
+	ld (vreg_vidpage),a
+	call kjt_page_in_video
+	
+	ld bc,40*25			;char map
+	ldir
+	ld hl,$2000			;attr buffer
+	ld bc,40*25
+	ldir
+	
+	call kjt_page_out_video
+	
+	ld hl,w_backup_stack
+	inc (hl)
+	jr w_quitpop
+
+
+
+
+
+w_restore_level_a
+
+	push hl
+	push de
+	push bc
+	jr w_restore_abs
+
+w_restore_display
+	
+	push hl
+	push de
+	push bc
+	
+	ld a,(w_backup_stack)
+	or a
+	jr nz,w_busok
+	inc a
+	jr w_quitpop
+
+w_busok	dec a
+	ld (w_backup_stack),a
+	
+w_restore_abs
 		
+	rlca
+	rlca
+	rlca
+	add a,$28
+	ld h,a
+	ld l,0
+	push hl
+	ld de,25*40
+	add hl,de
+	ex de,hl
+	pop hl
+	
+	ld a,$0e				;IE: $1c000/$2000
+	ld (vreg_vidpage),a
+	
+	ld c,0			
+w_rdlp2	ld b,0	
+w_rdlp1	in a,(sys_mem_select)		;make sure video is paged in for the read
+	or $40				;(kjt_plot_char keeping paging it out)
+	out (sys_mem_select),a
+	ld a,(de)
+	call kjt_set_pen
+	ld a,(hl)
+	call kjt_plot_char
+	inc hl
+	inc de
+	inc b
+	ld a,b
+	cp 40
+	jr nz,w_rdlp1
+	inc c
+	ld a,c
+	cp 25
+	jr nz,w_rdlp2
+	
+	ld a,(w_norm_pen)
+	call kjt_set_pen
+	xor a
+	jp w_quitpop
+	
+
+
+w_backup_stack
+	
+	db 0
+		
+	
 ;---------------------------------------------------------------------------------
 
 
 w_window_chars
 
-	db 0, 0,$8e,1,$86,0,$8f, $80
-	db 1, 0,$87,1,$20,0,$88, $80
-	db 0, 0,$90,1,$89,0,$91, $80
+	db 0, 0,$be,1,$b6,0,$bf, $80
+	db 1, 0,$b7,1,$20,0,$b8, $80
+	db 0, 0,$c0,1,$b9,0,$c1, $80
 	db $80	
 	
 w_text_area_chars	
 
-	db 0, 0,$00,1,$80,0,$00, $80
-	db 1, 0,$81,1,$20,0,$82, $80
-	db 0, 0,$00,1,$83,0,$00, $80
+	db 0, 0,$00,1,$b0,0,$00, $80
+	db 1, 0,$b1,1,$20,0,$b2, $80
+	db 0, 0,$00,1,$b3,0,$00, $80
 	db $80		
 
 w_text_area_swaplist
 
-	db $80,$83,$85, $81,$82,$84, $82,$81,$84, $83,$80,$85
-	db $80,$89,$8d, $81,$88,$8c, $82,$87,$8b, $83,$86,$8a
-	db $80,$90,$94, $80,$91,$95, $81,$8f,$97, $81,$91,$99
-	db $82,$8e,$96, $82,$90,$98, $83,$8e,$96, $83,$8f,$97
+	db $b0,$b3,$b5, $b1,$b2,$b4, $b2,$b1,$b4, $b3,$b0,$b5
+	db $b0,$b9,$bd, $b1,$b8,$bc, $b2,$b7,$bb, $b3,$b6,$ba
+	db $b0,$c0,$c4, $b0,$c1,$c5, $b1,$bf,$c7, $b1,$c1,$c9
+	db $b2,$be,$c6, $b2,$c0,$c8, $b3,$be,$c6, $b3,$bf,$c7
 	db 0
 	
 w_button_swaplist
 
-	db $8e,$83,$92, $86,$83,$8a, $8f,$83,$93
-	db $87,$82,$8b, $88,$81,$8c
-	db $90,$80,$94, $89,$80,$8d, $91,$80,$95
-	db $8e,$82,$96, $bf,$81,$97, $90,$82,$98, $91,$81,$99
+	db $be,$b3,$c2, $b6,$b3,$ba, $bf,$b3,$c3
+	db $b7,$b2,$bb, $b8,$b1,$bc
+	db $c0,$b0,$c4, $b9,$b0,$bd, $c1,$b0,$c5
+	db $be,$b2,$c6, $ff,$b1,$c7, $c0,$b2,$c8, $c1,$b1,$c9
 	db 0
 	
 
@@ -361,11 +536,14 @@ w_frame_x		db 0
 w_frame_y		db 0
 w_norm_pen	db 0
 w_inv_pen		db 0
+w_draw_pen	db 0
 w_active_window	db 0
 
-w_my_chars	incbin "window_chars.bin"
+w_my_chars	incbin "winchrs2.fnt"
 
 ;--------------------------------------------------------------------------------
+
+w_window_buffer	ds 2*40*25,0		; map and colour buffers
 
 
 ;---------------------------------------------------------------------------------
