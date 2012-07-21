@@ -10,6 +10,9 @@
 ; Changes:
 ; --------
 ;
+; v0.04 - Supports jumper Exp_b detect for RESIDOS/ESXDOS.NVR select: Closed = ESXDOS, Open = Residos
+;         (Note: If OSCA is < $671, the pin is ignored due to lack of weak pullup: Residos only.)       
+;
 ; v0.03 - Uses new requester code
 ; v0.02 - Manual saving of machine selection
 ; v0.01 - First release (previously called "gospec.exe")
@@ -64,11 +67,30 @@ lcfgbad	pop de
 
 
 ;----------------------------------------------------------------------------------------------
-	
+
+	call kjt_get_version		;if OSCA version < $671, dont read pin ExpB
+	ld hl,$670			;(always use Residos)
+	xor a
+	sbc hl,de
+	jr nc,start
+	ld a,2
+	out (sys_io_dir),a			;make sure exp B jumper is in input mode
 
 start	call update_vars_from_cfg_file
-	call kjt_clear_screen
+
+refrjp	call kjt_clear_screen
 	
+	call kjt_get_version		;if OSCA version < $671, dont read pin ExpB
+	ld hl,$670			;(always use Residos)
+	xor a
+	sbc hl,de
+	jr nc,menu	
+	in a,(sys_io_pins)			;test exp B jumper
+	cpl
+	rrca
+	and 1
+	ld (residos_esxdos),a		;0 = residos, 1 = esxdos	
+		
 menu	call show_menu
 
 menu_wait	call kjt_wait_key_press
@@ -90,7 +112,7 @@ not_quit	ld a,b
 	jr z,option5
 	cp "6"
 	jr z,option6
-	jr menu_wait
+	jr refrjp
 
 	
 option1	call reconfigure
@@ -146,7 +168,21 @@ shws48	call kjt_print_string
 	
 	call show_slot
 	
-	ld hl,menu_txt
+	ld hl,menu_txt1
+	call kjt_print_string
+	
+	ld a,(residos_esxdos)
+	ld l,a
+	ld h,0
+	add hl,hl
+	ld de,menu_nvr_list
+	add hl,de
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	ex de,hl
+	call kjt_print_string
+	ld hl,menu_txt2
 	call kjt_print_string
 	ret
 	
@@ -332,12 +368,18 @@ residos_reconf
 	call check_reconf_slot
 	ret nz				; if  not set up correctly, exit
 	
-	ld hl,restore_48_fn
+	ld a,(residos_esxdos)
+	or a
+	jr z,resimode
+	ld hl,restore_esx_fn
+	jr gotnvrfn	
+	
+resimode	ld hl,restore_48_fn
 	ld a,(machine_selection)
 	or a
-	jr z,res48
+	jr z,gotnvrfn
 	ld hl,restore_128_fn
-res48	ld (restore_fn_addr),hl
+gotnvrfn	ld (restore_fn_addr),hl
 	
 	call kjt_root_dir			; look in root dir and root:spectrum dir
 	
@@ -1035,6 +1077,8 @@ loading_msg
 
 ;------------------------------------------------------------------------------------
 
+residos_esxdos	db 0
+
 cfg_fn		db "EMU.CFG",0
 
 spectrum_dir	db "spectrum",0
@@ -1043,6 +1087,7 @@ settings_dir	db "settings",0
 cannot_find_txt	db "Cannot find: ",0
 restore_48_fn	db "RESI48K.NVR",0
 restore_128_fn	db "RESI128K.NVR",0
+restore_esx_fn	db "ESXDOS.NVR",0
 
 spectrum48_rom_fn	db "ZXSPEC48.ROM",0
 spectrum128_rom_fn	db "ZXSPE128.ROM",0
@@ -1058,22 +1103,35 @@ filename_txt	ds 16,0
 bad_fn_txt	db 11,"Can't find that file.",11,11,0
 
 banner_txt	db "                              ",11
-		db "   Emulator Kickstart V0.03   ",11
+		db "   Emulator Kickstart V0.04   ",11
 		db "                              ",11,0
 	
 machine_txt	db 11,"Selected machine: ",11,11," ",0
 
 m0_txt		db "SPECTRUM 48",0			;machine type $00
 m1_txt		db "SPECTRUM 128",0			;machine type $01
+
+
+
 		
-menu_txt		db 11,11," 1. Reset/boot machine (BASIC).",11
-		db " 2. Load .tap /.bin file & boot.",11
-		db " 3. Boot into Residos (.nvr).",11
-		db " 4. Change selected machine.",11
+menu_txt1		db 11,11," 1. Reset/boot machine (BASIC).",11
+		db " 2. Load .tap /.bin file & boot.",11,0
+		
+menu_nvr0		db " 3. Boot into RESIDOS (.nvr)",11,0
+menu_nvr1		db " 3. Boot into ESXDOS (.nvr)",11,0
+		
+		
+menu_txt2		db " 4. Change selected machine.",11
 		db " 5. Set config slot for emulator.",11
 		db " 6. Set machine selection as default.",11,11
 
 		db " ESC - Quit to FLOS.",11,11,0
+
+menu_nvr_list	dw menu_nvr0,menu_nvr1
+
+
+
+
 
 eeprom_contents_txt	db 11,"EEPROM contents:",11,11,0	
 
