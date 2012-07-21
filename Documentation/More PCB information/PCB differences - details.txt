@@ -84,7 +84,7 @@ A phsysical switch* controls the CPU clock selection in the following way:
  just leave the switch in the down position and use the V6Z80Plus V1.1 config
  files. (These are almost the same as the V6Z8op+ 1.0 configs: the only
  difference is that on the v6z80p+v1.1, the 16MHz system clock is looped
- through the FPGA and output to pin 75, whereas on the v6z8p+ v1.0 pin 75 is
+ through the FPGA and output to pin 75, whereas on the v6z80p+ v1.0 pin 75 is
  just pulled high)
 
 The serial comms socket has reverted back to being a 4-pin mini DIN (same pin
@@ -102,7 +102,7 @@ The PCB mounting holes are in different locations.
 V6Z80P+ v1.1b
 -------------
 
-Made in March 2011 this board has the same main features as the +v1.1
+Made in March 2011 this board has the same main features as the V6Z80P+ v1.1
 (and uses the same config files). The following changes were made:
 
 The board is marked "V6Z80P+ Rev1.1b"
