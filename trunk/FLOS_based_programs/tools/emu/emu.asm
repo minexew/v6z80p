@@ -692,6 +692,9 @@ gbcbyte2	xor a
 	cp $bf				; If SST25VF type EEPROM is present, we'll have received
 	jr nz,got_eid			; manufacturer's ID ($BF) not the capacity
 
+	ld b,0				; wait a while to ensure PIC is ready for command
+deloop1	djnz deloop1
+	
 	ld a,$88				; Use alternate "Get EEPROM ID" command to find ID 
 	call send_byte_to_pic		
 	ld a,$6c
