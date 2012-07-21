@@ -75,25 +75,29 @@ lcfgbad	pop de
 	jr nc,start
 	ld a,2
 	out (sys_io_dir),a			;make sure exp B jumper is in input mode
-
+	ld a,1
+	ld (esxdos_allowed),a
+	call read_expb
+	ld (residos_esxdos),a		;0 = residos, 1 = esxdos
+	
+;----------------------------------------------------------------------------------------------
+	
 start	call update_vars_from_cfg_file
 
-refrjp	call kjt_clear_screen
+menu_text	call kjt_clear_screen
+	call show_menu
 	
-	call kjt_get_version		;if OSCA version < $671, dont read pin ExpB
-	ld hl,$670			;(always use Residos)
-	xor a
-	sbc hl,de
-	jr nc,menu	
-	in a,(sys_io_pins)			;test exp B jumper
-	cpl
-	rrca
-	and 1
-	ld (residos_esxdos),a		;0 = residos, 1 = esxdos	
+menu_wait	ld a,(esxdos_allowed)		;has jumper exp_b changed?
+	or a
+	jr z,read_key	
+	call read_expb
+	ld hl,residos_esxdos
+	cp (hl)
+	jr z,read_key			
+	ld (hl),a
+	jr menu_text		
 		
-menu	call show_menu
-
-menu_wait	call kjt_wait_key_press
+read_key	call kjt_get_key
 	cp $76
 	jr nz,not_quit
 	xor a
@@ -112,7 +116,7 @@ not_quit	ld a,b
 	jr z,option5
 	cp "6"
 	jr z,option6
-	jr refrjp
+	jr menu_wait
 
 	
 option1	call reconfigure
@@ -124,7 +128,7 @@ option2	call load_tap_reconf
 	
 option3	call residos_reconf 
 	jr nz,error_menu
-	jr error_menu
+	jr menu_text
 	
 option4	call change_machine	
 	jr nz,error_menu
@@ -741,7 +745,15 @@ pause_lp2	djnz pause_lp2
 	ret
 
 ;----------------------------------------------------------------------------------------
-;----------------------------------------------------------------------------------------	
+
+read_expb	
+	in a,(sys_io_pins)			
+	cpl
+	rrca
+	and 1
+	ret
+
+;-----------------------------------------------------------------------------------------
 
 load_to_vram
 
@@ -1080,7 +1092,6 @@ loading_msg
 
 ;------------------------------------------------------------------------------------
 
-residos_esxdos	db 0
 
 cfg_fn		db "EMU.CFG",0
 
@@ -1159,6 +1170,9 @@ unknown_text	db "UNKNOWN",0
 bootcode_text	db "BOOTCODE ETC",0
 
 ;-------------------------------------------------------------------------------------------------
+
+esxdos_allowed	db 0
+residos_esxdos	db 0
 
 pen_colour	db 0
 cursor_pos	dw 0
