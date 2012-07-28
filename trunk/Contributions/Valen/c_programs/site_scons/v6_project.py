@@ -10,9 +10,13 @@ from SCons.Script import *
 
 class V6_Project(object):
     def __init__(self):
-        
-        
-        self.v6_dir  = os.environ['v6z80pdir']
+                      
+        if 'v6z80pdir' not in os.environ:
+            print 'Error: v6z80pdir env var is not set!'
+            print '(for example, on my system this var have value  ~/sharedFolder1/v6z80p_SVN)'
+            exit()
+            
+            
         self.basedir = os.environ['v6z80pdir'] + '/Contributions/Valen/c_programs/'
         
         self.base_variant_dir = 'build/v6/c_programs/'
@@ -45,10 +49,7 @@ class V6_Project(object):
 
 
     def Init(self):
-        if 'v6z80pdir' not in os.environ:
-            print 'Error: v6z80pdir env var is not set!'
-            return False
-        
+      
         
         
         
