@@ -17,6 +17,7 @@ class V6_Project(object):
             exit()
             
             
+        self.v6_dir  = os.environ['v6z80pdir']
         self.basedir = os.environ['v6z80pdir'] + '/Contributions/Valen/c_programs/'
         
         self.base_variant_dir = 'build/v6/c_programs/'
@@ -26,6 +27,7 @@ class V6_Project(object):
         
         self.checker         = V6_Project_SystemChecker()
         self.options_handler = V6_Project_OptionsHandler()  
+        self.misc_tools      = V6_Project_MiscTools()
         
         self.utilFilename_xd     = self.GetUtilFilename('xd')
         self.utilFilename_sendv6 = self.GetUtilFilename('sendv6')
@@ -248,14 +250,17 @@ class V6_Project_Dependencies():
         Depends(binary_proxy, ['macro.asm', 'i__kernal_jump_table.asm'])
         
         # generate C source from binary file
-        util_xd = self.v6_project.utilFilename_xd    
-        command = 'echo // Machine generated. Dont edit. > $TARGET && echo  const >> $TARGET  && ' + util_xd + ' -dflos_proxy_code $SOURCE >> $TARGET'
-        Command('flos_proxy_code.c' , binary_proxy, command)
+        target = 'flos_proxy_code.c'
+        source = binary_proxy
+        self.v6_project.misc_tools.Generate_C_source_from_binary_file(target, source, 'flos_proxy_code')
+        
         
         # compile C source
         self.obj_flosproxy = env.Object(   ['flos_proxy_code.c'], 
                 CCFLAGS     = env['CCFLAGS'] + ['--constseg', 'FLOS_PROXY_CODE', '--std-sdcc99', '--opt-code-speed', ] 
                 )
+        
+      
         
     def Make_C_FLOS_Lib(self):
         #return
@@ -292,7 +297,8 @@ class V6_Project_SystemChecker():
             return False
         if self.Check_srec_cat() == False:
             return False
-            
+        if self.Check_pasmo() == False:
+            return False           
         
     def Check_SDCC(self):
         # check, if sdcc is installed in system
@@ -336,7 +342,38 @@ class V6_Project_SystemChecker():
         if pipe.wait() != 0: 
             print 'Error: ' + str + ' not found! '
             return False
+        return True
 
+    def Check_pasmo(self):
+        # pasmo do output to stderr, insted of stdout (at least on my ubuntu 12.04)
+        # return True       # uncomment this line, to bypass pasmo check (if pasmo detection code is not worked for you)
+        
+        # check, if pasmo is installed in system
+        str =  'pasmo'
+        print 'Check for: pasmo. Executing: ' + str
+        pipe = SCons.Action._subproc(self.v6_project.env, [str],                                                       
+                             stdin = 'devnull',                                                                    
+                             stderr = subprocess.PIPE,                                                                   
+                             stdout = 'devnull')                                                             
+       
+        str =''
+        while 1:
+            line = pipe.stderr.readline()                        
+            str = str + line
+            if not line: break
+        
+        match = re.search(r'.sage', str)    # looking for string 'Usage'
+
+        #~ print match
+        #~ exit()
+                
+        if match:
+            print ''
+        else: 
+            print 'Error: ' + str + ' not found! '
+            return False
+        return True
+        
 # this class know how to handle specific ini file options
 class V6_Project_OptionsHandler():
     
@@ -368,7 +405,23 @@ class V6_Project_OptionsHandler():
             self.config = config
            
 
- 
+# this class 
+class V6_Project_MiscTools():
+    def Generate_C_source_from_binary_file(self, target, source, label_name):
+        env = DefaultEnvironment()
+        platform = env['PLATFORM']
+        
+        command = 'echo // Machine generated. Dont edit. > $TARGET && echo  const >> $TARGET  && '
+        if platform == 'win32':
+            util_xd = self.v6_project.utilFilename_xd
+            command += util_xd + ' -d' + label_name + ' $SOURCE >> $TARGET'
+        else:                
+            command += 'xxd' + ' -i  $SOURCE  >> $TARGET  '
+            command += " && sed 's/char.*\[/char " + label_name + "[/' $TARGET > $TARGET.dir/tmp   && mv $TARGET.dir/tmp  $TARGET"
+        node =  Command(target, source, command)  
+        node[0].my_progress_message = '---- binary file to C source file ------'
+        return node
+         
                         
 #screen = open('/dev/tty', 'w')
 def progress_function(node):
