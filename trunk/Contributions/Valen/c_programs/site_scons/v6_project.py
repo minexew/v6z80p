@@ -163,8 +163,9 @@ class V6_Project(object):
                             
 
         
-        env.Append( SENDV6_UTIL = self.utilFilename_sendv6,
-                    SENDV6_PORT = self.options_handler.config.get('SendV6', 'port'))
+        env.Append( SENDV6_UTIL = self.v6_dir + '/Contributions/Daniel/Linux_tools/sendv6/' + self.utilFilename_sendv6,
+                    SENDV6_PORT = self.options_handler.config.get('SendV6', 'port'),
+                    SLEEP_UTIL  = 'sleep')
         
         #print env['CC']
         #print env['ENV']['PATH']
@@ -201,7 +202,12 @@ class V6_Project(object):
         return util
             
     def Upload(self, upload_target):     #, is_upload_always):
-        upload_command = 'cd ${SOURCE.dir} && $SENDV6_UTIL $SENDV6_PORT ${SOURCE.file}'    
+        # Note: Why we need pause a few seconds, between file uploads :
+        # when SERCOPY is writing the last sended 32KB buffer to disk, it may be about 1.5-2 seconds to complete disk write,
+        # but (on the side of fast PC), the sendv6 exits immidiatly  and will re-run again, and thus will fail to connect to v6,
+        # because on v6 board, SERCOPY is still in disk write mode (not in listening mode).
+        
+        upload_command = 'cd ${SOURCE.dir} && $SENDV6_UTIL $SENDV6_PORT ${SOURCE.file}  &&  $SLEEP_UTIL 2'    
         #upload_command = 'sendv6 S0 $SOURCE'       # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
         
         upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)

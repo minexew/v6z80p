@@ -31,13 +31,10 @@ binary_fx_player_code = env_pasmo.Object('fx_player_code.asm.bin', 'fx_player/fx
                                     ) 
 Depends(binary_fx_player_code, asm_src_generated)
 
-# convert binary to C file (array of bytes)
-command1  =  ['echo // Machine generated. Dont edit. > $TARGET' ,
-            'echo const >> $TARGET',
-            v6_prj.utilFilename_xd + ' -d$MYPARAM1 $SOURCE >> $TARGET']
-fx_player_code_generated = env.Command('fx_player_code.c', binary_fx_player_code,  command1, MYPARAM1 = 'fx_player_code')
+# convert binary to C file (C array of bytes)
+fx_player_code_generated = v6_prj.misc_tools.Generate_C_source_from_binary_file('fx_player_code.c', binary_fx_player_code,   'fx_player_code')
 
-# compile fx_player_code.c (array of bytes) to separate segment FX_PLAYER_CODE
+# compile fx_player_code.c (C array of bytes) to separate segment FX_PLAYER_CODE
 objs2 = env.Object(   fx_player_code_generated, 
 #                CPPPATH     = env['CPPPATH']           + ['.'],         # add variant dir to include paths
                 CCFLAGS     = env['CCFLAGS']           + ['--constseg', 'FX_PLAYER_CODE', '--std-sdcc99', '--opt-code-speed'],  
