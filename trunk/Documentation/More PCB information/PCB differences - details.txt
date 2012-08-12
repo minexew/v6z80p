@@ -1,6 +1,6 @@
 
-Differences between the versions of the V6Z80P
-----------------------------------------------
+Differences between the versions of the V6Z80P, earliest model first
+--------------------------------------------------------------------
 
 V6Z80P v1.1
 -----------
