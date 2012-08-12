@@ -1,0 +1,26 @@
+V6Z80P Joystick interface description
+-------------------------------------
+
+Simply uses a PIC microcontroller to read 2 x 6 pin digital inputs
+from Atari/Amiga standard* 9 pin D-Sub connectors and sends data
+serially to the FPGA using two pins: Clock and Data. FPGA provides
+the clock, Data is always PIC -> FPGA.
+
+Data bits are output following detection of a rising edge on READ_CLOCK_IN
+The FPGA therefore latches each bit on the following clock high edge.
+
+
+ ACTION......    Latch 0    Latch 1     
+          ____      V_____      V_____
+ CLOCK __!    !_____!     !_____!     !____ 
+ DATA------<===BIT 0==><==BIT 1===><==BIT2==>
+
+
+When the clock stays low for more than ~300 microseconds, the data packet send
+is aborted, new joystick values are read from the ports and the data transmission
+begins on the next clock high.
+
+Transmission is a 16 bit word in the following order:
+
+(Joy A) U,D,L,R,F1,F2, 0,0, (Joy B) U,D,L,R,F1,F2, 0,0
+
