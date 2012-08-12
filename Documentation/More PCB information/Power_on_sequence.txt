@@ -13,11 +13,10 @@ Normal power On activity
     on PC.
 
   * If jumper J2 is not installed, the PIC sends the config data stored in
-    the current active slot of the EEPROM to the FPGA. (The active slot address can
-    be changed via software - by default the source address is $20000, IE: Slot 1)
+    the current active slot of the EEPROM to the FPGA. 
 
 4. If the FPGA starts up correctly with the architecture file supplied (ie: the
    FPGA "Done" line goes high) the status LED stays on. If the config fails, the
-   status LED will pulse and the PIC goes back to step 2.
+   status LED will pulse and the PIC goes back to step 3.
 
 5. The Z80 is released from reset 
