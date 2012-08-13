@@ -4,7 +4,6 @@ Serial Link App for PC / Windows
 This util is used for all PC to V6Z80P communication. Default BAUD rate
 is 115200, format 8-N-1.
 
-* At boot time, simply click "send file", select a file then "OK"
 
 * In FLOS, to send a file TO the VxZ80P OS, first enter:
 
