@@ -33,11 +33,17 @@ to completely overwrite slots 0-2 with the latest bootcode and config data.
 Bootcode
 --------
 
+6.15 (12-08-2012)
+
+Added 100 uS delay after each databurst so that PIC is guaranteed enough time
+to return to its "waiting for command" state. (Was previously sensitive
+to crystal timing variations)
+
+
+
 6.14 (18-08-2011)
 
 Added SDHC support.
-
-
 
 6.13 (31-07-2010)
 
