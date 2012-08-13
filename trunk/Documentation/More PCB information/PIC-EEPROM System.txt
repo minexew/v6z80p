@@ -52,7 +52,11 @@ bits latched by the PIC on the rising edge of the clock line. Use the OSCA
 port "sys_pic_comms" to bit-bang the data to the PIC). To prevent bits being
 missed or the system timing out, the bit rate should be between 2KHz and
 100 KHz. If a clock/busy signal is received from the PIC (see OSCA port
-"sys_hw_flags") this indicates the data is not acceptible (args out of range etc)
+"sys_hw_flags") this indicates the data is not acceptible (args out of range etc).
+Also, use a short delay (around 100 microseconds) between subsequent commands
+(EG: after a databurst) to allow the PIC to return to its "waiting for command"
+state.
+
 
 
 PIC Command List:
