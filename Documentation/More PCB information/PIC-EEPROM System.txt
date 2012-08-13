@@ -116,23 +116,38 @@ Status-related:
 ---------------
 
 $88 + $53 (added in PIC firmware v6.17 - Nov '09)
-Request EEPROM sends its size/ID byte (response to SPI command $AB) - Note: if the EEPROM
-is a SST25VFxxx type, this will return a manufacturer's code ($BF). If this is received,
-use command $88 + $6c (as shown below)
+
+ Request EEPROM sends its size/ID byte (response to SPI command $AB) - Note: if the EEPROM
+ is a SST25VFxxx type, this will return a manufacturer's code ($BF) instead. If this byte
+ is received, use command $88 + $6c (see details below).
+
+ Valid bytes returned by this command:
+
+ ID Byte:    Capacity of EEPROM:
+ -------------------------------
+
+   $12         512 KB
+   $13         1   MB
+   $14         2   MB
+   $15         4   MB
+
+   $BF         n/a: SST25VF chip, use $88 + $6c to obtain capacity code
+
 
 $88 + $76 (added in PIC firmware v6.17 - Nov '09) 
 Request PIC sends the MSB of the config base address (IE: slot selection * 2) As this data
 is sent from the PIC and not the EEPROM, it is not received as a byte in the usual port.
 (See "Reading data from the PIC" below)
 
+
 $88 + $4e (added in v6.18 - Nov' 09)
 Request PIC sends its firmware revision (last two BCD digits of the firmware version.
 EG: if fw version is 6.18, the byte is $18)  The byte is sent in the same way as the active
 slot.
 
+
 $88 + $6c (added in V6.35) Optional EEPROM ID read if Command $88+$53 returns manufacturer's
-ID instead of the capacity. ($BF = EEPROM type is SST25VFxxx) NOTE: data sent by this
-command is sent by the PIC, not EEPROM)
+ID ($BF) instead of the capacity.  NOTE: data sent by this command is sent by the PIC, not EEPROM)
 
 
 
@@ -177,4 +192,49 @@ Also, although the EEPROM can accept single bytes for programming, the V6Z80P sy
 stipulates that 64 byte packets must be sent. When sending DATA to the PIC, the CPU
 should check for a clock high from the PIC (OSCA's sys_hw_flags port bit 3). This means
 the CPU should pause the transmission as the PIC/EEPROM is busy (burning to flashram etc).
+
+
+
+EEPROM data arrangement as used in the OSCA/FLOS system
+-------------------------------------------------------
+
+The EEPROM memory is arranged as 64KB blocks. In the OSCA/FLOS documentation
+a "Slot" is two consecutive blocks.
+
+
+        .---------------. <-$00000
+      / !    BLOCK 0    !
+SLOT 0  !---------------! <-$10000
+      \ !    BLOCK 1    !
+        !---------------! <-$20000
+      / !    BLOCK 2    !
+SLOT 1  !---------------! <-$30000
+      \ !    BLOCK 3    !
+        !---------------! <-$40000
+      / !    BLOCK 4    !
+SLOT 2  !---------------! <-$50000
+      \ !    BLOCK 5    !
+        !---------------! <-$60000
+      / !    BLOCK 6    !
+SLOT 3  !---------------! <-$70000
+      \ !    BLOCK 7    !
+        !---------------!
+        ! etc etc etc   !
+
+
+Slot 0 is reserved for OS / bootcode / user data:
+
+ Block 0: 
+
+ $0000-$07FF: Unused
+ $0800-$EFFF: FLOS / other OS can be installed here
+ $F000-$FFFF: Primary bootcode
+
+ Block 1:
+
+ $0000-$EFFF: Not used
+ $F000-$FFFF: Backup bootcode
+
+The other slots can each take a spartan II XS2S150 FPGA config .bin file
+(or other arbitrary user data).
 
