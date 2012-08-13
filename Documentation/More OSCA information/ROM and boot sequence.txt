@@ -3,7 +3,8 @@ ROM:
 
 OSCA contains a boot ROM as part of its FPGA config file (it is implemented
 as a 512 byte blockRAM). This is normally mapped into $0000-$01FF of Z80 address
-space. The ROM code's job is to load the main boot code from the onboard EEPROM:
+space (but can be paged out with bit 6 of the port sys_alt_write_page).
+The ROM code's job is to load the main boot code from the onboard EEPROM:
 
 The ROM looks for the bootcode at two locations:
 
