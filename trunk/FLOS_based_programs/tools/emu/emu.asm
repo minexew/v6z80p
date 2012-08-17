@@ -10,6 +10,7 @@
 ; Changes:
 ; --------
 ;
+; V0.05 - Options 1/2 disabled in ESXDOS mode
 ; v0.04 - Supports jumper Exp_b detect for RESIDOS/ESXDOS.NVR select: Closed = ESXDOS, Open = Residos
 ;         (Note: If OSCA is < $671, the pin is ignored due to lack of weak pullup: Residos only.)       
 ;
@@ -119,10 +120,16 @@ not_quit	ld a,b
 	jr menu_wait
 
 	
-option1	call reconfigure
+option1	ld a,(residos_esxdos)
+	or a
+	jr nz,menu_wait
+	call reconfigure
 	jr error_menu	
 	
-option2	call load_tap_reconf
+option2	ld a,(residos_esxdos)
+	or a
+	jr nz,menu_wait
+	call load_tap_reconf
 	jr nz,error_menu
 	jr menu_wait			;no need to redraw menu, requester code replaces previous chars
 	
@@ -172,9 +179,13 @@ shws48	call kjt_print_string
 	
 	call show_slot
 	
-	ld hl,menu_txt1
-	call kjt_print_string
-	
+	ld hl,menu_txt_norm		;options 1/2 only work in Residos mode
+	ld a,(residos_esxdos)
+	or a
+	jr z,mt_norm
+	ld hl,menu_txt_esxdos
+mt_norm	call kjt_print_string
+		
 	ld a,(residos_esxdos)
 	ld l,a
 	ld h,0
@@ -1117,7 +1128,7 @@ filename_txt	ds 16,0
 bad_fn_txt	db 11,"Can't find that file.",11,11,0
 
 banner_txt	db "                              ",11
-		db "   Emulator Kickstart V0.04   ",11
+		db "   Emulator Kickstart V0.05   ",11
 		db "                              ",11,0
 	
 machine_txt	db 11,"Selected machine: ",11,11," ",0
@@ -1128,8 +1139,11 @@ m1_txt		db "SPECTRUM 128",0			;machine type $01
 
 
 		
-menu_txt1		db 11,11," 1. Reset/boot machine (BASIC).",11
+menu_txt_norm	db 11,11," 1. Reset/boot machine (BASIC).",11
 		db " 2. Load .tap /.bin file & boot.",11,0
+		
+menu_txt_esxdos	db 11,11," 1. N/A in ESXDOS mode.",11
+		db " 2. N/A in ESXDOS mode.",11,0
 		
 menu_nvr0		db " 3. Boot into RESIDOS (.nvr)",11,0
 menu_nvr1		db " 3. Boot into ESXDOS (.nvr)",11,0
