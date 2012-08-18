@@ -5,11 +5,19 @@ Use: FILECMP [#] file1 file2
 
 Notes:
 
-Sets the "ERR" envar to $80 if the 
-files are not the same.
-
 If # is included, the operation is
 performed without output to the
 display (only "ERR" is set).
 
+If the files are not the same size
+the comparison runs to the end of
+the shortest file.
+
+If any bytes are different, the
+"ERR" envar is set to $80.
+
+If the filesizes are different but
+the bytes up to the length of the
+shortest are the same, "ERR" is
+set to $81.
 
