@@ -1,0 +1,15 @@
+
+FILECMP.EXE - Compares two files
+
+Use: FILECMP [#] file1 file2
+
+Notes:
+
+Sets the "ERR" envar to $80 if the 
+files are not the same.
+
+If # is included, the operation is
+performed without output to the
+display (only "ERR" is set).
+
+

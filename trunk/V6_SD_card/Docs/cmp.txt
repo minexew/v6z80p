@@ -1,0 +1,20 @@
+
+CMP.EXE - Compares two areas of memory
+
+Use: CMP [#] Start End Target [Bank]
+
+Notes:
+
+Sets the "ERR" envar to $80 if the 
+memory ranges are not the same.
+
+If # is included the command is run
+without any output to the display
+(only "ERR" is set).
+
+The source bank is always the currently
+selected FLOS bank. The target bank is
+the same as the source unless specified.
+
+
+
