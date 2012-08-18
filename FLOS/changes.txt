@@ -2,6 +2,19 @@
 Current FLOS version:
 ---------------------
 
+V6.03 - 18/08/2012
+
+	Added - kjt_read_baddr		- read byte from bank:addr when code is in any bank
+		kjt_write_baddr		- write byte to bank:addr when code is in any bank
+		kjt_get_flos bank	- get the bank which FLOS was using before the command started
+
+	Change: kjt_ascii_to_hexword	- Sets ZF on return if no error (IE: A is 0)
+
+
+Previous changes:
+-----------------
+
+
 V6.02 - 12/06/12
 
 	Improvement:    All 256 ASCII characters can now be displayed. The built-in default FLOS
@@ -9,9 +22,6 @@ V6.02 - 12/06/12
 			can now patch all 256 character definitions and "kjt_plot_char"
 			will display them (Note: "kjt_print_string" cannot display characters
 			such as <CR> (13) <LF> (10) or <CR+LF> = (11))
-
-Previous changes:
------------------
 
 
 V6.01 - 11/05/12
