@@ -1,4 +1,4 @@
-List of FLOS kernal calls - last updated 16-07-2012 for FLOS v602
+List of FLOS kernal calls - last updated 17-08-2012 for FLOS v603
 
 File System Routines:
 
@@ -92,6 +92,10 @@ kjt_page_in_video - Pages video memory into $2000-$3FFF
 kjt_page_out_video - Pages system memory into $2000-$3FFF
 kjt_read_sysram_flat - read flat system memory location (E:HL) into A
 kjt_write_sysram_flat - write A into flat system memory location (E:HL)
+kjt_read_baddr - reads a byte into A from address BANK:ADDRESS
+kjt_write_baddr -writes a byte from A into address BANK:ADDRESS
+kjt_get_flos_bank -returns the bank seelcted by FLOS before the current command executed.
+
 
 Kernal Misc Routines:
 
@@ -1103,8 +1107,8 @@ Trashes: BC,DE,HL
 
 Notes:  
 
-* The routine saves and restores the current bank setting around the read so make sure any interrupt service routine is in unpaged memory (<$8000)
-  or disable interrupts to avoid problems.
+* The routine saves and restores the entire port byte "sys_mem_select" around the read so make sure any interrupt service routine is in unpaged
+  memory (<$8000) or disable interrupts to avoid problems.
 
 * As this routine is very slow, only use if convenience is more important than speed.
 
@@ -1124,11 +1128,66 @@ Trashes: BC, DE, HL
 
 Notes:  
 
-* The routine saves and restores the current bank setting around the write  so make sure any interrupt service routine is in unpaged memory (<$8000)
-  or disable interrupts to avoid problems.
+* The routine saves and restores the entire port byte "sys_mem_select" around the write  so make sure any interrupt service routine
+   is in unpaged memory (<$8000) or disable interrupts to avoid problems.
 
 * As this routine is not fast, only use if convenience is more important than speed.
 
+
+kjt_read_baddr
+
+Action: Reads a byte from system memory (allows programs in paged RAM (8000-FFFF) to easily read data from a different bank)
+
+Input Registers:
+
+B = Bank
+HL = Address
+
+Output registers:
+
+A = byte from memory location specified
+
+Notes:  
+
+* The routine saves and restores the entire port byte "sys_mem_select" around the read so make sure any interrupt service routine is
+   in unpaged memory (<$8000) or disable interrupts to avoid problems.
+
+* As this routine is not fast, only use if convenience is more important than speed.
+
+
+kjt_write_baddr
+
+Action: Writes a byte to system memory, allows programs in paged RAM (8000-FFFF) to write data to a different bank
+
+Input Registers:
+
+B = Bank
+HL = Address
+A = Byte to writes
+
+Notes:  
+
+* The routine saves and restores the entire port byte  "sys_mem_select" around the write so make sure any interrupt service routine is
+   in unpaged memory (<$8000) or disable interrupts to avoid problems.
+
+* As this routine is not fast, only use if convenience is more important than speed.
+
+* Hardware support for writing to alternative pages in provided via the port SYS_ALT_WRITE_PAGE (see hardware manual)
+
+
+kjt_get_flos_bank
+
+Action: Returns the value of the bank being used by FLOS before the current command executed. This is useful when a location header
+places a program in paged memory ($8000-$FFFF) thus changing the bank selection to that of the program, but  the program wants to
+act on the memory in the bank selected by FLOS as if it were an internal command.
+
+Input Registers:
+
+None
+
+Output Registers:
+
+A - The bank which FLOS was referencing.
 
  KERNAL TEXT AND DISPLAY ROUTINES 
 
@@ -1396,21 +1455,22 @@ Trashes: A
 
 kjt_ascii_to_hex_word
 
-Action: converts text string version of hex number at HL (1 to 4 chars) to actual hex word in DE
+Action: converts text string version of hex number at HL (1 to 4 chars max) to actual hex word in DE
 
 Input Registers  :
 
-HL = source text (scans for first non-zero character)
+HL = source text (the routine scans from this location to the first character that is not a space)
 
 Output Registers :
 
 DE = result
+HL = location of first space character after the hex string (IE: usually a space or null character)
 
-A = $00 : OK
+ZF = set if all OK (also A=$00), Else:
+
 A = $0c : Bad chars for hex
 A = $1F : No chars found
 
-Trashes: HL
 
 
 kjt_dont_store_registers
