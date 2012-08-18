@@ -16,7 +16,7 @@ kjt_dont_store_registers	equ os_start + $2b
 kjt_get_input_string	equ os_start + $2e
 kjt_check_volume_format	equ os_start + $31
 kjt_change_volume		equ os_start + $34
-kjt_unnecessary		equ os_start + $37	; no longer used (same as kjt_check_volume_format)
+kjt_read_baddr		equ os_start + $37	;added in v603
 kjt_get_volume_info		equ os_start + $3a
 kjt_format_device		equ os_start + $3d
 kjt_make_dir		equ os_start + $40
@@ -52,7 +52,7 @@ kjt_set_read_length		equ os_start + $7f	; alternative name for above
 kjt_serial_receive_header	equ os_start + $82
 kjt_serial_receive_file	equ os_start + $85
 kjt_serial_send_file	equ os_start + $88
-kjt_enable_mouse		equ os_start + $8b	; changed from "kjt_enable_pointer" in FLOS v571
+kjt_enable_mouse		equ os_start + $8b	; changed from "kjt_enable_pointer" in v571
 kjt_get_mouse_position	equ os_start + $8e
 kjt_get_version		equ os_start + $91
 kjt_set_cursor_position	equ os_start + $94
@@ -67,7 +67,7 @@ kjt_write_sector		equ os_start + $ac
 kjt_set_commander		equ os_start + $af   ; added in v590
 kjt_plot_char		equ os_start + $b2 
 kjt_set_pen		equ os_start + $b5 
-kjt_background_colours	equ os_start + $b8
+kjt_get_flos_bank		equ os_start + $b8   ; added/changed in v603
 kjt_draw_cursor		equ os_start + $bb
 kjt_get_pen		equ os_start + $be
 kjt_scroll_up		equ os_start + $c1
@@ -100,3 +100,4 @@ kjt_patch_font		equ os_start + $10f  ; added in v595
 kjt_get_fs_vars_location	equ os_start + $112  ; added in v599
 kjt_continue_file_read	equ os_start + $115  ; added in v599
 kjt_set_load_address	equ os_start + $118  ; added in v599
+kjt_write_baddr		equ os_start + $11b  ; added in v603
