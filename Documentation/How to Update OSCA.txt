@@ -1,0 +1,145 @@
+How to Update OSCA
+------------------
+
+Use the FLOS-based EEPROM.EXE tool (See readme.txt in same folder for more
+detailed info on the EEPROM layout etc)
+
+
+1. Choose Option 1 "Write config to slot".
+
+2. When asked which slot, choose a currently inactive slot (EG: Slot 2)
+
+3. Browse to the config's .bin file (or choose "RS232" in the window to use
+   the serial download option)
+
+4. Wait for file to load, write to the EEPROM and complete verification.
+
+5. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
+
+6. When prompted, choose to reconfigure from your chosen slot (EG: Slot 2)
+
+7. The FPGA restarts with the latest update. This selection persists until
+   power off.
+
+   If everything is OK, you can reload the EEPROM tool and choose option 3
+   to make the new Slot (EG: 2) the Active Slot. Of course, the next time you
+   update OSCA, it'd be best to choose one of the other slots. 
+
+   If you want, you can just rewrite the currently active slot in the first place,
+   but the method above allows you to test the new config BEFORE making it default.
+   IE: If you overwrite the current Active Slot with a bad config, the FPGA will
+   not start at power on and you'll be forced to use one of the emergency recovery
+   options to fix it. *** It is strongly recommended that a known working version 
+   of OSCA is always left intact in one of the first slots. ***
+
+
+Emergency Recovery:
+-------------------
+
+Config Problems
+
+If the FPGA does not receive a valid configuration pattern from the EEPROM upon
+power on, the yellow LED will flash slowly (around 1 flash per second). There are
+various ways to fix this..
+
+
+Recovery Instructions *** For the original V6Z80P Board ***
+-----------------------------------------------------------
+
+OPTION 1: With Config PIC firmware v616+ the Active Slot can be changed manually. Assuming
+there is a working config in Slot 1, 2 or 3 and the problem is just that the Active Slot
+selection is pointing at a bad config:
+
+•Power off.
+
+•Install jumper J2 only
+
+•Power on (yellow led flashes rapidly - JTAG mode).
+
+•Remove jumper J2 again
+
+•The PIC will reset the active slot to 1 (indicated by 1 pulse of the red LED)
+ The yellow led lights up for 4 seconds then Slot 2 is set (2 flashes of red LED),
+ again there's a 4 second pause, finally slot 3 is set (3 flashes).
+
+•Power off only when the yellow LED is lit following the desired slot setting.
+
+•When you power on the active slot will correctly point to slot 1, 2 or 3.
+
+OPTION 2: Remove and reprogram the EEPROM or config PIC externally. (Note: It is the PIC
+chip that actually holds the slot selection - you will only need to reprogram the PIC if
+you have old firmware that doesn't support the manual slot selection. If you do reprogram
+the PIC, use the latest firmware .hex file so that you wont have to do so again.) If you
+reprogram the EEPROM, use "default.bin" from the folder development_files/eeprom image as
+this also contains the bootcode for SLOT 0.
+
+OPTION 3: JTAG config. If none of the first 3 slots contain OSCA:
+
+•Power off and connect a Xilinx JTAG cable to the V6Z80P.
+
+•Install jumpers J1 and J2.
+
+•Load the most recent OSCA project into Xilinx webpack ISE and send the OSCA config .bit
+ file from the PC to the V6Z80P via JTAG.
+
+•If the bootcode is intact in the EEPROM, the system will start as normal allowing you to load
+ EEPROM.EXE via FLOS. If the bootcode checksum fails the screen will flash magenta, then grey.
+ See "bootcode problems" below.
+
+•Remove jumpers J1 and J2 next time you power off so that the system automatically configures
+ from the EEPROM.
+
+
+
+Recovery Instructions for the V6Z80P+ Board
+-------------------------------------------
+
+OPTION 1: Assuming there is a working config in Slot 1 - 7 and the problem is just that
+the Active Slot selection is pointing at a bad config:
+
+
+•Power off.
+
+•Install jumper J2 only
+
+•Power on (yellow led flashes rapidly).
+
+•Remove jumper J2 again
+
+•The yellow LED will flash once, pause about 5 seconds, then flash twice, pause 5 seconds,
+ then flash three times and so on - the number of flashes represents the slot selection.
+ During the pause following the slot selection you require, replace the jumper - the LED
+ will then stay on permanently signifying that the slot has been set.
+
+•Power off and remove Jumper J2.
+
+
+
+OPTION 2: JTAG configuration. (If none of the first seven slots contain OSCA)
+
+•Power off and connect a Xilinx JTAG cable to the V6Z80P.
+
+•Install jumpers J1 and J2.
+
+•Load the most recent OSCA project into Xilinx webpack ISE and send the OSCA config .bit
+ file from the PC to the V6Z80P via JTAG.
+
+•If the bootcode is intact in the EEPROM, the system will start as normal allowing you to
+ load EEPROM.EXE via FLOS. If the bootcode checksum fails the screen will flash magenta,
+ then grey. See "bootcode problems" below.
+
+•Remove jumpers J1 and J2 next time you power off so that the system automatically
+ configures from the EEPROM.
+
+
+
+
+Bootcode Problems:
+------------------
+
+If the OSCA ROM cannot load a valid bootcode file from the EEPROM, the display will flash
+magenta (bad CRC) or green (time out). If OSCA version 661 or above is installed it is possible
+to send the bootcode file manually via the serial link when the display turns grey.
+
+It is also possible to force serial transfer of the bootcode on power up by holding UP+RIGHT+FIRE
+on a joystick in port A. (Note: The transfer must be at 115200 BAUD).
