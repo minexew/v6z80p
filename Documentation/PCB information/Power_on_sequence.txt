@@ -1,0 +1,22 @@
+
+Normal power On activity
+------------------------
+
+1. Power switched on.
+
+2. Z80 CPU is held reset (by the FPGA's "done" line being low)
+
+3. PIC checks JTAG-mode jumper J2 (only)
+
+  * If jumper J2 is installed, the status LED flashes rapidly until the FPGA has 
+    been manually configured by downloading a .bit file from Xilinx Impact software
+    on PC.
+
+  * If jumper J2 is not installed, the PIC sends the config data stored in
+    the current active slot of the EEPROM to the FPGA. 
+
+4. If the FPGA starts up correctly with the architecture file supplied (ie: the
+   FPGA "Done" line goes high) the status LED stays on. If the config fails, the
+   status LED will pulse and the PIC goes back to step 3.
+
+5. The Z80 is released from reset and starts executing code from address $0
