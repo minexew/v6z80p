@@ -23,7 +23,8 @@ How to install the emulator
 ---------------------------
 
 1. Copy the folder "SPECTRUM" to the root of your FAT 16 SD card
-   (can be same card used for FLOS etc) 
+   (can be same card used for FLOS etc) (Add more Snapshots to the
+   "48snaps" and "128snaps" folders as desired).
 
 2. Install the FPGA config .bin file from the folder "FPGA_CFG"
    to the EEPROM using FLOS command "EEPROM.EXE" (Make sure you select
@@ -35,7 +36,7 @@ How to install the emulator
 
    a) Choosing option 2 in the EEPROM tool
    b) Using FLOS command "boot n" command where n is the slot with the emu config
-   c) (During boot) tapping the function key corresponding to the emu slot.
+   c) (During boot) tapping the function key corresponding to the emu slot (F1-F7 supported)
 
 
 -----------
