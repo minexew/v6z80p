@@ -10,8 +10,8 @@ include "system_equates.asm"
 
 	org $5000
 
-source	equ $0000				;address in EEPROM from which to get bytes
-src_block equ $0e
+source	equ $0000				;address within EEPROM block from which to get bytes
+src_block equ $00				;block number from which to get bytes
 
 length	equ $0000
 len_msb	equ $02				;number of bytes required from EEPROM (minimum = $000001)
