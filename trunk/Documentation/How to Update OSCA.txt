@@ -39,7 +39,7 @@ Emergency Recovery:
 Config Problems
 
 If the FPGA does not receive a valid configuration pattern from the EEPROM upon
-power on, the yellow LED will flash slowly (around 1 flash per second). There are
+power on, the status LED will flash slowly (around 1 flash per second). There are
 various ways to fix this..
 
 
