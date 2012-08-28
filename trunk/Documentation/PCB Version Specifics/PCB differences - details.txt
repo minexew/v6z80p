@@ -1,6 +1,86 @@
 
-Differences between the versions of the V6Z80P, earliest model first
---------------------------------------------------------------------
+Differences between the versions of the V6Z80P
+----------------------------------------------
+
+
+Summary of the crucial differences regards to the FPGA connections.
+
+
+CLOCK INPUT / OUTPUTS:
+----------------------
+
+The earliest version ("V6Z80P reV1.1") of the board has a single oscillator
+(16 MHz) that drives both the Z80 and FPGA.
+
+The 2nd version of the board ("V6Z80P+ rev1.0") has an output (p75) from the FPGA
+that can act as a clock enable to Z80 (pull this pin up in config for normal
+use).
+
+The 3rd version of the board ("V6Z80P+ rev1.1") has 2 oscillators (16MHz and
+14Mhz), these are connected to GCLK0 and GCLK1. The Z80 clock is sourced
+from an FPGA output (p75).
+
+
+Z80 ADDRESS BUS:
+---------------
+
+The earliest version of the board ("V6Z80P rev1.1") loops Z80 signal A15
+through the FPGA, allowing 32KB paging of the 512KB system RAM.
+
+All other versions loop both A15 and A14 through the FPGA allowing paging
+down to 16KB.
+
+
+SPARE PINS:
+-----------
+
+The earliest version of the board ("V6Z80P rev1.1") has 6 "spare" FPGA pins
+connected to the pin header.
+
+All other versions have only 5 spare FPGA IO pins connected to the pin
+header.
+
+
+MISC:
+-----
+
+The FPGA pin allocation is completely different between the earliest version
+of the board ("V6Z80P rev1.1") and all others. Note the pin-outs as listed
+in text file in the PCB-specific folder (or use the .UCF from the correct
+version of OSCA).
+
+The FPGA pin allocation between the two later "V6Z80P+" boards is the same
+except for the label: 
+
+"Z80_CLOCK_ENABLE" (p75) becomes "Z80_CLOCK" on the latest board "V6Z80P+ rev1.1"
+
+
+
+ADAPTING A CONFIGURATION TO WORK ON ALL BOARDS
+----------------------------------------------
+
+Obviously if a configuration uses a feature not available on a previous board
+revision (EG: the 14MHz clock, 16K paging) then it is not possible to directly
+adapt it work. However, if a configuration uses standard elements common on
+all boards (as OSCA does) then it is mainly a case of using the correct pin
+outs (.UCF file) and checking that:
+
+a) The clock input/output is handled correctly for each board. EG: Simply
+   loop the clock signal through the FPGA Input->output on the latest board.
+
+b) CPU A14 is looped straight through the FPGA Input->Output on the later boards
+   that support it.
+
+c) All FPGA configs should hold the Z80 reset signal low for a while on
+   start up to ensure reliable code execution.
+
+
+------------------------------------------------------------------------------------
+
+
+Full Details
+------------
+
 
 V6Z80P v1.1
 -----------
