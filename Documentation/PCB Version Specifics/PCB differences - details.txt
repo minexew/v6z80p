@@ -3,7 +3,7 @@ Differences between the versions of the V6Z80P
 ----------------------------------------------
 
 
-Summary of the crucial differences regards to the FPGA connections.
+Summary of the crucial differences with regards to the FPGA connections:
 
 
 CLOCK INPUT / OUTPUTS:
@@ -61,15 +61,16 @@ ADAPTING A CONFIGURATION TO WORK ON ALL BOARDS
 
 Obviously if a configuration uses a feature not available on a previous board
 revision (EG: the 14MHz clock, 16K paging) then it is not possible to directly
-adapt it work. However, if a configuration uses standard elements common on
-all boards (as OSCA does) then it is mainly a case of using the correct pin
-outs (.UCF file) and checking that:
+adapt it work on that board. However, if a configuration uses standard elements
+common across all boards (as OSCA does) then it is mainly a case of using the
+correct pin-outs (.UCF file) and checking that:
 
-a) The clock input/output is handled correctly for each board. EG: Simply
+a) The clock input/output should be handled correctly for each board. EG: Simply
    loop the clock signal through the FPGA Input->output on the latest board.
+   (Pull the clock_enable high on the V6Z80P+reV1.0.)
 
-b) CPU A14 is looped straight through the FPGA Input->Output on the later boards
-   that support it.
+b) Z80 A14 should be looped straight through the FPGA Input->Output on the
+   later boards that support this feature.
 
 c) All FPGA configs should hold the Z80 reset signal low for a while on
    start up to ensure reliable code execution.
