@@ -52,6 +52,12 @@ audchan3_len	equ $1d
 audchan3_per	equ $1e
 audchan3_vol	equ $1f
 
+aud_panning	equ $22		;alternative name for "sys_audio_panning"
+
+audchan0_loc_hi	equ $24
+audchan1_loc_hi	equ $25
+audchan2_loc_hi	equ $26
+audchan3_loc_hi	equ $27
 
 ;------ Graphics registers -------------------------------------------------
 
