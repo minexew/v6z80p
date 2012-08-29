@@ -10,8 +10,10 @@ Visible differences between boards
 * The original V6Z80P PCB was made prior to August 2010 and marked
   "V6Z80P Rev 1.1"  (it has an 8 pin mini DIN socket for video)
 
+
 * The V6Z80P+ V1.0 PCB was made between August 2010 and Dec 2010, the
   PCB is marked "V6Z80P+ Rev1.0", it has a 15pin standard VGA socket)
+
 
 * The V6Z80P+ V1.1 was made after Jan 2011 and is marked "V6Z80P+ Rev 1.1"
   (This board allows FPGA control of the CPU clock.) Normally the OSC SEL
@@ -21,10 +23,3 @@ Visible differences between boards
 * The V6Z80P+ 1.1b does NOT have an OSC SEL switch, the CPU clock is now always
   sourced from the FPGA. The SD card connector is a push-push, enclosed type.
 
-
-If developing new V6Z80P configs:
-
-Take note of the pin connections of the peripherals/components on the
-PCB (see pin list in docs) and avoid conflicting outputs. In general,
-set your project's configuration options to pull all I/O pins not
-used in your project high.
