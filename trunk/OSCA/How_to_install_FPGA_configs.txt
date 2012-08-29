@@ -59,6 +59,6 @@ Installing an FPGA config onto the EEPROM
    ( the method above allows you to test the new config before making it the         )
    ( default startup config.  IE: If you accidentally overwrite the current Active   ) 
    ( Slot data with a bad config, the system will not start at power on and you'll   )
-   ( be forced to use one of the manual config options to correct it - details below )
+   ( be forced to use one of the manual config options to correct it.                )
 
    ( It is recommended that a known-working OSCA config file is always left in slot 1 )
