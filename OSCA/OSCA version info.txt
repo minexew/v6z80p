@@ -10,6 +10,8 @@ Updates to OSCA
 672 - Audio system can now see all 512KB of System RAM (new location_hi register ports $24-$27)
       Simplified flood filler to XOR (as proposed by Daniel)
 
+
+
 671 - Exp Pin B has weak pull-up
 
 670 - Added more flexible sprite-background priority control.
@@ -34,10 +36,8 @@ Updates to OSCA
     - Includes ROM 6.15 (resets sys_vram_location on reset)
 
 
-
 663 - Added ability to expand pixels horizontally in chunky pixel mode.
       bit 3 of "vreg_vidctrl" enables and bits 0:2 "vreg_yhws_bplcount" sets the width
-
 
 
 661 - ROM version updated to v6.14 (requires bootcode 6.12)
