@@ -7,6 +7,9 @@ Both support VGA output.
 Updates to OSCA
 ---------------
 
+672 - Audio system can now see all 512KB of System RAM (new location_hi register ports $24-$27)
+      Simplified flood filler to XOR (as proposed by Daniel)
+
 671 - Exp Pin B has weak pull-up
 
 670 - Added more flexible sprite-background priority control.
