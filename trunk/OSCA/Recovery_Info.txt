@@ -2,8 +2,8 @@ Config Problems
 ---------------
 
 If the FPGA does not receive a valid configuration pattern from the
-EEPROM upon power on, the yellow LED (orange or red LED on later boards)
-will flash slowly (around 1 flash per second). There are various ways to
+EEPROM upon power on, the status LED (on the right below the PIC) will
+flash slowly (around 1 flash per second). There are various ways to
 fix this..
 
 
@@ -55,7 +55,7 @@ that the Active Slot selection is pointing at a bad config:
 
 * Power off.
 * Install jumper J2 only
-* Power on (yellow/orange/red LED flashes rapidly).
+* Power on (LED flashes rapidly).
 * Remove jumper J2
 * The LED will flash once, pause about 5 seconds, then flash twice,
   pause 5 seconds, then flash three times and so on - the number of flashes
@@ -84,7 +84,7 @@ Bootcode Problems
 -----------------
 
 If the OSCA ROM cannot load a valid bootcode file from the EEPROM, the display will flash
-magenta (bad CRC) or green (time out). If OSCA version 661 or above is active it is
+magenta (bad CRC) or green (time out). If OSCA version 661 or above is running it is
 possible to send the bootcode file manually via the serial link when the display turns grey.
 
 It is also possible to force serial transfer of the bootcode on power-up by holding
