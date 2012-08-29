@@ -4,7 +4,7 @@
 <body>
 <h1 style="text-decoration: underline;">OSCA - An FPGA
 Config For The V6Z80P</h1>
-<pre style="font-style: italic;">By Phil Ruston 2008-2012 - Last updated 22-08-2012 (OSCA v671)</pre>
+<pre style="font-style: italic;">By Phil Ruston 2008-2012 - Last updated 28-08-2012 (OSCA v672)</pre>
 <pre><br>OSCA (Old School Computer Architecture) provides a home-computer era hardware platform for<br>the V6Z80P. As well as basic memory and peripheral control, its features include bitmap and<br>character mapped displays, sprites, a raster line synchronized co-pro ("LineCop"), blitter,<br>hardware line draw and four channels of 8 bit digital sound.<br></pre>
 <pre style="text-decoration: underline;"><br>Hardware Control:</pre>
 <pre>In OSCA, memory and peripheral controls are accessed via the Z80's In/Out Ports. Video<br>settings such as the palette, display controls, sprite registers etc are accessed via<br>locations in Z80 address space (these can be paged in and out as desired). Sections of<br>Z80 address space are also assigned to video RAM etc.<br></pre>
@@ -16,10 +16,10 @@ Config For The V6Z80P</h1>
 <pre>$2000-$7FFF: The remaining 24KB Section of the lower RAM page</pre>
 <pre>$8000-$FFFF: 32KB Upper System RAM page</pre>
 <pre><br><span style="font-weight: bold;">Video RAM:</span> A user-selected 8KB section of Z80 address space can be used for CPU access to<br>video RAM (also, a special write-only mode allows the entire 64KB of Z80 address space to<br>access video RAM if desired).</pre>
-<pre><span style="font-weight: bold;">Audio RAM:</span> Unlike Video and Sprite RAM, audio memory is merely a 128KB subsection of system<br>RAM ($20000-$3FFFF) and is accessed by paging 32KB sections of it into the upper or lower<br>sections of Z80 address space. (This area of system RAM is treated the same as any other<br>by the CPU. IE: it is not exclusive to the audio system.)</pre>
-<pre><span style="font-weight: bold;">LineCop RAM:</span> This is also just a subsection of system RAM (64KB at $70000-$7FFFF) and is<br>accessed by paging 32KB sections of it into Z80 address space. (This area of system RAM is<br>also treated the same as any other by the CPU. IE: it is not exclusive to the LineCop system.)</pre>
+
+<pre><span style="font-weight: bold;"></span><span style="font-weight: bold;">LineCop RAM:</span> This is just a subsection of system RAM (the 64KB at $70000-$7FFFF) and is<br>accessed by paging the two 32KB sections of it into Z80 address space. This area of system<br>RAM is treated the same as any other by the CPU. IE: it is not exclusive to the LineCop system.</pre>
 <pre><br><span style="text-decoration: underline;">Paged RAM areas in Detail:</span></pre>
-<pre><span style="font-weight: bold;">System Memory:</span> The 32KB chunk of system RAM that appears to the Z80 at $0000-$7FFF is set<br>with the port "sys_low_page". The 32KB of system RAM that appears to the Z80 at<br>$8000-$FFFF is set with the port "sys_mem_select"</pre>
+<pre><span style="font-weight: bold;">System Memory:</span> The 32KB chunk of system RAM that appears to the Z80 at $0000-$7FFF is set<br>with the port "sys_low_page". The 32KB of system RAM that appears to the Z80 at $8000-$FFFF<br>is set with the port "sys_mem_select"</pre>
 <pre><br>Writing to Z80 address space between $0000 - $07FF:</pre>
 <pre>&nbsp;$0000 - $01FF: Write only Video Colour Palette or 512 bytes of system RAM*<br>&nbsp;$0200 - $03FF: Write only Video Control Registers or 512 bytes of system RAM* <br>&nbsp;$0400 - $05FF: Write only Sprite Control Registers or 512 bytes of system RAM*<br>&nbsp;$0600 - $07FF: Write only Maths Table or 512 bytes of system RAM*</pre>
 <pre><br>Reading from Z80 address space between $0000 - $07FF:</pre>
@@ -34,7 +34,7 @@ Ports:</span></h3>
 <pre>$00-$2F: System Control / Peripheral / Audio Ports:</pre>
 <pre>These port locations are mainly both readable and writeable. However, the read (IN) functions<br>can differ from the write (OUT) functions &#8211; see the individual port descriptions for details.<br><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br>Port: $00 - Read / Write: "sys_mem_select"</pre>
+<pre><br>Port: $00 - Read / Write: <span style="font-weight: bold;">"sys_mem_select</span>"</pre>
 <pre>Bit 0:3 - Upper 32KB memory page select (see table below)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 - Use alternate page for upper memory writes **<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 - Set Direct Video Write Mode (All Z80 address space memory writes go to VRAM).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6 - Page in Video RAM at selected location (In DVW Mode: 1 = exclude $0000-$0FFF).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7 - Page Sprite RAM in at $1000-$1FFF for writes (Ignored in DVW Mode)</pre>
 <pre>&nbsp;</pre>
 <pre>System RAM Upper Page Selection Table:</pre>
@@ -46,95 +46,95 @@ Ports:</span></h3>
 <pre>** When bit 4 (Alternate Write Page) is set, the UPPER 32KB page selection DURING<br> CPU WRITES is taken from Port $0B (sys_alt_write_page).</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br><br>Port: $01 - Read: "sys_irq_ps2_flags" - Interrupt status flags and PS2 port line status: </pre>
-<pre>Bit 0 - Keyboard IRQ flag (1 = interrupt occurred)<br>&nbsp;&nbsp;&nbsp; 1 - Mouse IRQ flag ("")<br>&nbsp;&nbsp;&nbsp; 2 - Timer IRQ flag ("")<br>&nbsp;&nbsp;&nbsp; 3 - Video IRQ flag ("")<br>&nbsp;&nbsp;&nbsp; 4 - Keyboard Clock line status (input)<br>&nbsp;&nbsp;&nbsp; 5 - Keyboard Data line status (input)<br>&nbsp;&nbsp;&nbsp; 6 - Mouse Clock status (input)<br>&nbsp;&nbsp;&nbsp; 7 - Mouse Data status (input)</pre>
-<pre>Port $01 - Write: "sys_irq_enable"</pre>
+<pre><br><br>Port: $01 - Read: "<span style="font-weight: bold;">sys_irq_ps2_flags</span>" - Interrupt status flags and PS2 port line status: </pre>
+<pre>Bit 0 - Keyboard IRQ flag (1 = interrupt occurred)<br>&nbsp;&nbsp;&nbsp; 1 - Mouse IRQ flag ("")<br>&nbsp;&nbsp;&nbsp; 2 - Timer IRQ flag ("")<br>&nbsp;&nbsp;&nbsp; 3 - Video IRQ flag ("")<br>&nbsp;&nbsp;&nbsp; 4 - Keyboard Clock line status (input)<br>&nbsp;&nbsp;&nbsp; 5 - Keyboard Data line status (input)<br>&nbsp;&nbsp;&nbsp; 6 - Mouse Clock status (input)<br>&nbsp;&nbsp;&nbsp; 7 - Mouse Data status (input)<br><br></pre>
+<pre>Port $01 - Write: "<span style="font-weight: bold;">sys_irq_enable</span>"</pre>
 <pre>Interrupt masks: Allow devices to interrupt CPU. (Note: The video IRQ enable bit is<br>in the video register vreg_rasthi)</pre>
-<pre><br>Bit 0 - Keyboard IRQ enable (1 = allow interrupt)</pre>
+<pre>Bit 0 - Keyboard IRQ enable (1 = allow interrupt)</pre>
 <pre>&nbsp;&nbsp;&nbsp; 1 - Mouse IRQ enable ("")<br>&nbsp;&nbsp;&nbsp; 2 - Timer IRQ enable ("")<br>&nbsp;&nbsp;&nbsp; 3 - Audio IRQ enable ("")<br>&nbsp;&nbsp;&nbsp; 4 - n/u<br>&nbsp;&nbsp;&nbsp; 5 - n/u<br>&nbsp;&nbsp;&nbsp; 6 - n/u<br>&nbsp;&nbsp;&nbsp; 7 - Master IRQ enable (must be set to allow ANY interrupt to occur)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br><br>Port: $02 - Read:&nbsp; "sys_keyboard_data"<br><br>&nbsp;&nbsp;&nbsp; 0:7 - Data byte received from keyboard<br><br><br>Port: $02 - Write: "Sys_Clear_IRQ_flags"</pre>
+<pre><br><br>Port: $02 - Read:&nbsp; "<span style="font-weight: bold;">sys_keyboard_data</span>"<br><br>&nbsp;&nbsp;&nbsp; 0:7 - Data byte received from keyboard<br><br><br>Port: $02 - Write: "<span style="font-weight: bold;">Sys_Clear_IRQ_flags</span>"</pre>
 <pre>(Bits written with ones clear the relevant IRQ flag)</pre>
 <pre>Bit 0 - Clear Keyboard IRQ<br>&nbsp;&nbsp;&nbsp; 1 - Clear Mouse IRQ<br>&nbsp;&nbsp;&nbsp; 2 - Clear Timer IRQ<br>&nbsp;&nbsp;&nbsp; 3 - n/u<br>&nbsp;&nbsp;&nbsp; 4 - Clear Audio Channel 0 Loop IRQ Flag<br>&nbsp;&nbsp;&nbsp; 5 - Clear Audio Channel 1 Loop IRQ Flag<br>&nbsp;&nbsp;&nbsp; 6 - Clear Audio Channel 2 Loop IRQ Flag<br>&nbsp;&nbsp;&nbsp; 7 - Clear Audio Channel 3 Loop IRQ Flag</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;"><span style="font-family: monospace;"><br>
 </span>
-<pre>Port: $03 - Read: "sys_mouse_data"</pre>
+<pre>Port: $03 - Read: "<span style="font-weight: bold;">sys_mouse_data</span>"</pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0:7 - Data byte received from mouse</pre>
-<pre><br>Port: $03 - Write: "Sys_PS2_Joy_control"</pre>
+<pre><br>Port: $03 - Write: "<span style="font-weight: bold;">Sys_PS2_Joy_control</span>"</pre>
 <pre>Bit: 0 - Joystick port 0/1 select - determines which port is active.<br>	1 - n/u<br>	2 - n/u<br>	3 - n/u<br>	4 - Keyboard Clock Control output - (Set to 1 to PULL DOWN the signal)<br>	5 - Keyboard Data Control output - ("")<br>	6 - Mouse Clock Control output - ("")<br>	7 - Mouse Data Control output - ("")</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br><br>Port $04 - Read/write: "sys_serial_port"</pre>
+<pre><br><br>Port $04 - Read/write: "<span style="font-weight: bold;">sys_serial_port</span>"</pre>
 <pre>Incoming or outgoing data byte for RS232 com port</pre>
 <pre>Note: Reading clears the "serial byte received" flag (bit 6 in Port $05)</pre>
 <pre><br><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
-<pre>Port $05 - Read:&nbsp; "sys_joy_com_flags" - Joystick inputs and RS232 status</pre>
+<pre>Port $05 - Read:&nbsp; "<span style="font-weight: bold;">sys_joy_com_flags</span>" - Joystick inputs and RS232 status</pre>
 <pre>Bit:    0 - Up<br>	1 - Down<br>	2 - Left<br>	3 - Right<br>	4 - Fire 1<br>	5 - Fire 2<br>	6 - RS232 Byte received<br>	7 - RS232 Output Buffer Busy</pre>
 
-<pre><br>Port $05 - Write: "sys_sdcard_ctrl1"<br><br>Bit:&nbsp;&nbsp; &nbsp;0:5 - n/u <br>	  6 - Enable FPGA to SD card data output<br>          7 - SD card port's SPI speed: 0 = 250KHz, 1 = 8MHz</pre>
+<pre><br>Port $05 - Write: "<span style="font-weight: bold;">sys_sdcard_ctrl1</span>"<br><br>Bit:&nbsp;&nbsp; &nbsp;0:5 - n/u <br>	  6 - Enable FPGA to SD card data output<br>          7 - SD card port's SPI speed: 0 = 250KHz, 1 = 8MHz</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
-<pre>Port $06 - Read/Write: "sys_sdcard_ctrl2"</pre>
+<pre>Port $06 - Read/Write: "<span style="font-weight: bold;">sys_sdcard_ctrl2</span>"</pre>
 <pre>Bit:    0:1 - n/u (ignore / mask these bits when reading. No write function.)<br>	  2 &#8211; Read/Write SD card /CS line (active low)<br>	  3 &#8211; Read/Write SD card /Power control (active low)<br>	4:7 - n/u&nbsp; (ignore / mask off these bits when reading. No write function.)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
-<pre>Port: $07 - Read: &#8220;sys_vreg_read&#8221; - Video status register (same as address $700)</pre>
+<pre>Port: $07 - Read: &#8220;<span style="font-weight: bold;">sys_vreg_read</span>&#8221; - Video status register (same as address $700)</pre>
 <pre>Bit:    7 - Interlace field 0 = short field, 1 = long field <br>	6 - LSB of scanline count<br>	5 - 60Hz mode (1 = NTSC config / VGA mode jumper installed and 50Hz not forced.)<br>	4 - Blitter / linedraw status (1 = busy) check before changing relevant registers <br>	3 - Raster IRQ status (for manual polling)<br>	2 - Y Window (1 = display area, 0 = border)<br>	1 - X Window&nbsp; (1 = display area, 0 = border) *<br>	0 - Last line (VRT). Reads as one during the last line of each frame.</pre>
 <pre><br>* Remember, in VGA mode each scanline's data is output twice at double the normal frequency.<br>This flag reflects the x-window of the normal PAL/NTSC ~15KHz scanline.</pre>
 <pre><br>Port: $07 - Write: "sys_timer" - The timer internally counts *upwards* from this value<br>            at 62.5KHz (ie: every 256 clock ticks) when it overflows, it sets the timer<br>            IRQ flag, then reloads the count from the value that was written here.</pre>
 <pre><br>Note: Writing to this port immediately sets the timer to the written value and clears<br>the internal prescaler count. </pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br>Port: $08 - Read: Sys_Audio_Flags</pre>
+<pre><br>Port: $08 - Read: <span style="font-weight: bold;">Sys_Audio_Flags</span></pre>
 <pre>Bit:&nbsp;&nbsp; &nbsp;0 - Channel 0 is playing<br>	1 - Channel 1 is playing<br>	2 - Channel 2 is playing<br>	3 - Channel 3 is playing<br>	4 - Channel 0 has looped (IE: internal length countdown has reached 0)<br>	5 - Channel 1 has looped (use bits 7:4 of port 2 to clear these flags)<br>	6 - Channel 2 has looped ("")<br>	7 - Channel 3 has looped ("")</pre>
-<pre><br>Port: $08 - Write: "Sys_Audio_Enable"</pre>
+<pre><br>Port: $08 - Write: "<span style="font-weight: bold;">Sys_Audio_Enable</span>"</pre>
 <pre>Bit&nbsp;&nbsp;&nbsp; 0 - Channel 0 - 1 = Play audio, 0 = Stop audio<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 - Channel 1 - ("")<br>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; 2 - Channel 2 - ("")<br>       3 - Channel 3 - ("")<br>     4:7 - n/u</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
 <br>
-<pre>Port $09 - Read: "sys_hw_flags"</pre>
+<pre>Port $09 - Read: "<span style="font-weight: bold;">sys_hw_flags</span>"</pre>
 <pre>Bit:      7 - Hardware version serial data (16 bit value)<br>	  6 - SD card serializer status (1 = busy)<br>	  5 - Video Mode jumper status (0 = TV mode, 1 = VGA mode)<br>	  4 - Config EEPROM serializer status (1 = data byte ready for read)<br>	  3 - Configuration PIC's RB7 port status<br>	2:0 - n/u: Ignore / mask off these undefined bits </pre>
 <pre><br>To read the hardware version word, set the address bus bits 11:8 to $0-$F when reading<br>this port (ie: use the "OUT (C),A" instruction, presetting register B with 0 to 15).<br>The bit addressed by B will appear in bit 7 of this port.</pre>
-<pre><br>Port $09 - Write: "sys_hw_settings"</pre>
+<pre><br>Port $09 - Write: "<span style="font-weight: bold;">sys_hw_settings</span>"</pre>
 <pre>Bit:      0 - NMI switch inhibit. Default = 0, NMI switch enabled<br>          1 - Reset switch inhibit. Default = 0, Reset switch enabled <br>          2 &#8211; No effect (was originally PAL/NTSC mode select)<br>          3 &#8211; Force VGA to 50Hz mode (no effect in TV mode)<br>        4:7 - Not used</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre>Port $0A - Read / Write: "sys_spi_port"</pre>
+<pre>Port $0A - Read / Write: "<span style="font-weight: bold;">sys_spi_port</span>"</pre>
 <pre>The SPI port is used by the V6Z80P to send bytes serially (MSB first, SPI mode 0) to<br>its SD Card interface. Also, serial data received from the card's Dout line appears<br>here for reading. See also: SPI speed setting in Port $05 and busy flag in port $09</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre>Port $0B - Read/Write: "sys_alt_write_page" **</pre>
+<pre>Port $0B - Read/Write: "<span style="font-weight: bold;">sys_alt_write_page</span>" **</pre>
 <pre>Bit: 0 - Write Page select Bit 0 - Relevant when bit 4 of Port 0 is set <br><br>     1 - Write Page select Bit 1 - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ""<br><br>     2 - Write Page select Bit 2 - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ""<br><br>     3 - Write Page select Bit 3 - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ""<br><br>     4 - "Write Palette/Read System RAM" - When set, CPU writes between $0-$1FF<br>          are directed to the palette registers, whilst CPU reads in this memory<br>          range return bytes from system RAM (instead of the ROM). This mode<br>          overrides bit 6 status<br><br>     5 &#8211; &#8220;Any page mode&#8221;. When set this allows the first 32KB of system RAM to be<br>         paged into locations $8000-$ffff of Z80 address space when bits 0:3 of<br>         sys_mem_select are zero. (Originally this was prohibited.)<br><br>     6 &#8211; "Read/Write First 512 bytes of System RAM" - When set, the system RAM<br>         &#8220;underneath&#8221; the ROM/palette at $000-$1ff is accessible as normal System RAM<br>         locations for read and write. Note: If bit 4 is set, this setting is ignored.<br><br>     7 &#8211;&nbsp;&#8220;Access RAM under video registers&#8221; - When set, the system RAM &#8220;underneath&#8221;<br>         the video registers at $200 - $7ff is accessible. As well as redirecting<br>         CPU writes to system RAM this control causes reads in the range $700-$7ff<br>         to return bytes from system RAM (READs from $200-$6ff return bytes from<br>         system RAM whether this bit is set or not). This means that the video<br>         status register and maths unit result word is not available (however,<br>         the video status register can always be read from port 7 - &#8220;sys_vreg_read&#8221;)</pre>
 <pre>** To ensure the ROM is paged in upon reset and the system can start, this port register<br> is reset to $00 when the reset button is pressed.</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><br>Port $0C - Read: No function</pre>
-<pre><br>Port $0C - Write: "sys_baud_rate"</pre>
+<pre><br>Port $0C - Write: "<span style="font-weight: bold;">sys_baud_rate</span>"</pre>
 <pre>Bit:&nbsp;&nbsp; &nbsp;0 - Set serial port RS232 comms speed: 0 = 57600 BAUD, 1 = 115200 BAUD</pre>
 <pre><br><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
-<pre>Port&nbsp; $0D - Read: "sys_eeprom_byte"</pre>
+<pre>Port&nbsp; $0D - Read: "<span style="font-weight: bold;">sys_eeprom_byte</span>"</pre>
 <pre><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This port contains data bytes from the SPI FPGA configuration EEPROM, which<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; can be read under CPU control. It should be read only when the "serializer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status flag" (bit 4 of port "sys_hw_flags") is 1. Reading this port clears<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the internal bit count and status flag. </pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Handshaking: When a databurst has been initiated (see PIC comms section) the<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PIC issues a new byte every time the PIC CLOCK (bit 1 of sys_pic_comms) is raised.</pre>
-<pre><br>Port&nbsp; $0D - Write: "sys_pic_comms"</pre>
+<pre><br>Port&nbsp; $0D - Write: "<span style="font-weight: bold;">sys_pic_comms</span>"</pre>
 <pre><br>Bit:   0 - Write to Configuration PIC port RB1 (data to PIC)<br>       1 - Write to Configuration PIC port RA5 (clock to PIC)<br>     2:7 - Not used, write with zeroes</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre>Port $0E - Read/Write: "sys_io_pins" (see data direction in port $0F)</pre>
+<pre>Port $0E - Read/Write: "<span style="font-weight: bold;">sys_io_pins</span>" (see data direction in port $0F)</pre>
 <pre><br>Bit:&nbsp;     0 - Read/Write data bit for IO pin A<br>          1 - Read/Write data bit for IO pin B (pulled up)<br>          2 - Read/Write data bit for IO pin C (on PCBs that support it)<br>	3:5 - n/u <br>          6 - Reads: RESET switch status (pulled up)* - Write: N/A<br>          7 - Reads: NMI switch status (pulled up)* - Write: N/A</pre>
 <pre>* Only relevant when Reset / NMI functions are disabled by port 9 bits 0:1</pre>
 <pre><br>Port $0F - Read: No function</pre>
-<pre>Port $0F - Write: "sys_io_dir" </pre>
+<pre>Port $0F - Write: "<span style="font-weight: bold;">sys_io_dir</span>" </pre>
 <pre>Bit:&nbsp;&nbsp;&nbsp;   0 - Data direction for IO pin A (0 = output, 1 = input)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   1 - Data direction for IO pin B ( &#8220;&#8221; )<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  2 - Data direction for IO pin C (on PCBs that support it)<br>        3:7 - n/u</pre>
 <pre><br><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br>Port $20 &#8211; Read / Write: &#8220;sys_low_page&#8221;</pre>
+<pre><br>Port $20 &#8211; Read / Write: &#8220;<span style="font-weight: bold;">sys_low_page</span>&#8221;</pre>
 <pre>&nbsp;Bit&nbsp;&nbsp;&nbsp; 0:3 &#8211; Lower 32KB page select*<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4:7 &#8211; Not Used &#8211; mask / ignore these undefined bits.</pre>
 <pre>* IE: Selects which 32KB page from the 512KB system RAM appears at Z80 $0000-$7fff<br>&nbsp; (see table below)</pre>
 <pre><br>System RAM Lower Page Selection Table</pre>
@@ -144,7 +144,7 @@ Ports:</span></h3>
 <pre><br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br>Port $21 &#8211; Read - No function</pre>
-<pre><br>Port $21 - Write: &#8220;sys_vram_location&#8221;</pre>
+<pre><br>Port $21 - Write: &#8220;<span style="font-weight: bold;">sys_vram_location</span>&#8221;</pre>
 <pre>Bit:    0:2 - Location of the video memory access window in Z80 address space (see table)<br>	3:7 &#8211; Not Used &#8211; write with zeroes</pre>
 <pre><br>Bits: 2 1 0&nbsp; -&nbsp; VRAM Location:<br>-------------------------------</pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 0 0&nbsp; -&nbsp; $2000 *<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 0 1&nbsp; -&nbsp; $2000 *<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 1 0&nbsp; -&nbsp; $4000<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 1 1&nbsp; -&nbsp; $6000<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 0 0&nbsp; -&nbsp; $8000<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 0 1&nbsp; -&nbsp; $a000<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 1 0&nbsp; -&nbsp; $c000<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 1 1&nbsp; -&nbsp; $e000</pre>
@@ -152,29 +152,24 @@ Ports:</span></h3>
 <pre>* 000 and 001 both set the VRAM window location at Z80 address $2000 (It is not possible to set<br>the VRAM window to Z80 $0000)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br><br>Port $22 - Read - No function</pre>
-
-
-<pre><br>Port $22 - Write: 'sys_audio_panning'<br><br>Bit&nbsp; &nbsp;&nbsp; 0:3 - Select which channels go to the right side<br> &nbsp;&nbsp;&nbsp;&nbsp; &nbsp; 4:7 - Select which channels go to the left side&nbsp;&nbsp; &nbsp;</pre>
-<pre>&nbsp;&nbsp; &nbsp; &nbsp; (Each bit position = one channel, IE: bit0=channel0, bit1=channel1 etc)</pre>
-<pre><br><br></pre>
-<hr style="width: 100%; height: 2px;">
+<pre><br>Ports $22 - $27: Used by sound system, see following section.<br><br></pre><hr style="width: 100%; height: 2px;">
 <h3><br>
 <span style="font-family: monospace;"></span>Sound
 System&nbsp;Detail:</h3>
-<pre>Ports $10-$1F are assigned to the audio channels (Write Only) :</pre>
-<pre>$10-$13: Channel 0 <br>$14-$17: Channel 1<br>$18-$1b: Channel 2<br>$1c-$1f: Channel 3</pre>
-<pre>For each channel:</pre>
-<pre>Port offset | Use:<br>----------------------------------------------------------------------------------------<br>&nbsp; +0 Location of sound wave (in words) IE: Byte offset from sample RAM base / 2.<br>&nbsp; +1 Length of sound wave (in words)<br> &nbsp;+2 Period of sound wave (number of 16MHz clock ticks between samples)<br>&nbsp; +3 Volume of sound wave ($00-$40) (Linear scale: $40 = maximum volume)</pre>
-<pre>The location, length and period values are 16 bit registers and should be updated using<br>the Z80 "OUT (C),r" command where C is the port number, r holds the low 8 bits and B<br>holds the high 8 bits. The location and length registers count in words *not bytes*.</pre>
-<pre>The samples need to be in signed 8 bit format and should be loaded into pages 4:7 of<br>system memory (ie: $20000-$3FFFF). The volume is a single byte linear scale value<br>(range $00:silence to $40:full volume) and can be updated using the normal Z80<br>"OUT (reg),A" instruction if desired.</pre>
-<pre>The sound system operates in a similar fashion to that of the Amiga Hardware, ie: You<br>set the location, length, period and volume of a channel, then start the channel<br>playing with the relevant "sys_audio_enable" port bit. Once the channel is playing,<br>its Location and Length registers can be updated - the channel will only fetch the<br>new values once its original length value has counted down to zero (or you stop<br>the channel for a while and restart it). If the registers are not changed, the<br>channel simply loops around playing the same sample data until it is stopped.</pre>
+
+
+
+<pre>Note: The audio channel location registers were expanded to 18 bit in OSCA 672. Previously,<br>only 128KB of System RAM ($20000-$3FFFF) was accessible to the audio system.<br><br><span style="text-decoration: underline;"><br>Port assignments:</span><br><br>Ports $10-$1F and $22-$27 are assigned to the audio channels: <span style="text-decoration: underline;"></span><br><br><span style="font-weight: bold;">Port $10 -&nbsp;"audchan0_loc"</span> Location (low) of sound wave in System RAM Bits [16:1] (16 bit register)<br><span style="font-weight: bold;">Port $11&nbsp;- "audchan0_len"</span> Length of sound wave (in words) (16 bit register)<br><span style="font-weight: bold;">Port $12 - "audchan0_per"</span> Period of sound wave (number of 16MHz clock ticks between samples) (16 bit register)<br><span style="font-weight: bold;">Port $13&nbsp;- "audchan0_vol"</span> Volume of sound wave ($00-$40) (Linear scale: $40 = maximum volume) (8 bit register)</pre>
+
+
+<pre>($14-$17: Same for channel 1 - <span style="font-weight: bold;">"audchan1_loc", "audchan1_len", "audchan1_per", "audchan1_vol"</span>)<br>($18-$1b: Same for channel 2 - <span style="font-weight: bold;">"audchan2_loc", "audchan2_len", "audchan2_per", "audchan2_vol"</span>)<br>($1c-$1f: Same for channel 3 - <span style="font-weight: bold;">"audchan3_loc", "audchan3_len", "audchan3_per", "audchan3_vol"</span>)<br><br><br><span style="font-weight: bold;">Port $22 - 'aud_panning'</span> (8 bit register)<br><br>Bit 0:3 - Select which channels go to the right side <br> &nbsp;&nbsp;&nbsp;4:7 - Select which channels go to the left side&nbsp;&nbsp; &nbsp;<br><br>&nbsp;&nbsp; &nbsp;(Each bit position = one channel, IE: bit0=channel0, bit1=channel1 etc)
+<br><br><span style="font-weight: bold;">Port $23 - Not implemented</span><br><br><br>Port $24 - '<span style="font-weight: bold;">audchan0_loc_hi</span>' Location (high) of sound wave in System RAM [Bits 18:17] for Channel 0<br>Port $25 - '<span style="font-weight: bold;">audchan1_loc_hi</span>' Location (high) of sound wave in System RAM [Bits 18:17] for Channel 1<br>Port $26 - '<span style="font-weight: bold;">audchan2_loc_hi</span>' Location (high) of sound wave in System RAM [Bits 18:17] for Channel 2<br>Port $27 - '<span style="font-weight: bold;">audchan3_loc_hi</span>' Location (high) of sound wave in System RAM [Bits 18:17] for Channel 3<br><br>(All the location (high) ports are 8 bit registers)<br><br><span style="text-decoration: underline;">Notes:</span><br><br>The sound location registers are 18 bits long in total and refer to WORD addresses, not<br>byte addresses in System RAM (samples need to placed at word boundaries). Therefore, you<br>write (the actual RAM address / 2) into the location registers. <br><br>Samples must be an even number of bytes in length - you write the length in WORDS into<br>the Length registers (IE: Actual byte length/2). Maximum sample length is therefore 128KB.<br><br>The location (low), length and period values are 16 bit registers and should be updated<br>by using the Z80 "OUT (C),r" command where C is the port number, r holds the low 8 bits<br>of data and B holds the high 8 bits of data. The location (high) ports are 8 bit registers<br>(actually only 2 bits are used) and can be updated with the normal "OUT (n),A" instruction<br>if desired. The same is true of the volume ports (though there 7 bits are used).<br><br>The volume is a single byte linear scale value (range: $00 = silence to $40 = full volume).<br><br>The sound sample data needs to be in signed 8-bit format and located in System RAM<br>(it is read by the hardware using DMA). The audio hardware ignores any memory paging<br>settings and always reads directly from the system RAM when fetching data.<br> The sound system operates in a similar fashion to that of the Amiga Hardware, ie: You<br>set the location, length, period and volume of a channel, then start the channel<br>playing with the relevant "sys_audio_enable" port bit. Once the channel is playing,<br>its Location and Length registers can be updated - the channel will only fetch the<br>new values once its original length value has counted down to zero (or you stop<br>the channel for a while and restart it). If the registers are not changed, the<br>channel simply loops around playing the same sample data until it is stopped.</pre>
 <pre>Because of the way the sound hardware pre-fetches sample data, some care needs<br>to be taken when setting up the registers.&nbsp; The recommended audio register setup<br>procedure is as follows:</pre>
 <pre>1. Wait for post-audio DMA time (EG: wait for bit 6 of "sys_vreg_read" to change)<br>2. Stop the relevant audio channel(s) and write location, length, period and volume.<br>3. Wait for next post-audio DMA time (IE: At least one scanline delay)<br>4. Start the relevant audio channel(s)</pre>
 <pre>(Once a sample is playing, the period and frequency registers can generally be updated on<br>the fly without special regard to the DMA timing)</pre>
 <pre>It's possible to use an interrupt to seamlessly switch between two or more sample<br>buffers in order to play long samples without worrying about the exact timing. To<br>do this you would start a channel playing, reload it with the second buffer ready<br>for the first loop as normal, and then set up the audio interrupt so that it occurs<br>upon the first loop (IE: just as the second buffer starts to play). In the IRQ<br>service routine, you would set the channel location and length to point back to<br>the first buffer, and on subsequent IRQs switch between the two buffers.</pre>
 <pre>Note: The four audio loop flags are OR'd into a single interrupt source. It is up<br>to the IRQ service routine to read bits 4:7 of the "sys_audio_flags" port, see<br>which bits are set (and clear them on exit from the IRQ).<br><br><br>Other sound related ports (see port breakdown detail above):</pre>
-<pre>Port $01 (sys_irq_enable)- to enable audio IRQ<br>Port $02 (sys_clear_irq_flags)- to clear audio IRQ loop flags<br>Port $08 (sys_audio_enable / sys_audio_flags) - to enable channels / read loop flags.</pre>
+<pre>Port $01 (<span style="font-weight: bold;">sys_irq_enable</span>)- to enable/disable the audio IRQ<br>Port $02 (<span style="font-weight: bold;">sys_clear_irq_flags</span>)- to clear audio IRQ loop flags<br>Port $08 (<span style="font-weight: bold;">sys_audio_enable</span> / <span style="font-weight: bold;">sys_audio_flags</span>) - to enable channels / read loop flags.</pre>
 <pre><br><span style="text-decoration: underline;">CALCULATING THE AUDIO PERIOD VALUE:</span></pre>
 <pre>The period value is not the same as the Amiga uses, it has 4 times the resolution however<br>so a close match value can be obtained if desired.</pre>
 <pre>Period = 16,000,000 / desired sample output rate</pre>
@@ -182,7 +177,7 @@ System&nbsp;Detail:</h3>
 <pre>For pure tones, the output frequency depends on the number of samples in your waveform<br>that constitute one cycle, so if the sample has EG: 16 bytes in one cycle, the period<br>value required to play it at a desired frequency is calculated thus:</pre>
 <pre>Period = 16,000,000 / (samples per cycle * frequency) </pre>
 <pre><br><span style="text-decoration: underline;">Panning:</span></pre>
-<pre>The default set-up is for channels 0 and 2 to go to the left side, whilst channels 1 and 3<br>go to the right side,&nbsp; but by writing to port $22 "sys_audio_panning" all 4 channels can be<br>individually directed to the left, right or both sides.</pre>
+<pre>The default set-up is for channels 0 and 2 to go to the left side, whilst channels 1 and 3<br>go to the right side,&nbsp; but by writing to port $22 "<span style="font-weight: bold;">sys_audio_panning</span>" all 4 channels can be<br>individually directed to the left, right or both sides.</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <h2>Hardware Maths Assist &#8211; multiply / scale unit</h2>
@@ -199,22 +194,13 @@ System&nbsp;Detail:</h3>
 <h3><span style="text-decoration: underline;">The
 Video System:</span> </h3>
 <pre>There is 512KB of &#8220;background video&#8221; RAM available (separate to sprite, audio and system memory).<br>It is normally accessible to the CPU in 8KB pages (at Z80 address $2000, $4000, $6000, $8000,<br>$A000, $C000 or $E000 depending on the port setting "sys_vram_location") with the page selected<br>by the register "vreg_vidpage". However, a special write-only mode also allows the entire Z80<br>address space to be mapped onto 64KB of video RAM.</pre>
-<pre><br>There are two main video modes, bitmap and tilemap - both allow up to 256 colours. The display<br>is normally non-interlaced, PAL ~50Hz or VGA/NTSC ~60Hz (there is an option to force VGA to<br>non-standard 50Hz). CPU access TO VIDEO MEMORY whilst the display window is being generated is<br>blocked by the video system. The different video modes affect how long the CPU is kept<br>waiting - Dual Playfield tilemap mode is the most demanding. <br></pre>
+<pre><br>There are two main video modes, bitmap and tilemap - both allow up to 256 colours. The display<br>is normally non-interlaced, PAL ~50Hz or VGA/NTSC ~60Hz (there is an option to force VGA to<br>non-standard 50Hz). CPU access TO VIDEO MEMORY whilst the display window is being generated is<br>blocked by the video system. The different video modes affect how long the CPU is kept<br>waiting - Dual Playfield tilemap mode is the most demanding. <br><br></pre>
 <pre style="font-weight: bold; text-decoration: underline;">BITMAP "CHUNKY" MODE:</pre>
-<pre><br>&nbsp;In standard chunky bitmap mode pixel data is fetched in a simple 1 byte = 1 pixel<br>&nbsp;fashion (it is called "chunky" as all the bits for each pixel come from the same<br>&nbsp;chunk - IE: location - in memory).</pre>
+<pre><br>&nbsp;In standard chunky bitmap mode pixel data is fetched in a simple 1 byte = 1 pixel<br>&nbsp;fashion (it is called "chunky" as all the bits for each pixel come from the same<br>&nbsp;'chunk' - IE: location - in memory).</pre>
 <pre>&nbsp;The byte fetched from VRAM represents an index in the video palette, therefore a $00 &nbsp;<br>&nbsp;shows a &#8220;palette entry 0&#8221; coloured pixel, $01 shows a &#8220;palette entry 1&#8221; coloured pixel<br>&nbsp;and so on. Data is fetched linearly from VRAM left to right, top to bottom of the screen<br>&nbsp;(a modulo register can be used to skip bytes at the end of each line - this is<br>&nbsp;useful for interlaced displays / skipping over an area used for fresh scroll data etc). <br>&nbsp;The data-fetch start address can be manipulated to achieve scrolling effects.</pre>
-<pre>&nbsp;In chunky mode, fast line draws (125ns per 256 colour pixel) are possible. The<br>&nbsp;hardware requires Bresenham constants, octant number, video start address and<br>&nbsp;length of line to be set up in the line draw registers, then the hardware carries<br>&nbsp;out the algorithm. The registers are doubled up, allowing line set-up data for a<br>&nbsp;new line to be loaded up whilst the previous line is being drawn.</pre>
-<pre>&nbsp;Chunky mode also offers "pixel flooding" (see bit 6 of vreg_vidctrl) which<br>&nbsp;repeats the last pixel colour to achieve flood fill effects. In this mode,<br>&nbsp;there are two ways the hardware can interpret pixel data - bit 4 of vreg_vidctrl<br>&nbsp;selects between them. </pre>
-<pre>Flood mode:<br><br>&nbsp;When vreg_vidctrl is 0, pixel data is interpreted according to the following rules:</pre>
-<pre>&nbsp;*&nbsp; If current pixel colour is 128-&gt;255, display the pixel as normal and remember it.</pre>
-<pre>&nbsp;*&nbsp; If current pixel colour is 0-&gt;127:</pre>
-<pre>&nbsp;&nbsp;&nbsp; If bit 6 of the previously stored colour is one and bit 6 of the current<br>&nbsp;&nbsp;&nbsp; pixel colour is zero, show a pixel of the previously stored colour.<br>&nbsp;&nbsp;&nbsp; Otherwise, use the current pixel colour (but do not remember it).</pre>
-<pre>&nbsp;* The stored colour is reset to zero at the start of each scan line.</pre>
-<pre><br>&nbsp;When vreg_vidctrl bit 4 is 1, pixel data is interpreted as follows:</pre>
-<pre>&nbsp;* If current pixel is 0, display a pixel of the last non-zero colour.</pre>
-<pre>&nbsp;* If pixel is &gt; 0 plot a pixel of this colour.</pre>
-<pre>&nbsp;* The stored colour is reset to zero at the start of each scan line.</pre>
-<pre><br>&nbsp;Finally in chunky mode, pixels can be horizontally expanded from 1 to 8 times (see<br>&nbsp;bit 3 of "vreg_vidctrl" and bits 0:2 "vreg_yhws_bplcount")</pre>
+<pre><span style="text-decoration: underline;"><br>Line draw system:</span><br>&nbsp;<br> Fast line draws (125ns per 256 colour pixel) are possible in chunky mode. The<br>&nbsp;hardware requires Bresenham constants, octant number, video start address and<br>&nbsp;length of line to be set up in the line draw registers, then the hardware carries<br>&nbsp;out the algorithm. The registers are doubled up, allowing line set-up data for a<br>&nbsp;new line to be loaded up whilst the previous line is being drawn.</pre>
+<pre><br><span style="text-decoration: underline;">Flood mode:</span> (Simplified in OSCA 672)<br><br>&nbsp;Chunky mode also offers "pixel flooding" (see bit 6 of vreg_vidctrl) which<br>&nbsp;repeats the last pixel colour to achieve flood fill effects. In this mode,<br>&nbsp;the hardware XOR's each new pixel with the value of the last. The stored<br> colour is reset to zero at the start of each scan line.</pre>
+<pre><br><span style="text-decoration: underline;">Pixel Expand</span>:<br><br> Finally, in chunky mode pixels can be horizontally expanded from 1 to 8 times<br> (see bit 3 of "<span style="font-weight: bold;">vreg_vidctrl</span>" and bits 0:2 "<span style="font-weight: bold;">vreg_yhws_bplcount</span>")</pre>
 <pre><br><span style="text-decoration: underline; font-weight: bold;">BITMAP "PLANAR" MODE:</span><br><br>&nbsp;In planar mode the display can have up to 8 bitplanes which are internally combined<br>&nbsp;to form a palette index for each pixel. As the number of&nbsp; bitplanes can be set,<br>&nbsp;the maximum number of colours on screen (without reloading the palette registers)<br>&nbsp;can be 2,4,8,16,32,64,128 or 256. This can offer efficiencies in terms of video<br>&nbsp;memory use and update speed. The main disadvantage is that fine pixel level access<br>&nbsp;is more difficult.</pre>
 <pre>&nbsp;Each bitplane has its own 19 bit start location register (in fact there are two<br>&nbsp;sets of 8 bitplane pointers - the video hardware uses the set indicated in the video<br>&nbsp;control register "vreg_vidctrl"). These pointers need only be written once,<br>&nbsp;as an internal counter adds the offset to the video memory required as the frame<br>&nbsp;is built up (this offset register can be reset at any time). The bitplane pointers<br>&nbsp;can be manipulated to achieve scrolling effects etc. Fine horizontal pixel scrolling<br>&nbsp;is provided via a hardware scroll register (vreg_xhws). A modulo register can be used to<br>&nbsp;skip bytes at the end of each line.</pre>
 <pre>&nbsp;The diagram below shows how bitplane data is combined to form a pixel's palette index:</pre>
@@ -395,7 +381,7 @@ List:</h3>
 <pre><span style="font-weight: bold;"><br>$201</span> = "<span style="font-weight: bold;">vreg_vidctrl</span>" - Playfield Control</pre>
 <pre>Certain bits of this register take on different meanings depending on the video mode:</pre>
 <pre style="text-decoration: underline;">In Bitmap Mode (IE: When bit 0 is clear)</pre>
-<pre>&nbsp; 7 &#8211; Enable &#8220;Chunky Pixel&#8221; Format (each video data byte fetched is a colour index)<br>&nbsp; 6 &#8211; Enable &#8220;Flood Mode&#8221; - for use with in Chunky Pixel mode<br>&nbsp; 5 - Use bitplane location registers A (0) or B (1) to point to the video data.<br>&nbsp; 4 &#8211; In "Flood Mode" select the pixel flooding rules. <br>&nbsp; 3 &#8211; Enable Horizontal Expand Mode (For chunky mode only)<br>&nbsp; 2 - Video inhibit: 0 = Normal, 1 = Colour index 0 replaces all non-sprite video.<br>&nbsp; 1 - Wide Left Border: 0 = Normal, 1 = Mask first 16 pixels for x-scrolling. <br>&nbsp; 0 &#8211; Display mode: 0 = Bitmap Mode, 1 = Tilemap mode</pre>
+<pre>&nbsp; 7 &#8211; Enable &#8220;Chunky Pixel&#8221; Format (each video data byte fetched is a colour index)<br>&nbsp; 6 &#8211; Enable &#8220;Flood Mode&#8221; - for use with in Chunky Pixel mode<br>&nbsp; 5 - Use bitplane location registers A (0) or B (1) to point to the video data.<br>&nbsp; 4 &#8211; Not Used. <br>&nbsp; 3 &#8211; Enable Horizontal Expand Mode (For chunky mode only)<br>&nbsp; 2 - Video inhibit: 0 = Normal, 1 = Colour index 0 replaces all non-sprite video.<br>&nbsp; 1 - Wide Left Border: 0 = Normal, 1 = Mask first 16 pixels for x-scrolling. <br>&nbsp; 0 &#8211; Display mode: 0 = Bitmap Mode, 1 = Tilemap mode</pre>
 <pre style="text-decoration: underline;">In Legacy Tile Map Mode (IE: When bit 0 is set and bit 0 of VREG_EXT_VIDCRTL is clear)</pre>
 <pre>&nbsp; 7 - Dual Playfield Enable<br>&nbsp; 6 - Playfield B Map Buffer Select<br>&nbsp; 5 - Playfield A Map Buffer Select<br>&nbsp; 4 - Playfield B Tile Set Select <br>&nbsp; 3 - Playfield A Tile Set Select<br>&nbsp; 2 - Video inhibit: 0 = Normal, 1 = Colour index 0 replaces all non-sprite video.<br>&nbsp; 1 - Wide Left Border: 0 = Normal, 1 = Mask first 16 pixels for x-scrolling <br>&nbsp; 0 &#8211; Display mode: 0 = Bitmap Mode, 1 = Tilemap mode</pre>
 <pre style="text-decoration: underline;">In Extended Tile Map Mode (IE: When bit 0 is set, and bit 0 of VREG_EXT_VIDCRTL is set)</pre>
@@ -410,7 +396,7 @@ List:</h3>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;"><span style="font-family: monospace;"><br>
 </span>
-<pre><span style="font-weight: bold;">$203</span> = "vreg_yhws_bplcount" - Vertical Hardware Scroll Settings / Bitplane count</pre>
+<pre><span style="font-weight: bold;">$203</span> = "<span style="font-weight: bold;">vreg_yhws_bplcount</span>" - Vertical Hardware Scroll Settings / Bitplane count</pre>
 <pre><br>In Tilemap mode this register sets two separate hardware scroll values, one for each playfield.<br>To set the scroll value for playfield 0, write to this register with bit 7 clear. To set the scroll<br>value for playfield 1, write to this register with bit 7 set.</pre>
 <pre>&nbsp;&nbsp; 7 - Select Playfield 0 / Playfield 1 Y-scroll register <br>&nbsp;6:4 - Not used<br>&nbsp;3:0 - Vertical Scroll offset value (0 to 15 pixels)</pre>
 <pre><br>In Planar Bitmap Mode this register has a totally different use - setting the number of bitplanes in the display:</pre>
@@ -420,61 +406,61 @@ List:</h3>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre><br>$204 =&nbsp; "vreg_rasthi" - Raster IRQ MSB, enable, clear &amp; Window XY switch </pre>
+<pre><br><span style="font-weight: bold;">$204 =&nbsp; "vreg_rasthi"</span> - Raster IRQ MSB, enable, clear &amp; Window XY switch </pre>
 <pre>&nbsp;&nbsp; 7 - Clear Raster IRQ flag *<br>&nbsp;6:3 - Not Used</pre>
 <pre>&nbsp;&nbsp; 2 - Window Register X/Y switch<br>&nbsp;&nbsp; 1 - Enable Raster IRQ<br>&nbsp;&nbsp; 0 - Raster IRQ Scanline Position MSB</pre>
 <pre>* When this register is written with bit 7 set, the video IRQ flag is cleared and the<br>rest of the register's contents are unchanged</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre><br>$205 = "vreg_rastlo" -&nbsp; Raster IRQ line position </pre>
+<pre><br><span style="font-weight: bold;">$205 = "vreg_rastlo"</span> -&nbsp; Raster IRQ line position </pre>
 <pre>&nbsp;7:0 - Low 8 bits of Raster IRQ scanline position</pre>
 <pre>&nbsp;The counter used in the line comparison starts 16 lines above the first visible <br>&nbsp;scanline (same as the sprites).&nbsp; Note: PAL, NTSC and VGA have different numbers of<br>&nbsp;scanlines and no interrupt will occur if this reqister and rasthi MSB are set<br>&nbsp;to a line the display mode never reaches.</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre><br>$206 = "vreg_vidpage" - Video Page Access Control </pre>
+<pre><br><span style="font-weight: bold;">$206 = "vreg_vidpage"</span> - Video Page Access Control </pre>
 <pre><br>This register selects the 8KB page from the total 512K VRAM appearing at $2000-$3FFF<br>in Z80 address space and the 4KB sprite page accepting writes at $1000-$1fff.</pre>
 <pre>&nbsp;When register written with bit 7 clear: Function is &#8220;set video page&#8221;.</pre>
 <pre>&nbsp;&nbsp; 7 - Write as 0<br>&nbsp;&nbsp; 6 &#8211; Not used</pre>
 <pre>&nbsp;5:0 - Video Page Selection (64 banks - 8KB each) when video memory is paged in.</pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (When Direct VRAM Write mode is active, bits 5:3 select the 64KB bank.)</pre>
 <pre>&nbsp;<br>&nbsp;When written with bit 7 set: Function is &#8220;Set sprite page&#8221;..</pre>
-<pre>&nbsp;7&nbsp;&nbsp; - Write as 1<br>&nbsp;6:5 - Not used<br>&nbsp;4:0 &#8211; Sprite page selection (32 banks - 4KB each) when sprite RAM is paged in.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Note: Sprite RAM is write only)<br><br><br>$207 = "vreg_sprctrl" - Sprite Control </pre>
+<pre>&nbsp;7&nbsp;&nbsp; - Write as 1<br>&nbsp;6:5 - Not used<br>&nbsp;4:0 &#8211; Sprite page selection (32 banks - 4KB each) when sprite RAM is paged in.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Note: Sprite RAM is write only)<br><br><br><span style="font-weight: bold;">$207 = "vreg_sprctrl"</span> - Sprite Control </pre>
 <pre>&nbsp;&nbsp;&nbsp; 7 - Not used, write with zero<br>&nbsp;&nbsp;&nbsp; 6 - &#8220;Fix colours low&#8221; - when set, only colours $00-$7f are used for sprites.<br>&nbsp;&nbsp;&nbsp; 5 - "Matte Mode Enable"&nbsp; *<br>&nbsp;&nbsp;&nbsp; 4 - "Modify Colour MSBs"&nbsp; *<br>&nbsp;&nbsp;&nbsp; 3 &#8211; Enable double buffer sprite register mode.<br>&nbsp;&nbsp;&nbsp; 2 &#8211; Register bank select (use with double buffer register mode) **<br>&nbsp;&nbsp;&nbsp; 1 - Priority Interleave: 0 = All sprites are in foreground. 1 = interleave mode<br>&nbsp;&nbsp;&nbsp; 0 - Global Sprite Enable. All sprites are disabled when this bit is 0</pre>
 <pre><br>* These modes force the upper bits of individual sprite height control registers to be<br>reassigned, see the sprite description text above for details.</pre>
 <pre>** Sprite Register Bank select bit:</pre>
 <pre>&nbsp;0 - Sprite hardware reads sprite registers $400 - $4fd<br>&nbsp;1 - Sprite hardware reads sprite registers $500 - $5fd<br><br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre><br>$208 / $209 = "mult_write" - 16 bit multiplier: </pre>
+<pre><br><span style="font-weight: bold;">$208 / $209 = "mult_write"</span> - 16 bit multiplier: </pre>
 <pre>The signed word written here is multiplied by the word in the multiply table indexed by the<br>following register. 16 bits (29:14) from the resulting 32-bit word are read from "mult_read"<br>(the set of bits was chosen to provide fast scaling.) </pre>
-<pre><br>$20A = "mult_index" - Maths table index (byte): </pre>
+<pre><br><span style="font-weight: bold;">$20A = "mult_index"</span> - Maths table index (byte): </pre>
 <pre>Selects which word from the look up table is used for the multiplication.</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre><br>$20B = "linedraw_colour" - Line draw colour: </pre>
+<pre><br><span style="font-weight: bold;">$20B = "linedraw_colour"</span> - Line draw colour: </pre>
 <pre><br>Colour table index for line draw hardware. (There is only a single colour register, so<br>to maintain a constant line colour, this value should not be changed whilst a line is<br>being drawn.)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre></pre>
-<pre><br>$20c = "vreg_ext_vidctrl"- Extended Video Mode Control Bits</pre>
+<pre><br><span style="font-weight: bold;">$20c = "vreg_ext_vidctrl"</span> - Extended Video Mode Control Bits</pre>
 <pre>&nbsp;&nbsp; &nbsp;7:4 &#8211; n/u<br>&nbsp;&nbsp; &nbsp;&nbsp; 3 &#8211; Enable Hi-Res 16 colour TV mode (no effect in VGA mode)<br>&nbsp;&nbsp; &nbsp;&nbsp; 2 - Enable interlaced TV mode (no effect on VGA output)<br>&nbsp;&nbsp; &nbsp;&nbsp; 1 - Flip Dual Playfield priorities (1 = PF B appears behind PF A)<br>&nbsp;&nbsp; &nbsp;&nbsp; 0 - Use extended tile indexes (1 = on, 0 = "legacy" 8 bit tile indexes)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre></pre>
-<pre><br>$20d = "vreg_linecop_lo"- LineCop LSB and Enable </pre>
+<pre><br><span style="font-weight: bold;">$20d = "vreg_linecop_lo"</span>- LineCop LSB and Enable </pre>
 <pre>&nbsp;&nbsp; &nbsp;7:1 - Linecop program location bits: 7:1<br>&nbsp;&nbsp; &nbsp;&nbsp; 0 - LineCop on/off (1 = enable)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br><br><br>$20e = "vreg_linecop_hi"- LineCop MSB </pre>
+<pre><br><br><br><span style="font-weight: bold;">$20e = "vreg_linecop_hi"</span>- LineCop MSB </pre>
 <pre><br>&nbsp;&nbsp; &nbsp;7:0 - Linecop program location bits 15:8</pre>
 <pre>(Linecop programs must be located at $70000-$7FFFE in system RAM)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre>$20f = "vreg_palette_ctrl"- Palette Control </pre>
+<pre><span style="font-weight: bold;">$20f = "vreg_palette_ctrl"</span>- Palette Control </pre>
 <pre>This register allows independent access to two palette control bits: The "live"<br>palette (ie: that currently being used by the video hardware to fetch the colours)<br>and the palette which receives CPU / LineCop writes. So that each setting can be<br>changed independently (without reads) the register uses a bit (1) to select which<br>register is to be accessed and a bit (0) for the data to be written:</pre>
 <pre>&nbsp; 7:2 - Not used (write with zeroes)<br>&nbsp;&nbsp;&nbsp; 1 - Choose to update "Live Palette Reg" (0) or "Target Palette Reg" (1)<br>&nbsp;&nbsp;&nbsp; 0 - Select palette 0 or 1</pre>
 <pre>Note: Changes to the live palette selection take effect at the start of the next<br>scanline, whereas changes to the target palette register take effect immediately.</pre>
@@ -482,10 +468,10 @@ List:</h3>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
 <pre><span style="text-decoration: underline;">Blitter set-up registers: $210 - $21a:</span><br></pre>
-<pre>$210 = "blit_src_loc" - Source Address in VRAM Low 16 bits (little endian)<br>$212 = "blit_dst_loc" - Destination Address in VRAM Low 16 bits (little endian)<br>$214 = "blit_src_mod" - Source modulo [bits 7:0] **<br>$215 = "blit_dst_mod" - Destination modulo [bits 7:0] **<br>$216 = "blit_height"&nbsp; - Number of lines in blit - 1<br>$217 = "blit_width"&nbsp;&nbsp; - Width of blit in bytes - 1 [Write starts the blit]<br>$218 = "blit_misc"&nbsp;&nbsp;&nbsp; - Misc bits, see assignments below:</pre>
+<pre><span style="font-weight: bold;">$210 = "blit_src_loc" </span>- Source Address in VRAM Low 16 bits (little endian)<br><span style="font-weight: bold;">$212 = "blit_dst_loc"</span> - Destination Address in VRAM Low 16 bits (little endian)<br><span style="font-weight: bold;">$214 = "blit_src_mod"</span> - Source modulo [bits 7:0] **<br><span style="font-weight: bold;">$215 = "blit_dst_mod"</span> - Destination modulo [bits 7:0] **<br><span style="font-weight: bold;">$216 = "blit_height"</span>&nbsp; - Number of lines in blit - 1<br><span style="font-weight: bold;">$217 = "blit_width"&nbsp;</span>&nbsp; - Width of blit in bytes - 1 [Write starts the blit]<br><span style="font-weight: bold;">$218 = "blit_misc"</span>&nbsp;&nbsp;&nbsp; - Misc bits, see assignments below:</pre>
 <pre><br>Bit&nbsp; 7 - Transparency mode: If 1 then zero value bytes read from source are not written.<br>&nbsp;&nbsp;&nbsp;&nbsp; 6 - Blit Direction: Ascending = 1 / Descending = 0 <br>&nbsp;&nbsp;&nbsp;&nbsp; 5 - Legacy destination Address MSb [bit 16] - see note below<br>&nbsp;&nbsp;&nbsp;&nbsp; 4 - Legacy source Address MSb [bit 16] - see note below<br>&nbsp;&nbsp;&nbsp;&nbsp; 3 - Destination Modulo bit 9 (Sign)<br>&nbsp;&nbsp;&nbsp;&nbsp; 2 - Destination Modulo bit 8<br>&nbsp;&nbsp;&nbsp;&nbsp; 1 - Source Modulo bit 9 (Sign)<br>&nbsp;&nbsp;&nbsp;&nbsp; 0 - Source Modulo bit 8</pre>
 <pre>(blitter registers continued..)</pre>
-<pre><br>$219 = "blit_src_msb" - 2:0 highest three bits [18:16] of source address #<br>$21a = "blit_dst_msb" - 2:0 highest three bits [18:16] of destination address #</pre>
+<pre><br><span style="font-weight: bold;">$219 = "blit_src_msb"</span> - 2:0 highest three bits [18:16] of source address #<br><span style="font-weight: bold;">$21a = "blit_dst_msb"</span> - 2:0 highest three bits [18:16] of destination address #</pre>
 <pre><br># Bit 16 is internally OR'd with the equivalent bit in "blit_misc", this is</pre>
 <pre>&nbsp; for backwards compatibility. If you are only accessing video addresses &lt; 128KB<br>&nbsp; you can just use the "blit_misc" and ignore these two registers. Conversely if<br>&nbsp; you are generally using the entire VRAM range its best to use these registers<br>&nbsp; and write the MSB bits in "blit_misc" with zeroes.</pre>
 <pre>Writing to &#8220;blit_width&#8221; actually starts the blit operation. Remember, the height<br>and width values should be the blit dimensions less one.</pre>
@@ -497,21 +483,21 @@ List:</h3>
 <pre><br><span style="text-decoration: underline;">Line Draw:</span><br><br>$220-$23f = Line draw set-up registers (all are 16 bit words)</pre>
 <pre>The line draw system utilizes two main groups of registers: Control registers that<br>need to be set up for each line, and an overall look-up table that only needs to be<br>set up once on initialization.</pre>
 <pre>The following four control words need to be set up for each line:</pre>
-<pre>$220/1 = Linedraw_reg0 - Bresenham decision=0 constant: 2 x (dy - dx) *<br>$222/3 = Linedraw_reg1 - Bresenham decision=1 constant: 2 x (dy)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br>$224/5 = Linedraw_reg2 - Video RAM start address of line (bits 15:0)<br>$226/7 = Linedraw_reg3 - Composite word - see below. Also, writing to(the LSB of)<br>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this register actually starts the line drawing operation, so<br>	the line draw busy flag should be checked beforehand.</pre>
+<pre><span style="font-weight: bold;">$220/1 = Linedraw_reg0</span> - Bresenham decision=0 constant: 2 x (dy - dx) *<br><span style="font-weight: bold;">$222/3 = Linedraw_reg1</span> - Bresenham decision=1 constant: 2 x (dy)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *<br><span style="font-weight: bold;">$224/5 = Linedraw_reg2</span> - Video RAM start address of line (bits 15:0)<br><span style="font-weight: bold;">$226/7 = Linedraw_reg3</span> - Composite word - see below. Also, writing to(the LSB of)<br>                         this register actually starts the line drawing operation, so<br>                         the line draw busy flag should be checked beforehand.</pre>
 <pre><br>Linedraw_reg3 breakdown:</pre>
 <pre>Bit 15&nbsp;&nbsp;&nbsp; : (Legacy) MSB of line's VRAM start address [Bit 16] - See bits 11:9<br>&nbsp;&nbsp;&nbsp; 14:12 : Octant code (bit12: dx is negative, bit13: dy is negative, bit14: dy =&gt; dx *<br>&nbsp;&nbsp;&nbsp; 11:9&nbsp; : Line VRAM start address: Bits 18:16 (NB: bit9 is internally OR'd with bit 15)<br>&nbsp;&nbsp;&nbsp; 8:0&nbsp;&nbsp; : Line length</pre>
 <pre><br>*&nbsp; 1. Registers should be written with positive values, the sign of the value is held<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; in the octant code.</pre>
 <pre>&nbsp;&nbsp; 2. If bit 14 of the composite word is set (because dy =&gt; dx) then the Bresenham<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; decision 0 register should be loaded with 2 x (dx - dy) and decision register<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; should be loaded with 2 x (dx)</pre>
 <pre>The next 4 register addresses (8 bytes) have the same function as registers $220-$227,<br>however they address separate internal locations. Having two sets of line-draw registers<br>allows one set to be loaded whilst a previous line draw operation is still running.<br>(The line_draw busy flag in vreg_read only needs to be checked before writing to the<br>LSB of linedraw_reg3/7 (which starts the linedraw) or the linedraw_colour register,<br>if changing colour.</pre>
-<pre>$228/9 = linedraw_reg4 - Same function as $220/1 for register set 2<br>$22a/b = linedraw_reg5 - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "" $222/3 for register set 2<br>$22c/d = linedraw_reg6 - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "" $224/5 for register set 2<br>$22e/f = linedraw_reg7 - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "" $226/7 for register set 2</pre>
+<pre><span style="font-weight: bold;">$228/9 = linedraw_reg4</span> - Same function as $220/1 for register set 2<br><span style="font-weight: bold;">$22a/b = linedraw_reg5</span> - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "" $222/3 for register set 2<br><span style="font-weight: bold;">$22c/d = linedraw_reg6</span> - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "" $224/5 for register set 2<br><span style="font-weight: bold;">$22e/f = linedraw_reg7</span> - ""&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "" $226/7 for register set 2</pre>
 <pre>The following 8 words form a look-up table used to offset the plot address of each<br>pixel, hence these registers need only be set once as part of an initialization routine,<br>IE: not per line.</pre>
-<pre>$230/1 = linedraw_lut0 - Pixel offset constant 0 .. (65536-Window width)+1 <br>$232/3 = linedraw_lut1 - Pixel offset constant 1 .. (65536-Window width)-1<br>$234/5 = linedraw_lut2 - Pixel offset constant 2 .. Window width + 1<br>$236/7 = linedraw_lut3 - Pixel offset constant 3 .. Window width - 1<br>$238/9 = linedraw_lut4 - Pixel offset constant 4 .. 1<br>$23a/b = linedraw_lut5 - Pixel offset constant 5 .. 65535<br>$23c/d = linedraw_lut6 - Pixel offset constant 6 .. (65536 - Window width)<br>$23e/f = linedraw_lut7 - Pixel offset constant 7 .. Window width </pre>
+<pre>$<span style="font-weight: bold;">230/1 = linedraw_lut0</span> - Pixel offset constant 0 .. (65536-Window width)+1 <br><span style="font-weight: bold;">$232/3 = linedraw_lut1</span> - Pixel offset constant 1 .. (65536-Window width)-1<br><span style="font-weight: bold;">$234/5 = linedraw_lut2</span> - Pixel offset constant 2 .. Window width + 1<br><span style="font-weight: bold;">$236/7 = linedraw_lut3</span> - Pixel offset constant 3 .. Window width - 1<br><span style="font-weight: bold;">$238/9 = linedraw_lut4</span> - Pixel offset constant 4 .. 1<br><span style="font-weight: bold;">$23a/b = linedraw_lut5</span> - Pixel offset constant 5 .. 65535<br><span style="font-weight: bold;">$23c/d = linedraw_lut6</span> - Pixel offset constant 6 .. (65536 - Window width)<br><span style="font-weight: bold;">$23e/f = linedraw_lut7</span> - Pixel offset constant 7 .. Window width </pre>
 <pre>(See also: Line colour register $20B - "linedraw_colour")</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
 <pre style="text-decoration: underline;">Bitplane location registers: $240 - $27f: </pre>
-<pre>$240 = bitplane0a_loc (BPl register set A)<br>$244 = bitplane1a_loc (BPl register set A)<br>$248 = bitplane2a_loc (BPl register set A)<br>$24c = bitplane3a_loc (BPl register set A)<br>$250 = bitplane4a_loc (BPl register set A)<br>$254 = bitplane5a_loc (BPl register set A)<br>$258 = bitplane6a_loc (BPl register set A)<br>$25c = bitplane7a_loc (BPl register set A)</pre>
+<pre><span style="font-weight: bold;">$240 = bitplane0a_loc</span> (BPl register set A)<br><span style="font-weight: bold;">$244 = bitplane1a_loc</span> (BPl register set A)<br><span style="font-weight: bold;">$248 = bitplane2a_loc</span> (BPl register set A)<br><span style="font-weight: bold;">$24c = bitplane3a_loc</span> (BPl register set A)<br><span style="font-weight: bold;">$250 = bitplane4a_loc</span> (BPl register set A)<br><span style="font-weight: bold;">$254 = bitplane5a_loc</span> (BPl register set A)<br><span style="font-weight: bold;">$258 = bitplane6a_loc</span> (BPl register set A)<br><span style="font-weight: bold;">$25c = bitplane7a_loc</span> (BPl register set A)</pre>
 <pre><br>$260-$27f = As above for Bitplane location register set B. Bit 5 of "vreg_vidctrl"<br>controls which set is used by the hardware to build the display.</pre>
 <pre>Each bitplane location "register" is 4 bytes long, the data required for each is:</pre>
 <pre>Offset:&nbsp; Data:<br>------------------------------------------------<br>+ 0&nbsp;&nbsp; =&nbsp; Location of Bitplane in video RAM [7:0]<br>+ 1&nbsp;&nbsp; =&nbsp; Location of Bitplane in video RAM [15:8]<br>+ 2&nbsp;&nbsp; =&nbsp; Location of Bitplane in video RAM [18:16]<br>+ 3&nbsp;&nbsp; =&nbsp; Reset internal offset counter / Set Modulo - see notes below</pre>
@@ -522,7 +508,7 @@ List:</h3>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
-<pre><br><span style="text-decoration: underline;">Sprite priority mask registers $280 - $28F:</span></pre>
+<pre><br><span style="text-decoration: underline;">Sprite priority mask registers $280 - $28F: <span style="font-weight: bold;">"priority_registers"</span></span></pre>
 <pre>$280: Bit 0: bgnd colours 00-0F mask level 0, Bit 1: bgnd colours 00-0F mask level 1<br>$281: Bit 0: bgnd colours 10-1F mask level 0, Bit 1: bgnd colours 10-1F mask level 1<br>$282: Bit 0: bgnd colours 20-2F mask level 0, Bit 1: bgnd colours 20-2F mask level 1<br>$283: Bit 0: bgnd colours 30-3F mask level 0, Bit 1: bgnd colours 30-3F mask level 1<br>$284: Bit 0: bgnd colours 40-4F mask level 0, Bit 1: bgnd colours 40-4F mask level 1<br>$285: Bit 0: bgnd colours 50-5F mask level 0, Bit 1: bgnd colours 50-5F mask level 1<br>$286: Bit 0: bgnd colours 60-6F mask level 0, Bit 1: bgnd colours 60-6F mask level 1<br>$287: Bit 0: bgnd colours 70-7F mask level 0, Bit 1: bgnd colours 70-7F mask level 1<br>$288: Bit 0: bgnd colours 80-8F mask level 0, Bit 1: bgnd colours 80-8F mask level 1<br>$289: Bit 0: bgnd colours 90-9F mask level 0, Bit 1: bgnd colours 90-9F mask level 1<br>$28A: Bit 0: bgnd colours A0-AF mask level 0, Bit 1: bgnd colours A0-AF mask level 1<br>$28B: Bit 0: bgnd colours B0-BF mask level 0, Bit 1: bgnd colours B0-BF mask level 1<br>$28C: Bit 0: bgnd colours C0-CF mask level 0, Bit 1: bgnd colours C0-CF mask level 1<br>$28D: Bit 0: bgnd colours D0-DF mask level 0, Bit 1: bgnd colours D0-DF mask level 1<br>$28E: Bit 0: bgnd colours E0-EF mask level 0, Bit 1: bgnd colours E0-EF mask level 1<br>$28F: Bit 0: bgnd colours F0-FF mask level 0, Bit 1: bgnd colours F0-FF mask level 1<br><br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><br><span style="text-decoration: underline;">Maths Assist Table:</span><br><br>$600-$7FF = "mult_table" WRITE ONLY </pre>
@@ -542,7 +528,7 @@ ROM</span> </h3>
 <h1>INDEX:</h1>
 <pre><br></pre>
 <h3 style="text-decoration: underline;">Port List:</h3>
-<pre>Port: Dir: Name:<br>---------------------------------<br>$00 R/W sys_mem_select<br>$01 R sys_irq_ps2_flags<br>$01 W sys_irq_enable<br>$02 R sys_keyboard_data<br>$02 W sys_clear_irq_flags<br>$03 R sys_mouse_data<br>$03 W sys_ps2_joy_control<br>$04 R/W sys_serial_port<br>$05 R sys_joy_com_flags<br>$05 W sys_sdcard_ctrl1 <br>$06 R/W sys_sdcard_ctrl2 <br>$07 R sys_vreg_read<br>$07 W sys_timer <br>$08 R sys_audio_flags<br>$08 W sys_audio_enable<br>$09 R sys_hw_flags <br>$09 W sys_hw_settings <br>$0a R/W sys_spi_port <br>$0b R/W sys_alt_write_page<br>$0c W sys_baud_rate <br>$0d R sys_eeprom_byte <br>$0d W sys_pic_comms <br>$0e R/W sys_io_pins <br>$0f R/W sys_io_dir <br><br>$10 W audchan0_loc<br>$11 W audchan0_len<br>$12 W audchan0_per<br>$13 W audchan0_vol<br>$14 W audchan1_loc<br>$15 W audchan1_len<br>$16 W audchan1_per<br>$17 W audchan1_vol<br>$18 W audchan2_loc<br>$19 W audchan2_len<br>$1a W audchan2_per<br>$1b W audchan2_vol<br>$1c W audchan3_loc<br>$1d W audchan3_len<br>$1e W audchan3_per<br>$1f W audchan3_vol<br><br>$20 R/W sys_low_page <br>$21 W sys_vram_location<br>$22 W sys_audio_panning <br><br><br></pre>
+<pre>Port: Dir: Name:<br>-----------------------<br>$00 R/W sys_mem_select<br>$01 R sys_irq_ps2_flags<br>$01 W sys_irq_enable<br>$02 R sys_keyboard_data<br>$02 W sys_clear_irq_flags<br>$03 R sys_mouse_data<br>$03 W sys_ps2_joy_control<br>$04 R/W sys_serial_port<br>$05 R sys_joy_com_flags<br>$05 W sys_sdcard_ctrl1 <br>$06 R/W sys_sdcard_ctrl2 <br>$07 R sys_vreg_read<br>$07 W sys_timer <br>$08 R sys_audio_flags<br>$08 W sys_audio_enable<br>$09 R sys_hw_flags <br>$09 W sys_hw_settings <br>$0a R/W sys_spi_port <br>$0b R/W sys_alt_write_page<br>$0c W sys_baud_rate <br>$0d R sys_eeprom_byte <br>$0d W sys_pic_comms <br>$0e R/W sys_io_pins <br>$0f R/W sys_io_dir <br><br>$10 W audchan0_loc<br>$11 W audchan0_len<br>$12 W audchan0_per<br>$13 W audchan0_vol<br>$14 W audchan1_loc<br>$15 W audchan1_len<br>$16 W audchan1_per<br>$17 W audchan1_vol<br>$18 W audchan2_loc<br>$19 W audchan2_len<br>$1a W audchan2_per<br>$1b W audchan2_vol<br>$1c W audchan3_loc<br>$1d W audchan3_len<br>$1e W audchan3_per<br>$1f W audchan3_vol<br><br>$20 R/W sys_low_page <br>$21 W sys_vram_location<br>$22 W sys_audio_panning <br><br>$24 W audchan0_loc_hi<br>$24 W audchan1_loc_hi<br>$24 W audchan2_loc_hi<br>$24 W audchan3_loc_hi<br><br></pre>
 <h3 style="text-decoration: underline;">Video Register
 List:</h3>
 <pre>($000-$6FF are all write only)<br><br><br>Location: Size: Name:<br>---------------------<br><br>$0000 256*W palette <br><br>$0200 B vreg_xhws<br>$0201 B vreg_vidctrl<br>$0202 B vreg_window<br>$0203 B vreg_yhws_bplcount<br>$0204 B vreg_rasthi<br>$0205 B vreg_rastlo<br>$0206 B vreg_vidpage<br>$0207 B vreg_sprctrl<br>$0208 B mult_write<br>$020a B mult_index<br>$020b B linedraw_colour<br>$020c B vreg_ext_vidctrl<br>$020d B vreg_linecop_lo<br>$020e B vreg_linecop_hi<br>$020f B vreg_palette_ctrl<br><br>$0210 W blit_src_loc<br>$0212 W blit_dst_loc<br>$0214 B blit_src_mod<br>$0215 B blit_dst_mod<br>$0216 B blit_height<br>$0217 B blit_width<br>$0218 B blit_misc<br>$0219 B blit_src_msb<br>$021a B blit_dst_msb<br><br>$0220 W linedraw_reg0<br>$0222 W linedraw_reg1<br>$0224 W linedraw_reg2<br>$0226 W linedraw_reg3<br>$0228 W linedraw_reg4 <br>$022a W linedraw_reg5<br>$022c W linedraw_reg6<br>$022e W linedraw_reg7<br><br>$0230 W linedraw_lut0<br>$0232 W linedraw_lut1<br>$0234 W linedraw_lut2<br>$0236 W linedraw_lut3<br>$0238 W linedraw_lut4 <br>$023a W linedraw_lut5<br>$023c W linedraw_lut6<br>$023e W linedraw_lut7<br><br>$0240 T bitplane0a_loc<br>$0243 B bitplane_reset<br>$0244 T bitplane1a_loc<br>$0247 B bitplane_modulo<br>$0248 T bitplane2a_loc<br>$024c T bitplane3a_loc<br>$0250 T bitplane4a_loc<br>$0254 T bitplane5a_loc<br>$0258 T bitplane6a_loc<br>$025c T bitplane7a_loc<br><br>$0260 T bitplane0b_loc<br>$0264 T bitplane1b_loc<br>$0268 T bitplane2b_loc<br>$026c T bitplane3b_loc<br>$0270 T bitplane4b_loc<br>$0274 T bitplane5b_loc<br>$0278 T bitplane6b_loc<br>$027C T bitplane7b_loc<br><br>$0280 16*B priority_registers<br><br>$0400 128*D sprite_registers<br><br>$0600 256*W mult_table<br><br>$0700 B vreg_read (READ ONLY)<br>$0704 W mult_read (READ ONLY)<br><br><br><span style="text-decoration: underline;">Size key:</span><br><br>B = byte, W = word, T = triple byte, D = Double Word<br></pre>

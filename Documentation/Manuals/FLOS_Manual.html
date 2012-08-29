@@ -4,7 +4,7 @@
 <body>
 <h3>FLOS: A Simple Command Line Operating System for OSCA on the
 V6Z80P by Phil Ruston</h3>
-<pre>Last updated 23th August 2012, for FLOS v603</pre>
+<pre>Last updated 28th August 2012, for FLOS v604</pre>
 <pre><span style="text-decoration: underline;"><br>Description:</span></pre>
 <pre>FLOS operates in a similar manner to the memory monitor / freezer cartridges of the home computer era.<br>In some ways it also behaves like a more modern DOS, allowing disk-based programs to be executed by<br>entering their filenames etc. </pre>
 <pre><span style="text-decoration: underline;"><br>Installation and OS file details:</span></pre>
@@ -47,7 +47,7 @@ V6Z80P by Phil Ruston</h3>
 <pre>If necessary, programs (IE: files with .exe extensions) can be made to load and run from a<br>specific location and also be truncated to 'n' bytes. This is achieved by putting the following<br>header at the start of the code:</pre>
 <pre>--------------------------------------------------------------------------------------------------</pre>
 <pre>my_location equ $f000&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;</pre>
-<pre>my_bank equ $00 ; desired bank (used if location is $8000 to $FFFF)<br><br> org my_location&nbsp;&nbsp;; desired load address<br><br>load_loc db $ed,$00&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ; header ID (Invalid but safe Z80 instruction)<br> jr exec_addr&nbsp;&nbsp; &nbsp; ; jump over remaining header data <br> dw load_loc&nbsp;&nbsp; &nbsp;&nbsp; ; location file should load to<br> db my_bank&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ; upper 32KB bank that file should load into<br> db xy&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ; control byte: 1=truncate using next 3 bytes<br> dw abcd&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; ; Load length 15:0 (if truncate feature required)<br> db ef&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ; Load length 23:16 (""&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;"")</pre>
+<pre>my_bank equ $00 ; desired bank (used if location is $8000 to $FFFF)<br><br>          org my_location&nbsp;&nbsp;; desired load address<br><br>load_loc  db $ed,$00&nbsp;&nbsp; &nbsp;   ; header ID (Invalid but safe Z80 instruction)<br>          jr exec_addr&nbsp;&nbsp;   ; jump over remaining header data <br>          dw load_loc&nbsp;&nbsp; &nbsp;  ; location file should load to <br>          db my_bank&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ; upper 32KB bank that file should load into<br>          db xy&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;  ; control byte: 1=truncate using next 3 bytes<br>          dw abcd&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;  ; Load length 15:0 (if truncate feature required)<br>          db ef            ; Load length 23:16 (""&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;"")</pre>
 <pre>exec_addr</pre>
 <pre>---------------------------------------------------------------------------------------------------</pre>
 <pre><br>Main program execution begins from "exec_addr". The labels "my_location" and "my_bank" obviously<br>should be set to suit the program. (Note: The header is loaded to "my_location" as a normal part<br>of the file).</pre>
@@ -61,7 +61,7 @@ V6Z80P by Phil Ruston</h3>
 <pre>Video RAM&nbsp; : $10000-$1FFFF</pre>
 <pre> OS display bitplanes: $10000,$12000,$14000,$16000,$18000,$1A000<br>&nbsp;Char colour buffer&nbsp; : $1C000-$1C3E8<br> <span style="font-style: italic;">Window routines : $1C400-$1DFFF (Note: Not actually used by FLOS itself)</span><br>&nbsp;Font bitplane images: $1E000-$1FFFF</pre>
 <pre>Sprite RAM : $1FF00-$1FFFF</pre>
-<pre>Also used by FLOS: The video registers associated with bitmap planar display, The timer hardware,<br>IRQ mode 1 for keyboard (and mouse), The Blitter, The Maths Table (first word, index and mult_write)</pre>
+<pre>Also used by FLOS: The video registers associated with bitmap planar display, The timer hardware,<br>IRQ mode 1 for keyboard (and mouse) and the Blitter.</pre>
 <pre>If the user program has made radical changes to these systems, then it may be best to restart FLOS<br>on exit (clear the carry flag and set accumulator to $FF)</pre>
 <pre>As FLOS internally uses the blitter and the first word of the hardware multiply table (index 0) &#8211;<br>user programs should take into account that these systems are reset to the values FLOS requires<br>every time control is passed to it (via KJT calls etc) and will not be restored upon return.</pre>
 <pre><br><span style="text-decoration: underline;">Debugging:</span></pre>
