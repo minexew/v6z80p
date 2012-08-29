@@ -2,6 +2,18 @@
 Current FLOS version:
 ---------------------
 
+v6.04 - 28/08/2012
+
+	Added:  Sets all four "aud_loc_hi" registers to $01 for backward compatibilty with OSCA v672
+
+        Change: FLOS no longer uses the hardware assist mult_table (display width fixed at 40 columns).
+
+
+
+Previous changes:
+-----------------
+
+
 V6.03 - 18/08/2012
 
 	Added - kjt_read_baddr		- read byte from bank:addr when code is in any bank
@@ -11,8 +23,6 @@ V6.03 - 18/08/2012
 	Change: kjt_ascii_to_hexword	- Sets ZF on return if no error (IE: A is 0)
 
 
-Previous changes:
------------------
 
 
 V6.02 - 12/06/12
