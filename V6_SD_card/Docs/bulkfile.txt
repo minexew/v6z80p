@@ -1,0 +1,41 @@
+
+BULKFILE.EXE - Collates all files in dir
+
+Use: BULKFILE filename
+
+The resulting file contains a header
+followed by all the files from the
+source directory joined end-to-end.
+
+The header is a file index. Each entry
+is 16 bytes long. The header is
+terminated with a zero:
+
+Header Format:
+
+First entry (not a file)
+------------------------
+$00       : $FF 
+$01 - $0C : 0
+$0D       : Length of header (ab,cd,ef)
+
+Other entries (file indices)
+----------------------------
+$00 - $0B : Filename
+$0C       : 0
+$0D - $0F : Length of file (ab,cd,ef)
+
+Termination:
+------------
+$00: 0
+
+Collated files can be used with the
+bulk_load routine in the code library
+to replace long directory with a
+single .dat file. Optionally, the
+collated file could be attached to
+end of an .exe, reducing everything
+to a single file (the program load
+truncation header should be employed
+in this case).
+
