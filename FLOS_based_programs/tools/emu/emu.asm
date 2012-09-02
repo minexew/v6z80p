@@ -10,6 +10,7 @@
 ; Changes:
 ; --------
 ;
+; V0.06 - Tests OSCA version on boot
 ; V0.05 - Options 1/2 disabled in ESXDOS mode
 ; v0.04 - Supports jumper Exp_b detect for RESIDOS/ESXDOS.NVR select: Closed = ESXDOS, Open = Residos
 ;         (Note: If OSCA is < $671, the pin is ignored due to lack of weak pullup: Residos only.)       
@@ -31,6 +32,9 @@ include "system_equates.asm"
 
 required_flos	equ $602
 include 		"test_flos_version.asm"
+
+required_osca	equ $671
+include 		"test_osca_version.asm"
 
 ;----------------------------------------------------------------------------------------------
 
@@ -69,15 +73,8 @@ lcfgbad	pop de
 
 ;----------------------------------------------------------------------------------------------
 
-	call kjt_get_version		;if OSCA version < $671, dont read pin ExpB
-	ld hl,$670			;(always use Residos)
-	xor a
-	sbc hl,de
-	jr nc,start
 	ld a,2
 	out (sys_io_dir),a			;make sure exp B jumper is in input mode
-	ld a,1
-	ld (esxdos_allowed),a
 	call read_expb
 	ld (residos_esxdos),a		;0 = residos, 1 = esxdos
 	
@@ -88,10 +85,7 @@ start	call update_vars_from_cfg_file
 menu_text	call kjt_clear_screen
 	call show_menu
 	
-menu_wait	ld a,(esxdos_allowed)		;has jumper exp_b changed?
-	or a
-	jr z,read_key	
-	call read_expb
+menu_wait	call read_expb			;has jumper exp_b changed?
 	ld hl,residos_esxdos
 	cp (hl)
 	jr z,read_key			
@@ -1185,7 +1179,6 @@ bootcode_text	db "BOOTCODE ETC",0
 
 ;-------------------------------------------------------------------------------------------------
 
-esxdos_allowed	db 0
 residos_esxdos	db 0
 
 pen_colour	db 0
