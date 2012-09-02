@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"cd" - Change Dir command. V6.09
+;"cd" - Change Dir command. V6.08
 ;-----------------------------------------------------------------------
 
 os_cmd_cd	
@@ -7,26 +7,28 @@ os_cmd_cd
 	call kjt_check_volume_format	
 	ret nz
 
-	ld a,(current_volume)
-	ld (original_vol_cd_cmd),a
-	push hl
-	call fs_get_dir_block
-	ld (original_dir_cd_cmd),de
-	pop hl
 
 	ld a,(hl)				; if no args, just show dir path		
 	or a				
 	jp z,cd_show_path		
 
-	ld a,(hl)				
-	cp $2f			
-	jr nz,cd_nogor			; if "/" = go root
-	push hl
-	call kjt_root_dir	
-	pop hl
-	ret nz
+
+	ld a,(hl)				;".." = goto parent dir
 	inc hl
-	jr cd_margs			; more args follow?
+	ld b,(hl)
+	dec hl
+	cp "."			
+	jr nz,cd_nual
+	cp b
+	jr nz,cd_nual
+	call kjt_parent_dir	
+	ret
+
+
+cd_nual	cp $2f			
+	jr nz,cd_nogor			; "/" char = go root
+	call kjt_root_dir	
+	ret
 	
 	
 cd_nogor	cp "%"				; "%" char = go assigned dir
@@ -52,10 +54,13 @@ cd_evok	ld e,(hl)
 	
 cd_no_assign
 
+	ld a,(current_volume)
+	ld (original_vol_cd_cmd),a
+
 	push hl
 	pop ix
 	ld a,(ix+4)
-	cp ":"				; wish to change volume?
+	cp ":"			; wish to change volume?
 	jr nz,cd_nchvol
 	ld de,vol_txt+1
 	ld b,3
@@ -63,57 +68,36 @@ cd_no_assign
 	jr nc,cd_nchvol
 	ld de,5
 	add hl,de
-	ld (os_args_start_lo),hl		; update args position
-	ld a,(ix+3)			; volume digit char
+	ld (os_args_start_lo),hl	; update args position
+	ld a,(ix+3)		; volume digit char
 	sub $30
 	call os_change_volume
-	ret nz				; error if new volume is invalid
-	call kjt_root_dir			; go to new drive's root block as drive has changed
-
+	ret nz			; error if new volume is invalid
+	call kjt_root_dir		; go to new drive's root block as drive has changed
 	ld hl,(os_args_start_lo)
-cd_margs	ld a,(hl)
 	cp " "
-	jr nz,cd_mollp			; look for additional paths in args
-cd_done	xor a
+	jr nz,cd_mollp		; look for additional paths in args
+	xor a
 	ret
 
-cd_nchvol	ld a,(hl)
-	cp "."
-	jr nz,cd_mollp
-	inc hl
-	ld a,(hl)
-	cp "."
-	jr nz,cd_dcherr
-	push hl
-	call kjt_parent_dir	
-	pop hl
-	ret nz
-	inc hl
-	jr cd_mol
+cd_nchvol	call fs_get_dir_block
+	ld (original_dir_cd_cmd),de
 
-cd_mollp	ld a,(hl)
-	or a
-	ret z
-	cp " "
-	jr nz,cd_gdn
-	inc hl
-	jr cd_mollp
-	
-cd_gdn	push hl
-	call kjt_change_dir			;step through args changing dirs as apt
+cd_mollp	push hl
+	call kjt_change_dir		;step through args changing dirs as apt
 	pop hl
 	jr nz,cd_dcherr
-cd_mol	ld a,(hl)				;move to next dir name in args (after "/") if no more found, quit
+cd_mol	ld a,(hl)			;move to next dir name in args (after "/") if no more found, quit
 	inc hl
 	or a
 	ret z
-	cp $2f				;"/"?
-	jr z,cd_nchvol
+	cp $2f
+	jr z,cd_mollp
 	jr cd_mol
 		
 cd_dcherr	
 
-	push af				;if a dir is not found go back to original dir and drive 
+	push af			;if a dir is not found go back to original dir and drive 
 	ld de,(original_dir_cd_cmd)
 	call fs_update_dir_block
 	ld a,(original_vol_cd_cmd)
@@ -172,4 +156,3 @@ original_dir_cd_cmd	equ scratch_pad
 original_vol_cd_cmd equ scratch_pad+2
 		
 ;--------------------------------------------------------------------------------------------------
-
