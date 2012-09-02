@@ -1,14 +1,11 @@
 ;=======================================================================================
 ;
-; COMMAND LINE PROTRACKER PLAYER FOR FLOS V1.05 by Phil Ruston & Daniel Illgen
+; COMMAND LINE PROTRACKER PLAYER FOR FLOS V1.04 by Phil Ruston & Daniel Illgen
 ;
 ; Usage: modplay [?] songname
 ;
-; Max pattern file size = approx 37K
-; Max sample file size = 448KB
-;
-; V1.05 - Includes Proracker Player 5.14 - Supports large sample range 
-;         Requires OSCA v672
+; Max pattern file size = around 36K
+; Max sample file size = 128K
 ;
 ; V1.04 - If "?" is first arg, show raster time.
 ;         Quit using normal FLOS error for file not found, load errors ($80 for others)
@@ -26,11 +23,6 @@ include "OSCA_hardware_equates.asm"
 include "system_equates.asm"
 
 	org $5000
-
-
-	required_osca equ $672
-	
-include 	"test_osca_version.asm"
 
 ;=======================================================================================
 
@@ -140,10 +132,9 @@ ptl	inc hl
 	ld bc,(pattlen)
 	add hl,bc
 	jp c,pattern_too_big
-	
 	ld hl,(samplelenhi)
 	ld a,l
-	cp 7
+	cp 2
 	jp nc,samples_too_big
 
 	ld hl,modu_filename		; load pattern data
@@ -157,19 +148,17 @@ ptl	inc hl
 	call kjt_force_load
 	ret nz
 		
-	ld iy,(samplelen)		; load samples data to $10000
+	ld iy,(samplelen)		; load samples data
 	ld ix,(samplelenhi)
 	call kjt_set_load_length
-	ld b,1			; bank 1
-	ld hl,$8000		; address $8000 
+	ld b,3			; bank 3 (audio ram base)
+	ld hl,$8000		; address to load to 
 	call kjt_force_load
 	ret nz
 	
-	ld a,$01
-	ld hl,$0000
-	call pt_set_sample_base	;set sample_base to $10000 in player
-	
-	call pt_init		;initialize tune
+	ld hl,0
+	ld (force_sample_base),hl	
+	call init_tracker		;initialize mod with forced sample_base
 
 	ld hl,playing_text
 	call kjt_print_string
@@ -193,13 +182,17 @@ wvrtend	ld a,(vreg_read)
 
 
 
-wait_bord	in a,(sys_vreg_read)	; wait until raster on screen so we can see how much
+wait_bord	ld a,(vreg_read)		; wait until raster on screen so we can see how much
 	bit 2,a			; time the actual music playing routine is taking
 	jr z,wait_bord
 
 	ld hl,$0f0 		; border colour = green
 	call change_border
-	call osca_play_tracker	; update OSCA sound hardware
+	call update_sound_hardware	; update OSCA sound hardware
+
+	ld hl,$f00 		; border colour = red
+	call change_border
+	call play_tracker		; main z80 tracker code
 
 	ld hl,(orig_border_colour)	; border colour = blue 
 	call change_border
@@ -207,14 +200,9 @@ wait_bord	in a,(sys_vreg_read)	; wait until raster on screen so we can see how m
 	or a
 	jr z,wvrtstart		; loop if no key pressed
 
-	ld a,1			; restore audio high registers to $01 for backward
-	out (audchan0_loc_hi),a	; compatibility
-	out (audchan1_loc_hi),a
-	out (audchan2_loc_hi),a
-	out (audchan3_loc_hi),a
-	
 	xor a
 	out (sys_audio_enable),a	; silence channels
+	xor a			; and quit
 	ret
 	
 ;--------------------------------------------------------------------------------------------
@@ -253,13 +241,13 @@ samples_too_big
 show_raster	db 0
 orig_border_colour	dw 0
 
-nfn_text		db "Modplay version 1.05",11,"Usage: MODPLAY [modname]",11,0
+nfn_text		db "Modplay version 1.04",11,"Usage: Modplay [modname]",11,0
 mod_ext         	db ".MOD",0
 
 mload_text	db 11,"Loading module: ",0
 playing_text	db 11,"Playing tune. Any key to quit.",11,11,0
-pattern_error_text	db 11,"Pattern data is too long!",11,11,0
-samples_error_text	db 11,"Sample data is too long!",11,11,0
+pattern_error_text	db 11,"Pattern data is too big!",11,11,0
+samples_error_text	db 11,"Sample data is too big!",11,11,0
 
 filelen         	dw 0
 filelenhi       	dw 0
@@ -267,7 +255,7 @@ pattlen         	dw 0
 samplelen       	dw 0
 samplelenhi     	dw 0
 
-include 		"Protracker_code_v514.asm"
+include 		"50Hz_60Hz_Protracker_code_v513.asm"
 
 ;-------------------------------------------------------------------------------------------------
 
