@@ -2,16 +2,24 @@
 Current FLOS version:
 ---------------------
 
+v6.05 - 02/09/2012
+
+	Bugfix: Ports $24-$27 are now only reset if OSCA > $671
+        
+        Improvement: CD argument parsing improved: "cd ../../some_dir", "cd /some_root_dir" etc allowed
+
+
+
+Previous changes:
+-----------------
+
+
 v6.04 - 28/08/2012
 
 	Added:  Sets all four "aud_loc_hi" registers to $01 for backward compatibilty with OSCA v672
 
         Change: FLOS no longer uses the hardware assist mult_table (display width fixed at 40 columns).
 
-
-
-Previous changes:
------------------
 
 
 V6.03 - 18/08/2012
