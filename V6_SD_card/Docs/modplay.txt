@@ -1,9 +1,13 @@
 
 MODPLAY - Plays Protracker format tunes.
 
-Use: MODPLAY filename
+Use: MODPLAY [?] filename
 
 Notes:
 
-Total samples in module must be < 128KB
+OSCA v672+ required. 
+
+Total samples in module must be < 448KB
+
+If ? is included, raster time is shown
 
