@@ -4,7 +4,7 @@
 <body>
 <h3>FLOS: A Simple Command Line Operating System for OSCA on the
 V6Z80P by Phil Ruston</h3>
-<pre>Last updated 28th August 2012, for FLOS v604</pre>
+<pre>Last updated 3rd Sept 2012, for FLOS v605</pre>
 <pre><span style="text-decoration: underline;"><br>Description:</span></pre>
 <pre>FLOS operates in a similar manner to the memory monitor / freezer cartridges of the home computer era.<br>In some ways it also behaves like a more modern DOS, allowing disk-based programs to be executed by<br>entering their filenames etc. </pre>
 <pre><span style="text-decoration: underline;"><br>Installation and OS file details:</span></pre>
@@ -96,9 +96,7 @@ V6Z80P by Phil Ruston</h3>
 <pre><br><br><br></pre>
 <pre><span style="font-weight: bold;">C</span> - Copy bytes in memory (from currently selected bank)<br><br>	Use: C <span style="font-style: italic;">start_address end_address destination_address [dest bank]</span></pre>
 <pre><br><br><br><br><span style="font-weight: bold;">CD</span> - Change Directory / Drive (or show path)</pre>
-<pre>	Use: CD ..&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;(go to parent dir)<br>	CD /&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;(go to root dir)<br>	CD subdir<span style="font-style: italic;">&nbsp;&nbsp;</span> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to subdir)<br>	CD VOLn: &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to volume n)<br>	CD VOLn:hats/berets&nbsp;(change volume and subdir)<br>	CD %xyz&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; (change to assigned directory)<br><br>&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; Without arguments, CD shows the current path</pre>
-<pre><br></pre>
-<pre><br><br><span style="font-weight: bold;">CLS</span> - Clear OS screen</pre>
+<pre>	Use: CD (no args)        (show current dir path)<br>             CD ..&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;        (go to parent dir)<br>             CD /&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;(go to root dir)<br>             CD /dir             (go to a dir in root)<br>             CD ../../hats       (go up two dir levels and into "hats")<br>             CD subdir<span style="font-style: italic;">&nbsp;&nbsp;</span> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to subdir)<br>             CD VOLn: &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to volume n)<br>             CD VOLn:hats/berets&nbsp;(change volume and subdir)<br>             CD %xyz&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; (change to assigned directory)<br><br></pre><pre><br><br><span style="font-weight: bold;">CLS</span> - Clear OS screen</pre>
 <pre>	Use: CLS (no args)</pre>
 <pre><br><br><br><br><span style="font-weight: bold;">COLOUR</span> - Changes the FLOS colour scheme</pre>
 <pre>	Use: COLOUR <span style="font-style: italic;">pen [paper] [border] [cursor] </span></pre>
