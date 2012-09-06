@@ -1,5 +1,6 @@
 
 bulk_file_loader.asm
+--------------------
 
  With this routine, a program can load files from a collated "bulk data file"
  as created with the utility BULKFILE.EXE
@@ -7,13 +8,22 @@ bulk_file_loader.asm
  The bulkfile util joins multiple files end to end and places a index at the
  top so that loading is as simple as reading normal individual files.
 
- To use the routine, set the following equates in your main code:
+ Limitations: Currently, only complete files can be read from bulk data (No
+ offset or truncated loads).
 
- index_start_lo [WORD] (Offset to index of bulk file. IE: Zero if the bulk file is seperate to main .exe)
- index_start_hi [WORD] 
 
- bulkfile_fn  [WORD] (Address of the filename of the bulk file. If the bulk file is
-                     attached to main .exe, make this be same as the .exe filename) 
+ To use the routine, set the following EQUATES in your main code:
+
+ index_start_lo 
+ index_start_hi  
+
+  (This is the 32 bit file offset (split into 2 words) to the index in the bulk file.
+   It should be zero if the bulk file is separate to main .exe)
+ 
+ 
+ bulkfile_fn  (Address of the filename of the bulk file. If the bulk file is
+               attached to main .exe, make this be same as the .exe filename) 
+
 
  To load a file from the bulk data, set:
 
@@ -22,6 +32,9 @@ bulk_file_loader.asm
   B = load bank
 
  then call "load_from_bulk_file"
+
+ The error codes returned are the same as a KJT file load call (IE: If ZF = set
+ all OK, else error code in A)
 
  The bulk data file can be joined to the end of the main executable, so reducing
  everything down to a one file. In this scenario, bulkfile_fn should point to a
