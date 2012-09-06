@@ -23,7 +23,7 @@
 ; 
 ;-----------------------------------------------------------------------------------------------
 ;
-; Set the following equates in main code:
+; Set the following EQUATES in main code:
 ;
 ;"index_start_lo" (0 if bulk file is seperate to main .exe)
 ;"index_start_hi" (""                                   "")
@@ -36,7 +36,7 @@ load_from_bulk_file
 
 
 ;Set HL = filename
-;    DE= load address
+;    DE = load address
 ;     B = load bank
 
 
@@ -133,5 +133,6 @@ load_bank		db 0
 
 bulk_offset	dw 0,0
 index_buffer	ds 16,0
+
 
 ;--------------------------------------------------------------------------------------------------
