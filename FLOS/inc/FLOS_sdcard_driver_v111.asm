@@ -11,7 +11,7 @@
 ;
 ; Somewhat arbitrary timimg due to quirks of my SD interface ("D_out" is not pulled up
 ; which means the data from the card following commands is undefined for one byte. This
-; is byte is skipped by the send_command routine.)
+; byte is skipped by the send_command routine.)
 
 
 ;--------------------------------------------------------------------------------------------------
