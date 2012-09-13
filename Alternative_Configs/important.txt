@@ -22,7 +22,12 @@ main revisions of the V6Z80P:
   files as the V6Z80P+ v1.1 above.
 
 
-If developing new V6Z80P configs:
+
+If developing new FPGA configs for the V6Z80P:
+----------------------------------------------
+
+The latest version of the Xilinx ISE Webpack development software which
+still supports the Spartan 2 used on the V6Z80P is version 10.1
 
 See the PCB_technical_manual in "Documentation/Manuals" for full info on the
 differences between board revisions.  Also, in general, set your project's
