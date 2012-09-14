@@ -56,7 +56,7 @@ load and save bytes to RAM etc) - a list of internal commands is available by
 entering "?" (for details use the command "HELP (command_name)"
 
 FLOS uses the FAT16 file system and loads from a file on the root of the SD card
-(or from the onboard EEPROM). Naturally, it can be replaced with any arbitary code
+(or from the onboard EEPROM). Naturally, it can be replaced with any arbitrary code
 that is required to load at boot up.
 
 
@@ -75,7 +75,7 @@ use a good brand to ensure compatibility). Copy the contents of the folder
 slot. (You can use the V6Z80P without an SD card, but you'll need to download
 everything serially except the internal commands via serial comms).
 
-Power on the V6Z80P with the switch near the DC power socket. The yellow LED should
+Power on the V6Z80P with the switch near the DC power socket. The status LED should
 come on, the black and white boot-up display appears on screen and afterwards the OS
 loads. Once loaded, you can type "?" <return> for a list of internal commands.
 
