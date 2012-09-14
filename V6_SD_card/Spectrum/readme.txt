@@ -23,7 +23,7 @@ There are two main Spectrum Emulators for the V6Z80P:
 
 
 
-2. Alessandro's cycle-perfect Spectrum 48 / 128 emulator for the V6Z80P v1.1 only (it
+2. Alessandro's cycle-perfect Spectrum 48 / 128 emulator for the V6Z80P+ v1.1 only (it
    requires clocking features only available on this board). Install the
    latest version of the config files free slots with eeprom.exe and launch
    the emulator with the FLOS command EMU.EXE
