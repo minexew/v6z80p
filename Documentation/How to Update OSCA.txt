@@ -7,7 +7,7 @@ detailed info on the EEPROM layout etc)
 
 1. Choose Option 1 "Write config to slot".
 
-2. When asked which slot, choose a currently inactive slot (EG: Slot 2)
+2. When asked which slot, choose a currently inactive slot
 
 3. Browse to the config's .bin file (or choose "RS232" in the window to use
    the serial download option)
@@ -16,21 +16,20 @@ detailed info on the EEPROM layout etc)
 
 5. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
 
-6. When prompted, choose to reconfigure from your chosen slot (EG: Slot 2)
+6. When prompted, choose to reconfigure from the slot chosen in step 2.
 
 7. The FPGA restarts with the latest update. This selection persists until
    power off.
 
    If everything is OK, you can reload the EEPROM tool and choose option 3
-   to make the new Slot (EG: 2) the Active Slot. Of course, the next time you
-   update OSCA, it'd be best to choose one of the other slots. 
+   to make the new Slot the Active Slot. 
 
    If you want, you can just rewrite the currently active slot in the first place,
    but the method above allows you to test the new config BEFORE making it default.
    IE: If you overwrite the current Active Slot with a bad config, the FPGA will
    not start at power on and you'll be forced to use one of the emergency recovery
    options to fix it. *** It is strongly recommended that a known working version 
-   of OSCA is always left intact in one of the first slots. ***
+   of OSCA is always left intact in one of the first 7 slots. ***
 
 
 Emergency Recovery:
@@ -102,11 +101,11 @@ the Active Slot selection is pointing at a bad config:
 
 •Install jumper J2 only
 
-•Power on (yellow led flashes rapidly).
+•Power on (status led flashes rapidly).
 
 •Remove jumper J2 again
 
-•The yellow LED will flash once, pause about 5 seconds, then flash twice, pause 5 seconds,
+•The status LED will flash once, pause about 5 seconds, then flash twice, pause 5 seconds,
  then flash three times and so on - the number of flashes represents the slot selection.
  During the pause following the slot selection you require, replace the jumper - the LED
  will then stay on permanently signifying that the slot has been set.
