@@ -1,5 +1,5 @@
 
-;----- OSCA v659 Main system hardware control / peripheral ports -------------
+;----- OSCA Main system hardware control / peripheral ports -----------------
 
 sys_mem_select	equ $00
 sys_irq_ps2_flags 	equ $01
