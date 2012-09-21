@@ -1,3 +1,7 @@
+// All functions and vars in this file will be placed to low memory. (some where, below 0x8000)
+// (the exact location (address) of low segment is in SConscript file)
+// So, function in this file, can switch system memory banks at 0x8000-0xFFFF.
+
 #define EXTERN_LOW_MEMORY_CONTAINER
 #include "low_memory_container.h"
 

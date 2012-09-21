@@ -15,6 +15,8 @@
 #include "util.h"
 #include "pong.h"
 #include "disk_io.h"
+#include <base_lib/resource.h>
+#include "handle_resource_error.h"
 
 
 void DiagMessage(const char* pMsg, const char* pFilename)
@@ -28,7 +30,9 @@ void DiagMessage(const char* pMsg, const char* pFilename)
         game.isFLOSVideoMode = TRUE;*/
 
         FLOS_PrintString(pMsg);
+        FLOS_PrintString("'");
         FLOS_PrintString(pFilename);
+        FLOS_PrintString("'");
 
         FLOS_PrintString(" OS_err: $");
         _uitoa(err, buffer, 16);
@@ -43,8 +47,8 @@ void DiagMessage(const char* pMsg, const char* pFilename)
 BOOL Util_LoadPalette(const char* pFilename)
 {
 
-    if(!load_file_to_buffer(pFilename, 0, (byte*)0x0000, 0x200, 0))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer(pFilename, 0, (byte*)0x0000, 0x200, 0))
+        return Handle_Resource_Error();
 
     *((ushort*)PALETTE) = 0;
     return TRUE;
