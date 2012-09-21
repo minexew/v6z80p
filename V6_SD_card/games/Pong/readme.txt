@@ -1,5 +1,5 @@
-PONG v0.03
--------------
+PONG 
+----------
 
 Menu keys:
 Joy 1 fire or keyb X - one player game
@@ -11,9 +11,11 @@ Game keys:
 P - pause
 LeftShift - show frame time
 
+For one player mode:
 Joy 1 up/down or keyb A/Z - move bat 1
 Joy 1 fire or keyb X - fire with rocket
-for two players mode:
+
+For two players mode:
 Joy 2 up/down or keyb J/M - move bat 2
 Joy 2 fire or keyb , - fire with rocket
 
