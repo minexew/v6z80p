@@ -1,0 +1,14 @@
+
+VERS.EXE - Shows FLOS / OSCA version
+
+Use: VERS (#)
+
+Notes: If # is excluded, the version
+numbers are displayed on screen.
+
+If # is included, two environment
+variables are created: "OSCA" & "FLOS"
+with values set to the respective
+version numbers.
+
+
