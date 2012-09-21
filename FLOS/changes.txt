@@ -2,6 +2,17 @@
 Current FLOS version:
 ---------------------
 
+v6.06 - 21/09/2012 (currently in testing phase)
+
+	Minor change: SD Card driver v112: Generates CRC for commands, sends 8 clocks instead
+                      of read_byte after command (for OSCA emulator compatibility).
+
+
+
+Previous changes:
+-----------------
+
+
 v6.05 - 02/09/2012
 
 	Bugfix: Ports $24-$27 are now only reset if OSCA > $671
@@ -9,9 +20,6 @@ v6.05 - 02/09/2012
         Improvement: CD argument parsing improved: "cd ../../some_dir", "cd /some_root_dir" etc allowed
 
 
-
-Previous changes:
------------------
 
 
 v6.04 - 28/08/2012
