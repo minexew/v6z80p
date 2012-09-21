@@ -4,7 +4,7 @@ import string
 
 v6_prj.name     = 'pong'
 v6_prj.linkopt  = '-Wl-b_LOW_MEM_CODE=0x6A80    --code-loc 0x8000 --data-loc 0'
-v6_prj.stack    = '0x6A80'
+v6_prj.stack    = '0x6A80'      # stack 5A80-6A80
 # v6_prj.heapsize = '0'
 
 

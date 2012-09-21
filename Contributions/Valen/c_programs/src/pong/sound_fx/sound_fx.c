@@ -1,11 +1,14 @@
 #include <v6z80p_types.h>
 
+//#include <stdio.h>
 //#include <stdlib.h>
 //#include <string.h>
 
 #include "sound_fx.h"
 #include "../disk_io.h"
+#include <base_lib/resource.h>
 #include "../low_memory_container.h"
+#include "handle_resource_error.h"
 
 
 byte bufModFileHeader[1084];
@@ -16,8 +19,10 @@ static word wtmp;
 
 BOOL Sound_LoadSoundCode(void)
 {
-    return load_file_to_buffer("SFXPROXY.BIN", 0, (byte*)SOUND_FX_CODE,
-                                SOUND_FX_CODE_MAX_SIZE, BANK_MUSIC_STUFF);
+    if(!Resource_LoadFileToBuffer("SFXPROXY.BIN", 0, (byte*)SOUND_FX_CODE, SOUND_FX_CODE_MAX_SIZE, BANK_MUSIC_STUFF))
+       return Handle_Resource_Error();
+    else
+        return TRUE;
 }
 
 BOOL Sound_LoadSounds(void)
@@ -25,7 +30,10 @@ BOOL Sound_LoadSounds(void)
     byte* sfx_samples_addr = (byte*)0x8000;
     byte sfx_samples_bank = 3;
 
-    return load_file_to_buffer("SFX.SAM", 0, sfx_samples_addr, 65536, sfx_samples_bank);
+    if(!Resource_LoadFileToBuffer("SFX.SAM", 0, sfx_samples_addr, 65536, sfx_samples_bank))
+        return Handle_Resource_Error();
+     else
+         return TRUE;
     //return load_file_to_buffer("ONE.RAW", 0, sfx_samples_addr, 4132, sfx_samples_bank);
 
 }
@@ -33,8 +41,10 @@ BOOL Sound_LoadSounds(void)
 
 BOOL Sound_LoadFxDescriptors(void)
 {
-    return load_file_to_buffer("ALL_FX.BIN", 0, (byte*)SOUND_FX_DESC, 464, BANK_MUSIC_STUFF);
-    //return TRUE;
+    if(!Resource_LoadFileToBuffer("ALL_FX.BIN", 0, (byte*)SOUND_FX_DESC, 464, BANK_MUSIC_STUFF))
+        return Handle_Resource_Error();
+     else
+         return TRUE;
 }
 
 
@@ -93,21 +103,25 @@ byte Mod_FindHighestUsedPattern(const byte* pPatternData)
 
 BOOL Mod_LoadMusicModule(const char* pFilename)
 {
-    FLOS_FILE myFile;
-    BOOL r;
+//    FLOS_FILE myFile;
+//    BOOL r;
     dword fileLen;
     byte pat;
     word patLen;             // length of pattern data part of file
     dword sampleLen;         // length of sample  data part of file
 
 
-    r = diag__FLOS_FindFile(&myFile, pFilename);
-    if(!r) return FALSE;
-    fileLen = myFile.size;
+//    r = diag__FLOS_FindFile(&myFile, pFilename);
+//    if(!r) return FALSE;
+//    fileLen = myFile.size;
+    fileLen = Resource_GetFileSize(pFilename);
+    if(fileLen == -1) return FALSE;
+//    printf("MOD fs: %li", fileLen);
 
     // load 1084 bytes
-    if(!load_file_to_buffer(pFilename, 0, bufModFileHeader, 1084, 0))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer(pFilename, 0, bufModFileHeader, 1084, 0))
+        return Handle_Resource_Error();
+
 
     // find highest used pattern in order to locate
     // the address where samples start
@@ -120,12 +134,12 @@ BOOL Mod_LoadMusicModule(const char* pFilename)
     _uitoa(sampleLen, buffer, 16);  FLOS_PrintString(buffer);  FLOS_PrintString(PS_LFCR);*/
 
     // load pattern data (to dedicated system memory bank)
-    if(!load_file_to_buffer(pFilename, 0, (byte*) SOUND_MOD_PATTERN_DATA, patLen, BANK_MUSIC_STUFF))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer(pFilename, 0, (byte*) SOUND_MOD_PATTERN_DATA, patLen, BANK_MUSIC_STUFF))
+        return Handle_Resource_Error();
 
     // load sample data (to audio memory bank)
-    if(!load_file_to_buffer(pFilename, patLen, (byte*) 0x8000, sampleLen, BANK_MOD_SAMPLE1))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer(pFilename, patLen, (byte*) 0x8000, sampleLen, BANK_MOD_SAMPLE1))
+        return Handle_Resource_Error();
 
     return TRUE;
 }

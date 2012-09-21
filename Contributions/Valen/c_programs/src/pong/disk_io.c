@@ -8,37 +8,20 @@
 
 #include <os_interface_for_c/i_flos.h>
 
+#include <stdio.h>
+
 #include "disk_io.h"
 #include "util.h"
 #include "keyboard.h"
 #include "background.h"     // for Game_RestoreFLOSVIdeoRam();
+#include <base_lib/resource.h>
+#include "handle_resource_error.h"
 
 struct tag_disk_io{
     const char* pFilename;
 } disk_io;
 
-BOOL load_file_to_buffer(const char *pFilename, dword file_offset, byte* buf, dword len, byte bank)
-{
-    FLOS_FILE myFile;
-    BOOL r;
 
-    r = diag__FLOS_FindFile(&myFile, pFilename);
-    if(!r) {
-       //DiagMessage("FindFile failed: ", pFilename);
-       return FALSE;
-    }
-
-    FLOS_SetLoadLength(len);
-    FLOS_SetFilePointer(file_offset);
-
-    r = diag__FLOS_ForceLoad( buf, bank );
-    if(!r) {
-       //DiagMessage("ForceLoad failed: ", pFilename);
-       return FALSE;
-    }
-
-    return TRUE;
-}
 
 
 /*#define DI_HALT() \
@@ -50,14 +33,23 @@ BOOL load_file_to_buffer(const char *pFilename, dword file_offset, byte* buf, dw
 
 
 
+void ShowErrorAndStopProgramExecution(const char* strErr)
+{
+    ShowDiskErrorAndStopProgramExecution(strErr, NULL);
+}
+
 void ShowDiskErrorAndStopProgramExecution(const char* strErr, const char* pFilename)
 {
 //    BYTE asciicode, scancode;
+    while(1);
 
     FLOS_FlosDisplay();
     Game_RestoreFLOSVIdeoRam();
+    FLOS_ClearScreen();
+    FLOS_PrintStringLFCR("FATAL PONG ERROR");
 
-    DiagMessage(strErr, pFilename);
+    if(pFilename) DiagMessage(strErr, pFilename);
+    else          FLOS_PrintStringLFCR(strErr);
     FLOS_PrintStringLFCR("Exiting to FLOS...");     //               Press a key to reboot... ");
 
     deinstall_irq_handler();
@@ -120,27 +112,35 @@ BOOL diag__FLOS_ForceLoad(const byte* address, const byte bank)
 // loads file from disk by 4KB chunks
 typedef struct {
     const char* pFilename;
-    FLOS_FILE file;
+    //FLOS_FILE file;
+
 
     byte* buf;           // 4KB buffer, where to load chunks
     byte bank;           // bank, to pass to FLOS ForceLoad()
     dword file_offset;   // current file offset (how many bytes was already readed)
+    dword file_size;     // file size
 
 } chunk_loader;
 
 chunk_loader cl;        // global instance
 
 
-void ChunkLoader_Init(const char* pFilename, byte* buf, byte bank)
+BOOL ChunkLoader_Init(const char* pFilename, byte* buf, byte bank)
 {
     cl.pFilename = pFilename;
 
     cl.buf       = buf;
     cl.bank      = bank;
 
-    cl.file.size   = -1;        // set -1 as "first chunk load" marker
     cl.file_offset = 0;
+    cl.file_size   = Resource_GetFileSize(pFilename);
+    if(cl.file_size == -1) {
 
+        return FALSE;
+    }
+//    printf("FSize: %li", cl.file_size);
+
+    return TRUE;
 }
 
 // load next chunk from disk to memory
@@ -148,18 +148,16 @@ BOOL ChunkLoader_LoadChunk(void)
 {
     dword num_bytes = 0;
 
-    // if loading first chunk, do findfile
-    if(cl.file.size == -1) {
-        if(!diag__FLOS_FindFile(&cl.file, cl.pFilename))
-            return FALSE;
-    }
 
+    (cl.file_offset+0x1000 <  cl.file_size) ?  (num_bytes = 0x1000) :  (num_bytes = cl.file_size - cl.file_offset);
 
-    (cl.file_offset+0x1000 <  cl.file.size) ?  (num_bytes = 0x1000) :  (num_bytes = cl.file.size - cl.file_offset);
+//    FLOS_SetLoadLength(num_bytes);
+//    if(!diag__FLOS_ForceLoad(cl.buf, cl.bank))
+//        return FALSE;
 
-    FLOS_SetLoadLength(num_bytes);
-    if(!diag__FLOS_ForceLoad(cl.buf, cl.bank))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer(cl.pFilename, cl.file_offset, cl.buf, num_bytes, cl.bank))
+        return Handle_Resource_Error();
+
 
     cl.file_offset  += num_bytes;
 
@@ -169,7 +167,7 @@ BOOL ChunkLoader_LoadChunk(void)
 
 BOOL ChunkLoader_IsDone(void)
 {
-    return (cl.file_offset >= cl.file.size);
+    return (cl.file_offset >= cl.file_size);
 }
 
 
@@ -212,3 +210,5 @@ void DiskIO_VisualizeDiskError(void)
 
 
 }
+
+

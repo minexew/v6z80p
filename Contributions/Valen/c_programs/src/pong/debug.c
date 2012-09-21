@@ -71,6 +71,8 @@ void Debug_Draw(void)
 
 }
 
+// Ensure FLOS is loaded PONG.EXE to correct default system bank (banked area 0x8000-0xFFFF).
+// On default, FLOS loads EXE to hardware bank 0 (logic bank 1).
 BOOL Debug_CheckCurrentBank(void)
 {
     char buf [8];

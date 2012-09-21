@@ -15,8 +15,8 @@
 #include "sprites.h"
 #include "pong.h"
 #include "disk_io.h"
-
-
+#include <base_lib/resource.h>
+#include "handle_resource_error.h"
 
 
 BOOL LoadingIcon_LoadSprites(void)
@@ -24,8 +24,8 @@ BOOL LoadingIcon_LoadSprites(void)
     const char *pFilename = SPRITES_DISKETTE_FILENAME;
     word size = 48*48;
 
-    if(!load_file_to_buffer(pFilename, 0, BUF_FOR_LOADING_SPRITES_4KB, size, PONG_BANK))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer(pFilename, 0, BUF_FOR_LOADING_SPRITES_4KB, size, PONG_BANK))
+        return Handle_Resource_Error();
 
     // put to the end of sprite memory
     PAGE_IN_SPRITE_RAM();
@@ -72,8 +72,8 @@ BOOL LoadingIcon_Load(void)
     if(!LoadingIcon_LoadSprites())
         return FALSE;
     // load palette of "loading icon"
-    if(!load_file_to_buffer(PALETTE_DISKETTE_FILENAME, 0, (byte*)loadingIcon.palette, 0x200, PONG_BANK))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer(PALETTE_DISKETTE_FILENAME, 0, (byte*)loadingIcon.palette, 0x200, PONG_BANK))
+        return Handle_Resource_Error();
     loadingIcon.palette[0] = 0;
 
     return TRUE;

@@ -3,6 +3,7 @@
 ../data_loader.c
 ../debug.c
 ../disk_io.c
+../handle_resource_error.c
 ../joystick.c
 ../keyboard.c
 ../loading_icon.c
@@ -27,6 +28,8 @@
 ../data_loader.h
 ../debug.h
 ../disk_io.h
+../game_state.h
+../handle_resource_error.h
 ../joystick.h
 ../keyboard.h
 ../loading_icon.h

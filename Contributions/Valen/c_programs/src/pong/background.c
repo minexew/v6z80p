@@ -23,7 +23,8 @@ BOOL Background_LoadTiles(const char* pFilename, word vram_addr)
 
     // load by 4KB chunks (using chunk loader)
     //video_offset = 0x1000;
-    ChunkLoader_Init(pFilename,/*&myFile,*/ BUF_FOR_LOADING_BACKGROUND_4KB, 0);
+    if(!ChunkLoader_Init(pFilename,/*&myFile,*/ BUF_FOR_LOADING_BACKGROUND_4KB, 0))
+        return FALSE;
 
     while(!ChunkLoader_IsDone()) {
         if(!ChunkLoader_LoadChunk())

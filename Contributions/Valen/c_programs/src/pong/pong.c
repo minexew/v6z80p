@@ -1,5 +1,5 @@
 /*
-PONG v0.05
+PONG v0.06
 
 Valen 2009, 2010, 2011, 2012
 -------------
@@ -14,6 +14,8 @@ v0.05:
 - adapted for SDCC 3.0.6 #6969
 - adapted for FLOS598+ (FLOS now produce correct 1B (EOF) error code)
 - added disk error diagnostic (Gracefully exits to FLOS:  restore FLOS display and font and print error.)
+v0.06:
+- load all pong files (resources) from one big bulk file (.DAT file)
 */
 
 
@@ -48,11 +50,13 @@ v0.05:
 #include "pool_gameobj.h"
 #include "pool_sprites.h"
 #include "ai.h"
+#include <base_lib/resource.h>
 
 #include "sound_fx/sound_fx.h"
 #include "debug.h"
 #include "low_memory_container.h"
 #include "data_loader.h"
+#include "handle_resource_error.h"
 
 //#undef  EXTERN_PONG
 #define EXTERN_PONG
@@ -359,17 +363,17 @@ int main (void)
     debug.isShowFrameTime = FALSE;
     //strcpy(debug.guard_str, "GUARD");
 
-//memset(&scoreA, 0, sizeof(scoreA));
-
 
     if(!Debug_CheckCurrentBank())
         return NO_REBOOT; 
 
     Game_StoreFLOSVIdeoRam();
 
+    Resource_Init(FALSE, "PONG.DAT");
     initgraph();
     Game_SetReg_SprCtrl(SPRITE_ENABLE|DOUBLE_BUFFER_SPRITE_REGISTER_MODE);
     Game_SetState(STARTUP);
+
 
     if(!LoadingIcon_Load())
         return NO_REBOOT;
@@ -381,6 +385,7 @@ int main (void)
     if(!Sound_LoadSoundCode())
         return REBOOT;
 
+
     if(!Sound_LoadSounds())
         return REBOOT;
     if(!Sound_LoadFxDescriptors())
@@ -389,16 +394,14 @@ int main (void)
 
 
 
-    //if(!Sprites_LoadSprites(SPRITES_FILENAME, 0))
-    //  return REBOOT;
 
     Keyboard_Init();
     install_irq_handler();
 
     if(!Game_SetState(MENU))
-        return REBOOT;
-    Game_Play (); // Game Engine
+        ShowErrorAndStopProgramExecution("SetState ERR!"); //return NO_REBOOT;
 
+    Game_Play (); // Game Engine
 
 
     Sys_ClearIRQFlags(CLEAR_IRQ_KEYBOARD);
@@ -522,8 +525,8 @@ void setfillstyle (int color1,int color2)
 
 BOOL Game_LoadSinTable(void)
 {
-    if(!load_file_to_buffer("SINE_TAB.BIN", 0, (byte*)MULT_TABLE, 0x200, 0))
-        return FALSE;
+    if(!Resource_LoadFileToBuffer("SINE_TAB.BIN", 0, (byte*)MULT_TABLE, 0x200, 0))
+        return Handle_Resource_Error();
     return TRUE;
 }
 
@@ -557,3 +560,17 @@ void Game_EnableMatteMode(BOOL isEnable)
         Game_SetReg_SprCtrl(Game_ReadReg_SprCtrl() & (~MATTE_MODE_ENABLE));
 }
 
+
+
+
+// --------------
+void putchar(char c)
+{
+    BYTE str[2];
+
+    str[0] = str[1] = 0;
+    str[0] = c;
+
+    if(c == '\n')   FLOS_PrintStringLFCR("");
+    else            FLOS_PrintString(str);
+}

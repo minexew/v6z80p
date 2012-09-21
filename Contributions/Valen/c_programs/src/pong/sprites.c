@@ -247,7 +247,8 @@ BOOL Sprites_LoadSprites(const char *pFilename, DWORD destSpriteMem)
 
 
     // load by 4KB chunks (using chunk loader)
-    ChunkLoader_Init(pFilename, BUF_FOR_LOADING_SPRITES_4KB, PONG_BANK);
+    if(!ChunkLoader_Init(pFilename, BUF_FOR_LOADING_SPRITES_4KB, PONG_BANK))
+        return FALSE;
 
     while(!ChunkLoader_IsDone()) {
         if(!ChunkLoader_LoadChunk())
