@@ -4,7 +4,7 @@
 <body>
 <h3>FLOS: A Simple Command Line Operating System for OSCA on the
 V6Z80P by Phil Ruston</h3>
-<pre>Last updated 3rd Sept 2012, for FLOS v605</pre>
+<pre>Last updated 21st Sept 2012, for FLOS v605</pre>
 <pre><span style="text-decoration: underline;"><br>Description:</span></pre>
 <pre>FLOS operates in a similar manner to the memory monitor / freezer cartridges of the home computer era.<br>In some ways it also behaves like a more modern DOS, allowing disk-based programs to be executed by<br>entering their filenames etc. </pre>
 <pre><span style="text-decoration: underline;"><br>Installation and OS file details:</span></pre>
@@ -16,7 +16,7 @@ V6Z80P by Phil Ruston</h3>
 <pre>The UI is a full screen editor, so the cursor can be moved back to any previous command and Enter<br>pressed again to re-execute it if desired. Other keys active in the UI:</pre>
 <pre>Home      - Puts cursor at left side<br><span style="font-family: monospace;"></span>Page Up   - Puts cursor at top<br>Page Down - Puts cursor at bottom, left on new line<br><span style="font-family: monospace;"></span>Insert    - Switches between overwrite and insert mode<br><span style="font-family: monospace;"></span>Alt       - Use alt_keymap character<br><span style="font-family: monospace;"></span>F1-F9     - Run an arbitrary command string (see "<a href="#Programmable_Function_Keys">Programmable Function keys</a>")</pre>
 <pre><br><span style="text-decoration: underline;">Internal command list:</span></pre>
-<pre>B       - Set the bank of System RAM appearing in Z80 address space $8000-$FFFF<br>C       - Copy bytes in memory (from currently selected bank)<br>CD      - Change directory<br>CLS     - Clear OS screen<br>COLOUR  &#8211; Change the OS colour scheme<br>D &nbsp;&nbsp; &nbsp;  - Disassemble Z80 code<br>DEL&nbsp;&nbsp;   - Delete a file<br>DIR&nbsp;&nbsp; &nbsp; - Show directory<br>EXEC&nbsp;&nbsp;  &#8211; Execute a script<br>F &nbsp;&nbsp;&nbsp; &nbsp; - Fill memory<br>FORMAT  - Format the (entire) SD card as a single FAT16 partition. <br>G &nbsp;&nbsp; &nbsp;  - Goto location (IE: Call a Z80 routine) ("G 0" resets the Z80)<br>H&nbsp;&nbsp; &nbsp;   - Hunt in memory for hex bytes or text<br>LB&nbsp;&nbsp; &nbsp;  - Load Binary file from disk to system RAM<br>M &nbsp;&nbsp; &nbsp;  - Show system RAM contents as hex bytes<br>MD&nbsp;&nbsp; &nbsp;  - Make a new directory<br>MOUNT&nbsp;  &#8211; Remount drives<br>R &nbsp;&nbsp; &nbsp;  - Show CPU registers<br>RD&nbsp;&nbsp; &nbsp;  - Remove directory<br>RX &nbsp;&nbsp; &nbsp; - Receive file (to RAM) from PC via serial link (and optionally, run it)<br>SB&nbsp;&nbsp; &nbsp;  - Save Binary file from RAM to disk<br>T&nbsp;&nbsp; &nbsp;   - Show system RAM as ASCII text<br>TX&nbsp;&nbsp; &nbsp;  - Transmit bytes from system RAM (to PC) via serial link<br>VERS&nbsp;&nbsp; &nbsp;- Show OSCA / FLOS version<br>VOLx:&nbsp;&nbsp; - Switch volume without altering the directory position<br>: &nbsp;&nbsp;&nbsp; &nbsp; - Put hex bytes in memory<br>&gt; &nbsp;&nbsp;&nbsp; &nbsp; - Put text in memory<br>&lt;&nbsp;&nbsp; &nbsp;   - Put bytes in memory and disassemble</pre>
+<pre><a href="#B_-_Bank_select">B</a>       - Set the bank of System RAM appearing in Z80 address space $8000-$FFFF<br><a href="#C_-_Copy_bytes">C</a>       - Copy bytes in memory (from currently selected bank)<br><a href="#CD_-_Change_Directory">CD</a>      - Change directory<br><a href="#CLS_-_Clear">CLS</a>     - Clear OS screen<br><a href="#COLOUR_-_Changes">COLOUR</a>  &#8211; Change the OS colour scheme<br><a href="#D_-_Disassemble">D</a> &nbsp;&nbsp; &nbsp;  - Disassemble Z80 code<br><a href="#DEL-_Delete_File">DEL</a>&nbsp;&nbsp;   - Delete a file<br><a href="#DIR_-_Show_Directory">DIR</a>&nbsp;&nbsp; &nbsp; - Show directory<br><a href="#EXEC_-_Execute">EXEC</a>&nbsp;&nbsp;  &#8211; Execute a script<br><a href="#F_-_Fill">F</a> &nbsp;&nbsp;&nbsp; &nbsp; - Fill memory<br><a href="#FORMAT">FORMAT</a>  - Format the (entire) SD card as a single FAT16 partition. <br><a href="#G_-_Goto">G</a> &nbsp;&nbsp; &nbsp;  - Goto location (IE: Call a Z80 routine) ("G 0" resets the Z80)<br><a href="#H_-_Hunt">H</a>&nbsp;&nbsp; &nbsp;   - Hunt in memory for hex bytes or text<br><a href="#LB_-_Loads_bytes">LB</a>&nbsp;&nbsp; &nbsp;  - Load Binary file from disk to system RAM<br><a href="#M_-_Show_memory">M</a> &nbsp;&nbsp; &nbsp;  - Show system RAM contents as hex bytes<br><a href="#MD_-_Make_new_dir">MD</a>&nbsp;&nbsp; &nbsp;  - Make a new directory<br><a href="#MOUNT_-_Rescans">MOUNT</a>&nbsp;  &#8211; Remount drives<br><a href="#R_-_Show_reg">R</a> &nbsp;&nbsp; &nbsp;  - Show CPU registers<br><a href="#RD_-_Remove_dir">RD</a>&nbsp;&nbsp; &nbsp;  - Remove directory<br><a href="#RX_-_Receive">RX</a> &nbsp;&nbsp; &nbsp; - Receive file (to RAM) from PC via serial link (and optionally, run it)<br><a href="#SB_-_Save_bytes">SB</a>&nbsp;&nbsp; &nbsp;  - Save Binary file from RAM to disk<br><a href="#T_-_Show_mem">T</a>&nbsp;&nbsp; &nbsp;   - Show system RAM as ASCII text<br><a href="#TX_-_Transmit">TX</a>&nbsp;&nbsp; &nbsp;  - Transmit bytes from system RAM (to PC) via serial link<br><a href="#VERS">VERS</a>&nbsp;&nbsp; &nbsp;- Show OSCA / FLOS version<br><a href="#VOLx:">VOLx:</a>&nbsp;&nbsp; - Switch volume without altering the directory position<br><a href="#:_-_Put_hex">:</a> &nbsp;&nbsp;&nbsp; &nbsp; - Put hex bytes in memory<br><a href="#_-_Put_text">&gt;</a> &nbsp;&nbsp;&nbsp; &nbsp; - Put text in memory<br><a href="#_-_Put_hex">&lt;</a>&nbsp;&nbsp; &nbsp;   - Put bytes in memory and disassemble</pre>
 <pre>More detailed <a href="#Internal_Commands">descriptions</a> are given at the end of this manual and can be shown in FLOS itself with the<br>command HELP [command_name].</pre>
 <pre>Throughout FLOS, all numeric data is in hexadecimal (apart from the free disk space reported by the<br>DIR command). The default keymap is that of the UK, but this can be changed with the command &#8221;Keymap&#8221;.<br>To assist with such settings, FLOS will run a batch file called &#8220;BOOT_RUN.SCR&#8221; at start-up if it is<br>present in the root directory of the SD card. (This script - along with any others launched from the<br>EXEC command - can be aborted by pressing CTRL+C).</pre>
 <pre><br><span style="text-decoration: underline;"><a name="Programmable_Function_Keys"></a>Programmable Function Keys:</span></pre>
@@ -28,7 +28,7 @@ V6Z80P by Phil Ruston</h3>
 <pre>The difference between programs deemed COMMANDS and those deemed UTILS is only that commands load to<br>the top of system memory (Bank $0E) to help avoid corrupting user programs which would usually be<br>located at $5000. (Such commands would ideally be <span style="font-style: italic;">internal FLOS commands</span> if there was space in the<br>OS for them.)</pre>
 <pre><br><span style="text-decoration: underline;">EXTERNAL COMMAND LIST:</span></pre>
 
-<pre>ASSIGN.EXE&nbsp;&nbsp; &nbsp;- Assigns a directory path to a short string of characters<br>BAUD.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Sets the BAUD rate (57600/115200 supported)<br>BOOT.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Reconfigure the FPGA from a given slot<br>CHFNT.EXE&nbsp;&nbsp; &nbsp;&nbsp;- Changes the OS font<br>CMP.EXE &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Compares two areas of system memory, shows differences<br>ECHO.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Displays short messages<br>FILEINFO.EXE&nbsp;&nbsp;- Shows info about a file<br>FILECMP.EXE&nbsp;&nbsp; - Compares two files, shows differences&nbsp;&nbsp; &nbsp;<br>FILERX.EXE&nbsp;&nbsp; &nbsp;- Receive a file via Serial Link and put in current dir<br>FILETX.EXE&nbsp;&nbsp; &nbsp;- Send a file from current dir (to PC) via Serial Link<br>GOTO.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Script control (see script section)<br>HELP.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Displays help files<br>IF.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;- Script control (see script section)<br>INPUTSTR.EXE&nbsp;&nbsp;- Get input from user, place in environment variable<br>INPUTNUM.EXE&nbsp;&nbsp;- Get hex value from user, place in environment variable<br>KEYMAP.EXE &nbsp;&nbsp; - Changes the keyboard mapping for non-UK keyboards.<br>LCD.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; - LineCop disassembler<br>LOADSPR.EXE&nbsp;&nbsp; - Loads a file to Sprite RAM<br>LOADVRAM.EXE&nbsp;&nbsp;- Loads a file to Video RAM<br>MONO.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Sets the stereo panning to &#8220;All channels to both sides&#8221;<br>MOUSE.EXE&nbsp;&nbsp; &nbsp;&nbsp;- Activates the mouse driver<br>SAVEVRAM.EXE&nbsp;&nbsp;- Saves data from Video RAM to a file<br>SET.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; - Sets an environment variable (or shows those defined)<br>STEREO.EXE&nbsp;&nbsp; &nbsp;- Sets the stereo panning to Channels 0+2: Left 1+3:right<br>TYPE.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Displays text files<br>VGA50.EXE&nbsp;&nbsp; &nbsp;&nbsp;- Sets VGA mode to 50Hz (non standard)<br>VGA60.EXE&nbsp;&nbsp; &nbsp;&nbsp;- Sets VGA mode to 60Hz<br> <br>Documentation for these programs is also available by typing "HELP [command]".</pre>
+<pre><a href="#ASSIGN.EXE">ASSIGN.EXE</a>&nbsp;&nbsp; &nbsp;- Assigns a directory path to a short string of characters<br><a href="#BAUD.EXE">BAUD.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Sets the BAUD rate (57600/115200 supported)<br><a href="#BOOT.EXE">BOOT.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Reconfigure the FPGA from a given slot<br><a href="#CHFNT.EXE">CHFNT.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;- Changes the OS font<br><a href="#CMP.EXE">CMP.EXE</a> &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Compares two areas of system memory, shows differences<br><a href="#ECHO.EXE">ECHO.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Displays short messages<br><a href="#FILEINFO.EXE">FILEINFO.EXE</a>&nbsp;&nbsp;- Shows info about a file<br><a href="#FILECMP.EXE">FILECMP.EXE</a>&nbsp;&nbsp; - Compares two files, shows differences&nbsp;&nbsp; &nbsp;<br><a href="#FILERX.EXE">FILERX.EXE</a>&nbsp;&nbsp; &nbsp;- Receive a file via Serial Link and put in current dir<br><a href="#FILETX.EXE">FILETX.EXE</a>&nbsp;&nbsp; &nbsp;- Send a file from current dir (to PC) via Serial Link<br><a href="#GOTO.EXE">GOTO.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Script control (see script section)<br><a href="#HELP.EXE">HELP.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Displays help files<br><a href="#IF.EXE">IF.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;- Script control (see script section)<br><a href="#INPUTSTR.EXE">INPUTSTR.EXE</a>&nbsp;&nbsp;- Get input from user, place in environment variable<br><a href="#INPUTNUM.EXE">INPUTNUM.EXE</a>&nbsp;&nbsp;- Get hex value from user, place in environment variable<br><a href="#KEYMAP.EXE">KEYMAP.EXE</a> &nbsp;&nbsp; - Changes the keyboard mapping for non-UK keyboards.<br><a href="#LCD.EXE">LCD.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; - LineCop disassembler<br><a href="#LOADSPR.EXE">LOADSPR.EXE</a>&nbsp;&nbsp; - Loads a file to Sprite RAM<br><a href="#LOADVRAM.EXE">LOADVRAM.EXE</a>&nbsp;&nbsp;- Loads a file to Video RAM<br><a href="#MONO.EXE">MONO.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Sets the stereo panning to &#8220;All channels to both sides&#8221;<br><a href="#MOUSE.EXE">MOUSE.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;- Activates the mouse driver<br><a href="#SAVEVRAM.EXE">SAVEVRAM.EXE</a>&nbsp;&nbsp;- Saves data from Video RAM to a file<br><a href="#SET.EXE">SET.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; - Sets an environment variable (or shows those defined)<br><a href="#STEREO.EXE">STEREO.EXE</a>&nbsp;&nbsp; &nbsp;- Sets the stereo panning to Channels 0+2: Left 1+3:right<br><a href="#TYPE.EXE">TYPE.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- Displays text files<br><a href="#VGA50.EXE">VGA50.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;- Sets VGA mode to 50Hz (non standard)<br><a href="#VGA60.EXE">VGA60.EXE</a>&nbsp;&nbsp; &nbsp;&nbsp;- Sets VGA mode to 60Hz<br> <br>Documentation for these programs is also available by typing "HELP [command]".</pre>
 <pre style="text-decoration: underline;"><br>UTILS:</pre>
 <pre>ASM.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;- Assemble Z80 source code<br>BULKFILE.EXE   - Makes a new file by joining the all files in dir (index at top)<br>DDIR.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;- Alernative DIR command - Decimal listing (By Stefano)<br>DISKTOOL.EXE&nbsp;&nbsp;&nbsp;- Allows partitioning of SD cards.<br>EDIT.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;- A simple text editor<br>EEPROM.EXE&nbsp;&nbsp; &nbsp;&nbsp;- An app to write FPGA configs etc to the onboard EEPROM<br>EMU.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;- Used to launch Alessandro&#8217;s cycle-perfect Spectrum Emulators<br>FILEMGR.EXE&nbsp;&nbsp; &nbsp;- A simple file manager<br>FIRMWARE.EXE &nbsp;&nbsp;- Writes blocks of data to the EEPROM 'wholesale'<br>FS.EXE &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;- File viewer / launcher (by Valen)<br>HEXOR.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- File Hex Editor (by Enzo)<br>MEMCLR.EXE&nbsp;&nbsp; &nbsp;&nbsp;- Clears entire memory (apart from FLOS) (By Daniel)<br>MEMRND.EXE&nbsp;&nbsp; &nbsp;&nbsp;- Fills memory with random data (apart from FLOS) (By Daniel)<br>MODPLAY.EXE&nbsp;&nbsp; &nbsp;- Protracker format music player<br>PCXSHOW.EXE&nbsp;&nbsp; &nbsp;- Displays .pcx format graphic files (By Enzo)<br>PLAYCV6.EXE&nbsp;&nbsp; &nbsp;- Plays .cv6 video files (by Daniel)<br>PLAYMV6.EXE&nbsp;&nbsp; &nbsp;- Plays .mv6 video files (by Daniel)<br>PLAYWAV.EXE&nbsp;&nbsp; &nbsp;- Plays .wav format sound files<br>PT3PLAY.EXE&nbsp;&nbsp; &nbsp;- PT3 format music player (by Daniel)<br>SHOWBMP.EXE&nbsp;&nbsp; &nbsp;- Displays .bmp pictures<br>SHOWVRAM.EXE&nbsp;&nbsp;&nbsp;- Display section of video RAM<br>SQ.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; - File Packer (by Stefano)<br>USQ.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;- File Unpacker (by Stefano)<br>ZPACK.EXE&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;- File packer (by Enzo)</pre>
 <pre>Documentation for most of these programs is also available by typing "HELP [command]",<br>or is provided in their respective folders.</pre>
@@ -90,168 +90,168 @@ V6Z80P by Phil Ruston</h3>
 <h3><span style="text-decoration: underline; font-weight: bold;">GLOSSARY</span></h3>
 <pre></pre>
 <pre><br><a name="Internal_Commands"></a>Internal Commands &#8211; Full Descriptions:</pre>
-<pre><br><span style="font-weight: bold;">B</span> - Bank select (ie: select one of 15 32KB banks for Z80 address $8000-$FFFF)<br><br>	Use: B <span style="font-style: italic;">n</span>&nbsp;&nbsp; &nbsp;(n = 0 to E)<br>	<br>	Bank 0 pages in system RAM $08000-$0FFFF to $8000-$FFFF<br>	Bank 1 pages in system RAM $10000-$17fff to $8000-$FFFF</pre>
+<pre><br><span style="font-weight: bold;"><a name="B_-_Bank_select"></a>B</span> - Bank select (ie: select one of 15 32KB banks for Z80 address $8000-$FFFF)<br><br>	Use: B <span style="font-style: italic;">n</span>&nbsp;&nbsp; &nbsp;(n = 0 to E)<br>	<br>	Bank 0 pages in system RAM $08000-$0FFFF to $8000-$FFFF<br>	Bank 1 pages in system RAM $10000-$17fff to $8000-$FFFF</pre>
 <pre>	and so on..</pre>
 <pre>	FLOS does not allow system RAM $00000-$07fff to be paged into<br>	$8000-$ffff (though the OSCA architecture does allow it.)</pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">C</span> - Copy bytes in memory (from currently selected bank)<br><br>	Use: C <span style="font-style: italic;">start_address end_address destination_address [dest bank]</span></pre>
-<pre><br><br><br><br><span style="font-weight: bold;">CD</span> - Change Directory / Drive (or show path)</pre>
-<pre>	Use: CD (no args)        (show current dir path)<br>             CD ..&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;        (go to parent dir)<br>             CD /&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;(go to root dir)<br>             CD /dir             (go to a dir in root)<br>             CD ../../hats       (go up two dir levels and into "hats")<br>             CD subdir<span style="font-style: italic;">&nbsp;&nbsp;</span> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to subdir)<br>             CD VOLn: &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to volume n)<br>             CD VOLn:hats/berets&nbsp;(change volume and subdir)<br>             CD %xyz&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; (change to assigned directory)<br><br></pre><pre><br><br><span style="font-weight: bold;">CLS</span> - Clear OS screen</pre>
+<pre><span style="font-weight: bold;"><a name="C_-_Copy_bytes"></a>C</span> - Copy bytes in memory (from currently selected bank)<br><br>	Use: C <span style="font-style: italic;">start_address end_address destination_address [dest bank]</span></pre>
+<pre><br><br><br><br><span style="font-weight: bold;"><a name="CD_-_Change_Directory"></a>CD</span> - Change Directory / Drive (or show path)</pre>
+<pre>	Use: CD (no args)        (show current dir path)<br>             CD ..&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;        (go to parent dir)<br>             CD /&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;(go to root dir)<br>             CD /dir             (go to a dir in root)<br>             CD ../../hats       (go up two dir levels and into "hats")<br>             CD subdir<span style="font-style: italic;">&nbsp;&nbsp;</span> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to subdir)<br>             CD VOLn: &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;(change to volume n)<br>             CD VOLn:hats/berets&nbsp;(change volume and subdir)<br>             CD %xyz&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; (change to assigned directory)<br><br></pre><pre><br><br><span style="font-weight: bold;"><a name="CLS_-_Clear"></a>CLS</span> - Clear OS screen</pre>
 <pre>      Use: CLS (no args)</pre>
-<pre><br><br><br><br><span style="font-weight: bold;">COLOUR</span> - Changes the FLOS colour scheme</pre>
+<pre><br><br><br><br><span style="font-weight: bold;"><a name="COLOUR_-_Changes"></a>COLOUR</span> - Changes the FLOS colour scheme</pre>
 <pre>         Use: COLOUR <span style="font-style: italic;">pen [paper] [border] [cursor] </span></pre>
 <pre>         Notes: <span style="font-style: italic;">'pen'</span> = $nm where 'n' is the font character's background colour<br>                and 'm' is the foreground colour as per the following table:<br><br>	0 - transparent (shows "paper" colour)<br>	1 - black<br>	2 - blue<br>	3 - red<br>	4 - magenta<br>	5 - green<br>	6 - cyan<br>	7 - yellow<br>	8 - white<br>	9 - dark grey<br>	a - mid grey<br>	b - light grey<br>	c - orange<br>	d - light blue<br>	e - light green<br>	f - brown</pre>
 <pre>	: [Paper], [border] and [cursor] are 12 bit $RGB values</pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">D</span> - Disassemble Z80 code</pre>
+<pre><span style="font-weight: bold;"><a name="D_-_Disassemble"></a>D</span> - Disassemble Z80 code</pre>
 <pre>	Use: D <span style="font-style: italic;">start_address end_address</span></pre>
 <pre>	Note: To aid debugging, it is possible to cursor up to a line of code, edit the hex bytes and<br>	press enter to update the disassembly listing. (You cannot edit the mnemonics, however).</pre>
 <pre><br></pre>
 <pre><br></pre>
-<pre><span style="font-weight: bold;">DEL</span>- Delete File</pre>
+<pre><span style="font-weight: bold;"><a name="DEL-_Delete_File"></a>DEL</span>- Delete File</pre>
 <pre>	Use:&nbsp;&nbsp; &nbsp;DEL <span style="font-style: italic;">filename</span> (name must be a file, not a dir)</pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">DIR</span> - Show Directory Listing</pre>
+<pre><span style="font-weight: bold;"><a name="DIR_-_Show_Directory"></a>DIR</span> - Show Directory Listing</pre>
 <pre>	Use:&nbsp;&nbsp; &nbsp;DIR (no args)</pre>
 <pre><br></pre>
-<pre><br><br><span style="font-weight: bold;">EXEC</span> - Execute a script </pre>
+<pre><br><br><span style="font-weight: bold;"><a name="EXEC_-_Execute"></a>EXEC</span> - Execute a script </pre>
 <pre>	Use: EXEC <span style="font-style: italic;">filename</span> (note: scripts cannot execute further scripts)</pre>
-<pre><br><br><br><br><span style="font-weight: bold;">F</span>&nbsp; - Fill Memory</pre>
+<pre><br><br><br><br><span style="font-weight: bold;"><a name="F_-_Fill"></a>F</span>&nbsp; - Fill Memory</pre>
 <pre>	Use: &nbsp;&nbsp; &nbsp;F <span style="font-style: italic;">start_address end_address fill_byt</span>e</pre>
-<pre><br><br><br><br><span style="font-weight: bold;">FORMAT</span> - Formats *entire disk* for FAT16 (no partition table)</pre>
+<pre><br><br><br><br><span style="font-weight: bold;"><a name="FORMAT"></a>FORMAT</span> - Formats *entire disk* for FAT16 (no partition table)</pre>
 <pre>	Use:&nbsp;&nbsp; &nbsp;FORMAT <span style="font-style: italic;">device_name</span> (EG: SD_CARD)</pre>
 <pre><br><br><br></pre>
-<pre><br><span style="font-weight: bold;">G</span> - Goto location (IE: Call Z80 routine)</pre>
+<pre><br><span style="font-weight: bold;"><a name="G_-_Goto"></a>G</span> - Goto location (IE: Call Z80 routine)</pre>
 <pre>	Use: G <span style="font-style: italic;">address </span></pre>
 <pre>	Notes: "G 0" resets the Z80</pre>
 <pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; HL will be equal to the first non-space character after the address.</pre>
 <pre><br><br><br>&nbsp;&nbsp; &nbsp;</pre>
-<pre><span style="font-weight: bold;">H</span> - Hunt in memory for hex bytes or text (not case sensitive)</pre>
+<pre><span style="font-weight: bold;"><a name="H_-_Hunt"></a>H</span> - Hunt in memory for hex bytes or text (not case sensitive)</pre>
 <pre>	Use:&nbsp;&nbsp; &nbsp; H <span style="font-style: italic;">start_address end_address byte1 [byte2 byte3 etc]</span><br><br>	H <span style="font-style: italic;">start_address end_address &#8220;string&#8221;</span></pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">LB</span> - Loads bytes to RAM from currently selected drive</pre>
+<pre><span style="font-weight: bold;"><a name="LB_-_Loads_bytes"></a>LB</span> - Loads bytes to RAM from currently selected drive</pre>
 <pre>	Use: &nbsp;&nbsp; LB <span style="font-style: italic;">filename address [bank]</span></pre>
 <pre>	Notes: No path is allowed in the filename.</pre>
 <pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; If no bank is specified, the current bank is used (only when <span style="font-style: italic;">address</span> is &gt; $7FFF)<br><br>	If <span style="font-style: italic;">address</span> is &lt; $8000, any data loading beyond $7FFF will load into bank 0<br><br>	If the load address counter goes beyond address $FFFF, bytes are loaded into the next<br>	bank (and the address wraps around to $8000). This does not affect the current bank<br>	as selected by the B command.<br>	<br><br></pre>
-<pre><br><br><span style="font-weight: bold;">M</span> - Show memory as hex bytes</pre>
+<pre><br><br><span style="font-weight: bold;"><a name="M_-_Show_memory"></a>M</span> - Show memory as hex bytes</pre>
 <pre>        Use: M <span style="font-style: italic;">address</span><br><br>        Note: You can edit the displayed data and press return to update it in memory as the string<br>	      is displayed with the : prefix</pre>
 <pre><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">MD</span> - Make new directory</pre>
+<pre><span style="font-weight: bold;"><a name="MD_-_Make_new_dir"></a>MD</span> - Make new directory</pre>
 <pre>	Use:&nbsp;&nbsp; &nbsp;MD <span style="font-style: italic;">new_subdir</span><br><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">MOUNT</span> - Rescans for connected drives<br><br>	Use:&nbsp;&nbsp; &nbsp;MOUNT (no args)<br><br>	Note: Deletes all environment variables except %EX0</pre>
+<pre><span style="font-weight: bold;"><a name="MOUNT_-_Rescans"></a>MOUNT</span> - Rescans for connected drives<br><br>	Use:&nbsp;&nbsp; &nbsp;MOUNT (no args)<br><br>	Note: Deletes all environment variables except %EX0</pre>
 <pre><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">R</span> - Show registers (Updated on exit from external programs or NMI exception.)</pre>
+<pre><span style="font-weight: bold;"><a name="R_-_Show_reg"></a>R</span> - Show registers (Updated on exit from external programs or NMI exception.)</pre>
 <pre>	Use: &nbsp;&nbsp; &nbsp;R (no args)</pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">RD</span> - Remove directory<br><br>	Use:&nbsp;&nbsp; &nbsp;RD <span style="font-style: italic;">subdir</span> (name must be a dir, not a file)</pre>
+<pre><span style="font-weight: bold;"><a name="RD_-_Remove_dir"></a>RD</span> - Remove directory<br><br>	Use:&nbsp;&nbsp; &nbsp;RD <span style="font-style: italic;">subdir</span> (name must be a dir, not a file)</pre>
 <pre><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">RX</span> -&nbsp; Receive data from serial comms port (place it in RAM) and optionally execute it as code. <br><br>        Use: &nbsp;&nbsp; RX<span style="font-style: italic;"> filename address [bank]&nbsp; &nbsp;</span></pre>
+<pre><span style="font-weight: bold;"><a name="RX_-_Receive"></a>RX</span> -&nbsp; Receive data from serial comms port (place it in RAM) and optionally execute it as code. <br><br>        Use: &nbsp;&nbsp; RX<span style="font-style: italic;"> filename address [bank]&nbsp; &nbsp;</span></pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Notes: If <span style="font-style: italic;">filename</span> is "*" whatever file is sent is accepted.</pre>
 <pre>        If <span style="font-style: italic;">filename</span> is "!", the file is downloaded and immediately run (no other arguments<br>        are used. If the file being downloaded has a FLOS location header, it is loaded to<br>        the address and bank specified in the header (any truncation info in the header is <br>        ignored) otherwise it is loaded to $5000. HL will be set to the first non-space<br>        character after the &#8220;!&#8221;)</pre>
 <pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;  If no bank is specified, the current bank is used (only when <span style="font-style: italic;">address</span> is &gt; $7FFF)<br><br>        If <span style="font-style: italic;">address</span> is &lt; $8000, any data loading beyond $7FFF will load into bank 0<br><br>        If the load address counter goes beyond address $FFFF, bytes are loaded into the next<br>        bank (and the address wraps around to $8000). This does not affect the current bank<br>        as selected by the B command.<br><br><br><br></pre>
-<pre><span style="font-weight: bold;">SB</span> - Save bytes from RAM to currently selected drive</pre>
+<pre><span style="font-weight: bold;"><a name="SB_-_Save_bytes"></a>SB</span> - Save bytes from RAM to currently selected drive</pre>
 <pre>	Use: SB <span style="font-style: italic;">filename address length [bank] &nbsp;</span></pre>
 <pre>	Notes: No path is allowed in the filename <br><br>	When address &lt; $8000 any data eventually sourced from the paged memory area will be<br>	taken from bank 0 first.<br><br>	If no bank is specified, the current bank is used (but only when <span style="font-style: italic;">address</span> is &gt; $7FFF)&nbsp;<br><br>	When the length + address extends beyond address $FFFF, bytes are fetched from the<br>	next bank (ie: the address wraps around to $8000 and the bank number increases. This<br>	does not affect the currently selected bank as set with the B command.</pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">T</span> - Show memory as ASCII text</pre>
+<pre><span style="font-weight: bold;"><a name="T_-_Show_mem"></a>T</span> - Show memory as ASCII text</pre>
 <pre>	Use: &nbsp;&nbsp; &nbsp;T <span style="font-style: italic;">address</span></pre>
 <pre>	Note: you can edit the displayed data and press return to update it in memory as the string<br>	is displayed with the &gt; prefix</pre>
-<pre><br><br><br><br><br><br><span style="font-weight: bold;">TX</span> - Transmit bytes from RAM to serial comms port (using Serial Link app)</pre>
+<pre><br><br><br><br><br><br><span style="font-weight: bold;"><a name="TX_-_Transmit"></a>TX</span> - Transmit bytes from RAM to serial comms port (using Serial Link app)</pre>
 <pre>	Use: &nbsp;&nbsp;&nbsp;TX <span style="font-style: italic;">filename address length [bank]</span></pre>
 <pre>	Notes: When address &lt; $8000 any data eventually sourced from the paged memory area will be<br>	taken from bank 0 first.<br><br>	If no bank is specified, the current bank is used (but only when <span style="font-style: italic;">address</span> is &gt; $7FFF)&nbsp;<br><br>	When the length + address extends beyond address $FFFF, bytes are fetched from the<br>	next bank (ie: the address wraps around to $8000 and the bank number increases. This<br>	does not affect the currently selected bank as set with the B command.<br> <br><br><br>&nbsp;&nbsp; &nbsp;<br></pre>
-<pre><span style="font-weight: bold;">VERS</span> - Shows the OS and Hardware version numbers<br><br>	Use: VERS (no args)</pre>
+<pre><span style="font-weight: bold;"><a name="VERS"></a>VERS</span> - Shows the OS and Hardware version numbers<br><br>	Use: VERS (no args)</pre>
+<pre><br><br><br><br><br><a name="VOLx:"></a><span style="font-weight: bold;">VOLx:</span> - Switches to another volume (goes to the directory that was last active on that volume)<br><br>	Use: VOL0: VOL1: VOL2: etc<br><br>&nbsp;<br><br><br></pre>
+<pre><span style="font-weight: bold;"><a name="_-_Put_text"></a>&gt;</span>&nbsp; - Put text in memory<br><br>	Use: &nbsp;&nbsp; &nbsp;T <span style="font-style: italic;">address "text"</span></pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">&gt;</span>&nbsp; - Put text in memory<br><br>	Use: &nbsp;&nbsp; &nbsp;T <span style="font-style: italic;">address "text"</span></pre>
-<pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">:</span>&nbsp; - Put hex bytes in memory</pre>
+<pre><span style="font-weight: bold;"><a name=":_-_Put_hex"></a>:</span>&nbsp; - Put hex bytes in memory</pre>
 <pre>	Use: &nbsp;&nbsp; <span style="font-style: italic;">&nbsp;address byte1 [byte2 etc]</span></pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">?</span> - List internal commands</pre>
+<pre><span style="font-weight: bold;"><a name="_-_List"></a>?</span> - List internal commands</pre>
 <pre>	Use: &nbsp;&nbsp; &nbsp;? (no args)</pre>
 <pre><br></pre>
-<pre><br><br><span style="font-weight: bold;">&lt;</span> - Put hex bytes in memory and disassemble</pre>
+<pre><br><br><span style="font-weight: bold;"><a name="_-_Put_hex"></a>&lt;</span> - Put hex bytes in memory and disassemble</pre>
 <pre>	Use: &lt; <span style="font-style: italic;">address hexbytes</span></pre>
 <pre><br><br><br><br><span style="text-decoration: underline;">External Commands (created by Phil Ruston)</span></pre>
 <pre>(These are located in the Commands directory and load high in memory - usually Bank $0E, address $F000)<br><br></pre>
-<pre><span style="font-weight: bold;">ASSIGN.EXE</span>&nbsp; - Assigns a directory to an environment variable</pre>
+<pre><span style="font-weight: bold;"><a name="ASSIGN.EXE"></a>ASSIGN.EXE</span>&nbsp; - Assigns a directory to an environment variable</pre>
 <pre>	Use: ASSIGN <span style="font-style: italic;">xyz [path]</span></pre>
 <pre>	'xyz' is the name of the path "proxy" which will have a "%" prefix.<br><br>	If the path is omitted then the current folder is assigned.</pre>
 <pre><br><br><br></pre>
-<pre><span style="font-weight: bold;">BAUD.EXE</span> - Sets the BAUD rate used in FLOS</pre>
+<pre><span style="font-weight: bold;"><a name="BAUD.EXE"></a>BAUD.EXE</span> - Sets the BAUD rate used in FLOS</pre>
 <pre>	Use: BAUD <span style="font-style: italic;">speed</span></pre>
 <pre>	'Speed' is 115200 or 57600 (default Baud rate is 115200)</pre>
-<pre><br></pre>
-<pre><span style="font-weight: bold;"><br><br><br>CHFNT.EXE</span> - Changes the OS font</pre>
+<pre><br><br><br></pre>
+<pre><span style="font-weight: bold;"><br><a name="BOOT.EXE"></a>BOOT.EXE -</span> Reconfigure the FPGA from the specified slot<br><br>	Use: Boot n<br><br>	Where n is the slot to boot from<br><span style="font-weight: bold;"><br><br><br><br><br><a name="CHFNT.EXE"></a>CHFNT.EXE</span> - Changes the OS font</pre>
 <pre>	Use: CHFNT <span style="font-style: italic;">fontfile [xx]</span></pre>
 <pre>	CHFNT looks in the current directory and then in the root/fonts directory for the font file.</pre>
 <pre>	<br>	FONT FILE DESCRIPTION:</pre>
 <pre>	Two types of font files are supported - both use raw bitmap data but are formatted differently.<br>	The original (.fnt) files hold 96 character definitions (for ASCII codes 32 to 127) and are<br>	stored in a raster-like format: 96 bytes wide * 8 lines high</pre>
 <pre>	FLOS 6.02+ supports all 256 ASCII characters, so the font file can be 1 to 256 characters long.<br>	The new FLOS font files (.fff) are formatted in the linear &#8220;8-bytes-per-character-defintion&#8221;<br>	grouped style. When an .fff file is specified, the first character image to be overwritten<br>	can be set by adding a hex value to the end of the command line. This allows, for example,<br>	the extended ASCII char images (128-255) to be patched onto the current font. (If no value<br>	is supplied, patching starts at ASCII char $00)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;</pre>
 <pre><br></pre>
-<pre><span style="font-weight: bold;"><br><br><br>CMP.EXE</span> - Compares two areas of system RAM and shows differences</pre>
+<pre><span style="font-weight: bold;"><br><br><br><a name="CMP.EXE"></a>CMP.EXE</span> - Compares two areas of system RAM and shows differences</pre>
 <pre>	Use: CMP <span style="font-style: italic;">[#] start_address end_address target_address [bank]</span></pre>
 <pre>	If # is included, the operation is carried out silently (apart from FLOS error messages<br>	such as incorrect syntax)</pre>
 <pre>	The source bank is always that currently seleced by FLOS, the target bank is the same as<br>	the source bank unless specified.</pre>
-<pre><br></pre>
-<pre><br><span style="font-weight: bold;"><br><br>FILEINFO.EXE</span> - Shows file length / load address, sets the Envar &#8220;FSIZ&#8221;<br><br>	Use: FILEINFO <span style="font-style: italic;">(#) filename</span></pre>
+<pre><br><br><br><br></pre>
+<pre><span style="font-weight: bold;"><a name="ECHO.EXE"></a>ECHO.EXE</span> - Displays a line of text<br><br>	Use: ECHO some text to display<br><br><br><br><br><br><span style="font-weight: bold;"><br><br><a name="FILEINFO.EXE"></a>FILEINFO.EXE</span> - Shows file length / load address, sets the Envar &#8220;FSIZ&#8221;<br><br>	Use: FILEINFO <span style="font-style: italic;">(#) filename</span></pre>
 <pre>	If # is included, the operation is carried out silently (any FLOS error message is also muted to $80)</pre>
 <pre>	A load and bank address is only shown if the file is a program with the location header.</pre>
-<pre><br><br><span style="font-weight: bold;"><br><br><br>FILECMP.EXE</span> - Compares two files and shows any differences.</pre>
+<pre><br><br><span style="font-weight: bold;"><br><br><br><a name="FILECMP.EXE"></a>FILECMP.EXE</span> - Compares two files and shows any differences.</pre>
 <pre>	Use: <span style="font-style: italic;">FILECMP [#] FILENAME_1 FILENAME_2</span></pre>
 <pre>	If # is included, the operation is carried out silently (apart from FLOS error messages such as<br>	incorrect syntax)</pre>
 <pre>	If the files are not the same size the comparison runs to the end of the shortest file.</pre>
 <pre>	If any bytes are different, the "ERR" envar is set to $80.</pre>
 <pre>	If the filesizes are different but the bytes up to the end of the shortest are the same, "ERR" is set to $81.</pre>
 <pre><br></pre>
-<pre><br><span style="font-weight: bold;"><br><br>FILERX.EXE</span> - Receives files over Serial Link and saves them to the current dir.<br><br>	Use: FILERX (no args)</pre>
-<pre><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">FILETX.EXE</span> - Sends a file from the current dir (to PC) over Serial Link</pre>
+<pre><br><span style="font-weight: bold;"><br><br><a name="FILERX.EXE"></a>FILERX.EXE</span> - Receives files over Serial Link and saves them to the current dir.<br><br>	Use: FILERX (no args)</pre>
+<pre><br><br><br><br><br></pre>
+<pre><span style="font-weight: bold;"><a name="FILETX.EXE"></a>FILETX.EXE</span> - Sends a file from the current dir (to PC) over Serial Link</pre>
 <pre>	Use: FILETX <span style="font-style: italic;">filename</span><br><br></pre>
-<pre><br><br><br><span style="font-weight: bold;">GOTO.EXE</span> - Causes a jump within scripts (IE: sets the GOTO envar)</pre>
+<pre><br><br><br><br><span style="font-weight: bold;"><a name="GOTO.EXE"></a>GOTO.EXE</span> - Causes a jump within scripts (IE: sets the GOTO envar)</pre>
 <pre>	Use: GOTO <span style="font-style: italic;">label</span></pre>
 <pre>	Where <span style="font-style: italic;">&#8216;label&#8217;</span> is a 4 character ASCII label within a script.</pre>
 <pre>	This command is essentially the same as: &#8220;SET GOTO label&#8221;</pre>
-<pre><br><br></pre>
-<pre><br><br><br><span style="font-weight: bold;">IF.EXE</span> - Main script control function.</pre>
+<pre><br><br><br><br></pre>
+<pre><span style="font-weight: bold;"><a name="HELP.EXE"></a>HELP.EXE</span> - Shows the help file for a particular command<br><br>	Use: HELP command<br><br><br><br><br><br><br><span style="font-weight: bold;"><a name="IF.EXE"></a>IF.EXE</span> - Main script control function.</pre>
 <pre>	Use: IF <span style="font-style: italic;">xxxx cond yyyy </span>GOTO<span style="font-style: italic;"> zzzz</span><br><br>	Where <span style="font-style: italic;">xxxx</span> is the name of an Envar cond is "=" or &#8220;&lt;&gt;&#8221; for maths/strings or "&lt;" or "&gt;" for maths only. </pre>
 <pre>	<span style="font-style: italic;">yyyy </span>= is a hex number, another Envar name if enclosed in brackets or a literal string if enclosed in quotes.</pre>
 <pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<span style="font-style: italic;">zzzz</span> = a 4 character (max) label</pre>
 <pre>	EG:-<br>	IF ERR &gt; 0 GOTO FAIL<br>	IF STR = &#8220;THIS&#8221; GOTO THAT<br>	IF NUM1 &lt; (NUM2) GOTO LESS</pre>
 <pre>	(Remember: Envars names/values and labels are 4 characters max)</pre>
 <pre><br></pre>
-<pre><br><br><br><span style="font-weight: bold;">INPUTNUM.EXE</span> - Get user input (hex number) and apply to an environment variable.</pre>
+<pre><br><br><a name="INPUTNUM.EXE"></a><br><span style="font-weight: bold;">INPUTNUM.EXE</span> - Get user input (hex number) and apply to an environment variable.</pre>
 <pre>               Use: INPUTNUM <span style="font-style: italic;">envar</span></pre>
 <pre><br><br></pre>
 <pre><br></pre>
-<pre><span style="font-weight: bold;">INPUTSTR.EXE</span> - Get user input (4 chars max string) and apply to an environment variable.</pre>
+<pre><span style="font-weight: bold;"><a name="INPUTSTR.EXE"></a>INPUTSTR.EXE</span> - Get user input (4 chars max string) and apply to an environment variable.</pre>
 <pre>               Use: INPUTSTR <span style="font-style: italic;">envar</span></pre>
 <pre><br><br></pre>
 <pre><br></pre>
-<pre><span style="font-weight: bold;">KEYMAP.EXE</span> - Change the keymap</pre>
+<pre><span style="font-weight: bold;"><a name="KEYMAP.EXE"></a>KEYMAP.EXE</span> - Change the keymap</pre>
 <pre>	Use: KEYMAP <span style="font-style: italic;">keymap_file</span></pre>
 <pre>	Keymap looks in the current directory and then in the root/keymaps directory for the keymap file.<br>	The current keymap list is</pre>
 <pre>	UK.bin - UK (default)<br>	US.bin - USA<br>	DE.bin - Germany<br>	IT.bin - Italy<br>	PT.bin - Portugal</pre>
 <pre><br>	KEYMAP FILE DESCRIPTION:</pre>
 <pre>	Keymap files are "PS/2 set 2" scancode-to-ASCII translation tables.<br>	They can contain two or three "banks" of the translation table: one<br>	for unshifted keys, one for shifted keys and optionally one for<br>	Alt-modified keys. Each bank is 98 bytes long, covering scancodes $00-$61</pre>
-<pre><br><br><br><br><br><br style="font-weight: bold;"><span style="font-weight: bold;">LOADVRAM.EXE</span> - Loads a file to Video RAM<br><br>	Use: LOADVRAM <span style="font-style: italic;">filename address</span></pre>
+<pre><br><br><br><br><br><span style="font-weight: bold;"><a name="LCD.EXE"></a>LCD.EXE</span> - Disassembles a Linecop program<br><br>          Use: LCD linecop_address<br><br>           Notes: "linecop_address" is in the range 0-FFFE and refers to the LineCop accessible area of<br>           system RAM from $70000-$7ffff. (The least significant bit is ignored)<br><br><br><br><br><br><a name="LOADSPR.EXE"></a><br style="font-weight: bold;"><span style="font-weight: bold;">LOADSPR.EXE</span> - Loads a file to Sprite RAM<br><br>	Use: LOADSPR <span style="font-style: italic;">filename address</span><br><br>	Notes: address is flat sprite memory location between 0-1FFFF<br><br><br><br><br><br><br style="font-weight: bold;"><span style="font-weight: bold;"><a name="LOADVRAM.EXE"></a>LOADVRAM.EXE</span> - Loads a file to Video RAM<br><br>	Use: LOADVRAM <span style="font-style: italic;">filename address</span></pre>
 <pre>	Notes: <span style="font-style: italic;">address</span> is a flat video memory location between 0-7FFFF</pre>
-<pre><br><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">MOUSE.EXE</span> - Activate the mouse driver</pre>
+<pre><br><br><br><br><br><span style="font-weight: bold;"><a name="MONO.EXE"></a>MONO.EXE</span> - Direct all 4 sound channels to both left and right speakers<br><br>	Use: MONO<br><br><br><br><br><br></pre>
+<pre><span style="font-weight: bold;"><a name="MOUSE.EXE"></a>MOUSE.EXE</span> - Activate the mouse driver</pre>
 <pre>	Use: MOUSE (no parameters)</pre>
 <pre>	Notes: The mouse command initializes the mouse driver. If a mouse is detected it calls the<br>	kernal routine "kjt_enable_mouse".</pre>
 <pre><br><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">SAVEVRAM.EXE</span> - Saves data from Video RAM to a file</pre>
+<pre><span style="font-weight: bold;"><a name="SAVEVRAM.EXE"></a>SAVEVRAM.EXE</span> - Saves data from Video RAM to a file</pre>
 <pre>	Use: SAVEVRAM <span style="font-style: italic;">filename address length</span></pre>
 <pre>	Notes: <span style="font-style: italic;">address</span> is flat video memory location between 0-7FFFF</pre>
 <pre><br><br><br><br><br></pre>
-<pre><span style="font-weight: bold;">SET.EXE</span> - Sets / deletes / adjusts environment variables</pre>
+<pre><span style="font-weight: bold;"><a name="SET.EXE"></a>SET.EXE</span> - Sets / deletes / adjusts environment variables</pre>
 <pre>	Use: SET <span style="font-style: italic;">abcd (=) value</span></pre>
 <pre>	Where: <span style="font-style: italic;">abcd</span> is the 4 character ascii name for the envar.<br><br>	&#8220;=&#8221; can be omitted if desired.</pre>
 <pre>	<span style="font-style: italic;">Value </span>is either:</pre>
 <pre>	A 32 bit max hex value string EG: 1234AAFF<br>	A 4 character (max) string in quotes EG: &#8220;BEEP&#8221;<br>	Another envar name in round brackets. EG: (NAME)<br>	+ To increment the value of the envar <br>	- To decrement the value of the envar<br>	# To delete the envar if it exists.</pre>
 <pre>	If no arguments are given, the current environment variables are listed.</pre>
 <pre>	EG: SET HATS = &#8220;CATS&#8221;<br>	SET BEAN = 12345678<br>	SET BEAN -<br>	SET BEAN +<br>	SET HATS #<br>	SET BLAH = (HATS)</pre>
-<pre><br></pre>
+<pre><br><br><br><br><br><span style="font-weight: bold;"><a name="STEREO.EXE"></a>STEREO.EXE</span> - Directs sound channels 0+2 to left speaker, and 1+3 to right speaker<br><br>         Use: STEREO<br><br><br><br><br><br><span style="font-weight: bold;"><a name="TYPE.EXE"></a>TYPE.EXE</span> - Shows the contents of a text file<br><br>         Use: TYPE filename<br><br><br><br><br><br><span style="font-weight: bold;"><a name="VGA50.EXE"></a>VGA50.EXE</span> - Sets VGA Mode to non-standard 50Hz<br><br>        Use: VGA50<br><br><br><br><br><br><span style="font-weight: bold;"><a name="VGA60.EXE"></a>VGA60.EXE</span> - Sets VGA Mode to Standard 60Hz<br><br>        Use: VGA60<br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="text-decoration: underline; font-weight: bold;">FLOS return messages</span></pre>
 <pre><br>When a program returns to FLOS with a value in A other than zero, (and the zero flag is not set)<br>one of the following messages will be displayed:</pre>
