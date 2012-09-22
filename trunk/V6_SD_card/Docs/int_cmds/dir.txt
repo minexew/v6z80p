@@ -1,5 +1,10 @@
 
 DIR - Show Directory Listing
 
-Usage: DIR (no args)
+Usage: DIR 
+       DIR path
+       DIR %asn
+       
+       etc etc..
+
 
