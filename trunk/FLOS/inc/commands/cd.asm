@@ -1,23 +1,69 @@
 ;-----------------------------------------------------------------------
-;"cd" - Change Dir command. V6.09
+;"cd" - Change Dir command. V6.11
 ;-----------------------------------------------------------------------
 
 os_cmd_cd	
 
+	ld a,(hl)				; if no args, just show dir path		
+	or a				
+	jr nz,cd_parse_path		
+
+;--------------------------------------------------------------------------------------------------
+
+max_dirs	equ 16
+
+cd_show_path
+
 	call kjt_check_volume_format	
 	ret nz
 
-	ld a,(current_volume)
-	ld (original_vol_cd_cmd),a
-	push hl
-	call fs_get_dir_block
-	ld (original_dir_cd_cmd),de
-	pop hl
+	ld b,max_dirs
+	ld c,0
+lp1	push bc
+	call kjt_get_dir_cluster
+	pop bc
+	push de
+	inc c
+	push bc
+	call kjt_parent_dir
+	pop bc
+	jr nz,shdir_lp
+	djnz lp1
+	
+shdir_lp	pop de
+	push bc
+	push de
+	call kjt_set_dir_cluster
+	call kjt_get_dir_name
+	call kjt_print_string
+	pop de				;dont show "/" if root dir (VOLx)
+	ld a,d
+	or e
+	pop bc
+	jr z,no_dirsl
+	ld a,c				;dont show "/" if last dir of list
+	dec a
+	jr z,no_dirsl
+	ld a,$2f				;2f = "/"
+	call os_print_char
+no_dirsl	dec c
+	jr nz,shdir_lp
 
-	ld a,(hl)				; if no args, just show dir path		
-	or a				
-	jp z,cd_show_path		
+	call os_new_line	
+	xor a
+	ret
 
+
+;--------------------------------------------------------------------------------------------------
+
+
+cd_parse_path
+	
+	call kjt_check_volume_format	
+	ret nz
+	
+	call cd_store_vol_dir
+	
 	ld a,(hl)				
 	cp $2f			
 	jr nz,cd_nogor			; if "/" = go root
@@ -31,25 +77,14 @@ os_cmd_cd
 	
 cd_nogor	cp "%"				; "%" char = go assigned dir
 	jr nz,cd_no_assign
-
-cd_envar	call kjt_get_envar
-	jr z,cd_evok
-	ld a,$23
-	or a
-	ret
-cd_evok	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	inc hl
-	ld a,(hl)
-	push de
-	call os_change_volume
-	pop de
+	push hl
+	call os_set_dirvol_from_envar
+	pop hl
 	ret nz
-	call kjt_set_dir_cluster
-	ret
-	
-	
+	ld de,5
+	add hl,de
+	jr cd_nchvol
+		
 cd_no_assign
 
 	push hl
@@ -114,58 +149,30 @@ cd_mol	ld a,(hl)				;move to next dir name in args (after "/") if no more found,
 cd_dcherr	
 
 	push af				;if a dir is not found go back to original dir and drive 
-	ld de,(original_dir_cd_cmd)
-	call fs_update_dir_block
-	ld a,(original_vol_cd_cmd)
-	call os_change_volume	
+	call cd_restore_vol_dir
 	pop af
 	or a
 	ret
-	
+
+
 ;--------------------------------------------------------------------------------------------------
-
-cd_show_path
-
-
-max_dirs	equ 16
-
-	ld b,max_dirs
-	ld c,0
-lp1	push bc
-	call kjt_get_dir_cluster
-	pop bc
-	push de
-	inc c
-	push bc
-	call kjt_parent_dir
-	pop bc
-	jr nz,shdir_lp
-	djnz lp1
 	
-shdir_lp	pop de
-	push bc
-	push de
-	call kjt_set_dir_cluster
-	call kjt_get_dir_name
-	call kjt_print_string
-	pop de				;dont show "/" if root dir (VOLx)
-	ld a,d
-	or e
-	pop bc
-	jr z,no_dirsl
-	ld a,c				;dont show "/" if last dir of list
-	dec a
-	jr z,no_dirsl
-	ld a,$2f				;2f = "/"
-	call os_print_char
-no_dirsl	dec c
-	jr nz,shdir_lp
+cd_store_vol_dir
 
-	call os_new_line	
-	xor a
+	call os_get_dir_vol
+	ld (original_vol_cd_cmd),a
+	ld (original_dir_cd_cmd),de
+	ret
+	
+	
+cd_restore_vol_dir
+	
+	ld a,(original_vol_cd_cmd)
+	ld de,(original_dir_cd_cmd)
+	call os_set_dir_vol
 	ret
 
-
+		
 ;--------------------------------------------------------------------------------------------------
 
 original_dir_cd_cmd	equ scratch_pad 

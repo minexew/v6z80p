@@ -2,10 +2,22 @@
 Current FLOS version:
 ---------------------
 
-v6.06 - 21/09/2012 (currently in testing phase)
+v6.06 - 22/09/2012
 
-	Minor change: SD Card driver v112: Generates CRC for commands, sends 8 clocks instead
-                      of read_byte after command (for OSCA emulator compatibility).
+	Change      : "VERS" command is now external, additionally the command can now set environment
+                      variables "OSCA" and "FLOS" if args = "#"
+
+	Improvement : DIR command no longer scrolls the directory name off screen on first page of long listings.
+
+	Improvement : CD command with assigned dir can now accept extra path. EG: "CD %EX1/subdir"
+
+	Improvement : DIR command now accepts path argument, EG: "DIR VOL0:some_dir/blah"
+
+	Bugfix      : Volume switching on upon error fixed
+	
+	Internal    : SD Card driver v112: Generates CRC for commands, sends 8 clocks instead
+                      of read_byte after command (mods by Stefano Bodrato for OSCA emulator
+                      compatibility).
 
 
 

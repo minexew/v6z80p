@@ -1051,7 +1051,17 @@ os_cold_start
 	ld bc,$0603
 	ld (cursor_y),bc
 
-	call os_cmd_vers		; show FLOS / OSCA versions
+	call os_get_version		; show FLOS / OSCA versions
+	push hl
+	ex de,hl
+	ld hl,flos_version_hex
+	call hexword_to_ascii
+	pop de
+	ld hl,osca_version_hex
+	call hexword_to_ascii
+	ld hl,flos_version_txt
+	call os_print_string
+	
 	call os_cmd_remount		; set up drives
 	call os_new_line		; skip 1 line
 
@@ -1196,7 +1206,7 @@ tst_fkey	cp (hl)
 	jr z,fkey_gfn
 	
 	ld hl,key_txt		; not found, try to change to "%key" envar dir assignment
-	call cd_envar
+	call os_set_dirvol_from_envar
 	jr nz,nofkstr		; if envar doesnt exist, quit
 	ld hl,fkey_filename
 	call os_find_file		; if Fx.CMD file doesn't exist here either quit
@@ -1529,7 +1539,7 @@ not_g_cmd	ld (os_args_start_lo),hl	; attempt to load external OS command
 os_tryex	ld a,$30			; look for assigned envars with %EX1-%EX9
 pathlp1	ld (ex_path_txt+3),a
 	ld hl,ex_path_txt
-	call cd_envar
+	call os_set_dirvol_from_envar
 	jr nz,evpbad
 	ld hl,scratch_pad		; sucessfully changed to assigned dir
 	call os_find_file		; is the program here?
@@ -1544,9 +1554,8 @@ os_ndfxc	call restore_dir_vol	; go back to pre-command dir and volume
 	jp show_erm
 	
 	
-os_gecmd	ld a,(current_volume)	; store the dir and vol the command loaded from
+os_gecmd	call os_get_dir_vol		; store the dir and vol the command loaded from
 	ld (cmd_vol),a
-	call fs_get_dir_block
 	ld (cmd_dir),de
 	ld hl,(os_args_start_lo)	; Found external command!
 	call os_scan_for_non_space	; set args start to first non-space character
@@ -1692,9 +1701,8 @@ os_exec_command
 cache_dir_vol
 	
 	push de
-	ld a,(current_volume)
+	call os_get_dir_vol
 	ld (os_vol_cache),a
-	call fs_get_dir_block	
 	ld (os_dir_block_cache),de
 	pop de
 	ret
@@ -1704,10 +1712,9 @@ cache_dir_vol
 restore_dir_vol
 	
 	push de
-	ld (os_vol_cache),a
-	call os_change_volume
+	ld a,(os_vol_cache)
 	ld de,(os_dir_block_cache)
-	call fs_update_dir_block
+	call os_set_dir_vol
 	pop de
 	ret
 	
@@ -1717,8 +1724,7 @@ get_pre_launch_regs
 				
 	ld hl,(os_args_start_lo)	; at start, HL = first argument location
 	call os_next_arg
-	call fs_get_dir_block	; at start, DE = dir block
-	ld a,(current_volume)	; at start, A = current volume
+	call os_get_dir_vol		; at start, DE = dir block, A = current volume
 	ret
 	
 
@@ -2798,7 +2804,6 @@ include "commands\rx.asm"
 include "commands\tx.asm"
 include "commands\t.asm"
 include "commands\mount.asm"
-include "commands\vers.asm"
 include "commands\colour.asm"
 include "commands\exec.asm"
 include "commands\ltn.asm"
@@ -3375,8 +3380,25 @@ os_get_volume_info
 	ld b,a
 	ld a,(current_volume)
 	ret
+
+
+
 	
-		
+os_set_dirvol_from_envar
+	
+	call kjt_get_envar			;HL = location of envar name
+	jr z,cd_evok
+	ld a,$23
+	or a
+	ret
+cd_evok	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	inc hl
+	ld a,(hl)
+	call os_set_dir_vol
+	ret		
+
 ;------------------------------------------------------------------------------------------------------------
 
 
@@ -3719,6 +3741,31 @@ include	"fat16_code_v121.asm"
 ;-----------------------------------------------------------------------------------------------
 
 
+
+os_get_dir_vol
+
+	call fs_get_dir_block		;returns in cluster in DE
+	ld a,(current_volume)		;returns volume in A
+	ret
+
+
+
+
+
+os_set_dir_vol
+
+	push de
+	call os_change_volume		;set A to volume, set DE to cluster
+	pop de
+	ret nz
+	call fs_update_dir_block
+	xor a
+	ret
+	
+
+
+
+	
 
 fs_get_dir_cluster_address
 

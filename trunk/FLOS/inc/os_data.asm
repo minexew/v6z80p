@@ -16,19 +16,16 @@ boot_script_fn	db "BOOT_RUN.SCR",0
 
 os_hex_prefix_txt	db "$",0
 
-os_version_txt	db "FLOS V:$",0		
-
-hw_version_txt	db "OSCA V:$",0
-
-fwd_slash_txt	db " / ",0
+flos_version_txt	db "FLOS V:$"
+flos_version_hex	db "xxxx / OSCA V:$"
+osca_version_hex	db "xxxx"
+crlfx2_txt	db 11,11,0
 
 loading_txt	db "Loading..",11,0
 
 saving_txt	db "Saving..",11,0
 
 os_more_txt	db 11,"More?",11,11,0
-
-crlfx2_txt	db 11,11,0
 
 nmi_freeze_txt	db 11,11,"** BREAK! **"
 
@@ -149,7 +146,7 @@ dictionary	db 0,"DEBUG:"		;01
 		db $94,"SB"		;4b
 		db $95,"T"		;4c
 		db $96,"TX"		;4d
-		db $97,"VERS"		;4e	
+		db 0,""			;4e	
 		db 0,""			;4f
 		
 		db 0,"Mem"		;50
@@ -158,13 +155,13 @@ dictionary	db 0,"DEBUG:"		;01
 		db 0,""			;53
 		db 0,""			;54
 		db 0,""			;55
-		db $98,"MD"		;56
+		db $97,"MD"		;56
 		db 0,""			;57
 		db 0,""			;58
 		db 0,""			;59
 		db 0,""			;5a
 		db 0,""			;5b
-		db $99,"?"		;5c
+		db $98,"?"		;5c
 		db 0,""			;5d
 		db 0," "			;5e ???
 		db 0,"-"			;5f
@@ -239,7 +236,7 @@ hex_byte_txt	db "xx"			;90 (for hex-to-ascii)
 		db 0,""			;9c
 		db 0,""			;9d
 		db 0,"Enter"		;9e 
-		db $9a,"EXEC"		;9f
+		db $99,"EXEC"		;9f
 
 		db 0,""			;a0
 		db 0,"Script"		;a1
@@ -249,7 +246,7 @@ yes_txt		db 0,"YES" 		;a2
 		db 0,"Continue"		;a5
 		db 0,"None"		;a6
 		db 0,"Driver"		;a7
-		db $9b,"<"		;a8
+		db $9a,"<"		;a8
 		db 0,"Envar"		;a9
 				
 		db 0,1			;END MARKER
@@ -298,11 +295,10 @@ os_cmd_locs	dw os_cmd_colon	;command 0
 		dw os_cmd_t	;15
 		dw os_cmd_tx	;16	
 
-		dw os_cmd_vers	;17											
-		dw os_cmd_md	;18
-		dw os_cmd_list	;19
-		dw os_cmd_exec	;1a
-		dw os_cmd_ltn	;1b
+		dw os_cmd_md	;17
+		dw os_cmd_list	;18
+		dw os_cmd_exec	;19
+		dw os_cmd_ltn	;1a
 
 
 
