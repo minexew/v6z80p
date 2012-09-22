@@ -9,6 +9,7 @@
 ;-------------------------------------------------------------------------------------
 ; Changes
 ;
+; 1.04 - Changed "/../" (truncated path) to "/--/"
 ; 1.03 - Allow Envar data to be ascii string (4 chars in quotes)
 ;        "+" and "-" parameters to inc or dec value
 ;        "#" to delete the Envar
@@ -374,7 +375,7 @@ ds_end	push de
 	or b				;if no dir names in buffer, all done
 	ret z
 	
-	ld hl,trunc_txt			;if the dir list was truncated show "/../"
+	ld hl,trunc_txt			;if the dir list was truncated show "/--/"
 	ld a,e
 	or d
 	call z,kjt_print_string	
@@ -404,7 +405,7 @@ dnbacklp	dec hl
 
 last_full dw 0
 
-trunc_txt	db "/../",0
+trunc_txt	db "/--/",0
 
 text_buffer ds max_chars+8,0
 
