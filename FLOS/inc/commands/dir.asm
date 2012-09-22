@@ -1,11 +1,26 @@
 ;-----------------------------------------------------------------------
-; "dir" - show directory command. v6.07
+; "dir" - show directory command. v6.08
 ;-----------------------------------------------------------------------
 
 os_cmd_dir
 
 	call kjt_check_volume_format	
 	ret nz
+	
+	ld a,(hl)
+	or a
+	jr z,dir_no_args
+
+	call cd_parse_path			;if DIR has args, interpret as path
+	ret nz
+	call dir_no_args
+	push af
+	call cd_restore_vol_dir
+	pop af
+	ret
+	
+	
+dir_no_args
 	
 	call div_line
 	call os_get_current_dir_name		;show dir name
@@ -21,7 +36,7 @@ os_cmd_dir
 nrootdir	call div_line
 	call os_goto_first_dir_entry
 	jr nz,os_dlr
-	xor a
+	ld a,2
 	ld (os_linecount),a
 	
 os_dfllp	call os_get_dir_entry		;line list loop starts here
