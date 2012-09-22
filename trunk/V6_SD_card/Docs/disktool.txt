@@ -7,7 +7,7 @@ Use: DISKTOOL (no arguments)
 Info
 ----
 
-Ordinarilly, when formatting an SD
+Ordinarily, when formatting an SD
 card with Windows (or by using the
 FLOS FORMAT command) no Master Boot
 Record is created - instead the entire
