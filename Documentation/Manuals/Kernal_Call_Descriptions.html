@@ -1,12 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
-<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>FLOS Kernal Calls</title>
-
-</head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>FLOS Kernal Calls</title></head>
 <body>
 <h3><span style="text-decoration: underline; font-weight: bold;">FLOS
-Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
-Last updated 25-08-2012 for FLOS v603</span></h3>
+v603 Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
+Last updated 22-09-2012</span></h3>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span><br>The following FLOS kernal routines can be executed simply by using a "CALL name"<br>instruction, with registers pre-set to the routines requirements. <br><br>EG:- <br><br>---------------------------------------------------------------------------------<br><br>         LD HL,  my_text<br>         CALL    kjt_print_string<br><br>         [rest of program..]<br>	<br>my_text  DB "HELLO WORLD!",0<br><br>----------------------------------------------------------------------------------<br><br><br><span style="text-decoration: underline;">Notes:</span><br><br>Kernal calls should not be made when the Video RAM is paged in. The only routine<br>that is guaranteed to work in that situation is "kjt_page_out_video"</pre>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span>It should be assumed that Kernal calls trash all registers, unless a routine's<br>documentation says otherwise.</pre>
 <span style="text-decoration: underline; font-weight: bold;"><br>
@@ -57,7 +55,7 @@ Kernal Call Index:</span><br>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;"><a name="kjt_change_volume"></a>&nbsp;kjt_change_volume</span></pre>
-<pre><br>Action: Selects a new volume</pre>
+<pre><br>Action: Selects a new volume (the directory will be that which was last selected in the new volume) </pre>
 <pre><br>Input Registers&nbsp; :<br><br> A = volume to select</pre>
 <pre><br>Output Registers : <br><br> Standard error codes </pre>
 <pre><br>Notes: Will not allow a change to an invalid Volume (non-FAT16 etc)</pre>
@@ -66,7 +64,7 @@ Kernal Call Index:</span><br>
 <pre><br><span style="font-weight: bold;"><a name="kjt_format_device"></a>&nbsp;kjt_format_device</span></pre>
 <pre><br>Action: Formats a device (entire drive as single partition, no MBR)</pre>
 <pre><br>Input Registers&nbsp; :</pre>
-<pre> A&nbsp; = Device to format<br><br> HL = Disk label ascii </pre>
+<pre> A&nbsp; = Device to format (0 = DEV0: (SD_Card), 1 = DEV1: (user driver 1)<br><br> HL = Address of desired disk label ASCII string </pre>
 <pre><br>Output Registers : Standard error codes </pre>
 <pre><br>Notes: It is highly recommended that "kjt_mount_volumes" is called after this routine.</pre>
 <pre><br></pre>
@@ -92,20 +90,20 @@ Kernal Call Index:</span><br>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_root_dir"></a>&nbsp;kjt_root_dir</span></pre>
-<pre><br>Action: Go to root directory of drive</pre>
+<pre><br>Action: Go to root directory of volume</pre>
 <pre><br>Input Registers&nbsp; : None</pre>
 <pre>Output Registers : Standard error codes</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_delete_dir"></a>kjt_delete_dir</span></pre>
-<pre><br>Action: Deletes an (empty) directory</pre>
+<pre><br>Action: Deletes an (empty) subdirectory</pre>
 <pre><br>Input Registers:</pre>
 <pre> HL = zero terminated dir name</pre>
 <pre><br>Output Registers : Standard error codes</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_erase_file"></a>kjt_erase_file</span></pre>
-<pre><br>Action: Deletes a file</pre>
+<pre><br>Action: Deletes a file in the current directory</pre>
 <pre><br>Input Registers:</pre>
 <pre> HL = zero terminated file name</pre>
 <pre><br>Output Registers : Standard error codes</pre>
@@ -121,7 +119,7 @@ Kernal Call Index:</span><br>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;"></span></pre>
 <pre><span style="font-weight: bold;"><a name="kjt_load_file"></a>kjt_load_file</span></pre>
-<pre><br>Action: Loads the specified file in its entirity to the specifed address.</pre>
+<pre><br>Action: Loads the specified file from current directory in its entirity to the specifed address.</pre>
 <pre><br>Input registers:</pre>
 <pre> IX&nbsp;&nbsp; = address to load to</pre>
 <pre> B&nbsp;&nbsp;&nbsp; = bank to load to</pre>
@@ -132,7 +130,7 @@ Kernal Call Index:</span><br>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_save_file"></a>kjt_save_file</span></pre>
-<pre><br>Action: Saves a file to current disk / directory.</pre>
+<pre><br>Action: Saves a file to current directory.</pre>
 <pre><br>Input registers:</pre>
 <pre> IX&nbsp;&nbsp; = Source data start address</pre>
 <pre> B&nbsp;&nbsp;&nbsp; = bank to save data from</pre>
@@ -144,7 +142,7 @@ Kernal Call Index:</span><br>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_open_file"></a>kjt_open_file</span></pre>
-<pre><br>Action: Looks for a file on current disk and sets internal registers ready<br>        for "kjt_read_from_file" call.</pre>
+<pre><br>Action: Looks for a file in current directory and sets internal registers ready<br>        for "kjt_read_from_file" call.</pre>
 <pre><br>Input Registers&nbsp; :</pre>
 <pre> HL = pointer to zero terminated filename to look for</pre>
 <pre><br>Output Registers :</pre>
@@ -185,14 +183,14 @@ Kernal Call Index:</span><br>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;"><a name="kjt_create_file"></a>kjt_create_file</span></pre>
-<pre><br>Action: Makes a file stub for a new file on current disk, current directory.</pre>
+<pre><br>Action: Makes a file stub for a new file in current directory.</pre>
 <pre><br>Input Registers :</pre>
 <pre>HL = address of zero-terminated filename.</pre>
 <pre><br>Output Registers : Standard error codes</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;"><a name="kjt_write_to_file"></a>kjt_write_to_file</span></pre>
-<pre><br>Action: Appends new data to an existing file on current disk / directory.</pre>
+<pre><br>Action: Appends new data to an existing file in current directory.</pre>
 <pre><br>Input Registers:</pre>
 <pre> HL&nbsp;&nbsp; = null-terminated ascii filename of file to be appended to</pre>
 <pre> IX&nbsp;&nbsp; = address of source data</pre>
@@ -204,7 +202,7 @@ Kernal Call Index:</span><br>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_dir_list_first_entry"></a>kjt_dir_list_first_entry</span></pre>
-<pre><br>Action: Finds the first listing in a directory, returns info.</pre>
+<pre><br>Action: Finds the first listing of current directory, returns info.</pre>
 <pre><br>Input registers: None</pre>
 <pre><br>Output registers: If zero flag is set:</pre>
 <pre> HL&nbsp;&nbsp;&nbsp; = Location of null terminated filename string</pre>
@@ -233,7 +231,7 @@ Kernal Call Index:</span><br>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;"><a name="kjt_get_dir_name"></a>kjt_get_dir_name</span></pre>
-<pre><br>Action: Returns ascii string of current dir name (null terminated)</pre>
+<pre><br>Action: Returns ascii string of current directory name (null terminated)</pre>
 <pre><br>Input registers: None</pre>
 <pre><br>Output registers :</pre>
 <pre>If zero flag set: HL = ascii string.</pre>
