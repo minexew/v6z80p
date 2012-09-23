@@ -1052,7 +1052,7 @@ os_cold_start
 	ld (cursor_y),bc
 
 	call os_get_version		; show FLOS / OSCA versions
-	push hl
+	push de
 	ex de,hl
 	ld hl,flos_version_hex
 	call hexword_to_ascii
