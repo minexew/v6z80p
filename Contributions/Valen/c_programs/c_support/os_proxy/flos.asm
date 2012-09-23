@@ -330,7 +330,7 @@ failed30
         proxy__read_file_data    ;start + $79
         PUSH_ALL_REGS
         GET_I_DATA l, h, b
-        call kjt_force_load	; read_file_data and force_load are equ
+        call kjt_force_load	; read_file_data and force_load are equ
         ld c,0                  ; status = failed
         jr nz,failed2
         ld c,1                  ; status = ok
@@ -424,6 +424,11 @@ failed16
         ret
 
         proxy__serial_tx_byte    ;start + $97
+        PUSH_ALL_REGS
+        GET_I_DATA a
+        call kjt_serial_tx_byte
+        POP_ALL_REGS
+        ret
 
         proxy__serial_rx_byte    ;start + $9a
 

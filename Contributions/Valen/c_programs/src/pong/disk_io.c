@@ -41,7 +41,7 @@ void ShowErrorAndStopProgramExecution(const char* strErr)
 void ShowDiskErrorAndStopProgramExecution(const char* strErr, const char* pFilename)
 {
 //    BYTE asciicode, scancode;
-    while(1);
+//    while(1);
 
     FLOS_FlosDisplay();
     Game_RestoreFLOSVIdeoRam();
