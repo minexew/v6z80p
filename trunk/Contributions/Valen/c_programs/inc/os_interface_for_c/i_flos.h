@@ -173,6 +173,9 @@ V6Z80P_EXTERN void FLOS_SetCommander(const char* pCmdLine);
 // Mouse --------------------------------------
 V6Z80P_EXTERN BOOL FLOS_GetMousePosition(MouseStatus* ms);
 
+// Serial --------------------------------------
+void FLOS_SerialTxByte(BYTE byte_to_send);
+
 V6Z80P_EXTERN byte FLOS_ReadSysramFlat(const dword address);
 
 // helpers --------------------------------------

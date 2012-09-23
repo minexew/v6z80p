@@ -70,6 +70,8 @@ typedef struct {
     //BOOL isDisketteIconLoaded;
     BOOL isFLOSVideoMode;
 
+    BOOL isPrintToSerial;
+
     GameObjScore* pScore_to_blink;
 
     byte shadow_sprite_register_bank;

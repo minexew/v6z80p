@@ -65,7 +65,7 @@ v0.06:
 
 
 
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -351,7 +351,9 @@ void Game_InitLevelBegining(void)
 }
 
 
-
+#define DEBUGPRINT(...)     game.isPrintToSerial = TRUE;  \
+                            printf(__VA_ARGS__);          \
+                            game.isPrintToSerial = FALSE;
 
 int main (void)
 {
@@ -361,11 +363,19 @@ int main (void)
     loadingIcon.isLoaded = FALSE;
     game.isFLOSVideoMode = TRUE;
     debug.isShowFrameTime = FALSE;
+    game.isPrintToSerial = FALSE;
     //strcpy(debug.guard_str, "GUARD");
 
 
     if(!Debug_CheckCurrentBank())
         return NO_REBOOT; 
+
+
+
+    DEBUGPRINT("PONG\n");
+    DEBUGPRINT("Log started\n");
+    DEBUGPRINT("Cur sysmem bank: %ui\n", io__sys_mem_select);
+
 
     Game_StoreFLOSVIdeoRam();
 
@@ -571,6 +581,13 @@ void putchar(char c)
     str[0] = str[1] = 0;
     str[0] = c;
 
-    if(c == '\n')   FLOS_PrintStringLFCR("");
-    else            FLOS_PrintString(str);
+    if(game.isPrintToSerial) {
+        if(c == '\n')   { FLOS_SerialTxByte(0xA); FLOS_SerialTxByte(0xD); }
+        else            FLOS_SerialTxByte(c);
+    } else {
+        if(c == '\n')   FLOS_PrintStringLFCR("");
+        else            FLOS_PrintString(str);
+    }
+
+
 }
