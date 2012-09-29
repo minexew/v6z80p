@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------
-; Window support routines v0.10 - by Phil Ruston 3-7-2010
+; Window support routines v0.11 - by Phil Ruston, last updated: 27-9-2012
 ;------------------------------------------------------------------------------
 ;
 ; These routines support the "Window_draw.asm" code, providing a framework of
@@ -371,6 +371,8 @@ w_show_associated_text
 	ld h,(ix+6)
 	ld e,(ix+1)
 w_satlp	ld a,(hl)
+	bit 4,(ix+3)				;is gadget a textbox? If so swap 0/1 to space or tick char
+	call nz,w_01_to_space_tick
 	call kjt_plot_char
 	inc hl
 	inc b
