@@ -14,7 +14,7 @@ A:hover {color: #00ffff}
 <body>
 <h1 style="text-decoration: underline;">OSCA - An FPGA
 Config For The V6Z80P</h1>
-<pre style="font-style: italic;">By Phil Ruston 2008-2012 - Last updated 18-09-2012 (OSCA v672)</pre>
+<pre style="font-style: italic;">By Phil Ruston 2008-2012 - Last updated 29-09-2012 (OSCA v672)</pre>
 <pre><br>OSCA (Old School Computer Architecture) provides a home-computer era hardware platform for<br>the V6Z80P. As well as basic memory and peripheral control, its features include bitmap and<br>character mapped displays, sprites, a raster line synchronized co-pro ("LineCop"), blitter,<br>hardware line draw and four channels of 8 bit digital sound.<br>  <br><span style="font-weight: bold;">Quick Links:</span></pre>
 
 <ul>
@@ -184,8 +184,8 @@ System&nbsp;Detail:</h3>
 <pre>Port $01 ("<a href="#Port_01_-_Write">sys_irq_enable</a>")- to enable/disable the audio IRQ<br>Port $02 (<a href="#Port:_02_-_Write">"sys_clear_irq_flags"</a>)- to clear audio IRQ loop flags<br>Port $08 (<a href="#Port:_08_-_Write">"sys_audio_enable" / "sys_audio_flags"</a>) - to enable channels / read loop flags.</pre>
 <pre><br><span style="text-decoration: underline;">CALCULATING THE AUDIO PERIOD VALUE:</span></pre>
 <pre>The period value is not the same as the Amiga uses, however, it has 4 times the resolution<br>so a close match value can be obtained if desired.</pre>
-<pre>Period = 16,000,000 / desired sample output rate</pre>
-<pre>The minimum period value is around 512 (corresponds to a sample rate of ~31KHz) - this is<br>because the hardware pre-fetches 2 samples during DMA per scanline (and there is a couple<br>of cycles overhead etc)</pre>
+<pre>Period = 16,000,000 / desired sample output rate<br><br>EG: To playback at 22050Hz, set the period to (16,000,000/22050) = 725</pre>
+<pre>The minimum period value is around 512 (corresponding to a sample rate of ~31KHz) - this is<br>because the hardware only pre-fetches 2 samples during DMA per scanline (and there is a couple<br>of cycles overhead etc)</pre>
 <pre>For pure tones, the output frequency depends on the number of samples in your waveform<br>that constitute one cycle, so if the sample has EG: 16 bytes in one cycle, the period<br>value required to play it at a desired frequency is calculated thus:</pre>
 <pre>Period = 16,000,000 / (samples per cycle * frequency) </pre>
 <pre><br><span style="text-decoration: underline;">Panning:</span></pre>
