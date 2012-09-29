@@ -1,0 +1,19 @@
+
+SHOWSPR.EXE - Browse sprite memory.
+
+Use: SHOWSPR [address]
+
+Keys: 
+
+Enter = Update current parameter
+
++/-   = Add/Sub current parameter
+
+Esc   = Quit
+
+Notes:
+
+If supplied, "address" is a flat
+byte address in sprite RAM in the
+range $0-1ff00
+
