@@ -1,0 +1,32 @@
+
+SHOWSND.EXE - Browse memory for
+sound sample data.
+
+Use: SHOWSND [address length period]
+
+Keys: 
+
+Up/Down/Left/Right cursor or Tab to
+move selection.
+
+Space = Play current sample
+
+Enter = Update current parameter
+
++/-   = Add/Sub current parameter
+
+Esc   = Quit
+
+Notes:
+
+If supplied, "address" is a flat
+byte address in system RAM 0-7fffe
+and "length" is the number of bytes
+in the sample. Length is currently
+limited to 128KB.
+
+This util overwrites the last 32
+bytes of system RAM (used for a
+Linecop program).
+
+
