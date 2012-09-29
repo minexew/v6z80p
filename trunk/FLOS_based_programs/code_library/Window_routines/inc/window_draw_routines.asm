@@ -1,6 +1,6 @@
-;-------------------------------------------------------------------------------
-; FLOS Character-based window drawing code v0.10 by Phil Ruston
-;-------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------------
+; FLOS Character-based window drawing code v0.11 by Phil Ruston, last update: 27-09-2012
+;---------------------------------------------------------------------------------------
 ;
 ; Before calling "draw_window", set:
 ;
@@ -17,7 +17,9 @@
 ; ALL REGISTERS ARE PRESERVED!
 ;-------------------------------------------------------------------------------
 
-display_width equ 40
+display_width 	equ 40
+
+checkbox_tick_char	equ 205
 
 draw_window
 
@@ -185,6 +187,8 @@ w_draw_data_area
 	call w_gadget_draw		;if the data area can accept user input, check for default data
 	bit 2,(ix+3)
 	call nz,w_drw_tnv		;display default data
+	bit 4,(ix+3)
+	call nz,w_drw_tnv		;display default selection if a checkbox
 	bit 3,(ix+3)
 	jr z,w_nincdec		;is the input area numeric?
 	ld a,(w_frame_y)		
@@ -309,6 +313,10 @@ w_drw_tl1	ld a,(hl)
 	jr z,w_drwtdun
 	cp 11
 	jr z,w_tcr
+	
+	bit 4,(ix+3)		;is gadget a textbox? If so swap 0/1 to space or tick char
+	call nz,w_01_to_space_tick
+
 	call w_char_to_buffer
 	inc b
 	dec e
@@ -319,7 +327,15 @@ w_tcr	inc c
 w_drwtdun	xor a
 	ret
 
+;----------------------------------------------------------------------------------
 
+w_01_to_space_tick
+
+	sub $10			;if data = "0" display a space, if "1" display a tick
+	cp $20
+	ret z
+	ld a,checkbox_tick_char
+	ret
 
 ;---------------------------------------------------------------------------------
 
@@ -539,7 +555,7 @@ w_inv_pen		db 0
 w_draw_pen	db 0
 w_active_window	db 0
 
-w_my_chars	incbin "winchrs2.fnt"
+w_my_chars	incbin "winchrs3.fff"
 
 ;--------------------------------------------------------------------------------
 
@@ -592,7 +608,7 @@ w_window_buffer	ds 2*40*25,0		; map and colour buffers
 ;		
 ;win_elementa	db 2			;0 = Element Type: 0=button, 1=data area, 2=info (text)
 ;		db 3,1			;1/2 = dimensions of element x,y
-;		db 0			;3 = control bits (b0=selectable, b1=special line selection, b2=accept ascii input)
+;		db 0			;3 = control bits (b0=selectable, b1=special line selection, b2=accept ascii input. b3= hex input, b4=checkbox)
 ;		db 0			;4 = event flag (for external apps)
 ;		dw dir_txt		;5/6 = location of associated data
 ;		

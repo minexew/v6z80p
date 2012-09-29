@@ -1,7 +1,11 @@
 Simple Window drawing and support code for FLOS - by Phil Ruston
 -----------------------------------------------------------------
 
-Last updated 02/07/2012 - Window draw code version 0.10
+Last updated 27/09/2012 - Window draw code version 0.11
+
+(Added checkbox element type and hex input granularity mask)
+
+-----------------------------------------------------------------
 
 The routines allow the user to create and operate simple windows
 (EG: requesters) with minimal effort. To use, please include
@@ -80,7 +84,7 @@ my_ok_requester	db 0,0			;0 - position on screen of frame (x,y)
 		db 0			;5 - unused at present
 
 		db 4,2			;6 - position of first element (x,y)
-		dw win_element_a	;8 - address of first element description
+		dw win_element_a		;8 - address of first element description
 
 		db 255			;End of list of window elements
 
@@ -111,7 +115,7 @@ Data structure for each unique element:
  Byte  3   : Control bits
  Byte  4   : Event flag (currently unused)
  Bytes 5/6 : (Word) address of "associated data" (set to zero if irrelevant)
- Bytes 7-16: Element dependant (can be omitted if irrelevant) 
+ Bytes 7-19: Element dependant (can be omitted if irrelevant) 
  
 The bits of the control byte (3) are mainly used in the window support code,
 and are described later. However, if an element is a data area and bit 2
@@ -125,7 +129,7 @@ to the  element type, EG: ASCII text for a button (or default data as stated abo
 If such data is irrelevant to an element type, the word should be set to 0 (for safety)
 but can be omitted if desired.
 
-Bytes 7-16 change meaning based on the element type. They play no part in the
+Bytes 7-19 change meaning based on the element type. They play no part in the
 drawing of the window and can be omitted if irrelevant to the element type.
 
 -----------------------------------------------------------------------------
@@ -186,16 +190,22 @@ bits (byte 3 of element descriptions) come into play. The bits are defined:
           for parent programs.
 
      3  : The data to be entered is to be interpreted as a signed 32 bit hex number.
-          When this bit is set, bytes 7-16 of the element data are required:
+          When this bit is set, bytes 7-19 of the element data are required:
 	  
 	   Bytes 7-10: Double word, upper limit for numeric input (32 bit signed)
  	   Bytes 11-14:Double word, lower limit for numeric input (32 bit signed)
  	   Bytes 15/16:Displacement value for numeric data adjust (+/- keys)
              (this value doubles several times when +/- key is held)
-           Byte 17    :Bit 0 = sign extend number entered by user to 32bit internal
-                      :Bit 1 = Skip leading zeroes when displaying number
-
-     4-7: currently unused.
+             Byte 17    :Bit 0 = sign extend number entered by user to 32bit internal
+                        :Bit 1 = Skip leading zeroes when displaying number
+                        :Bit 2 = Use granularity mask on lowest 16 bits of input
+             Byte 18/19 :Word - Granularity mask (EG: $FFFE = input will be rounded to even bytes) 
+             
+     
+     4  : This element is a check box. The associated data string should be "0" ticked
+          or "1" = unticked.
+     
+     5-7: currently unused.
 
 
 
