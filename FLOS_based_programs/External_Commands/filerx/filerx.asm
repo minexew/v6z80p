@@ -1,6 +1,8 @@
 ;=======================================================================================
 ;
-; FILERX.EXE (previously sercopy.exe) V1.00
+; FILERX.EXE (previously sercopy.exe) V1.01
+;
+; Changes: v1.01: If serial error during file reception, erase file stub
 ;
 ;=======================================================================================
 
@@ -84,11 +86,15 @@ s_ffhswz	xor a
 	inc de
 	djnz s_ffhswz	
 
+;---------EDIT (by Daniel)?--------------------------------------------------------------------------------
+	
 	ld hl,serial_filename		; filename
-        call is_command_exit            ; check filename for command 
-        jr nc,not_a_exit_command        ; if CF=1, quit (exit command is present in filename)
-        call s_badack                   ; drop serial connection
-        ret
+	call is_command_exit            	; check filename for command 
+	jr nc,not_a_exit_command        	; if CF=1, quit (exit command is present in filename)
+	call s_badack                   	; drop serial connection
+	ret
+	
+;---------------------------------------------------------------------------------------------------------
 
 not_a_exit_command
 	ld hl,receiving_text		; say "Receiving [filename]"
@@ -140,7 +146,7 @@ buff_lp	ld de,(len_lo)			; length of file low
 	ld c,load_buffer_length/256
 rx_filelp	call s_goodack			; prompt sender for a file block
 	call receive_block			; get block of file data
-	jp c,s_nfhdr			; if carry set = there was an error (code in A)
+	jp c,file_rec_error			; if carry set = there was an error (code in A)
 	ld ix,rx_sector_buffer		; copy sector buffer to load buffer
 	ld b,0
 scopylp	ld a,(ix)
@@ -176,7 +182,22 @@ ffb_bad	push af
 	call save_error
 	pop af
 	ret
-	
+
+
+
+file_rec_error
+
+	push af
+	call s_badack			; tell the sender that the header was rejected
+	ld hl,partial_file_txt
+	call kjt_print_string
+	ld hl,serial_filename		; if error whilst receiving, remove partial file
+	call kjt_erase_file
+	pop af				; and quit
+	or a
+	ret
+
+
 
 all_bytes_rec
 
@@ -289,6 +310,7 @@ s_waitack	ld a,"W"				; send "wait ack" to pause file
 	call kjt_serial_tx_byte	
 	ret
 
+;--------EDIT by Daniel? -------------------------------------------------------------------------------------
 
 ; Search exit command in string and set CF if command was found.
 ; Input:
@@ -307,6 +329,7 @@ is_command_exit
         pop de
         ret
 
+;------------------------------------------------------------------------------------------------------------
 
 compare_strings 
 ; (copy'n'paste from FLOSxxx.asm)
@@ -343,9 +366,9 @@ ocs_diff	pop de
 ;----------------------------------------------------------------------------------
 internal_command_exit
 
-		db "EXIT.---",0         ; command, to exit sercopy
+		db "EXIT.---",0         	; command, to exit FILERX
 
-start_text	db 11,"FILERX v1.00",11,0
+start_text	db 11,"FILERX v1.01",11,0
 		
 waiting_text	db "Waiting for file.. (ESC Quits)",11,0		
 
@@ -354,6 +377,8 @@ overwrite_text	db "File exists. Overwrite (y/n)",11,0
 aborted_text	db "File dismissed.",11,11,0
 
 ok_overwrite_text	db "Overwriting file..",11,0
+
+partial_file_txt	db "COMMS ERROR! Partial file erased.",11,0
 
 receiving_text	db "Receiving: ",0
 saved_text	db "OK, File saved to disk..",11,11,0
