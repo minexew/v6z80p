@@ -1,4 +1,5 @@
 ; Ultra simple audio example - play a continuous tone
+; Note: Requires OSCA v672+
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------
 
@@ -10,52 +11,100 @@ include "system_equates.asm"
 	org $5000		
 ;-----------------------------------------------------------------------------------------
 
-	ld a,4			;put first page of audio RAM
-	out (sys_mem_select),a	;(sysRAM $20000-$27fff) at Z80 $8000-$FFFF
+	ld a,0				;set up address of sample, 0-$7fffe
+	ld hl,my_sound
+	ld (sample_addr),hl
+	ld (sample_addr+2),a
 	
-	ld hl,$7f80		;put 2 byte square wave at $8000
-	ld ($8000),hl
+	ld hl,end_sound-my_sound		;set up byte length of sample,  0-$1fffe
+	ld (sample_length),hl
+	ld a,0
+	ld (sample_length+2),a
+	
+	ld hl,$2000			;set up playback rate, 0-$ffff
+	ld (sample_period),hl
+	
+	ld a,$40
+	ld (sample_volume),a		;set up volume 0-$40
 
-;-----------------------------------------------------------------------------------------
-	
-	in a,(sys_audio_enable)	
-	and %11111110
-	out (sys_audio_enable),a	;stop channel 0 playback
-
-
-	in a,(sys_vreg_read)	;wait for the beginning of a scan line 
-	and $40			;(ie: after audio DMA) This is so that all the
-	ld b,a			;audio registers are cleanly initialized
-dma_loop	in a,(sys_vreg_read)
-	and $40
-	cp b
-	jr z,dma_loop
-	
-
-	ld hl,0			;Sample location * WORD POINTER IN SAMPLE RAM* 
-	ld b,h			;(EG: 0=$20000,1=$20002)
-	ld c,audchan0_loc	
-	out (c),l			;write sample address to relevant port
-		
-	ld hl,2			;sample length * IN WORDS *
-	ld b,h
-	ld c,audchan0_len
-	out (c),l			;set sample length to relevant port
-	
-	ld hl,$8000		;period = clock ticks between sample bytes
-	ld b,h
-	ld c,audchan0_per
-	out (c),l			;set sample period to relevant port 
-	
-	ld a,64
-	out (audchan0_vol),a	;set sample volume to relevant port (64 = full volume)
-
-	
-	in a,(sys_audio_enable)	
-	or %00000001
-	out (sys_audio_enable),a	;start channel 0 playback
+	call play_sound
 	
 	xor a
 	ret
 	
+;-----------------------------------------------------------------------------------------
+
+my_sound	db $7f,$80			;2 byte square wave
+end_sound
+
+;----------------------------------------------------------------------------------------
+
+sample_addr	db 0,0,0			;all little-endian
+sample_length	db 0,0,0
+sample_period	dw 0
+sample_volume	db 0	
+
+;-----------------------------------------------------------------------------------------
+	
+
+
+;----------------------------------------------------------------------------------------
+; This routine handles the conversion of byte address/length to word address/length
+; and writes to the hardware registers
+;----------------------------------------------------------------------------------------
+
+play_sound
+
+	call dma_wait
+	
+	in a,(sys_audio_enable)	
+	and %11111110
+	out (sys_audio_enable),a		;stop channel 0 playback
+
+	ld a,(sample_addr+2)
+	ld hl,(sample_addr)
+	srl a 				;divide location by 2 for WORD location
+	rr h
+	rr l
+	ld b,h			
+	ld c,audchan0_loc	
+	out (c),l				;write sample WORD address [15:0] to audio port	
+	out (audchan0_loc_hi),a		;write sample WORD address [16:17] to audio port
+	
+	ld a,(sample_length+2)
+	ld hl,(sample_length)
+	srl a
+	rr h
+	rr l				;divide length by 2 for length in WORDS
+	ld b,h
+	ld c,audchan0_len
+	out (c),l				;write sample WORD length to port
+	
+	ld hl,(sample_period)		;period = clock ticks between sample bytes
+	ld b,h
+	ld c,audchan0_per
+	out (c),l				;write sample frequency to period port 
+	
+	ld a,(sample_volume)
+	out (audchan0_vol),a		;write sample volume to port (64 = full volume)
+
+	call dma_wait
+
+	in a,(sys_audio_enable)	
+	or %00000001
+	out (sys_audio_enable),a		;start channel 0 playback
+	ret
+	
+	
+;-----------------------------------------------------------------------------------------
+
+dma_wait	in a,(sys_vreg_read)		;wait for the beginning of a scan line 
+	and $40				;(ie: after audio DMA) This is so that all the
+	ld b,a				;audio registers are cleanly initialized
+dma_loop	in a,(sys_vreg_read)
+	and $40
+	cp b
+	jr z,dma_loop
+	ret
+		
 ;-----------------------------------------------------------------------------------------
