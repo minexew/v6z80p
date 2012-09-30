@@ -1,11 +1,12 @@
 V6Z80P - A Z80 / FPGA based standalone 8-bit retro computer by Phil Ruston.
 ---------------------------------------------------------------------------
 
-The V6Z80P system as supplied comprises of 3 main elements:
+The V6Z80P system as supplied comprises 3 main elements:
 
 1. The PCB itself, this is the actual "V6Z80P".
 
-2. A default "hardware" design for the FPGA called OSCA (Old School Computer Architecture)
+2. An original architectural design for the FPGA called OSCA (Old School Computer Architecture)
+   plus cycle-perfect Spectrum Emulators by Alessandro Dorigatti
 
 3. A simple command line operating system for OSCA called FLOS (Freezer-Like Operating System)
 
@@ -19,20 +20,14 @@ and 3 memory chips on their own seperate buses. It offers 12bit colour and stere
 sound output, connectors for PC standard PS/2 keyboard and mouse, Atari 2600 joysticks,
 RS232 serial and SD card IO. The V6Z80P should be powered from a regulated 7.5 to
 9.0 Volt DC mains adapter with a 2.1mm jack (centre positive) capable of supplying
-about 1Amp (or more).
+about 800 mA (or more).
 
 
 
 Brief description of the features of OSCA
 -----------------------------------------
 
-OSCA is the V6Z80P's default hardware configuration but it is by no means fixed.
-Using the Xilinx Webpack software (ISE version 10.1 or below) the FPGA can be
-reconfigured to provide different features, or a totally new design. EG: emulate 
-another system. The limitations are the components and connections provided on
-the PCB (such as the Z80 CPU, memory, oscillators and IO.)
-
-The video system offers bitplane, bytemap and tilemap style displays, using a
+The OSCA video system offers bitplane, bytemap and tilemap style displays, using a
 dedicated 512KB RAM. Each mode allows hardware scrolling and a 256 colour palette.
 Other features include linedraw hardware, Blitter datacopy and Line-synced co-processor
 for split screen effects.
@@ -67,7 +62,7 @@ First time power up:
 At a minimum, connect power, PS/2 keyboard, video/audio cables, make sure the VGA-mode
 jumper (on the 10 pin header) is installed if using a PC monitor. The JTAG jumpers
 (J1 and J2) should be uninstalled for normal EEPROM-based start-up and the OSC SEL
-switch (where fitted) should be in the down position.
+switch (if fitted) should be in the down position.
 
 Download the full project archive (to PC) then format an SD card to FAT16 (please
 use a good brand to ensure compatibility). Copy the contents of the folder
@@ -96,7 +91,8 @@ are called "slots". On power-up, the FPGA starts from whichever is the "Active S
 As supplied, OSCA for 50Hz PAL TVs in Slot 1 and OSCA for 60Hz NTSC TVs is in Slot2.
 
 (Depending on the date of production, other slots may have been preloaded with
-Spectrum Emulators.)
+Spectrum Emulators. Note that the cycle-perfect Spectrum emulators must be launched
+with the FLOS command "EMU")
 
 All the configs supplied support VGA output.
 
@@ -109,11 +105,11 @@ Recommended reading:
 Offline versions, from main project archive:
 
 
-FLOS manual: Documentation\Manuals\FLOS_manual.doc
+FLOS manual: Documentation\Manuals\FLOS_manual.html
 
-OSCA manual: Documentation\Manuals\OSCA_hardware_manual.doc
+OSCA manual: Documentation\Manuals\OSCA_hardware_manual.html
 
-PCB tech manual:  Documentation\Manuals\PCB_technical_manual.doc
+PCB tech manual:  Documentation\Manuals\PCB_technical_manual.html
 
 
 Online documentation & link to main project archive: http://wiki.retroleum.co.uk
