@@ -1,8 +1,7 @@
 How to Update OSCA
 ------------------
 
-Use the FLOS-based EEPROM.EXE tool (See readme.txt in same folder for more
-detailed info on the EEPROM layout etc)
+In FLOS, enter the command "EEPROM"  (no quotes)
 
 
 1. Choose Option 1 "Write config to slot".
