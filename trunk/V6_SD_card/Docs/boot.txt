@@ -1,5 +1,10 @@
 
 BOOT.EXE - Reconfigure the FPGA
 
-Use: BOOT slot
+Use: BOOT [slot]
+
+If "slot" is not supplied, a list
+of the EEPROM contents is shown
+and the user is prompted to make
+a selection.
 
