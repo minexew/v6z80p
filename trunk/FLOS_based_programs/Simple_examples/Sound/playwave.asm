@@ -44,6 +44,8 @@ include "system_equates.asm"
 
 ;-----------------------------------------------------------------------------------------
 
+	org ($+1) & $fffe			;word align the samples
+
 my_sound     incbin "pop.bin"			;pop sample data (8 bit, signed - no header)
 end_sound			
 
