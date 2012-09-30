@@ -34,6 +34,8 @@ include "system_equates.asm"
 	
 ;-----------------------------------------------------------------------------------------
 
+	org ($+1) & $fffe			;word align the samples
+	
 my_sound	db $7f,$80			;2 byte square wave
 end_sound
 
