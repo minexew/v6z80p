@@ -85,6 +85,21 @@ wait_ras2	bit 2,(hl)
 	ld a,c
 	cp $0d
 	jp z,req_tab_pressed
+	
+	ld a,(req_ascii_input_mode)
+	or a
+	jp nz,nocurs
+	ld a,(req_current_scancode)
+	cp $72
+	jp z,req_down_pressed
+	cp $75
+	jp z,req_up_pressed
+	cp $74
+	jp z,req_right_pressed
+	cp $6b
+	jp z,req_left_pressed
+
+nocurs	ld a,(req_current_scancode)
 	cp $66
 	jp z,req_backspace_pressed
 	cp $5a
@@ -109,7 +124,7 @@ req_idrm	ld a,(hl)
 req_nrsr	ld a,(req_current_ascii_char)
 	or a
 	jp nz,req_ascii_input
-	jr req_loop
+	jp req_loop
 	
 ;---------------------------------------------------------------------------------------------------------
 
@@ -146,6 +161,7 @@ req_quit	ld de,0
 	
 ;---------------------------------------------------------------------------------------------------------
 
+req_down_pressed
 req_tab_pressed
 
 	ld a,(req_ascii_input_mode)
@@ -155,6 +171,59 @@ req_tab_pressed
 	call w_next_selectable_element
 	jp req_loop
 
+req_up_pressed
+
+	ld ix,up_element_sel_swaps
+	call element_sel_swap
+	jp req_loop
+
+
+
+req_left_pressed
+
+	ld ix,left_element_sel_swaps
+	call element_sel_swap
+	jp req_loop
+	
+
+
+req_right_pressed
+
+	ld ix,right_element_sel_swaps
+	call element_sel_swap
+	jp req_loop
+	
+
+		
+element_sel_swap
+
+	ld a,(ix)
+	cp $ff
+	ret z
+	call w_get_element_selection
+	cp (ix)
+	jr z,gotswap
+	inc ix
+	inc ix
+	jr element_sel_swap
+gotswap	ld a,(ix+1)
+	call w_set_element_selection
+	ret
+
+
+	
+
+right_element_sel_swaps
+
+	db 1,7, 3,9, 7,1, 9,3, $ff
+
+left_element_sel_swaps
+
+	db 7,1, 9,3, 1,7, 3,9, $ff
+
+up_element_sel_swaps
+
+	db 1,9, 3,1, 5,3, 7,5, 9,7, $ff
 
 ;----------------------------------------------------------------------------------------------------------
 
@@ -295,7 +364,8 @@ req_hexlp	ld a,(iy)
 	inc a
 	ret
 	
-req_hxok	ld c,a
+req_hxok	push bc
+	ld c,a
 	ld b,4
 req_shdw	add hl,hl
 	rl e
@@ -305,6 +375,8 @@ req_shdw	add hl,hl
 	or c
 	ld l,a
 	inc iy
+	
+	pop bc
 	djnz req_hexlp
 	xor a
 	ret
@@ -486,8 +558,18 @@ req_incdec_release
 
 
 req_enter_pressed
+	
+	call w_get_selected_element_data_location	
+	bit 4,(ix+3)			
+	jr z,notchkb			;is the selected element a checkbox?
+	call w_get_associated_data_location
+	ld a,(hl)
+	xor 1				;flip string "0" / "1"
+	ld (hl),a
+	call w_show_associated_text		;and display new data
+	jp req_loop
 
-	ld a,(req_ascii_input_mode)		;if pressed Enter on text input box init text input here
+notchkb	ld a,(req_ascii_input_mode)		;if pressed Enter on text input box init text input here
 	or a				;(unless already in input mode)
 	jr z,req_ascii_input
 	call req_end_ascii_input_mode	
@@ -800,7 +882,7 @@ win_element0	db 2			;0 = Element Type: 0=button, 1=data area, 2=info (text)
 					
 win_element1	db 1
 		db 5,1
-		db %1101			;b0:selectable + b2:accepts user input + b3:hex
+		db %1101			;b0:selectable + b2:accepts user input, b3=hex input
 		db 0
 		dw entry1_txt
 		dw $ffff,$0007		;upper limit for hex value
@@ -825,7 +907,7 @@ win_element2	db 2			;0 = Element Type: 0=button, 1=data area, 2=info (text)
 		
 win_element3	db 1
 		db 3,1
-		db %1101			;b0:selectable + b2:accepts user input (not numeric)
+		db %1101			;b0:selectable + b2:accepts user input, b3=hex input
 		db 0
 		dw entry2_txt
 		dw $0180,$0000
@@ -850,15 +932,10 @@ win_element4	db 2			;0 = Element Type: 0=button, 1=data area, 2=info (text)
 		
 win_element5	db 1
 		db 1,1
-		db %1101			;b0:selectable + b2:accepts user input
+		db %10001			;b0:selectable + b4: checkbox
 		db 0
 		dw entry3_txt
-		dw $0001,$0000		;upper limit for hex value
-		dw $0000,$0000		;lower limit for hex value
-		dw 1			;min inc/decrement for +/- buttons
-		db 0			;sign extend input: on, skip leading zeroes: on
-			
-			
+
 chunky_txt	db "CHUNKY?",0
 entry3_txt	db "0",0
 
@@ -876,7 +953,7 @@ win_element6	db 2			;0 = Element Type: 0=button, 1=data area, 2=info (text)
 		
 win_element7	db 1
 		db 1,1
-		db %1101			;b0:selectable + b2:accepts user input
+		db %1101			;b0:selectable + b2:accepts user input, b3=hex input
 		db 0
 		dw entry4_txt
 		dw $000f,$0000		;upper limit for hex value
@@ -901,7 +978,7 @@ win_element8	db 2			;0 = Element Type: 0=button, 1=data area, 2=info (text)
 		
 win_element9	db 1
 		db 1,1
-		db %1101			;b0:selectable + b2:accepts user input
+		db %1101			;b0:selectable + b2:accepts user input, b3=hex input
 		db 0
 		dw entry5_txt
 		dw $000f,$0000		;upper limit for hex value
