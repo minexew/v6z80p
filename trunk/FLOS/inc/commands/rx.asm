@@ -1,10 +1,11 @@
-;-----------------------------------------------------------------------
+;---------------------------------------------------------------------------------------------------
 ;"RX" - Receive binary file via serial port command. V6.06
-;-----------------------------------------------------------------------
+;---------------------------------------------------------------------------------------------------
 ;
+;  6.06 - Bugfix: If comms error encountered in file header the error code is now properly returned
 ;  6.05 - Added "RX !" to download and run.
 ;
-;-------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------------------------
 
 os_cmd_rx:
 
@@ -87,7 +88,7 @@ rx_run	ld hl,ser_rec_msg
 
 	ld hl,serial_filename
 	ld (hl),"*"
-	ld a,$80			; no time out / escape key active
+	ld a,$80			; no time out, escape key is active
 	call serial_get_header
 	ret nz			
 	
@@ -104,6 +105,7 @@ rx_run	ld hl,ser_rec_msg
 	push af			; if carry set there was an error (code in A)
 	call s_badack		; tell the sender that the header was rejected
 	pop af
+	or a
 	ret
 
 rxe_fblok
