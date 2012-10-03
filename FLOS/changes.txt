@@ -2,6 +2,22 @@
 Current FLOS version:
 ---------------------
 
+v6.07 - 01/10/2012
+
+	Improvement : The "B - bank" command now shows the area of system RAM paged into Z80 $8000-$FFFF
+
+	Bugfix      : Previously, if "RX !" encountered a comms error in the header, no error code was being reported.
+	
+	Bugfix      : Previously, if a file load ended on the last byte of RAM, a memory error was being returned.
+	
+	Added       : Kernal call "KJT_PARSE_PATH" - Change dir and vol from string (IE: runs the CD command).
+
+
+
+
+Previous changes:
+-----------------
+
 v6.06 - 22/09/2012
 
 	Change      : "VERS" command is now external, additionally the command can now set environment
@@ -20,9 +36,6 @@ v6.06 - 22/09/2012
                       compatibility).
 
 
-
-Previous changes:
------------------
 
 
 v6.05 - 02/09/2012
@@ -147,7 +160,7 @@ v5.95 - 10/1/12 (unreleased)
                  FLOS completely restarts. Hold CTRL to abort and cancel commander
                  upon reboot.
 
-	- Added: KJT_PATCH_FONT - allows easy user-defined chars at CHR 32-159
+	- Added: KJT_PATCH_FONT - allows easy user-defined chars 
 
 
 
