@@ -1,5 +1,5 @@
 ;-------------------------------
-;Kernal jump table for FLOS v595
+; FLOS Kernal Jump Table equates
 ;-------------------------------
 
 os_start equ $1000
@@ -101,3 +101,4 @@ kjt_get_fs_vars_location	equ os_start + $112  ; added in v599
 kjt_continue_file_read	equ os_start + $115  ; added in v599
 kjt_set_load_address	equ os_start + $118  ; added in v599
 kjt_write_baddr		equ os_start + $11b  ; added in v603
+kjt_parse_path		equ os_start + $11e  ; added in v607
