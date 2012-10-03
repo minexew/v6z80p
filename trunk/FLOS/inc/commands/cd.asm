@@ -175,8 +175,8 @@ cd_restore_vol_dir
 		
 ;--------------------------------------------------------------------------------------------------
 
-original_dir_cd_cmd	equ scratch_pad 
-original_vol_cd_cmd equ scratch_pad+2
+original_dir_cd_cmd	dw 0			; dont use scratch pad for these 
+original_vol_cd_cmd db 0			 
 		
 ;--------------------------------------------------------------------------------------------------
 
