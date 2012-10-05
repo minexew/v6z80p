@@ -1,6 +1,7 @@
-; EDIT.EXE v0.02 for FLOS by Phil Ruston 2011 (to replace TEXTEDIT.EXE)
+; EDIT.EXE v0.03 for FLOS by Phil Ruston 2011 (to replace TEXTEDIT.EXE)
 ; ---------------------------------------------------------------------
 
+; V0.03 - Allow path in filename
 ; V0.02 - New requester code for FLOS 6.02
 ; V0.01 - First release
 
@@ -36,15 +37,24 @@
 
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
-required_flos	equ $602
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
+;---------------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call edit_go
+	call restore_dir_vol
+	ret
+	
 ;-----------------------------------------------------------------------------------------------
 
 win_x_size 	equ 40
@@ -53,7 +63,7 @@ win_y_size 	equ 24
 ;-----------------------------------------------------------------------------------------------
 
 
-	ld de,1
+edit_go	ld de,1
 	ld (goto_line),de
 
 	ld a,(hl)
@@ -64,8 +74,19 @@ win_y_size 	equ 24
 	cp "-"
 	jr z,args_done
 	
-	call hl_to_filename
-	
+	call extract_path_and_filename
+	ld hl,path_txt
+	call kjt_parse_path		;change dir according to the path part of the string
+	ret nz
+
+fna1	ld a,(hl)			;find next arg
+	or a
+	jr z,args_done
+	cp " "
+	jr z,findpar
+	inc hl
+	jr fna1
+
 findpar	inc hl
 	ld a,(hl)
 	or a
@@ -90,7 +111,7 @@ args_done	call store_charmap
 	xor a
 	ld (rebuild_flag),a
 
-	ld hl,filename
+	ld hl,filename_txt
 	call commence_load
 
 	ld hl,(goto_line)
@@ -863,17 +884,21 @@ cursor_y		db 0
 ;-----------------------------------------------------------------------------------------------------------------
 
 
-include	"text_manipulation.asm"
+include	"inc\text_manipulation.asm"
 
-include	"infobar.asm"
+include	"inc\infobar.asm"
 
-include	"load_save.asm"
+include	"inc\load_save.asm"
 
-include	"alerts.asm"
+include	"inc\alerts.asm"
 
-include	"file_requesters.asm"
+include   "inc\maths.asm"
 
-include   "maths.asm"
+include	"requesters\inc\file_requesters.asm"
+
+include   "string\inc\extract_path_and_filename.asm"
+
+include   "loading\inc\save_restore_dir_vol.asm"
 
 ;-----------------------------------------------------------------------------------------------
 

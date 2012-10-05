@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------------------------------
 
-save_req	ld hl,filename
+save_req	ld hl,filename_txt
 	ld b,7
 	ld c,1
 	call save_requester
@@ -19,7 +19,7 @@ commence_save
 
 
 	call hl_to_filename
-	ld hl,filename
+	ld hl,filename_txt
 	call kjt_create_file
 	jr nz,fil_error
 	
@@ -54,7 +54,7 @@ sf_nxtp	ld (vid_bank),a
 	ld b,0	
 	ld de,8192			;c:de = save length of chunk
 	ld c,0
-	ld hl,filename
+	ld hl,filename_txt
 	call kjt_write_to_file		;append data to file
 	jp nz,fil_error
 	ld a,(vid_bank)			;get chunk from next video page
@@ -68,7 +68,7 @@ sf_lastpage
 	ld c,0
 	ld ix,work_buffer
 	ld b,0
-	ld hl,filename
+	ld hl,filename_txt
 	call kjt_write_bytes_to_file
 	ret z
 	jp fil_error
@@ -83,7 +83,7 @@ save_length	dw 0,0
 
 load_req	call update_text_file	;in case user cancels 
 
-	ld hl,filename		;default filename
+	ld hl,filename_txt		;default filename
 	ld b,7
 	ld c,1
 	call load_requester
@@ -104,7 +104,7 @@ commence_load
 	or a
 	jp z,new_document
 	call hl_to_filename		; replace with filename from requester in case its changed
-	ld hl,filename		; does filename exist?
+	ld hl,filename_txt		; does filename exist?
 	call kjt_find_file		; if not, make a new document (but use the filename specified)
 	jp nz,new_doc_same_filename		
 	ld (file_length),iy		; LSW
@@ -193,7 +193,7 @@ new_doc_same_filename
 hl_to_filename
 
 
-	ld de,filename		; copy text at hl to filename string
+	ld de,filename_txt		; copy text at hl to filename string
 	ld b,16
 fnclp	ld a,(hl)
 	or a
@@ -235,8 +235,6 @@ flen_err	xor a			;ZF is also set if FL < 0 for some reason
 vid_bank	  	db 0
 
 file_length	dw 0,0
-
-filename		ds 16,0
 
 new_doc_txt	db "NEW.TXT",0
 		

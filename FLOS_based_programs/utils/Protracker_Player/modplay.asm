@@ -1,11 +1,13 @@
 ;=======================================================================================
 ;
-; COMMAND LINE PROTRACKER PLAYER FOR FLOS V1.05 by Phil Ruston & Daniel Illgen
+; COMMAND LINE PROTRACKER PLAYER FOR FLOS V1.06 by Phil Ruston & Daniel Illgen
 ;
 ; Usage: modplay [?] songname
 ;
 ; Max pattern file size = approx 37K
 ; Max sample file size = 448KB
+;
+; V1.06 - allowe path in filename
 ;
 ; V1.05 - Includes Proracker Player 5.14 - Supports large sample range 
 ;         Requires OSCA v672
@@ -27,14 +29,26 @@ include "system_equates.asm"
 
 	org $5000
 
+;----------------------------------------------------------------------------------------------
 
-	required_osca equ $672
+required_osca 	equ $672
+include 		"program_header\test_osca_version.asm"
+
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
+
+;---------------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call modplay
+	call restore_dir_vol
+	ret
+			
+;-------- Parse command line arguments ---------------------------------------------------------
 	
-include 	"test_osca_version.asm"
-
-;=======================================================================================
-
-	ld a,0
+modplay	ld a,0
 	call kjt_forcebank
 
 ;--------- Load and init -------------------------------------------------------------------------
@@ -60,8 +74,13 @@ findnarg	inc hl
 	jr z,findnarg
 	
 
-no_rast	ld de,modu_filename		; create extended filename
-cpyfn	ld a,(hl)
+no_rast	call extract_path_and_filename
+	ld hl,path_txt
+	call kjt_parse_path		; change dir according to the path part of the string
+	ret nz
+
+	ld de,filename_txt		; create extended filename
+cpyfn	ld a,(de)
 	or a
 	jr z,modex
 	cp " "
@@ -70,27 +89,22 @@ cpyfn	ld a,(hl)
 	jr z,modex
 	ld (de),a
 	inc de
-	inc hl
 	jr cpyfn
 	
 modex	ld hl,mod_ext		;append ".mod" to filename
-modexlp	ld a,(hl)
-	or a
-	jr z,modexdone
-	ld (de),a
-	inc hl
-	inc de
-	jr modexlp
+	ld de,4
+	ld bc,4
+	ldir
 
 modexdone
 	
-	ld hl,modu_filename		; find module
+	ld hl,filename_txt		; find module
 	call kjt_find_file
 	ret nz
 
 	ld hl,mload_text		; show "loading.."
 	call kjt_print_string
-	ld hl,modu_filename	
+	ld hl,filename_txt	
 	call kjt_print_string
 
 
@@ -146,7 +160,7 @@ ptl	inc hl
 	cp 7
 	jp nc,samples_too_big
 
-	ld hl,modu_filename		; load pattern data
+	ld hl,filename_txt		; load pattern data
 	call kjt_find_file
 	ret nz
 	ld iy,(pattlen)
@@ -253,7 +267,7 @@ samples_too_big
 show_raster	db 0
 orig_border_colour	dw 0
 
-nfn_text		db "Modplay version 1.05",11,"Usage: MODPLAY [modname]",11,0
+nfn_text		db "Modplay version 1.06",11,"Usage: MODPLAY [?] [fileame]",11,0
 mod_ext         	db ".MOD",0
 
 mload_text	db 11,"Loading module: ",0
@@ -267,11 +281,14 @@ pattlen         	dw 0
 samplelen       	dw 0
 samplelenhi     	dw 0
 
-include 		"Protracker_code_v514.asm"
 
-;-------------------------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------------
 
-modu_filename   	ds 32,0
+include "string\inc\extract_path_and_filename.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
+include "protracker_player\inc\Protracker_code_v514.asm"
 
 ;-------------------------------------------------------------------------------------------------
 

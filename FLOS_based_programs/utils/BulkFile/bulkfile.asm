@@ -26,7 +26,12 @@ include "system_equates.asm"
 	org $5000
 	
 ;-----------------------------------------------------------------------------
-	
+
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
+
+;-----------------------------------------------------------------------------
+
 	ld a,(hl)
 	or a
 	jr nz,got_arg

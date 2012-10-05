@@ -1,6 +1,8 @@
 ;-----------------------------------------------------------------------------------------
-; .wav file player v1.01 - by Phil '09
+; .wav file player v1.02 - by Phil 2009-2012
 ; 
+; v1.02 - Allowed path in args
+;
 ; Any sample size supported
 ; .wav file must be 8 bit / mono / unsigned 
 ; Sample rate max 30KHz
@@ -16,39 +18,36 @@ include "system_equates.asm"
 	
 	org $5000
 
-required_flos	equ $548
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
-	
+;---------------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call playwav
+	call restore_dir_vol
+	ret
+			
 ;-------- Parse command line arguments ---------------------------------------------------------
 	
 
-	ld a,(hl)			; examine argument text, if 0: show use
+playwav	ld a,(hl)			; examine argument text, if 0: show use
 	or a			
 	jp z,show_use
 
-	push hl			; copy args to working filename string
-	ld de,filename
-	ld b,16
-fnclp	ld a,(hl)
-	or a
-	jr z,fncdone
-	cp " "
-	jr z,fncdone
-	ld (de),a
-	inc hl
-	inc de
-	djnz fnclp
-fncdone	xor a
-	ld (de),a			; null terminate filename
-
+	call extract_path_and_filename
+	ld hl,path_txt
+	call kjt_parse_path		;change dir according to the path part of the string
+	ret nz
+	
 	ld hl,loading_txt
 	call kjt_print_string
-	pop hl
 
 ;--------------------------------------------------------------------------------------------
 
-	ld hl,filename		; does filename exist?
+	ld hl,filename_txt		; does filename exist?
 	call kjt_find_file
 	jp nz,load_error
 	
@@ -113,7 +112,7 @@ divdone	ld (period),ix
 
 short_samp
 
-	ld hl,filename		; load from end of header
+	ld hl,filename_txt		; load from end of header
 	call kjt_find_file
 	jp nz,load_error
 	ld ix,0
@@ -389,6 +388,12 @@ sampratebad
 	xor a
 	ret
 
+;--------------------------------------------------------------------------------------
+
+include "string\inc\extract_path_and_filename.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
 ;---------------------------------------------------------------------------------------
 
 notwav_txt	db "File is not a .wav",11,0
@@ -410,8 +415,6 @@ loading_txt	db "Loading...",11,0
 fnf_txt		db "Load error - file not found?",11,0
 
 test_fn		db "sample1.wav",0
-
-filename		ds 32,0
 
 original_irq	dw 0
 

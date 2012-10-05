@@ -1,5 +1,7 @@
 
-; App: Shows .bmp pictures  - v1.02 By Phil '09
+; App: Shows .bmp pictures  - v1.03 By Phil '09
+;
+; Changes: v1.03 - allow path in filename
 ;
 ; Usage: showbmp [filename]
 ;
@@ -16,40 +18,35 @@ include "system_equates.asm"
 
 	org $5000
 
-required_flos	equ $547
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
-	
+;---------------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call showbmp
+	call restore_dir_vol
+	ret
+			
 ;-------- Parse command line arguments ---------------------------------------------------------
 	
 
-	ld a,(hl)			; examine argument text, if encounter 0: show use
+showbmp	ld a,(hl)			; examine argument text, if 0: show use
 	or a			
 	jp z,show_use
 
-	push hl			; copy args to working filename string
-	ld de,filename
-	ld b,16
-fnclp	ld a,(hl)
-	or a
-	jr z,fncdone
-	cp " "
-	jr z,fncdone
-	ld (de),a
-	inc hl
-	inc de
-	djnz fnclp
-fncdone	xor a
-	ld (de),a			; null terminate filename
-	pop hl
-
-
-
-;---------Load and Show Picture -----------------------------------------------------------------
-
-
+	call extract_path_and_filename
+	ld hl,path_txt
+	call kjt_parse_path		;change dir according to the path part of the string
+	ret nz
+	
 	ld hl,loading_txt
 	call kjt_print_string
+
+;--------------------------------------------------------------------------------------------
+
 	
 	call get_palette
 	jp nz,error_quit
@@ -86,7 +83,7 @@ show_use
 get_palette
 
 
-	ld hl,filename		; does filename exist?
+	ld hl,filename_txt		; does filename exist?
 	call kjt_find_file
 	jp nz,pic_load_error
 
@@ -202,7 +199,7 @@ get_image_data
 	ld a,16
 	ld (vid_bank),a		; pic data to load at video RAM $20000 onwards
 
-	ld hl,filename		; does filename exist?
+	ld hl,filename_txt		; does filename exist?
 	call kjt_find_file
 	jp nz,pic_load_error
 
@@ -399,7 +396,12 @@ show_pic
 	ld (vreg_vidctrl),a		; select bitmap/chunky mode - enable video
 	ret
 	
-			
+;--------------------------------------------------------------------------------------
+
+include "string\inc\extract_path_and_filename.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
 ;============================================================================================
 
 loading_txt	db "Loading...",11,0
@@ -423,8 +425,6 @@ usage_txt		db "Use: Showbmp filename.bmp (v1.00)",11,11
 		db "uncompressed, 368x256 or smaller",11
 		db "with width a multiple of 8 pixels",11,11,0
 		
-filename		ds 32,0
-
 pic_width		dw 0
 pic_height	dw 0
 source_lo		dw 0
