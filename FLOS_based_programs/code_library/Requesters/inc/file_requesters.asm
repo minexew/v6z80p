@@ -120,8 +120,8 @@
 
 ;--------------------------------------------------------------------------
 
-	include "window_draw_routines.asm"
-	include "window_support_routines.asm"
+	include "window_routines\inc\window_draw_routines.asm"
+	include "window_routines\inc\window_support_routines.asm"
 
 ;--------------------------------------------------------------------------
 
