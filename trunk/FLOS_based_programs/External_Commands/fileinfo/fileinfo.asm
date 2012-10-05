@@ -14,9 +14,9 @@
 ; Standard equates for OSCA and FLOS
 ;======================================================================================
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ; Header code - Force program load location and test FLOS version.
@@ -24,13 +24,24 @@ include "system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $594
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
 ;--------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call fileinfo
+	call restore_dir_vol
+	ret
+			
+;-------- Parse command line arguments ---------------------------------------------------------
 	
+
+fileinfo	
 	ld a,(hl)			; If no arguments supplied, show usage.
 	or a
 	jp z,show_usage
@@ -45,25 +56,15 @@ include 		"test_flos_version.asm"
 		
 not_quiet_mode
 
-				
-	ld de,output_fn		; "source" name is copied to output_fn
-	ld b,12
-evnclp	ld a,(hl)
-	cp " "
-	jr z,evncdone
-	ld (de),a
-	inc hl
-	inc de
-	djnz evnclp
-
-evncdone	
-	
-		
+	call extract_path_and_filename
+	ld hl,path_txt
+	call kjt_parse_path		;change dir according to the path part of the string
+	ret nz
+			
 	ld hl,fsiz_txt		; remove fsiz envar if exists
 	call kjt_delete_envar
 
-
-	ld hl,output_fn
+	ld hl,filename_txt
 	call kjt_open_file
 	jp nz,ferror
 	
@@ -173,8 +174,14 @@ show_usage
 		
 ;-------------------------------------------------------------------------------------------
 
+include "string\inc\extract_path_and_filename.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
+;---------------------------------------------------------------------------------------
+
 usage_txt	db "-----------------------------------",11
-	db "FILEINFO.EXE - V1.00 By Phil Ruston",11
+	db "FILEINFO.EXE - V1.01 By Phil Ruston",11
 	db "Shows information about a file",11
 	db "Usage:",11
 	db "FILEINFO.EXE # filename",11
@@ -185,8 +192,6 @@ fsiz_txt		db "FSIZ",0
 
 size_data		ds 4,0
 	
-output_fn		ds 13,0
-
 output_size	db "Size: $"
 size_bytes	db "xxyyzzaa",11,0
 

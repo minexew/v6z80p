@@ -1,8 +1,10 @@
 ;=======================================================================================
 ;
-; FILERX.EXE (previously sercopy.exe) V1.01
+; FILERX.EXE (previously sercopy.exe) V1.02
 ;
-; Changes: v1.01: If serial error during file reception, erase file stub
+; Changes: v1.02: Allow path argument
+;
+;          v1.01: If serial error during file reception, erase file stub
 ;
 ;=======================================================================================
 
@@ -18,10 +20,10 @@ include "system_equates.asm"
 
 my_location	equ $8000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $598
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
 ;======================================================================================
 ; MAIN PROGRAM CODE STARTS HERE
@@ -29,6 +31,18 @@ include 		"test_flos_version.asm"
 
 load_buffer_length equ $7800
 
+max_path_length equ 40
+
+	call save_dir_vol
+	call filerx
+	call restore_dir_vol
+	ret
+		
+filerx	call kjt_parse_path			; change dir according to the path if supplied
+	ret nz
+
+;--------------------------------------------------------------------------------------
+	
 	ld hl,start_text
 	call kjt_print_string
 	in a,(sys_serial_port)		; flush serial buffer at prog start
@@ -362,8 +376,12 @@ ocs_diff	pop de
 	xor a			; carry flag zero if different	
 	ret
 
+;--------------------------------------------------------------------------------------
+
+include "loading\inc\save_restore_dir_vol.asm"
 
 ;----------------------------------------------------------------------------------
+
 internal_command_exit
 
 		db "EXIT.---",0         	; command, to exit FILERX

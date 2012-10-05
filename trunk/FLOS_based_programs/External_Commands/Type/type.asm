@@ -1,6 +1,7 @@
 
-; Type [filename] command - shows text files By Phil '09
+; Type [filename] command - shows text files By Phil 2009-2012
 ;
+; v1.04 - allowed path in filename
 ; v1.03 - tab positioning added
 
 ;======================================================================================
@@ -17,46 +18,35 @@ include "system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $594
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
 ;------------------------------------------------------------------------------------------------
 ; Actual program starts here..
 ;------------------------------------------------------------------------------------------------
 
-
 window_rows equ 25
 window_cols equ 40
 
+max_path_length equ 40
 
-fnd_para	ld a,(hl)			; examine argument text, if encounter 0: give up
-	or a			
-	jr nz,fn_ok
-
-show_use	ld hl,usage_txt
-	call kjt_print_string
-	xor a
+	call save_dir_vol
+	call type
+	call restore_dir_vol
 	ret
 	
-fn_ok	push hl			; copy args to working filename string
-	ld de,filename
-	ld b,16
-fnclp	ld a,(hl)
-	or a
-	jr z,fncdone
-	cp " "
-	jr z,fncdone
-	ld (de),a
-	inc hl
-	inc de
-	djnz fnclp
-fncdone	xor a
-	ld (de),a			; null terminate filename
-	pop hl
+type	ld a,(hl)			; examine argument text, if 0: show use
+	or a			
+	jp z,show_use
+
+	call extract_path_and_filename
+	ld hl,path_txt
+	call kjt_parse_path		;change dir according to the path part of the string
+	ret nz
 	
-	ld hl,filename		; does filename exist?
+	ld hl,filename_txt		; does filename exist?
 	call kjt_find_file
 	ret nz
 			
@@ -235,13 +225,25 @@ more_prompt
 	ret
 	
 ;-------------------------------------------------------------------------------------------
+	
+show_use	ld hl,usage_txt
+	call kjt_print_string
+	xor a
+	ret
+		
+;--------------------------------------------------------------------------------------
 
-usage_txt		db "TYPE v1.03 - shows ASCII text",11,"Usage: TYPE filename",11,0
+include "string\inc\extract_path_and_filename.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
+;---------------------------------------------------------------------------------------
+
+usage_txt		db "TYPE v1.04 - shows ASCII text",11,"Usage: TYPE filename",11,0
 
 more_txt		db " More? (y/n) ",13,0
 more_gone_txt	db "             ",0
 	
-filename		ds 32,0
 text_buffer	ds 256,0			
 
 cursor_pos	dw 0

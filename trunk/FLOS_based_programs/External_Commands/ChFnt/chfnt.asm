@@ -1,9 +1,11 @@
 
 ; Chfnt [filename] command - switches FLOS font - originally by Daniel
-; Updated for FLOS v6.02 By Phil (V1.04) 7-7-2012
+; Updated for FLOS v6.02 By Phil (V1.05) 7-7-2012
 ;
 ; Changes:
 ; --------
+;
+; v1.05 - Supports path in filename
 ;
 ; V1.04 - Now supports upto 256 chars, sequential-char format font files (.fff) for FLOS v6.02.
 ;         Uses patch_font kernal call
@@ -22,9 +24,9 @@
 ; Standard equates for OSCA and FLOS
 ;======================================================================================
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ; Header code - Force program load location and test FLOS version.
@@ -32,53 +34,66 @@ include "system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $602
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
+;---------------------------------------------------------------------------------------------
 
-;-----------------------------------------------------------------------------------------------	
-;  Look for associated file
-;-----------------------------------------------------------------------------------------------	
-	
-fnd_param	ld a,(hl)				;if args = 0, show use
-    	or a    
-    	jp nz,got_param
+max_path_length equ 40
 
-	ld hl,no_param_txt			; no arguments supplied
-	call kjt_print_string
-	xor a
+	call save_dir_vol
+	call change_font
+	call restore_dir_vol
 	ret
+			
+change_font
+
+
+;-------- Parse command line arguments ---------------------------------------------------------
+
+	
+fnd_param	ld (args_loc),hl
+
+	ld a,(hl)				;if args = 0, show use
+    	or a    
+    	jp z,show_use
+
+	call extract_path_and_filename
+	ld a,(path_txt)
+	or a
+	jr z,no_path
+	ld hl,path_txt
+
+	call kjt_parse_path			;change dir according to the path part of the string
+	ret nz
+	jr find_font_file
 
 ;------------------------------------------------------------------------------------------------
 
-got_param
-
-	ld (filename_loc),hl
-	
-	call kjt_store_dir_position
-	
-	ld hl,(filename_loc)
+no_path	ld hl,filename_txt
 	call kjt_open_file			;does file exist in current dir?
 	jr z,got_fn
 
-	call kjt_root_dir			;change to root dir, look for appropriate dir
+	ld hl,font_dir_txt			;change to root dir, look for appropriate dir
+	call kjt_parse_path
+	ret nz
 
-	ld hl,fonts_dir_fn
-	call kjt_change_dir
-	jp nz,exit
+find_font_file
 
-	ld hl,(filename_loc)		;try loading specified file again
+	ld hl,filename_txt			;try loading specified file again
 	call kjt_open_file
-	jp nz,exit	
+	ret nz	
 got_fn	
 
 ;-------------------------------------------------------------------------------------------------
 ; Examine filename extension
 ;-------------------------------------------------------------------------------------------------
 
-	ld hl,(filename_loc)
+examine_ext
+
+	ld hl,filename_txt
 ffne	inc hl
 	ld a,(hl)
 	or a
@@ -100,7 +115,7 @@ ffne	inc hl
 ; Check for start char (new .fff files only)
 ;-----------------------------------------------------------------------------------------------
 
-	ld hl,(filename_loc)
+	ld hl,(args_loc)
 spar1	inc hl
 	ld a,(hl)
 	or a
@@ -141,7 +156,7 @@ old_font	push ix				;make sure font size = 768
 	ld b,my_bank
     	ld hl,fnt_data
     	call kjt_read_from_file
-         	jp nz,exit
+         	ret nz
 	
 	ld ix,fnt_data			;for 96 planar  font
 	ld c,32
@@ -198,7 +213,7 @@ new_font	push iy
     	jr z,nfflok
     	cp $1b
     	jr z,nfflok				;dont care about EOF error
-    	jp exit
+    	ret
 
 nfflok	ld ix,char_count
 	ld hl,fnt_data	
@@ -228,12 +243,10 @@ fnt_done
 
 	ld hl,font_set_txt			
 all_done	call kjt_print_string		
-	call kjt_restore_dir_position
 	xor a				; all OK
 	ret
 
 
-	
 bad_param	ld hl,bad_param_txt
 	jr all_done
 
@@ -241,21 +254,24 @@ bad_font	ld hl,bad_font_txt
 	jr all_done	
 	
 	
+;----------------------------------------------------------------------------------------------
 
-		
-exit	push af				; save A and flags
-	call kjt_restore_dir_position
-	pop af
+show_use	ld hl,no_param_txt			; no arguments supplied
+	call kjt_print_string
+	xor a
 	ret
-	
-;----------------------------------------------------------------------------------------------
-;  Generic data
+		
 ;----------------------------------------------------------------------------------------------
 
-	
-fonts_dir_fn
+include "string\inc\extract_path_and_filename.asm"
 
-	db "fonts",0
+include "loading\inc\save_restore_dir_vol.asm"
+
+;----------------------------------------------------------------------------------------------
+
+font_dir_txt
+
+	db "VOL0:FONTS/",0
 		
 font_set_txt
 
@@ -263,7 +279,7 @@ font_set_txt
 
 no_param_txt
 
-	db 11,"CHFNT.EXE V1.04",11
+	db 11,"CHFNT.EXE V1.05",11
 	db "USE: CHFNT filename [xx]",11
 	db "xx = start char (.fff files only)",11,0
 
@@ -274,10 +290,9 @@ bad_param_txt
 bad_font_txt
 
 	db "ERROR - Not an old FLOS font file",11,0
-		
-filename_loc
 
-	dw 0
+		
+args_loc	dw 0
 
 char_stack ds 8,0
 

@@ -15,10 +15,10 @@ include "system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $598
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
 ;------------------------------------------------------------------------------------------------
 ; Actual program starts here..
@@ -28,16 +28,26 @@ buffer_size equ $800		; must be multiple of 256
 
 ;------------------------------------------------------------------------------------------------
 
-fnd_para	ld a,(hl)			; examine argument text, if encounter 0 show usage
-	or a			
-	jr nz,fn_ok
+max_path_length equ 40
 
-show_use	ld hl,usage_txt
-	call kjt_print_string
-	xor a
+	call save_dir_vol
+	call filetx
+	call restore_dir_vol
 	ret
 	
-fn_ok	ld de,filename		; copy args to working filename string
+filetx	ld a,(hl)			; examine argument text, if encounter 0 show usage
+	or a			
+	jp z,show_use
+	
+	call extract_path_and_filename
+	ld hl,path_txt
+	call kjt_parse_path		;change dir according to the path part of the string
+	ret nz
+
+;-------------------------------------------------------------------------------------------------------
+	
+	ld hl,filename_txt
+	ld de,sh_filename		; copy filename to serial header
 	ld b,15
 fnclp	ld a,(hl)
 	or a
@@ -50,11 +60,8 @@ fnclp	ld a,(hl)
 	djnz fnclp
 fncdone	xor a
 	ld (de),a			; null terminate filename
-
-;-------------------------------------------------------------------------------------------------------
-
-
-send_file	ld hl,filename		; does filename exist?
+	
+	ld hl,filename_txt		; does filename exist?
 	call kjt_find_file
 	ret nz
 	ld (file_size),iy
@@ -195,10 +202,27 @@ crcnext	djnz crcbyte
 	dec c
 	jr nz,crcloop
 	ret
+
+
+;--------------------------------------------------------------------------------------
+
+show_use	ld hl,usage_txt
+	call kjt_print_string
+	xor a
+	ret
+	
+;--------------------------------------------------------------------------------------
+	
+include "string\inc\extract_path_and_filename.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
+;---------------------------------------------------------------------------------------
+
 			
 ;=============================================================================================
 
-usage_txt		db "FILETX - V1.00 Send a file from disk",11
+usage_txt		db "FILETX - V1.01 Send a file from disk",11
 		db "using Serial Link protocol.",11,11
 		db "Usage: FILETX filename",11,0
 
@@ -209,7 +233,7 @@ ok_txt		db "OK",11,0
 
 serial_header	
 
-filename		ds 16,0
+sh_filename	ds 16,0
 file_size		dw 0,0
 serial_h_txt	db "Z80P.FHEADER"
 remaining		ds $e0,0
