@@ -3,6 +3,8 @@ LOADSPR.EXE - Loads data to sprite RAM
 
 Use: LOADSPR filename addr
 
+"filename" can contain a path
+
 "addr" is in the range 0-1FFFF
 
 (IE: A flat, linear address in Sprite

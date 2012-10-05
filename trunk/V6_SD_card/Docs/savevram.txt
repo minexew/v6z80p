@@ -3,6 +3,8 @@ SAVEVRAM.EXE - Saves data from Video RAM
 
 Use: SAVEVRAM filename address length
 
+"filename" can contain a path.
+
 "address" is in the range 0-7FFFF
 
 (IE: A flat, linear address in Video

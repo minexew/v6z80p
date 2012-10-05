@@ -9,6 +9,7 @@ called "NEW.TXT" is created. The
 parameter [-G hex_number] is the line
 to go to at the start (1-FFFF)
 
+Filename can contain path string.
 
 Keys:
 ----
