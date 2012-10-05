@@ -7,7 +7,7 @@ show_info_bar
 	
 	call inverse_video	
 	
-	ld hl,filename
+	ld hl,filename_txt
 	call kjt_print_string
 	
 	call kjt_get_cursor_position

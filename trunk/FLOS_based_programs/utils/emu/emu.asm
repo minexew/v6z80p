@@ -10,6 +10,7 @@
 ; Changes:
 ; --------
 ;
+; v0.07 - Allows boot (to residos/esxdos) via arguments ("EMU M0" = machine0, "EMU M1" = machine1)
 ; V0.06 - Tests OSCA version on boot
 ; V0.05 - Options 1/2 disabled in ESXDOS mode
 ; v0.04 - Supports jumper Exp_b detect for RESIDOS/ESXDOS.NVR select: Closed = ESXDOS, Open = Residos
@@ -45,7 +46,9 @@ spectrum_rom_addr	equ $8000
 spectrum_rom_bank	equ 1
 
 ;----------------------------------------------------------------------------------------------
-
+	
+	ld (arg_string),hl
+	
 	call kjt_get_pen
 	ld (pen_colour),a
 	
@@ -79,6 +82,59 @@ lcfgbad	pop de
 	ld (residos_esxdos),a		;0 = residos, 1 = esxdos
 	
 ;----------------------------------------------------------------------------------------------
+	
+	ld hl,(arg_string)
+	ld a,(hl)				;was run via arg string?
+	or a
+	jr z,no_args
+	
+	xor a
+	ld (args_set),a
+	
+argloop	ld a,(hl)
+	or a
+	jr nz,notlarg
+
+last_arg	ld a,(args_set)
+	cp 1				;number of args required for successful boot
+	jr z,args_ok
+	ld a,$12				;bad args
+	or a
+	ret
+
+args_ok	jp option3			;boot to residos/esxdos
+	
+notlarg	cp "M"
+	jr z,config_arg
+	cp "m"
+	jr z,config_arg
+nxtarg	inc hl
+	jr argloop
+
+
+config_arg
+
+	inc hl
+	ld a,(hl)
+	push hl
+	and $01
+	push af
+	call set_machine
+	pop af
+	ld e,a
+	call update_settings_string
+	ld a,(args_set)
+	inc a
+	ld (args_set),a
+	pop hl
+	inc hl
+	jr nxtarg
+
+	
+no_args
+	
+	
+;-----------------------------------------------------------------------------------------------	
 	
 start	call update_vars_from_cfg_file
 
@@ -460,15 +516,8 @@ gotstr	push hl
 	pop hl
 	or a
 	ret nz
-	
-	ld hl,cfg_line2_txt			; copy value to appropriate line in config file
-	ld a,(machine_selection)
-	or a
-	jr z,prin48
-	ld hl,cfg_line3_txt
-prin48	ld a,e
-	call kjt_hex_byte_to_ascii
-	
+
+	call update_settings_string	
 	call update_vars_from_cfg_file
 	
 	
@@ -503,8 +552,21 @@ setdok	ld hl,cfg_fn			;remove old cfg file (if exists)
 			
 	xor a
 	ret
-	
 
+;-----------------------------------------------------------------------------------------
+	
+	
+update_settings_string
+
+	ld hl,cfg_line2_txt			; copy value to appropriate line in config file
+	ld a,(machine_selection)
+	or a
+	jr z,prin48
+	ld hl,cfg_line3_txt
+prin48	ld a,e
+	call kjt_hex_byte_to_ascii
+	ret
+	
 ;---------------------------------------------------------------------------------------
 	
 	
@@ -512,6 +574,9 @@ change_machine
 
 	ld a,(machine_selection)
 	xor 1
+
+set_machine
+
 	ld (machine_selection),a
 	add a,$30
 	ld (cfg_line1_txt+1),a
@@ -1122,7 +1187,7 @@ filename_txt	ds 16,0
 bad_fn_txt	db 11,"Can't find that file.",11,11,0
 
 banner_txt	db "                              ",11
-		db "   Emulator Kickstart V0.05   ",11
+		db "   Emulator Kickstart V0.07   ",11
 		db "                              ",11,0
 	
 machine_txt	db 11,"Selected machine: ",11,11," ",0
@@ -1133,19 +1198,19 @@ m1_txt		db "SPECTRUM 128",0			;machine type $01
 
 
 		
-menu_txt_norm	db 11,11," 1. Reset/boot machine (BASIC).",11
-		db " 2. Load .tap /.bin file & boot.",11,0
+menu_txt_norm	db 11,11," 1. Reset/boot machine (BASIC)",11
+		db " 2. Load .tap /.bin file & boot",11,0
 		
-menu_txt_esxdos	db 11,11," 1. N/A in ESXDOS mode.",11
-		db " 2. N/A in ESXDOS mode.",11,0
+menu_txt_esxdos	db 11,11," 1. N/A in ESXDOS mode",11
+		db " 2. N/A in ESXDOS mode",11,0
 		
 menu_nvr0		db " 3. Boot into RESIDOS (.nvr)",11,0
 menu_nvr1		db " 3. Boot into ESXDOS (.nvr)",11,0
 		
 		
-menu_txt2		db " 4. Change selected machine.",11
-		db " 5. Set config slot for emulator.",11
-		db " 6. Set machine selection as default.",11,11
+menu_txt2		db " 4. Change selected machine",11
+		db " 5. Set config slot for this machine",11
+		db " 6. Set machine selection as default",11,11
 
 		db " ESC - Quit to FLOS.",11,11,0
 
@@ -1178,6 +1243,9 @@ unknown_text	db "UNKNOWN",0
 bootcode_text	db "BOOTCODE ETC",0
 
 ;-------------------------------------------------------------------------------------------------
+
+args_set		db 0
+arg_string	dw 0
 
 residos_esxdos	db 0
 
