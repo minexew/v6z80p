@@ -1,13 +1,15 @@
 
-; Load file to video memory v1.01
+; Load file to video memory v1.02
+;
+; v1.02 - allowed path in filename
 
 ;======================================================================================
 ; Standard equates for OSCA and FLOS
 ;======================================================================================
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ; Header code - Force program load location and test FLOS version.
@@ -15,18 +17,24 @@ include "system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $594
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
-;---------------------------------------------------------------------------------------
-; Actual program starts here..
-;---------------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------------------
 
+max_path_length equ 40
+
+	call save_dir_vol
+	call loadvram
+	call restore_dir_vol
+	ret
+			
 
 buffer_size equ 512			
 
+loadvram
 
 ;-------- Parse command line arguments ---------------------------------------------------------
 
@@ -34,31 +42,13 @@ buffer_size equ 512
 	or a
 	jp z,show_use
 	
-	ld de,filename		; copy args to working filename string
-	ld b,16
-fnclp	ld a,(hl)
-	or a
-	jr z,fncdone
-	cp " "
-	jr z,fncdone
-	ld (de),a
-	inc hl
-	inc de
-	djnz fnclp
-fncdone	xor a
-	ld (de),a			; null terminate filename
-	
+	call extract_path_and_filename
 
 ;-------------------------------------------------------------------------------------------------
 
 	call find_next_arg		; is a destination address specified?
-	jr nz,parse_dest
-	ld hl,0
-	ld de,0
-	jr got_dest
-
-parse_dest
-
+	ret nz
+	
 	ld (addr_txt_loc),hl
 	call get_arg_size
 	ld a,b
@@ -110,8 +100,11 @@ got_dest	ld a,e			; convert linear address to 8KB page and address between 2000-
 	
 ;-------------------------------------------------------------------------------------------------
 
+	ld hl,path_txt
+	call kjt_parse_path		;change dir according to the path part of the string
+	ret nz
 
-	ld hl,filename		; does filename exist?
+	ld hl,filename_txt		; does filename exist?
 	call kjt_find_file
 	jp nz,load_error
 	ld (length_hi),ix		; ix:iy = size of file (bytes-to-go)
@@ -119,7 +112,7 @@ got_dest	ld a,e			; convert linear address to 8KB page and address between 2000-
 	
 	ld hl,loading_txt
 	call kjt_print_string
-	ld hl,filename
+	ld hl,filename_txt
 	call kjt_print_string
 	ld hl,to_txt
 	call kjt_print_string
@@ -281,20 +274,40 @@ argslp	ld a,(hl)
 	jr argslp
 	
 	
+;-------------------------------------------------------------------------------------------------
 	
 find_next_arg
 
-	ld a,(hl)			;move to hl start of next string, if ZF is set - no string
+	ld a,(hl)			;move to hl start of next string, if ZF is not set - no more args
 	or a
-	ret z
+	jr z,mis_arg
 	cp " "
-	ret nz
+	jr z,got_spc
 	inc hl
 	jr find_next_arg
-	
-	
-;-------------------------------------------------------------------------------------------------
 
+got_spc	inc hl
+	ld a,(hl)
+	or a
+	jr z,mis_arg
+	cp " "
+	jr z,got_spc
+	cp a			;return with zero flag set, char in A
+	ret
+	
+mis_arg	ld a,$1f			;return with zero flag unset, error code $1f
+	or a
+	ret
+	
+	
+;--------------------------------------------------------------------------------------
+
+include "string\inc\extract_path_and_filename.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
+;---------------------------------------------------------------------------------------
+	
 loading_txt	db "Loading: ",0
 to_txt		db " to VRAM $",0
 
@@ -302,13 +315,11 @@ addr_txt_loc	dw 0
 cr_txt		db 11,0
 
 use_txt		db "USAGE:",11
-		db "LOADVRAM Filename [VRAM Address]",11,0
+		db "LOADVRAM Filename VRAM_Address",11,0
 
 load_error_txt	db "Load error - File not found?",11,0
 
 range_error_txt	db "Video RAM address out of range!",11,0
-
-filename		ds 32,0
 
 video_page	db 0
 page_address	dw 0

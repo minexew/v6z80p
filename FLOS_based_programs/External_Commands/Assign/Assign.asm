@@ -3,15 +3,15 @@
 ; Usage: Assign "proxy_name" "path" (proxy name 3 chars max. If no path is
 ; supplied, the current dir is assigned)
 ;
-; V1.00
+; V1.01 - use kernal for path parsing
 
 ;======================================================================================
 ; Standard equates for OSCA and FLOS
 ;======================================================================================
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ; Header code - Force program load location and test FLOS version.
@@ -19,12 +19,24 @@ include "system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $594
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
-;-------- Parse command line arguments -------------------------------------------------
+;---------------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call assign
+	call restore_dir_vol
+	ret
+			
+
+assign
+
+;-------- Parse command line arguments ---------------------------------------------------------
 
 
 	push hl
@@ -43,8 +55,10 @@ include 		"test_flos_version.asm"
 	jp z,no_args
 	
 	cp "%"
-	jp z,inv_proxy
-	push hl
+	jr nz,nproxyp		; if proxy named as "%xxx", skip the %
+	inc hl
+	
+nproxyp	push hl
 	ld de,var_name+1
 	ld b,3
 evnclp	ld a,(hl)
@@ -71,113 +85,32 @@ fnd_para2	ld a,(hl)			; examine path argument text, if encounter 0: give up and 
 	inc hl
 	jr fnd_para2
 
-para2_ok	push hl			
-	pop ix			; analyse the path string
-	ld a,(ix+4)
-	cp ":"			; volume specified?
-	jr nz,nxt_path
-	ld de,vol_txt
-	ld b,3
-	push ix
-	call kjt_compare_strings
-	pop ix
-	jp nc,bad_path
-	ld a,(ix+3)		; get volume digit char
-	sub $30
-	push ix
-	call kjt_change_volume
-	pop ix
-	jp nz,bad_path		; error if new volume is invalid
-
-	ld de,5
-	add ix,de			; move past "VOLx:"
-	push ix
-	call kjt_root_dir		; go to new drive's root block as drive has changed
-	pop ix
-	ld a,(ix)			; if "/" follows "VOLx:" then skip the fwdslash
-	cp $2f
-	jr nz,nxt_path
-	inc ix
-
-nxt_path	ld de,filename_txt		;step through args changing dirs as apt
-	call skip_spaces
-	jr z,path_done
-cpypslp	ld a,(ix)
-	cp $2f
-	jr z,path_break
-	cp 33
-	jr c,path_break
-	ld (de),a
-	inc ix
-	inc de
-	jr cpypslp
-	
-path_break
-
-	xor a
-	ld (de),a			;zero terminate this dir string
-	ld hl,filename_txt
-	push ix
-	call kjt_change_dir		
-	pop ix
-	jr nz,bad_path
-	
-	ld a,(ix)
-	cp 33
-	jr c,path_done
-	inc ix
-	jr nxt_path		;next char in path string
-				
-
-skip_spaces
-
-	ld a,(ix)
-	or a
-	ret z
-	cp 32
+para2_ok	call kjt_parse_path
 	ret nz
-	inc ix
-	jr skip_spaces
-
-
-path_done
 
 	call kjt_get_dir_cluster	;use this updated drive and dir as the %proxy values
 	ld (var_data),de
 	call kjt_get_volume_info
 	ld (var_data+2),a
 
-set_var	
-
-	ld hl,var_name		;set the environment variable
+set_var	ld hl,var_name		;set the environment variable
 	ld de,var_data
 	call kjt_set_envar
-	jr z,all_done
+	ret z
 	ld hl,no_room_txt
 	jr err_quit
 
-all_done	ld a,(orig_volume)		;restore original current drive and dir
-	call kjt_change_volume
-	ld de,(orig_cluster)
-	call kjt_set_dir_cluster
-	xor a
-	ret
-
 no_args	ld hl,missing_args_txt
 err_quit	call kjt_print_string
-	jr all_done
-
-inv_proxy	ld hl,bad_proxy_txt
-	jr err_quit
-
-bad_path	ld hl,bad_path_txt
-	jr err_quit
+	xor a
+	ret
 		
-;-------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------		
 
-vol_txt	   db "VOL",0
+include "loading\inc\save_restore_dir_vol.asm"
 
-filename_txt ds 16,0
+;----------------------------------------------------------------------------------------------
+
 
 var_name	   db "%xxx",0
 
@@ -200,8 +133,6 @@ missing_args_txt	db 11,"ASSIGN.EXE (v1.00)",11,11
 		
 
 no_room_txt	db "Not enough space for assignment.",11,11,0
-bad_path_txt	db "The path specified is invalid.",11,11,0
-bad_proxy_txt	db "Bad proxy name.",11,11,0
 		
 ;-------------------------------------------------------------------------------------------
 

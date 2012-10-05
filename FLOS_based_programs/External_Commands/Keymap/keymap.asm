@@ -1,14 +1,16 @@
 ;-----------------------------------------------------------------------------------------------
-; "KEYMAP.EXE" = Change the default keymap. v1.02
+; "KEYMAP.EXE" = Change the default keymap. v1.03
 ;-----------------------------------------------------------------------------------------------
+
+; v1.03 - Supports path in filename
 
 ;======================================================================================
 ; Standard equates for OSCA and FLOS
 ;======================================================================================
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ; Header code - Force program load location and test FLOS version.
@@ -16,36 +18,57 @@ include "system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $594
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
+
+;---------------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call change_keymap
+	call restore_dir_vol
+	ret
+			
+
+change_keymap
 
 
-;------------------------------------------------------------------------------------------------
-; Actual program starts here..
-;------------------------------------------------------------------------------------------------
+;-------- Parse command line arguments ---------------------------------------------------------
 
 
-fnd_param	ld a,(hl)				; examine argument text, if 0: show use
+fnd_param	ld (args_loc),hl
+	ld a,(hl)				; examine argument text, if 0: show use
 	or a			
 	jr z,no_param
 
-	call kjt_store_dir_position
-	ld (filename_loc),hl
-	call kjt_find_file			;get header info, does file exist in current dir?
-	jr c,hw_err
+	call extract_path_and_filename
+	ld a,(path_txt)
+	or a
+	jr z,no_path
+	
+	ld hl,path_txt
+	call kjt_parse_path			; change dir according to the path part of the string
+	ret nz
+	jr find_keymap_file
+
+;------------------------------------------------------------------------------------------------
+
+no_path	ld hl,filename_txt
+	call kjt_open_file			; does file exist in current dir?
 	jr z,got_km
 
-	call kjt_root_dir			;change to root dir, look for keymaps dir
-	ld hl,keymaps_fn
-	call kjt_change_dir
-	jr c,hw_err
-	jr nz,exit
-	ld hl,(filename_loc)		;try loading specified file again
-	call kjt_find_file
-	ret c
-	jr nz,exit	
+	ld hl,keymap_dir_txt		; change to vol0:keymaps
+	call kjt_parse_path
+	ret nz
+
+find_keymap_file
+
+	ld hl,filename_txt			;try loading specified file again
+	call kjt_open_file
+	ret nz	
 
 got_km	ld a,%10000000		
 	out (sys_alt_write_page),a		; write "under" the video registers
@@ -55,31 +78,36 @@ got_km	ld a,%10000000
 	call kjt_set_load_length
 	ld hl,keymaps
 	ld b,0
-	call kjt_force_load			; overwrite default keymap
-	jr c,hw_err
-
-	ld ix,0
+	call kjt_read_from_file		; overwrite default non qualified key map
+	ret nz
+		
+key1ok	ld ix,0
 	ld iy,$62
 	call kjt_set_load_length
 	ld hl,keymaps+$80
 	ld b,0
-	call kjt_force_load	
-	jr c,hw_err
-
-	ld ix,0
+	call kjt_read_from_file		; shift-ed keys
+	jr z,key2ok	
+	cp $1b				; if EOF error, this is a short keymap just end
+	jr z,keymdone
+	ret
+	
+key2ok	ld ix,0
 	ld iy,$62
 	call kjt_set_load_length
 	ld hl,keymaps+$100
 	ld b,0
-	call kjt_force_load	
-	jr c,hw_err		
-
-	xor a	
+	call kjt_read_from_file		; alt-ed keys
+	jr z,keymdone
+	cp $1b				; if EOF error, this is a short keymap just end
+	jr z,keymdone
+	ret
+	
+keymdone	xor a	
 	out (sys_alt_write_page),a		; normal video register write mode
 
 	ld hl,km_set_txt			
 all_done	call kjt_print_string		
-	call kjt_restore_dir_position
 	xor a				; all OK
 	ret
 
@@ -88,35 +116,21 @@ no_param	ld hl,no_param_txt
 	jr all_done
 	
 	
-hw_err	push af
-	xor a	
-	out (sys_alt_write_page),a		; normal video register write mode
-	call kjt_restore_dir_position
-	pop af
-	ret
-	
-exit	push af				; save A and flags
-	call kjt_restore_dir_position
-	pop af
-	ret
-	
 ;-------------------------------------------------------------------------------------------		
 
-filename_loc
+include "string\inc\extract_path_and_filename.asm"
 
-	dw 0
+include "loading\inc\save_restore_dir_vol.asm"
 
-keymaps_fn
+;----------------------------------------------------------------------------------------------
 
-	db "keymaps",0
+args_loc		dw 0
+
+keymap_dir_txt	db "VOL0:KEYMAPS/",0
 		
-km_set_txt
+km_set_txt	db "Keymap set",11,0
 
-	db "Keymap set",11,0
-
-no_param_txt
-
-	db "USE: KEYMAP [filename]",11,0
+no_param_txt	db "USE: KEYMAP [filename]",11,0
 
 
 ;-------------------------------------------------------------------------------------------

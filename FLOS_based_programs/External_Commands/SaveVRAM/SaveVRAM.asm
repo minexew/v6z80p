@@ -1,56 +1,61 @@
 
-; SAVEVRAM.EXE (External command to save video memory - v0.01) 
+; SAVEVRAM.EXE (External command to save video memory)
+;
+; V1.02 - allowed path in filename 
 
 ;======================================================================================
 ; Standard equates for OSCA and FLOS
 ;======================================================================================
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ; Header code - Force program load location and test FLOS version.
 ;--------------------------------------------------------------------------------------
 
-my_location	equ $d000			;allows space for 8kb buffer
+my_location	equ $d000
 my_bank		equ $0e
-include 		"force_load_location.asm"
+include 		"program_header\force_load_location.asm"
 
-required_flos	equ $594
-include 		"test_flos_version.asm"
+required_flos	equ $607
+include 		"program_header\test_flos_version.asm"
 
-;---------------------------------------------------------------------------------------
-; Actual app starts here..
-;---------------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------------------
+
+max_path_length equ 40
+
+	call save_dir_vol
+	call save_vram
+	call restore_dir_vol
+	ret
+			
+save_vram
+
+;-------- Parse command line arguments ---------------------------------------------------------
 
 	
 	ld a,(hl)				; examine argument text, if 0: show use
 	or a
 	jp z,show_use
 	
-	ld de,filename			; copy chars to filename string
-	ld b,16
-fnclp	ld a,(hl)
-	or a
-	jp z,no_src_addr
-	cp " "
-	jr z,fncdone
-	ld (de),a
-	inc hl
-	inc de
-	djnz fnclp
-fncdone	xor a
-	ld (de),a				; null terminate filename
+	call extract_path_and_filename
 	
+	push hl
+	ld hl,path_txt
+	call kjt_parse_path			;change dir according to the path part of the string
+	pop hl
+	ret nz
+
 ;-------------------------------------------------------------------------------------------------
 
-	
-	call find_next_arg			; is address specified?
-	jp z,no_src_addr
+	call find_next_argument			; is address specified?
+	jp nz,no_src_addr
+	ld (arg_addr),hl
+
 	call ascii_to_hex_bcde
 	jp nz,bad_hex
-	ld (arg_addr),hl
 	ld (addr_linear_lo),de
 	ld (addr_linear_hi),bc
 	push bc
@@ -61,7 +66,6 @@ fncdone	xor a
 	sbc hl,bc
 	pop bc
 	jp nc,out_of_range
-	
 	ld l,e				; convert linear address in C:DE to 8KB page (A) 
 	ld a,d				; and address between 2000-3fff (HL)
 	and $1f
@@ -81,9 +85,11 @@ fncdone	xor a
 	ld (video_page),a
 	ld (video_address),hl
 	
+	
 	ld hl,(arg_addr)
-	call find_next_arg			; is length specified?
-	jp z,no_length
+	call find_next_argument			; is length specified?
+	jp nz,no_length
+	
 	call ascii_to_hex_bcde
 	jp nz,bad_hex
 	ld (length_lo),de
@@ -93,15 +99,14 @@ fncdone	xor a
 	or d
 	or e
 	jp z,len_zero			;abort if length = 0
-	
 	dec de				;dec BC:DE for following calc
 	ld a,d
 	and e
 	cp $ff
 	jr nz,noundfl
 	dec bc
-noundfl	
-	ld hl,(addr_linear_lo)
+
+noundfl	ld hl,(addr_linear_lo)
 	add hl,de
 	ld hl,(addr_linear_hi)
 	adc hl,bc
@@ -115,7 +120,7 @@ noundfl
 ;-------------------------------------------------------------------------------------------------
 
 
-	ld hl,filename			;try to make new file stub		
+	ld hl,filename_txt			;try to make new file stub		
 	call kjt_create_file
 	jr z,new_file
 	cp 9				;if error 9, file exists already. If other error quit.
@@ -181,7 +186,7 @@ save_buffer
 	push hl
 	pop ix				;sysram buffer address to save from
 	ld b,my_bank
-	ld hl,filename
+	ld hl,filename_txt
 	ld c,0
 	ld de,(save_chunk_size)
 	call kjt_write_to_file
@@ -271,18 +276,25 @@ show_use
 ;-------------------------------------------------------------------------------------------------
 	
 	
-find_next_arg
+find_space
 
+	inc hl
 	ld a,(hl)			;move to hl start of next string, if ZF is set - no string
 	or a
 	ret z
 	cp " "
-	ret nz
+	jr nz,find_space
+	ret
+	
+find_non_space
+
 	inc hl
-	jr find_next_arg
-
-
-
+	ld a,(hl)
+	or a
+	ret z			
+	cp " "
+	jr z,find_non_space
+	ret
 	
 
 ascii_to_hex_bcde
@@ -326,6 +338,14 @@ hexerr	xor a
 
 ;-------------------------------------------------------------------------------------------------
 
+include "string\inc\extract_path_and_filename.asm"
+
+include "string\inc\find_next_argument.asm"
+
+include "loading\inc\save_restore_dir_vol.asm"
+
+;---------------------------------------------------------------------------------------
+
 saving_txt	db "Saving VRAM data..",11,0
 
 use_txt		db 11,"USAGE:",11
@@ -334,8 +354,6 @@ use_txt		db 11,"USAGE:",11
 save_append_txt	db "File exists. Append data (y/n)",11,0
 
 arg_addr		dw 0
-
-filename		ds 32,0
 
 addr_linear_lo	dw 0
 addr_linear_hi	dw 0
