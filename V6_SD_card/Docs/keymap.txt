@@ -1,12 +1,14 @@
 
 KEYMAP.EXE - Change the keymap
 
-Use: KEYMAP keymap_file
+Use: KEYMAP filename
 
-Keymap looks in the current directory
-and then in the root/keymaps directory
-for the keymap file. The currently
-available keymap list is
+Filename can contain a path. If no
+path is supplied KEYMAP looks in the
+current directory and then in the
+VOL0:keymaps directory for the keymap
+file. The currently available keymap
+list is:
 
 UK.bin - UK (default)
 US.bin - USA

@@ -1,6 +1,7 @@
 
 FIRMWARE.EXE - Writes data to the
-onboard EEPROM in 64KB chunks.
+onboard EEPROM in 64KB chunks from
+a file in the current dir.
 
 Use: FIRMWARE file.bin [start_block]
 

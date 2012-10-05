@@ -1,16 +1,26 @@
 
 EMU.EXE - Emulator config launcher
 
-(Replaces GOSPEC.EXE)
+Used to start Alessandro's cycle perfect
+Spectrum emulators. (A simple "BOOT n"
+is not sufficient as files such as the
+Spectrum ROM need to be pre-loaded into
+the V6Z80P's memory).
 
-Currently used to start Alessandro's
-cycle perfect Spectrum emulators.
-(A simple "BOOT n" is not sufficient
-as files such as the Spectrum ROM
-need to be pre-loaded into the
-V6Z80P's memory).
+Use: EMU (options)
 
-Use: EMU (no parameters)
+If supplied, Options can be:
+
+"M0" (IE: Machine 0 Spectrum 48)
+"M1" (IE: Machine 1 Spectrum 128)
+
+When arguments are supplied, the
+emulator boots into Residos or
+Esxdos depending on jumper status
+of expansion pin B. If the program
+has not been run before, you will
+be prompted to set the config
+slots.
 
 Notes:
 
@@ -20,15 +30,14 @@ file called emu.cfg in a root folder
 named SETTINGS (both are created if
 necessary).
 
-From version v0.04, EMU.EXE detects
-status of expansion pin EXT_B. If
-this is low (pulled down by a jumper)
-Option 3 will restore from ESXDOS.NVR
-If the pin is high (no jumper) 
-RESIDOS.NVR is used. For this
-automatic feature to work a) OSCA 
-v671 must be installed and b) the
-Spectrum emulator configs must be
-versions 048K2715.bin / 128K2715.bin
+EMU.EXE detects status of expansion
+pin EXT_B. If this is low (pulled down
+by a jumper) Option 3 will restore
+from ESXDOS.NVR If the pin is high
+(no jumper)  RESIDOS.NVR is used.
+For this automatic feature to work
+a) OSCA v671+ must be installed and
+b) the Spectrum emulator configs must
+be versions 048K2715.bin/128K2715.bin
 or above.
 

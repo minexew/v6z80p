@@ -3,6 +3,8 @@ LOADVRAM.EXE - Loads data to Video RAM
 
 Use: LOADVRAM filename addr
 
+"filename" can contain a path
+
 "addr" is in the range 0-7FFFF
 
 (IE: A flat, linear address in Video
