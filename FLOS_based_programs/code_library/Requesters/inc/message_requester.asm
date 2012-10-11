@@ -24,8 +24,8 @@
 ;
 ;--------------------------------------------------------------------------
 
-	include "window_draw_routines.asm"	; comment these lines out if
-	include "window_support_routines.asm"	; any other code includes them
+	include "window_routines\inc\window_draw_routines.asm"	; comment these lines out if
+	include "window_routines\inc\window_support_routines.asm"	; any other code includes them
 
 ;--------------------------------------------------------------------------
 

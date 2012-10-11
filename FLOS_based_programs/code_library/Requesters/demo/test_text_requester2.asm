@@ -6,14 +6,13 @@
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
-
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
-;------------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
 
 	ld a,$25			;example error code in A
 	ld b,3			;x coord of window
@@ -51,7 +50,7 @@ text2	db " And another",11,"     One!",0
 		
 ;---------------------------------------------------------------------------------
 
-	include "message_requester.asm"
+	include	"requesters\inc\message_requester.asm"
 	
 ;---------------------------------------------------------------------------------
 

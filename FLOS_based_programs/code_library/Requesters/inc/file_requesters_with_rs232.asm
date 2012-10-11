@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------------
-; Library Code: FLOS File Requestors with RS232 RX/TX v0.04 By Phil Ruston
+; Library Code: FLOS File Requestors with RS232 RX/TX v0.06 By Phil Ruston
 ;--------------------------------------------------------------------------------
 ;
 ; Requires FLOS v602
@@ -7,6 +7,8 @@
 ;
 ; Changes:
 ; --------
+;
+; 0.06 : Changed include path only
 ;
 ; 0.05 : Automatic backup/restore of display around load/save and error requesters
 ;      : Cursor position is saved/restored around load/save and error requesters
@@ -153,8 +155,8 @@
 
 ;--------------------------------------------------------------------------
 
-	include "window_draw_routines.asm"
-	include "window_support_routines.asm"
+	include "window_routines\inc\window_draw_routines.asm"
+	include "window_routines\inc\window_support_routines.asm"
 
 ;--------------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 FLOS Load and Save Requesters for user programs - By Phil Ruston
 ----------------------------------------------------------------
 
-Requires FLOS v602+ / Last update 08-07-2012
+Requires FLOS v602+ / Last update 11-10-2012
 
 Purpose:
 ---------
@@ -12,30 +12,19 @@ and saves serially.) NOTE: The requester code does not perform the actual load a
 save operation, that is left to the user program.
 
 
-How to add to a project:
--------------------------
+How to add the necessary files to a project:
+--------------------------------------------
 
-The file requester routines utilise the window draw and support code.
-The simplest way to include all the necessary source is to add:
+The file requester routines utilise the window draw and support code. Make sure
+the following include path is set for Pasmo: (EG: in assemble.bat)
  
--I %v6z80pdir%\FLOS_based_programs\code_library\requesters\inc
--I %v6z80pdir%\FLOS_based_programs\code_library\window_routines\inc
+-I %v6z80pdir%\FLOS_based_programs\code_library\
 
-to your project's assemble.bat PASMO.EXE command line and then
-put this line in your source:
+and add one of the following lines to your .asm source:
 
-include "file_requesters.asm" (or include "file_requesters_with_rs232.asm")
-
-Alternatively, you can manually copy all of the source files to your projects
-inc folder. You need:
-
-"file_requesters.asm" (or "file_requesters_with_rs232.asm")
-"window_draw_routines.asm"
-"window_support_routines.asm"
-"window_chars.bin"
-
-You only need to add the line "include file_requesters.asm" to your own project's
-source, as the code has includes for the rest of the required files itself.
+include	"requesters\inc\file_requesters.asm"
+or
+include	"requesters\inc\file_requesters_with_rs232.asm"
 
 
 Usage:

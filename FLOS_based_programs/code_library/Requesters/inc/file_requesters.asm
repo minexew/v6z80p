@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------------
-; Library Code: FLOS File Requesters v0.26 - By Phil Ruston
+; Library Code: FLOS File Requesters v0.27 - By Phil Ruston
 ;--------------------------------------------------------------------------------
 ;
 ; Requires FLOS v602
@@ -7,6 +7,7 @@
 ;
 ; Changes:
 ; --------
+; 0.27: Changed include path only
 ;
 ; 0.26: Automatic backup/restore of display around load/save and error requesters
 ;     : Cursor position is saved/restored around load/save and error requesters

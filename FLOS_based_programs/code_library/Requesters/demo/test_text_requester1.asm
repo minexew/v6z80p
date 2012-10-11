@@ -6,14 +6,13 @@
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
-
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
-;------------------------------------------------------------------------------
+;-----------------------------------------------------------------------------
 	
 	ld b,8			;x coord of window
 	ld c,2			;y coord of window
@@ -29,7 +28,7 @@ my_text	db "Here is some text for the requester",0
 		
 ;---------------------------------------------------------------------------------
 
-	include "message_requester.asm"
+	include	"requesters\inc\message_requester.asm"
 	
 ;---------------------------------------------------------------------------------
 

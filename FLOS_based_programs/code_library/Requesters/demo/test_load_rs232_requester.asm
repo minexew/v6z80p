@@ -4,16 +4,16 @@
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
-
-
-load_buffer equ $8000
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
 ;-----------------------------------------------------------------------------
+
+load_buffer equ $8000
+
 	
 	ld b,8			; x coord of requester (in characters)
 	ld c,2			; y coord ""
@@ -99,7 +99,7 @@ hw_error_txt
 
 	
 ;----------------------------------------------------------------------------
-include	"file_requesters_with_rs232.asm"
+include	"requesters\inc\file_requesters_with_rs232.asm"
 ;----------------------------------------------------------------------------
 
 my_filename

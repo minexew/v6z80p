@@ -6,9 +6,9 @@
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
@@ -109,7 +109,7 @@ rs232_error_txt
 	db "A serial error occured..",11,11,0
 		
 ;----------------------------------------------------------------------------
-include	"file_requesters_with_rs232.asm"
+include	"requesters\inc\file_requesters_with_rs232.asm"
 ;----------------------------------------------------------------------------
 
 my_filename

@@ -6,9 +6,9 @@
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
@@ -75,7 +75,7 @@ hw_error_txt
 
 
 ;----------------------------------------------------------------------------
-include	"file_requesters.asm"
+include	"requesters\inc\file_requesters.asm"
 ;----------------------------------------------------------------------------
 
 my_filename
