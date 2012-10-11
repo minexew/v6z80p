@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme>
+	<keyword-classes>
+		<keyword-class name="instructions">
+			ex EX exx EXX ld LD ldd LDD lddr LDDR ldi LDI ldir LDIR pop POP push PUSH
+			adc ADC add ADD cp CP cpd CPD cpdr CPDR cpi CPI cpir CPIR cpl CPL daa DAA dec DEC inc INC neg NEG sbc SBC sub SUB
+			and AND bit BIT ccf CCF or OR res RES scf SCF set SET xor XOR
+			rl RL rla RLA rlc RLC rlca RLCA rld RLD rr RR rra RRA rrc RRC rrca RRCA rrd RRD sla SLA sra SRA srl SRL
+			call CALL djnz DJNZ jp JP jr JR nop NOP ret RET reti RETI retn RETN rst RST
+			di DI ei DI halt HALT im IM in IN ind IND indr INDR ini INI inir INIR otdr OTDR otir OTIR out OUT outd OUTD outi OUTI
+		</keyword-class>
+		<keyword-class name="math">
+			bcall BCALL b_call B_CALL $ *
+		</keyword-class>
+		<keyword-class name="registers">
+			a A af AF b B bc BC c C d D de DE e E h H hl HL i I ix IX iy IY l L r R
+		</keyword-class>
+		<keyword-class name="directives">
+			.addinstr .ADDINSTR .byte .BYTE .db .DB .dw .DW .equ .EQU .end .END .list .LIST .module .MODULE .nolist .NOLIST .org .ORG
+			define DEFINE else ELSE elseif ELSEIF elseifdef ELSEIFDEF endif ENDIF if IF ifdef IFDEF include INCLUDE
+		</keyword-class>
+		<keyword-class name="undocumented">
+			hx HX hy HY sll SLL ixh IXH ixl IXL iyh iYH iyl IYL lx LX ly LY
+		</keyword-class>
+	</keyword-classes>
+	<language name="z80" title="Z80 Assembler" folding="false">
+		<lexer name="asm" />
+		<comments line=";" />
+		<use-keywords>
+			<keyword key="0" name="Instructions" class="instructions" />
+			<keyword key="1" name="PC" class="math" />
+			<keyword key="2" name="Registers" class="registers" />
+			<keyword key="3" name="Directives" class="directives" />
+			<keyword key="5" name="Undocumented Instructions" class="undocumented" />
+		</use-keywords>
+		<use-styles>
+			<style name="Default" key="32" fore="#808080" />
+			<style name="Whitespace" key="0" class="whitespace" />
+			<style name="Comment" key="1" class="comment" />
+			<style name="Number" key="2" class="number" />
+			<style name="String" key="3" class="string" />
+			<style name="Operator" key="4" class="string" />
+			<style name="Identifier" key="5" class="identifier" />
+			<style name="Instruction" key="6" class="keyword" bold="true" />
+			<style name="Misc." key="7" class="keyword" bold="true" />
+			<style name="Register" key="8" fore="46aa03" bold="true" />
+			<style name="Directive" key="9" class="keyword" />
+			<style name="Directive Operand" key="10" class="keyword" />
+			<style name="Single Quote String" key="12" class="string" />
+			<style name="Unclosed String" key="13" fore="000000" back="E0C0E0" eolfilled="true" />
+			<style name="Undocumented Instructions" key="14" fore="FF0000" />
+		</use-styles>
+	</language>
+</Scheme>
