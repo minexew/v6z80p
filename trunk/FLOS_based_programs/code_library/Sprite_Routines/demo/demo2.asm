@@ -169,7 +169,7 @@ mine_y_disp	dw 1
 
 ;------------------------------------------------------------------------------------------------------------------------------
 
-	include object_to_sprites.asm
+	include "sprite_routines\inc\object_to_sprites.asm"
 
 ;------------------------------------------------------------------------------------------------------------------------------
 
@@ -196,8 +196,8 @@ mine	db 2			; number of h/w sprite resources used by this object
 
 my_sprites
 
-	incbin "birdy_sprites.bin"
-	incbin "mine_sprites.bin"
+	incbin "sprite_routines\demo\data\birdy_sprites.bin"
+	incbin "sprite_routines\demo\data\mine_sprites.bin"
 
 end_of_sprites
 
@@ -205,7 +205,8 @@ end_of_sprites
 	
 my_colours
 
-	incbin "palette.bin"
+	incbin "sprite_routines\demo\data\palette.bin"
 	
+
 	
 ;------------------------------------------------------------------------------------------------------------------------------	
