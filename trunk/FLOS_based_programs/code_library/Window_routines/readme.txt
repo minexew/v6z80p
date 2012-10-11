@@ -8,16 +8,21 @@ Last updated 27/09/2012 - Window draw code version 0.11
 -----------------------------------------------------------------
 
 The routines allow the user to create and operate simple windows
-(EG: requesters) with minimal effort. To use, please include
-the following files into your project's code:
+(EG: requesters) with minimal effort. 
 
- "Window routines/inc/window_draw_routines.asm" (this source
-  has an incbin for the data "window_chars.bin" so that file
-  should also be copied into your project's include folder).
+Make sure the following include path is set for Pasmo: (EG: in assemble.bat)
+ 
+-I %v6z80pdir%\FLOS_based_programs\code_library\
 
- and, if required: 
+and add the following line(s) to your .asm source:
 
- "Window routines/inc/Window_Support_Routines.asm"
+include	"Window routines/inc/window_draw_routines.asm"
+
+and, if required: 
+
+include "Window routines/inc/Window_Support_Routines.asm"
+
+-----------------------------------------------------------------
 
 
 Overview

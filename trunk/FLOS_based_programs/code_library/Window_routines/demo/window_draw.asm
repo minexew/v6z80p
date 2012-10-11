@@ -2,13 +2,13 @@
 ; Demo of Support code for Window drawing routines
 ;-----------------------------------------------------------------------------
 ;
-;Requires FLOS v602
+; Requires FLOS v602
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 
 	org $5000
@@ -31,8 +31,8 @@ include "system_equates.asm"
 ;---------------------------------------------------------------------------------
 
 
-	include "window_draw_routines.asm"
-	
+	include "window_routines\inc\window_draw_routines.asm"
+
 
 ;------ My Window Descriptions -----------------------------------------------------
 
