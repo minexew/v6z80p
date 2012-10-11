@@ -1,11 +1,11 @@
 ; Demo of object_to_sprites routine - most basic code
 
 
-;---Standard header for OSCA and FLOS ---------------------------------------------
+;---Standard source header for OSCA and FLOS ---------------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\osca_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
@@ -53,7 +53,7 @@ left_border 	equ $7f ; first visible leftmost pixel on the display (currently se
 
 ;------------------------------------------------------------------------------------------------------------------------------
 
-	include object_to_sprites.asm
+	include "sprite_routines\inc\object_to_sprites.asm"
 
 ;------------------------------------------------------------------------------------------------------------------------------
 
@@ -79,8 +79,8 @@ mine	db 2			; number of h/w sprite resources used by this object
 
 my_sprites
 
-	incbin "birdy_sprites.bin"
-	incbin "mine_sprites.bin"
+	incbin "sprite_routines\demo\data\birdy_sprites.bin"
+	incbin "sprite_routines\demo\data\mine_sprites.bin"
 
 end_of_sprites
 
@@ -88,7 +88,7 @@ end_of_sprites
 	
 my_colours
 
-	incbin "palette.bin"
+	incbin "sprite_routines\demo\data\palette.bin"
 	
 	
 ;------------------------------------------------------------------------------------------------------------------------------	
