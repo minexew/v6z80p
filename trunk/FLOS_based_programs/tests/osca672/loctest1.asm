@@ -6,9 +6,9 @@
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "\equates\kernal_jump_table.asm"
+include "\equates\OSCA_hardware_equates.asm"
+include "\equates\system_equates.asm"
 
 ;-----------------------------------------------------------------------------------------
 	org $5000		
@@ -225,16 +225,16 @@ four_len	dw 0
 
 
 one_wav	dw 0
-	incbin "one.raw"
+	incbin "\FLOS_based_programs\tests\osca672\data\one.raw"
 
 two_wav	dw 0
-	incbin "two.raw"
+	incbin "\FLOS_based_programs\tests\osca672\data\two.raw"
 
 three_wav	dw 0
-	incbin "three.raw"
+	incbin "\FLOS_based_programs\tests\osca672\data\three.raw"
 
 four_wav	dw 0
-	incbin "four.raw"
+	incbin "\FLOS_based_programs\tests\osca672\data\four.raw"
 
 end_wav	db 0
 
