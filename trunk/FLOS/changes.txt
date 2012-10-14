@@ -2,7 +2,8 @@
 Current FLOS version:
 ---------------------
 
-v6.08 - 14/10/2012
+v6.08 - 14/10/2012  **** WORK IN PROGRESS ****
+
 
 	Improvement: Path is now allowed with all internal commands' arguments: DEL, EXEC, LB, MD, RD, RN, SB
 
