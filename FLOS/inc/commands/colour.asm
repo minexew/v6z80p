@@ -4,7 +4,7 @@
 
 os_cmd_colour
 
-	call os_scan_for_non_space		;find save length
+	ld a,(hl)				
 	or a
 	jp z,os_no_args_error
 

@@ -11,8 +11,12 @@ os_cmd_c
 	call get_start_and_end	;this routine only returns here if start/end data is valid
 	
 	call hexword_or_bust	;only returns here if the hex in DE (destination address) is valid
-	jp z,os_no_d_addr_error
-	ld (copy_dest_address),de
+	jr nz,gotdaddr
+	ld a,$1d			;no_dest_addr_error
+	or a
+	ret
+
+gotdaddr	ld (copy_dest_address),de
 
 	inc hl
 	call hexword_or_bust	;the call only returns here if the hex in DE is valid
@@ -81,11 +85,10 @@ get_start_and_end
 	call ascii_to_hexword	;get start address
 	ld (cmdop_start_address),de
 	inc hl
-	or a
 	jr z,st_addrok
 	pop hl			;this pop is remove originating call addr from the stack
-	cp $c			;bad hex error code
-	jr z,c_badhex
+	cp $1f			;bad hex error code
+	jr nz,c_badhex
 	ld a,$16			;no start address error code
 c_badhex	or a
 	ret
@@ -93,11 +96,10 @@ c_badhex	or a
 st_addrok	call ascii_to_hexword	;get end address
 	ld (cmdop_end_address),de
 	inc hl
-	or a
 	ret z
 	pop hl			;this pop is remove originating call addr from the stack
-	cp $c			;bad hex error code
-	jr z,c_badhex
+	cp $1f			;bad hex error code
+	jr nz,c_badhex
 	ld a,$1c			;no end address error code
 	ret
 	

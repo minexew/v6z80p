@@ -1,15 +1,14 @@
 ;-------------------------------------------------------------------------------------------
-;"md" - Make dir command. V6.01
+;"MD" - Make dir command. V6.03
 ;-------------------------------------------------------------------------------------------
 
 os_cmd_md
 	
-	call kjt_check_volume_format	
+	call fileop_preamble		; handle path parsing etc
 	ret nz
-
-	call filename_or_bust
-	
-	jp kjt_make_dir			;no point it being a call, nothing follows
+	call kjt_make_dir
+	call cd_restore_vol_dir
+	ret
 	
 
 ;-------------------------------------------------------------------------------------------

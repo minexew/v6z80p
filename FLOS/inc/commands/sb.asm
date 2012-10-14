@@ -1,57 +1,30 @@
 ;-----------------------------------------------------------------------
-;"SB" - Save binary file command. V6.04
+;"SB" - Save binary file command. V6.05
 ;-----------------------------------------------------------------------
 
 os_cmd_sb
-	
-	call kjt_check_volume_format		;disk ok?
+	call fileop_preamble		; handle path parsing etc
 	ret nz
+	call do_sb_cmd
+	call cd_restore_vol_dir
+	ret
 	
+
+do_sb_cmd	ld (sb_save_name_addr),hl
+
 	call os_getbank			
 	ld (sb_save_bank),a			;use current bank for save by default
 
-	call filename_or_bust		;filename supplied?
-	ld (sb_save_name_addr),hl
-	
-	ld hl,(os_args_start_lo)
-	call os_next_arg
+	call os_move_to_next_arg
 	call hexword_or_bust		;the call only returns here if the hex in DE is valid
 	jp z,os_no_start_addr		;get the save location from command string
 	ld (sb_save_addr),de
 	
-	call os_next_arg			;find save length
-	jp z,os_no_filesize
-	exx
-	ld hl,0				;hl = LSW	
-	ld e,0				; e = MSN
-	exx
-sb_fsllp	ld a,(hl)
-	cp " "
-	jr z,sb_gsl
-	call ascii_to_hex_digit		;convert up to 5 digits
-	inc hl
-	cp 16
-	jr c,sb_hok
-	ld a,$c
-	or a
-	ret	
-sb_hok	exx
-	add hl,hl
-	rl e
-	add hl,hl
-	rl e
-	add hl,hl
-	rl e
-	add hl,hl
-	rl e
-	or l
-	ld l,a
-	ld (sb_save_len_lo),hl
-	ld a,e
-	ld (sb_save_len_hi),a
-	exx
-	jr sb_fsllp
-
+	call ascii_to_hex32_scan		;hl->bc:de
+	ret nz
+	ld (sb_save_len_lo),de
+	ld (sb_save_len_hi),bc
+	
 sb_gsl	call hexword_or_bust		;the call only returns here if the hex in DE is valid			
 	jr z,os_sfgds			;no hex = no bank override
 	ld a,e
@@ -95,3 +68,4 @@ sb_save_name_addr	equ scratch_pad+8
 
 
 ;--------------------------------------------------------------------------------------------------
+

@@ -1,15 +1,14 @@
 ;--------------------------------------------------------------------------------
-;"RD" - Remove directory command. V6.05
+;"RD" - Remove directory command. V6.06
 ;--------------------------------------------------------------------------------
 
 os_cmd_rd
 
-	call kjt_check_volume_format	
+	call fileop_preamble		; handle path parsing etc
 	ret nz
+	call kjt_delete_dir
+	call cd_restore_vol_dir
+	ret
 	
-	call filename_or_bust
-
-	jp kjt_delete_dir		;no point it being a call, nothing follows
-
 
 ;---------------------------------------------------------------------------------

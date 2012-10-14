@@ -1,7 +1,7 @@
 ;---------------------------------------------------------------------------------------
 ; Dummy - used pre-optimization for debugging.
 
-os_cmd_d
+os_cmd_dummy
 
 	ret
 	

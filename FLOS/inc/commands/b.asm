@@ -41,17 +41,22 @@ shwbnk2	push af			;show bank number (and sysram section paged)
 hexword_or_bust
 
 ; Set HL to string address:
-; Returns to parent routine ONLY if the string is valid hex (or no hex found) in which case:
-; DE = hex word. If no hex found, the zero flag is set (A = error code $1f)
-; If chars are invalid hex, returns to grandparent (IE: main OS) with error code $0c: bad hex
+; Returns to parent routine ONLY if the string is valid hex (OR no hex found) in which case:
+; DE = hex word. 
+; If no hex found, the zero flag is set (and A = error code $1f)
+; If chars are invalid hex, returns to grandparent (IE: main OS) with error code
 
 	call ascii_to_hexword		
-	cp $c
-	jr nz,hex_good
-	pop hl			; remove parent return address from stack
+	cp $1f
+	ret z
+
+	or a
+	jr nz,bad_hex
+	inc a			; returns with ZF NOT set if valid hex
+	ret
+
+bad_hex	pop hl			; remove parent return address from stack
 	or a	
 	ret			 
-hex_good	cp $1f			; no args?
-	ret
 	
 ;------------------------------------------------------------------------------------------

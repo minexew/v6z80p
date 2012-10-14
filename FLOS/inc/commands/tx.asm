@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"TX" - Transmit binary file via serial port command. V6.03
+;"TX" - Transmit binary file via serial port command. V6.04
 ;-----------------------------------------------------------------------
 
 os_cmd_tx:
@@ -8,51 +8,16 @@ os_cmd_tx:
 	or a
 	jp z,os_no_fn_error
 	
-	call clear_serial_filename
-	
-	ld b,16			;max chars to copy
-	ld de,serial_filename
-	call os_copy_ascii_run	;(hl)->(de) until space or zero, or count = 0
-	ld a,c
-	ld (serial_fn_length),a
-	call os_scan_for_space
-				
+	call rx_copy_filename	
+			
 	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jp z,os_no_start_addr	;get save address in DE
 	ld (fs_z80_address),de
 
-	ld de,0			;find file length
-	ld (fs_file_length+2),de	
-	call os_scan_for_non_space	
-	or a
-	jp z,os_no_filesize
-	push hl
-	ld b,5			;check for 5 digit save length
-	ld c,0
-sers_cflc	ld a,(hl)
-	or a
-	jp z,sers_fsb
-	cp " "
-	jr z,sers_cgfl
-	inc c
-	inc hl
-	djnz sers_cflc
-sers_cgfl	pop hl
-	ld a,c
-	cp 5
-	jr nz,sers_fln
-
-	call ascii_to_hex_digit	;convert first digit
-	cp 16
-	jr c,tx_hok
-	ld a,$c
-	or a
-	ret	
-tx_hok	ld (fs_file_length+2),a
-	inc hl	
-sers_fln	call hexword_or_bust	;do (rest of) length
-	jp z,os_no_filesize
+	call ascii_to_hex32_scan	;hl->bc:de
+	ret nz
 	ld (fs_file_length),de
+	ld (fs_file_length+2),bc
 	
 	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jr nz,sers_dfb		;get bank if specified, else use current bank
@@ -78,7 +43,12 @@ sers_dfb	ld b,e
 	jp ok_ret			;return with ok msg
 
 sers_fsb	pop hl
-	jp os_no_filesize
+
+os_no_filesize
+
+	ld a,$17
+	or a
+	ret
 	
 
 ;----------------------------------------------------------------------------------------------

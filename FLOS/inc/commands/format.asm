@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"format" - format disk command. V6.05
+;"format" - format disk command. V6.06
 ;
 ; This internal format routine is limited to formatting entire disks
 ; No partition data is allowed.
@@ -10,17 +10,16 @@ os_cmd_format
 
 	ld a,(hl)			;check args exist
 	or a
-	jr nz,fgotargs		;no args
-	ld a,$1f
-	or a
-	ret
+	jp z,os_no_args_error
 	
-fgotargs	push hl
+fgotargs	call kjt_check_volume_format	;if volume is OK (disk not swapped) do not remount (as this will lose ENVARS unnecessarily)
+	jr z,no_remnt
+	push hl
 	ld a,1			;quiet mode on
 	call os_mount_volumes	;refresh mount list
 	pop hl
 	
-	ld de,fs_sought_filename
+no_remnt	ld de,fs_sought_filename
 	call fs_clear_filename			
 	push hl			;use 2nd parameter as label if supplied
 	call os_next_arg

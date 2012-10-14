@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"cd" - Change Dir command. V6.11
+;"cd" - Change Dir command. V6.12
 ;-----------------------------------------------------------------------
 
 os_cmd_cd	
@@ -148,9 +148,7 @@ cd_mol	ld a,(hl)				;move to next dir name in args (after "/") if no more found,
 		
 cd_dcherr	
 
-	push af				;if a dir is not found go back to original dir and drive 
-	call cd_restore_vol_dir
-	pop af
+	call cd_restore_vol_dir		;if a dir is not found go back to original dir and drive 
 	or a
 	ret
 
@@ -167,9 +165,15 @@ cd_store_vol_dir
 	
 cd_restore_vol_dir
 	
+	push af
 	ld a,(original_vol_cd_cmd)
 	ld de,(original_dir_cd_cmd)
 	call os_set_dir_vol
+	jr z,cd_rvdok
+	inc sp
+	inc sp
+	ret
+cd_rvdok	pop af
 	ret
 
 		
