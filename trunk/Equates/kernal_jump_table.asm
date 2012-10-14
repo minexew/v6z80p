@@ -102,3 +102,4 @@ kjt_continue_file_read	equ os_start + $115  ; added in v599
 kjt_set_load_address	equ os_start + $118  ; added in v599
 kjt_write_baddr		equ os_start + $11b  ; added in v603
 kjt_parse_path		equ os_start + $11e  ; added in v607
+kjt_ascii_to_hex32		equ os_start + $121	 ; added in v608
