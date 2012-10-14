@@ -14,6 +14,8 @@ v6.08 - 14/10/2012
 
 	Improved   : FORMAT command does not remount card if not swapped (ENVARs are not lost if FORMAT aborted).
 	
+	Improved:  : EXEC.EXE now returns error code when script file is not supplied / found
+
 	Bugfix	   : Corrected mangled text in FORMAT command
 
 	
