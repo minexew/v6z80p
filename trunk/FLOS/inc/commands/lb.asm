@@ -1,36 +1,32 @@
 ;-----------------------------------------------------------------------
-;"lb" - Load binary file command. V6.04
+;"lb" - Load binary file command. V6.05
 ;-----------------------------------------------------------------------
 
 os_cmd_lb
-	
-	call kjt_check_volume_format	
+	call fileop_preamble		; handle path parsing etc
 	ret nz
+	call do_lb_cmd
+	call cd_restore_vol_dir
+	ret
 
-	call os_getbank			;default load bank is current bank
+	
+do_lb_cmd	call os_getbank			;default load bank is current bank
 	ld (lb_load_bank),a
-		
-	call filename_or_bust		;filename supplied?
+	
 	call os_find_file			;get header info
 	ret nz
 	ld (filesize_cache_lsw),iy		;note the filesize
 	ld (filesize_cache_msw),ix
 	ld (lb_load_addr),hl
 
-	ld hl,(os_args_start_lo)
-	call os_next_arg
+	call os_move_to_next_arg
 	call hexword_or_bust		;the call only returns here if the hex in DE is valid
 	jr z,os_lbnao			;load location override?
 	ld (lb_load_addr),de
-	push hl
-	ld hl,os_high			;ensure load doesn't overwrite OS
-	sbc hl,de
-	pop hl
-	jr c,os_lbprok
-	ld a,$26				;ERROR $26 - OS SPACE PROTECT
-	or a
-	ret
-	
+
+	call lb_test_os_loc
+	ret nz
+		
 os_lbprok	call hexword_or_bust		;the call only returns here if the hex in DE is valid
 	jr z,os_lbnao			;bank override too?
 	ld a,e				
@@ -64,7 +60,22 @@ show_bl	ld hl,os_hex_prefix_txt		;show "$"
 	call show_packed_text_and_cr
 	xor a
 	ret
-	
+
+;-----------------------------------------------------------------------------------------------
+
+lb_test_os_loc
+
+	push hl
+	ld hl,os_high			;ensure load doesn't overwrite OS
+	xor a
+	sbc hl,de
+	pop hl
+	jr c,lb_olok
+	ld a,$26				;ERROR $26 - OS SPACE PROTECT
+lb_olok	or a
+	ret
+
+
 ;-----------------------------------------------------------------------------------------------
 
 lb_load_addr	equ scratch_pad

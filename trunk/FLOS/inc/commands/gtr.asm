@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;">" for write ascii bytes to memory command. V6.01
+;">" for write ascii bytes to memory command. V6.02
 ;-----------------------------------------------------------------------
 
 os_cmd_gtr
@@ -35,8 +35,7 @@ os_gtrdn	xor a
 	ret	
 
 noquot2	pop hl			;no second quote - bad args
-	ld a,$12
-	or a
-	ret
+	jp os_bad_args_error
+	
 
 ;-----------------------------------------------------------------------

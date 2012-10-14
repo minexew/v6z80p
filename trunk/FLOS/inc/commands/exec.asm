@@ -1,8 +1,9 @@
 ;-----------------------------------------------------------------------
-;"exec" - execute script V6.04
+;"exec" - execute script V6.05
 ;
 ;Changes:
 ;
+;6.05 - Allowed path for script file
 ;6.04 - Made load script line a subroutine so it can be used by programmable F-keys
 ;6.03 - Set load length = 24bit (optimized)
 ;6.02 - Support for loop (via GOTO envar and [xxxx] labels)
@@ -14,23 +15,29 @@
 
 os_cmd_exec
 
-	call scr_clear_goto
-	
-	ld hl,in_script_flag		;test if already in a script
-	bit 0,(hl)
+	ld a,(in_script_flag)		;test if already in a script
+	or a
 	jp nz,scr_error
 
-	set 0,(hl)			;set the in-script flag
-
-	ld hl,(os_args_start_lo)		;copy the script filename (scripts cannot launch
-	ld de,script_fn			;scripts as this would require nested script filenames)
-	ld b,13
-	call os_copy_ascii_run
-	call fs_get_dir_block		;store location of dir that holds the script
-	ld (script_dir),de
-	
-	call kjt_check_volume_format	
+	call fileop_preamble		;try to move to dir containing script		
 	ret nz
+	
+	ld de,script_fn			;copy the script filename (scripts cannot launch
+	ld b,12				;scripts as this would require nested script filenames)
+	call os_copy_ascii_run
+	xor a
+	ld (de),a
+	
+	call scr_clear_goto
+
+	call os_get_dir_vol			;store dir/vol that contains script
+	ld (script_dir),de
+	ld (script_vol),a
+	
+	call cd_restore_vol_dir		;go back to original dir
+
+	ld a,1
+	ld (in_script_flag),a		;set the in-script flag
 
 ;----------------------------------------------------------------------------------------------------------
 	
@@ -51,10 +58,14 @@ scrp_loop
 	
 noskip_script
 
-	call fs_get_dir_block		;store current dir
+	call os_get_dir_vol			;store current dir
 	push de
+	push af
+	
+	ld a,(script_vol)
 	ld de,(script_dir)			;return to dir that contains the script
-	call fs_update_dir_block
+	call os_set_dir_vol
+	
 	ld hl,script_fn			;locate the script file - this needs to be done every
 	call os_find_file			;script line as external commands will have opened files
 	jr nz,scr_ferr
@@ -62,9 +73,10 @@ noskip_script
 	jr nz,scr_ferr
 	ld (script_file_offset),iy
 	ld (script_buffer_offset),hl
-	pop de
-	call fs_update_dir_block		;go back to dir before script file
 	
+	pop af				;go back to dir we were at before script file load
+	pop de
+	call os_set_dir_vol			
 	
 	ld a,(commandstring)		;Is this line a label?
 	cp "["
@@ -119,9 +131,11 @@ scrp_gnc	ld (script_file_offset),iy		;update file offset and loop
 
 ;-----------------------------------------------------------------------------------------------
 
-scr_ferr	pop de
-	call fs_update_dir_block		;return to dir selected prior to script
-	xor a
+scr_ferr	pop af
+	pop de
+	call os_set_dir_vol			;return to dir selected prior to script
+	ld a,$02
+	or a
 	ret
 	
 ;-----------------------------------------------------------------------------------------------
@@ -194,7 +208,6 @@ scrp_cmd	ld a,(hl)
 	inc iy
 	djnz scrp_cmd
 scrp_eol	xor a
-	ld (de),a	
 	ret
 
 ;------------------------------------------------------------------------------------------------

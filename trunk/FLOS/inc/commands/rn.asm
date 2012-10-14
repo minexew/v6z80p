@@ -1,17 +1,21 @@
 ;-------------------------------------------------------------------------------------------
-;"rn" - Rename command. V6.02
+;"rn" - Rename command. V6.03
 ;-------------------------------------------------------------------------------------------
 
 os_cmd_rn
 	
-	call kjt_check_volume_format	
+	call fileop_preamble		; handle path parsing etc
 	ret nz
+	call do_rn_cmd
+	call cd_restore_vol_dir
+	ret
 
-	call filename_or_bust
-	push hl
+do_rn_cmd	push hl
 	pop de
+	
 	call os_next_arg
-	call filename_or_bust
+	jp z,os_no_args_error
+	
 	ex de,hl
 	jp kjt_rename_file			;no point it being a call, nothing follows
 		

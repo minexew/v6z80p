@@ -6,13 +6,14 @@
 ; Non-packed Text Strings
 ;-------------------------------------------------------------------------------------------
 
-welcome_message	db "FLOS by Phil Ruston 2012",0
+welcome_message	db "FLOS by Phil Ruston 2012"
+null_txt		db 0
 
 storage_txt	db "Drives:",11,0
 
 commands_txt	db "COMMANDS",0
 
-boot_script_fn	db "BOOT_RUN.SCR",0
+boot_script_fn	db " BOOT_RUN.SCR ",0	;note: surrounding spaces are required for path split routine
 
 os_hex_prefix_txt	db "$",0
 
@@ -70,11 +71,11 @@ sysram2_txt	db "xxFFF @ 8000)",11,0
 ;------------------------------------------------------------------------------------------------
 
 dictionary	db 0,"DEBUG:"		;01	
-		db 0,"------"		;02
+		db 0," "			;02 (space)
 		db 0,"IO:"		;03
-		db 0,"---"		;04
+		db 0,11,11		;04 (new line * 2)
 		db 0,"MISC:"		;05
-		db 0,"-----"		;06
+		db 0,"Value"		;06 
 		db 0,"Filename"		;07
 		db 0,"MBR"		;08
 		db 0,"Envar"		;09
@@ -210,7 +211,7 @@ hw_err_msg	db $0b,$53,$4f,$15,0			;"Driver Error:$xx",11,0
 disk_err_msg	db $60,$53,0				;"Disk Error",0
 script_aborted_msg	db $11,$59,$15,$15,0			;"Script Aborted",11.0
 script_error_msg	db $11,$53,$15,$15,0			;"Script Error",11,0
-form_dev_warn1	db $27,$28,$36,$40,$15,$76,0			;"Warning! all volumes on"
+form_dev_warn1	db $27,$28,$36,$76,$15,$15,0			;"Warning! all volumes on"
 form_dev_warn2	db $52,$46,$4e,$14,$12,$10,$0f,$0e,$15,0	;"will be lost. Enter YES to Continue"
 
 
@@ -249,22 +250,19 @@ os_cmd_locs	dw os_cmd_colon	;command 0
 
 
 
-packed_cmd_list	db $15,0
-		db $01,$15,0
-		db $02,$15,0					; DEBUG
-		db $33,$34,$75,$35,$37,$3b,$3f,$42,$3e,$44,$47,$4c,0
-		db $15,$15,0
+packed_cmd_list	db $15,0						;DEBUG
+		db $01,$04,0
+		db $02,$33,$34,$75,$35,$37,$3b,$3f,$42,$3e,$44,$47,$4c,0
+		db $04,0
 
-		db $03,$15,0
-		db $04,$15,0					; IO
-		db $38,$3c,$3d,$41,$43,$56,$45,$48,$49,$15,0
-		db $4a,$4b,$4d,$23,0
-		db $15,$15,0
-
-		db $05,$15,0
-		db $06,$15,0					; MISC		
-		db $39,$3a,$74,$5c,0
-		db $15,$15,0
+		db $03,$04,0					; IO
+		db $02,$38,$3c,$3d,$41,$43,$56,$45,$48,$49,$15,0
+		db $02,$4a,$4b,$4d,$23,0
+		db $04,0
+	
+		db $05,$04,0					; MISC
+		db $02,$39,$3a,$74,$5c,0
+		db $04,0
 		db $ff						;end marker	
 
 
@@ -298,11 +296,11 @@ format_err_msg	db $62,$73,0		;$13 not FAT16
 
 		db $2d,$59,0		;$18 save aborted
 		db $2d,$53,$6b,$2b,0	;$19 save error at destination
-		db $5c,0			;$1a (NOT USED)
+		db $06,$66,$67,$68,0	;$1a Value Out of Range
 		db $6f,$71,$70,$6e,0	;$1b Data after EOF request
 		db $5a,$1c,$0a,0		;$1c no end address
 		db $5a,$2b,$0a,0		;$1d no destination address
-		db $5d,$68,0		;$1e bad range
+		db $2a,$68,0		;$1e Invalid range
 		db $29,$51,0		;$1f missing arguments
 
 ok_msg		db $25,0			;$20 OK

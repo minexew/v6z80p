@@ -80,10 +80,11 @@ banksel_cache	db 0
 script_buffer		ds OS_window_cols+2,0
 script_file_offset		dw 0
 script_buffer_offset	dw 0
-script_orig_dir		dw 0
 in_script_flag		db 0
 script_dir		dw 0
+script_vol		db 0
 script_fn			ds 13,0
+script_unused		db 0
 
 ;---------------------------------------------------------------------------------------
 ; Keyboard buffer and registers

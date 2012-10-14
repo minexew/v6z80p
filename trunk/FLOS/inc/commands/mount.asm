@@ -11,10 +11,12 @@ os_cmd_remount
 	ld hl,commands_txt		; set "%ex0" assign envar
 	call os_change_dir
 	jr nz,no_cmds
+	
 	call fs_get_dir_block
 	ld (envar_data),de
 	ld a,$30
 	ld (ex_path_txt+3),a
+	
 	ld hl,ex_path_txt
 	ld de,envar_data
 	call os_set_envar

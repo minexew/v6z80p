@@ -73,7 +73,7 @@ env_var_list	EQU 00480H
 hl_store1	EQU 00B09H
 hl_store2	EQU 00B10H
 host_device_hardware_info EQU 00380H
-in_script_flag	EQU 00BB4H
+in_script_flag	EQU 00BB2H
 insert_mode	EQU 00BE9H
 irq_jp_inst	EQU 00A00H
 irq_vector	EQU 00A01H
@@ -135,10 +135,11 @@ scancode_buffer	EQU 00BC4H
 scratch_pad	EQU 00A08H
 script_buffer	EQU 00B84H
 script_buffer_offset EQU 00BB0H
-script_dir	EQU 00BB5H
+script_dir	EQU 00BB3H
 script_file_offset EQU 00BAEH
-script_fn	EQU 00BB7H
-script_orig_dir	EQU 00BB2H
+script_fn	EQU 00BB6H
+script_unused	EQU 00BC3H
+script_vol	EQU 00BB5H
 sector_buffer	EQU 00800H
 sector_lba0	EQU 00B00H
 sector_lba1	EQU 00B01H

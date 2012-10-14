@@ -1,5 +1,5 @@
 ;---------------------------------------------------------------------------------------------------
-;"RX" - Receive binary file via serial port command. V6.06
+;"RX" - Receive binary file via serial port command. V6.07
 ;---------------------------------------------------------------------------------------------------
 ;
 ;  6.06 - Bugfix: If comms error encountered in file header the error code is now properly returned
@@ -15,8 +15,6 @@ os_cmd_rx:
 	or a
 	jp z,os_no_fn_error
 
-	call clear_serial_filename
-	
 	ld a,(hl)			;If args = "!", RX and run requested.
 	cp "!"
 	jr nz,not_rx_run
@@ -31,27 +29,14 @@ os_cmd_rx:
 
 not_rx_run
 	
-	ld b,16			;max chars to copy
-	ld de,serial_filename
-	call os_copy_ascii_run	;(hl)->(de) until space or zero, or count = 0
-	ld a,c
-	ld (serial_fn_length),a
-	call os_scan_for_space
-	
+	call rx_copy_filename
+
 	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jp z,os_no_start_addr	;gets load location in DE
 	ld (serial_address),de
 	
-	push hl
-	ld hl,os_high
-	xor a
-	sbc hl,de
-	jr c,os_prok
-	pop hl
-	ld a,$26			;ERROR $26 - A load here would overwrite OS code/data
-	or a
-	ret
-os_prok	pop hl
+	call lb_test_os_loc		;make sure it doesnt overwrite the OS
+	ret nz
 	
 	call hexword_or_bust	;the call only returns here if the hex in DE is valid
 	jr nz,serl_dfb		;get bank if specified, else use current bank
@@ -66,7 +51,6 @@ serl_dfb	ld b,e
 	ld hl,ser_rec_msg
 	call os_show_packed_text
 	
-
 	ld hl,serial_filename	; filename location in HL
 	ld a,$80			; no time out / escape key active
 	call serial_get_header	
@@ -86,7 +70,9 @@ serl_dfb	ld b,e
 rx_run	ld hl,ser_rec_msg
 	call os_show_packed_text
 
-	ld hl,serial_filename
+	ld hl,serial_filename+1
+	ld (hl),0
+	dec hl
 	ld (hl),"*"
 	ld a,$80			; no time out, escape key is active
 	call serial_get_header
@@ -177,14 +163,21 @@ call_rx
 	
 ;----------------------------------------------------------------------------------------------
 
-
-clear_serial_filename
+rx_copy_filename
 
 	push hl			;clear serial filename area
 	ld hl,serial_filename
 	ld c,16
 	call os_chl_memclear_short
 	pop hl
-	ret
+		
+	ld b,16			;max chars to copy
+	ld de,serial_filename
+	call os_copy_ascii_run	;(hl)->(de) until space or zero, or count = 0
+	ld a,c
+	ld (serial_fn_length),a
 	
+	call os_scan_for_space
+	ret
+		
 ;----------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------------------------
-; OS "<" Command: Update mem hex bytes and re-disassemble v6.02
+; OS "<" Command: Update mem hex bytes and re-disassemble v6.03
 ;------------------------------------------------------------------------------------------
 
 os_cmd_ltn:
@@ -24,7 +24,7 @@ nsplp	inc b
 	ld a,b			;if 2 consecutive spaces encountered, end the byte copy
 	cp 2
 	jr nc,redisa
-	call ascii_to_hex_no_scan	;copy hex bytes from line to RAM
+	call ascii_to_hexw_no_scan	;copy hex bytes from line to RAM
 	cp $c
 	jp z,os_no_args_error
 	ld (ix),e
