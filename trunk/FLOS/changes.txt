@@ -2,22 +2,29 @@
 Current FLOS version:
 ---------------------
 
-v6.08 - 14/10/2012  **** WORK IN PROGRESS ****
+v6.08 - 15/10/2012  
 
+        Improvement : Path is now allowed with all internal commands' arguments: DEL, EXEC, LB, MD, RD, RN, SB
 
-	Improvement: Path is now allowed with all internal commands' arguments: DEL, EXEC, LB, MD, RD, RN, SB
+        Improvement : R command (show registers) now shows CPU's I,R registers and also BANK (and PORT0: SYS_MEM_SELECT)
 
-	Added      : kernal call "kjt_ascii_to_hex32" 
+        Improvement : Upon NMI freeze, keymap/ENVARs are no longer reset and the FLOS working bank and DIR are restored
+                      (Also NMI can occur when video is paged in without problems, but lower page must be $00000-$07fff)
+
+        Improvement : "kjt_ascii_to_hex_word" now returns error ($1a) if > $ffff
+
+        Improvement : FORMAT command does not remount card if not swapped (ENVARs are not lost if FORMAT aborted).
 	
-	Added      : Error message $1A = "Value out of range"
+        Improvement : EXEC.EXE now returns error code when script file is not supplied / found
 
-	Improved   : "kjt_ascii_to_hex_word" now returns error ($1a) if > $ffff
+        Improvement : When "RX !" is executed, the PC register (for R command) is updated to the start address
+                      of loaded program and the NMI freezer is enabled.
 
-	Improved   : FORMAT command does not remount card if not swapped (ENVARs are not lost if FORMAT aborted).
+        Added       : kernal call "kjt_ascii_to_hex32" 
 	
-	Improved:  : EXEC.EXE now returns error code when script file is not supplied / found
+        Added       : Error message $1A = "Value out of range"
 
-	Bugfix	   : Corrected mangled text in FORMAT command
+        Bugfix	    : Corrected mangled text in FORMAT command
 
 	
 

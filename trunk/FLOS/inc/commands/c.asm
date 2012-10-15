@@ -2,8 +2,11 @@
 ;"c" - Copy memory command. V6.06
 ;-----------------------------------------------------------------------
 
-copy_dest_address	equ scratch_pad
-copy_dest_bank	equ scratch_pad+2
+cmdop_start_address	equ scratch_pad
+cmdop_end_address	equ scratch_pad+2
+
+copy_dest_address	equ scratch_pad+4
+copy_dest_bank	equ scratch_pad+6
 
 
 os_cmd_c

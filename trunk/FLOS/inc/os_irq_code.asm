@@ -1,5 +1,4 @@
-;----------------------------------------------------------------------------------------
-; IRQ / NMI Routines v5.01
+
 ;----------------------------------------------------------------------------------------
 
 os_irq_handler
@@ -210,22 +209,37 @@ no_mouse
 	ret
 	
 ;-----------------------------------------------------------------------------------------
-	
+; NMI code v6.01
+;-----------------------------------------------------------------------------------------
+
+os_allow_nmi_freeze
+
+	ld hl,os_nmi_freeze		; allow NMI freezer
+	ld (nmi_vector),hl	 
+	ret
+		
+;-----------------------------------------------------------------------------------------
 	
 os_nmi_freeze
 
-
+	
 	call os_store_CPU_regs
 	pop hl			; gets the NMI return address
-	ld (storepc),hl		; stores it for recorded PC
+	ld (pc_store),hl		; stores it for recorded PC
 	ld hl,continue		; change return address for continue
 	push hl			; to get out of NMI mode
 	retn			; jump to continue
 	
-continue:	ld sp,stack		; Fix stack pointer to default - so wiping out
+continue	ld sp,stack		; Fix stack pointer to default - so wiping out
 	di			; program's subroutines/maskable IRQ status
 	im 1			; CPU IRQ: mode 1
-	call initialize_os		; set up OS front end (disk system not reset)
+	xor a
+	out (sys_mem_select),a	; make sure VRAM etc is not paged in
+	out (sys_alt_write_page),a
+
+	call nmi_freeze_os_init	; set up OS front end (disk system not reset)
+	call restore_bank_no_script	; restore original FLOS bank
+	call restore_dir_vol	; restore original FLOS dir
 	
 	ld hl,nmi_freeze_txt	; show NMI break text
 	call os_print_string	

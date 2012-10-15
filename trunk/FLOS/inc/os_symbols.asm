@@ -1,10 +1,12 @@
-;---------------------------------
-; OS SYMBOLS / EQUATES V5.01
-;---------------------------------
+;----------------------------
+; OS SYMBOLS / EQUATES V5.03
+;----------------------------
 
 ; Assemble this prior to os_code to create symbols included into that file
-
-;--------------------------------------------------------------------------------------------
+;
+;-------------------------------------------------------------------------
+; VARIABLE BANK USED BY OS - 256 BYTES MAXIMUM  (located at OS_variables)
+;------------------------------------------------------------------------
 
 include "OSCA_hardware_equates.asm"
 include "system_equates.asm"
@@ -12,40 +14,43 @@ include "system_equates.asm"
 OS_window_cols equ 40
 OS_window_rows equ 25
 
-;--------------------------------------------------------------------------------------------
-
-
-;------------------------------------------
-; VARIABLES USED BY OS - 256 BYTES MAXIMUM!
-;------------------------------------------
 
 	org OS_variables 
+
+;---------------------------------------------------------------------------------------------
 
 sector_lba0	db 0		; keep this byte order
 sector_lba1	db 0
 sector_lba2	db 0
 sector_lba3	db 0
 
-a_store1		db 0		
-bc_store1		db 0,0
-de_store1		db 0,0
-hl_store1		db 0,0
-a_store2		db 0
-bc_store2		db 0,0
-de_store2		db 0,0
-hl_store2		db 0,0
-storeix		db 0,0
-storeiy		db 0,0
-storesp		db 0,0
-storepc		db 0,0
-storef	  	db 0
+;---------------------------------------------------------------------------------------------
+
+mem_select_store	db 0
+iff2_store	db 0
+		
+af_store1		dw 0
+bc_store1		dw 0
+de_store1		dw 0
+hl_store1		dw 0
+
+af_store2		dw 0
+bc_store2		dw 0
+de_store2		dw 0
+hl_store2		dw 0
+
+ix_store		dw 0
+iy_store		dw 0
+sp_store		dw 0
+ir_store		dw 0
+
+pc_store		dw 0
+
 store_registers	db 0
+
+;---------------------------------------------------------------------------------------------
+
 com_start_addr	dw 0
-
-;--------------------------------------------------------------------------------------------
-
-cursor_y		db 0		;keep this byte order 
-cursor_x		db 0		;(allows read as word with y=LSB) 
 
 ;---------------------------------------------------------------------------------------------
 		
@@ -57,9 +62,6 @@ cursorstatus	db 0
 
 memmonaddrl	db 0
 memmonaddrh	db 0
-
-cmdop_start_address	db 0,0
-cmdop_end_address	db 0,0
 
 os_linecount	db 0
 
@@ -84,7 +86,6 @@ in_script_flag		db 0
 script_dir		dw 0
 script_vol		db 0
 script_fn			ds 13,0
-script_unused		db 0
 
 ;---------------------------------------------------------------------------------------
 ; Keyboard buffer and registers

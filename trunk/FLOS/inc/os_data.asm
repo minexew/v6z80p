@@ -28,8 +28,6 @@ saving_txt	db "Saving..",11,0
 
 os_more_txt	db 11,"More?",11,11,0
 
-nmi_freeze_txt	db 11,11,"** BREAK! **"
-
 rep_char_txt	db "x",0
 
 err_txt		db "ERR",0
@@ -44,22 +42,24 @@ default_label	db "FLOS_DISK",0
 dir_txt		db "[DIR]",0
 xb_spare_txt	db "xB Free",11,0
 
-register_txt	db " A=",0,1
-		db " BC=",0,2
-		db " DE=",0,2
-		db " HL=",0,2
-		
-		db 11,$27,"A=",0,1
-		db $27,"BC=",0,2
-		db $27,"DE=",0,2
-		db $27,"HL=",0,2
-		
-		db 11," IX=",0,2
-		db " IY=",0,2
-		db " SP=",0,2
-		db " PC=",0,2,0,0
+nmi_freeze_txt	db 11,"** NMI **",11,11,0
 
-flag_txt		db " ZF=0 CF=0 SF=P PV=E IFF=0",11,11,0
+register_txt	db "AF=",0
+		db "BC=",0
+		db "DE=",0
+		db "HL=",0,0
+		
+		db "IX=",0
+		db "IY=",0
+		db "SP=",0
+		db "IR=",0,0
+		
+		db "PC=",0,0
+		
+		db " BANK=",0
+		db " PORT0=",0
+		
+flag_txt		db 11," ZF=0 CF=0 SF=P PV=E IFF=0",11,11,0
 		
 sysram_banked_txt	db "Bank "
 banknum_txt	db "xx selected ("
@@ -493,9 +493,15 @@ filesize_cache_msw	dw 0		; ""
 
 dir_pos_cache	dw 0		; for KJT routines store/restore dir position
 
+;----------------------------------------------------------------------------------------
+
 ui_index		db 0
 ui_max_chars	db 0
 
+;----------------------------------------------------------------------------------------
+
+cursor_y		db 0		;keep this byte order 
+cursor_x		db 0		;(allows read as word with y=LSB) 
 
 ;----- INTERRUPT RELATED ----------------------------------------------------------------
 

@@ -154,27 +154,18 @@ include "os_irq_code.asm"
 
 ;----------------------------------------------------------------------------------------
 
-initialize_os
-
 ;----------------------------------------------------------------------------------------
 ; Ports / System set up
 ;----------------------------------------------------------------------------------------
 
-	ld hl,default_irq_instructions  ; set interrupts for kernal
-	ld de,irq_jp_inst
-	ld bc,6
-	ldir
+initialize_os
 
-	xor a
-	out (sys_audio_enable),a	; disable audio channels
-	out (sys_hw_settings),a
-	
 	call page_out_hw_registers	; write underneath the video registers
 
-	ld hl,env_var_list
+	ld hl,env_var_list		 ; erase environment variables
 	ld bc,max_envars*8
-	call os_bchl_memclear	; erase environment variables
-	
+	call os_bchl_memclear	
+
 	ld hl,keymaps		
 	ld bc,$180		; clear the unshifted, shifted and alt keymaps
 	call os_bchl_memclear
@@ -199,16 +190,27 @@ kmcpylp	ld a,(ix)
 	jr kmcpylp
 	
 kmcdone	xor a
-	out (sys_alt_write_page),a	; page video registers in at $200
-	ld (bank_pre_cmd),a		; reset "original bank" register
+	out (sys_alt_write_page),a	  ; page video registers back in at $200
+	ld (bank_pre_cmd),a		  ; reset "original bank" register
+
+
+nmi_freeze_os_init
+
+	ld hl,default_irq_instructions  ; set interrupts for kernal
+	ld de,irq_jp_inst
+	ld bc,6
+	ldir
+
+	xor a
+	out (sys_audio_enable),a	; disable audio channels
+	out (sys_hw_settings),a
 	
 	ld a,%00001111
 	out (sys_clear_irq_flags),a	; clear irq flags 
 
 	ld a,%10000001		
           out (sys_irq_enable),a	; enable keyboard interrupts
-	xor a
-	
+		
 
 ;-------------------------------------------------------------------------------
 ; Video set up
@@ -1004,7 +1006,129 @@ unp_rllp	ld (de),a		; write byte value, byte run length
 	or c
 	jr nz,unp_gtok
 	ret	
+
+
+;------------------------------------------------------------------------------------------
+
+
+os_store_CPU_regs
+
+	push af			
+	push bc
+	ld a,r
+	ld c,a
+	ld a,i
+	ld b,a
+	ld (ir_store),bc		;store IR regs
+	ld b,0
+	jp pe,iff2zero
+	inc b
+iff2zero	ld a,b
+	ld (iff2_store),a		;store IFF2 value
 	
+	in a,(sys_mem_select)
+	ld (mem_select_store),a	;store port0 (mem paging reg)
+	pop bc
+	pop af
+	
+	di
+	ld (sp_store),sp		;store_register_values - PC is not stored at present
+	ld sp,sp_store
+	push iy
+	push ix
+	exx
+	ex af,af'
+	push hl
+	push de
+	push bc
+	push af
+	exx
+	ex af,af'
+	push hl
+	push de
+	push bc
+	push af
+	ld sp,(sp_store)
+	ei
+	ret
+	
+	
+;-------- Memory bank switching /paging functions ---------------------------
+
+
+os_forcebank
+
+; sets which of the 32KB banks is mapped into address space $8000-$ffff
+; set A to required bank (range: 0 - max_bank)
+
+	push bc			
+	inc a					
+	and %00001111
+set_op1	ld b,a
+	in a,(sys_mem_select)
+          and %11110000
+          or  b
+	pop bc
+set_op2	out (sys_mem_select),a
+	ret
+	
+
+
+
+os_getbank
+
+; returns current bank number in A
+
+	in a,(sys_mem_select)		
+	and %00001111	
+	ret z			;if %000, forcebank has not been called previously.
+	dec a			;range is normally %001 to %111 so sub 1 to give 0-maxbank
+	ret
+
+
+
+os_cachebank
+
+	in a,(sys_mem_select)	; stores the current bank number internally
+	and %00001111
+	ld (banksel_cache),a
+	ret
+
+
+	
+os_restorebank
+	
+	push bc			; restores the bank saved with above function
+	ld a,(banksel_cache)
+	jr set_op1
+	
+	
+	
+os_incbank
+
+	call os_getbank		; selects the next bank, if > max_bank, error 8 is returned in A
+	inc a			; A=0 if successful
+	cp max_bank+1
+	jr z,fs_iberr
+	call os_forcebank
+	xor a			; set zero flag
+	ret
+fs_iberr	ld a,8			; error 8 - address out of range
+	or a			; clear carry flag / reset zero flag
+	ret
+
+
+
+
+restore_bank_no_script
+
+	ld a,(bank_pre_cmd)		; restore original bank when finally returning to OS
+	call os_forcebank
+	xor a
+	ld (in_script_flag),a
+	ret
+	
+			
 ;------------------------------------------------------------------------------------------
 
 include	"keyboard_routines.asm"	;keyboard routines
@@ -1303,8 +1427,10 @@ os_cursor_x_home
 	ld (cursor_x),a
 	ret
 	
+
 ;---------------------------------------------------------------------------------------------
-	
+; ENTERED A COMMAND
+;---------------------------------------------------------------------------------------------
 	
 os_enter_pressed
 		
@@ -1332,16 +1458,6 @@ os_esdok	call os_getbank		; save the bank the OS was in before any commands laun
 	call restore_bank_no_script
 	jp os_main_loop
 
-
-
-restore_bank_no_script
-
-	ld a,(bank_pre_cmd)		; restore original bank when finally returning to OS
-	call os_forcebank
-	xor a
-	ld (in_script_flag),a
-	ret
-	
 
 
 os_parse_cmd_chk_ps
@@ -1519,8 +1635,7 @@ novolcmd	ld a,(hl)			; special case for "G" command, this is internal but the co
 gotgargs	call ascii_to_hexw_no_scan	; returns DE = goto address
 	or a
 	jr nz,show_erm
-	ld hl,os_nmi_freeze		; allow NMI freezer
-	ld (nmi_vector),hl	 
+	call os_allow_nmi_freeze	
 	push de
 	pop ix
 	call get_pre_launch_regs
@@ -1627,8 +1742,7 @@ readcode	ld (os_extcmd_jmp_addr),hl	; store code execution address
 	
 	ld a,(exe_bank)		; set the bank that the program requires
 	call os_forcebank
-	ld hl,os_nmi_freeze		; allow NMI freezer
-	ld (nmi_vector),hl	 
+	call os_allow_nmi_freeze
 	ld hl,os_extcmd_jmp_addr	; address of external command held at this address
 	ld c,(hl)			; get low byte of command routine address
 	inc hl
@@ -1649,7 +1763,7 @@ extcmd_r	push af			; <-FIRST INSTRUCTION ON RETURN FROM EXTERNAL COMMAND
 	jr z,skp_strg
 	push hl
 	ld hl,(com_start_addr)
-	ld (storepc),hl
+	ld (pc_store),hl
 	pop hl
 	pop af
 	call os_store_CPU_regs	; store registers and flags on return
@@ -2326,50 +2440,6 @@ os_print_output_line_skip_zeroes
 		
 ;----------------------------------------------------------------------------------
 
-os_store_CPU_regs
-
-	push af
-	ld (a_store1),a		;store_register_values - PC is not stored at present
-	ex af,af'
-	ld (a_store2),a
-	ex af,af'
-	ld (bc_store1),bc		
-	ld (de_store1),de
-	ld (hl_store1),hl
-	exx
-	ld (bc_store2),bc
-	ld (de_store2),de
-	ld (hl_store2),hl
-	exx
-	ld (storeix),ix
-	ld (storeiy),iy
-	ld (storesp),sp
-
-	push bc
-	ld b,0
-	jr nz,zfstzero		;test zero flag
-	set 6,b
-
-zfstzero	jr nc,cfstzero		;test carry flag
-	set 0,b
-
-cfstzero	jp p,sfstzero		;test sign flag 1=minus
-	set 7,b
-
-sfstzero	jp pe,pfstzero		;test parity flag 1=par odd
-	set 2,b
-
-pfstzero	ld a,i			
-	jp pe,ifstzero		;test iff flag
-	set 4,b
-
-ifstzero	ld a,b
-	ld (storef),a
-	pop bc
-	pop af
-	ret
-
-
 
 os_dont_store_registers
 
@@ -2526,76 +2596,9 @@ eoword	ld (ix),32		;enter a space
 	jr readpind
 
 
-;===========================================================================
-; LOW LEVEL ROUTINES
-;===========================================================================
-
-;-------- Memory bank switching /paging functions ---------------------------
-
-os_forcebank
-
-; sets which of the 32KB banks is mapped into address space $8000-$ffff
-; set A to required bank (range: 0 - max_bank)
-
-	push bc			
-	inc a					
-	and %00001111
-set_op1	ld b,a
-	in a,(sys_mem_select)
-          and %11110000
-          or  b
-	pop bc
-set_op2	out (sys_mem_select),a
-	ret
-	
-
-
-
-os_getbank
-
-; returns current bank number in A
-
-	in a,(sys_mem_select)		
-	and %00001111	
-	ret z			;if %000, forcebank has not been called previously.
-	dec a			;range is normally %001 to %111 so sub 1 to give 0-maxbank
-	ret
-
-
-
-os_cachebank
-
-	in a,(sys_mem_select)	; stores the current bank number internally
-	and %00001111
-	ld (banksel_cache),a
-	ret
-
-
-	
-os_restorebank
-	
-	push bc			; restores the bank saved with above function
-	ld a,(banksel_cache)
-	jr set_op1
-	
-	
-	
-os_incbank
-
-	call os_getbank		; selects the next bank, if > max_bank, error 8 is returned in A
-	inc a			; A=0 if successful
-	cp max_bank+1
-	jr z,fs_iberr
-	call os_forcebank
-	xor a			; set zero flag
-	ret
-fs_iberr	ld a,8			; error 8 - address out of range
-	or a			; clear carry flag / reset zero flag
-	ret
-
-
-
+;--------------------------------------------------------------------------------------------------
 ;--------- Mouse functions ------------------------------------------------------------------------
+;--------------------------------------------------------------------------------------------------
 
 os_enable_mouse
 
@@ -3816,10 +3819,10 @@ pf_haspth	push bc
 	push de
 	call cd_parse_path
 	pop hl
-	pop bc
-	ld (hl),c				; restore characters at split point
-	inc hl
-	ld (hl),b
+	pop de
+	ld (hl),e				; restore characters at split point (dont use B reg, as may be used
+	inc hl				; for driver error code)
+	ld (hl),d
 	dec hl
 	ret nz				; return already if error
 	
