@@ -155,10 +155,12 @@ rxe_done	call set_serial_bank	; need to set the bank again as "s_gbloop" call re
 call_rx
 	ld a,1
 	ld (store_registers),a	; switching to external code, so store registers by default
+	call os_allow_nmi_freeze
 	
 	call get_pre_launch_regs	; set default args position in HL, DE = current DIR block, A = current VOL
 
 	ld ix,(serial_address)
+	ld (com_start_addr),ix
 	jp (ix)
 	
 ;----------------------------------------------------------------------------------------------
