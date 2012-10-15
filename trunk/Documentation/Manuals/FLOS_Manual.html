@@ -4,7 +4,7 @@
 <body>
 <h3>FLOS: A "Freezer-Like" Operating System for OSCA on the
 V6Z80P by Phil Ruston</h3>
-<pre>Last updated 14th October 2012, for FLOS v608</pre>
+<pre>Last updated 15th October 2012, for FLOS v608</pre>
 <pre><span style="text-decoration: underline;"><br>QUICK LINKS:</span><br><br><a href="FLOS_Manual.html#Internal_command">Internal Commands</a><br><a href="FLOS_Manual.html#EXTERNAL_COMMAND">External Commands</a><br><a href="#Scripts">Script Info</a><br><a href="FLOS_Manual.html#FLOS_return_messages">Error Codes</a><br><span style="text-decoration: underline;"><br></span><br><span style="text-decoration: underline;"><br>Description:</span></pre>
 
 <pre>FLOS is a simple Z80 command line operating system for the OSCA architecture, it works in a similar<br>manner to the memory monitor / freezer cartridges of the home computer era. In some ways it also<br>behaves like a more modern DOS, allowing disk-based programs to be executed by entering their<br>filenames etc.<br><span style="text-decoration: underline;"><br><br>Installation and OS file details:</span></pre>
@@ -102,8 +102,8 @@ V6Z80P by Phil Ruston</h3>
 <pre>        Use:&nbsp;MD <span style="font-style: italic;">path/new_dir</span><br><br>        EG:  MD hats          (makes a new subdir called HATS)<br>             MD settings/test (makes a new dir in subdir SETTINGS called TEST)          <br>&nbsp;            MD /gubbins      (makes a new dir in root called GUBBINS)<br><br><br><br><br></pre>
 <pre><span style="font-weight: bold;"><a name="MOUNT_-_Rescans"></a>MOUNT</span> - Rescans for connected drives<br><br>           Use:&nbsp;MOUNT (no args)<br><br>           Note: Deletes all environment variables except %EX0</pre>
 <pre><br><br><br><br></pre>
-<pre><span style="font-weight: bold;"><a name="R_-_Show_reg"></a>R</span> - Show registers (Updated on exit from external programs or NMI exception.)</pre>
-<pre>       Use:&nbsp;R (no args)</pre>
+<pre><span style="font-weight: bold;"><a name="R_-_Show_reg"></a>R</span> - Show registers </pre>
+<pre>       Use:&nbsp;R (no args)<br><br>       Notes: The register list is updated on return from external programs or via NMI freeze.<br><br>              The PC register reflects the current location only when a program has been stopped via NMI.<br>              At all other times it is simply set to the start/execute address when a program is run.</pre>
 <pre><br><br><br><br><br></pre>
 <pre><span style="font-weight: bold;"><a name="RD_-_Remove_dir"></a>RD</span> - Remove directory<br><br>        Use:&nbsp;RD <span style="font-style: italic;">dir</span> (name must be a dir, not a file)</pre>
 <pre>        EG:  RD hats          (removes a subdir called HATS)<br>             RD settings/test (removes dir in SETTINGS called TEST)          <br>&nbsp;            RD /gubbins      (removes a dir in root called GUBBINS)<br><br>        Notes: DIR must be empty.<br><br><br><br><br><br><br><a name="RN_-_Rename"></a><span style="font-weight: bold;">RN</span> - Rename file or Dir<br><br>     Use: RN <span style="font-style: italic;">path/filename new_filename</span><br><br>     EG : RN myfile.bin file1.bin<br>          RN stuff/lettuce.bin veg.bin<br>          RN textdir mytext<br><br><br><br><br></pre>
