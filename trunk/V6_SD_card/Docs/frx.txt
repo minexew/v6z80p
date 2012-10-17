@@ -1,10 +1,8 @@
 
-FILERX.EXE - Copies a file sent
+FRX.EXE - Copies a file sent
 serially to the current dir
 
-[Recently renamed to: FRX.EXE]
-
-Use: FILERX (path)
+Use: FRX (path)
 
 Notes:
 

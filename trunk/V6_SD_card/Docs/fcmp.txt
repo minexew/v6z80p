@@ -1,9 +1,7 @@
 
-FILECMP.EXE - Compares two files
+FCMP.EXE - Compares two files
 
-[Recently renamed to: FCMP.EXE]
-
-Use: FILECMP [#] file1 file2
+Use: FCMP [#] file1 file2
 
 Notes:
 

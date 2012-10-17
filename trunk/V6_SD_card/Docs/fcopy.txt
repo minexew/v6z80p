@@ -1,0 +1,11 @@
+
+FCOPY.EXE - Copy a file from one dir
+to another.
+                                   
+Use: FCOPY [path/]filename [path]
+
+Notes:
+
+If destination path is not supplied
+the current dir is used.
+
