@@ -1,5 +1,7 @@
 
-; App: FCMP - compares files. V1.01 By Phil Ruston
+; App: FCMP - compares files. V1.02 By Phil Ruston
+;
+; V1.02 - Allows paths in filenames
 ;
 ; Source TAB size = 8
 
@@ -28,76 +30,72 @@ window_rows	equ 25
 
 buffer_size	equ $400
 
+max_path_length equ 40
 
-		ld a,(hl)			; examine name argument text, if 0: show use
-		or a			
-		jr nz,got_args
-	
-		ld hl,usage_txt
-		call kjt_print_string
-		xor a
+
+		call save_dir_vol
+		call compare_files_cmd
+		call restore_dir_vol
 		ret
-	
-got_args	cp '#'				; check for # = silent running
+		
+;------------------------------------------------------------------------------------------------
+
+compare_files_cmd
+
+		ld a,(hl)				; examine name argument text, if 0: show use
+		or a			
+		jp z,show_use
+		
+		cp '#'					; check for # = silent running
 		jr nz,not_sr
 		ld a,1
 		ld (silent),a
-fnd_nsp2	inc hl
-		ld a,(hl)
-		or a
-		jr z,bad_fn
-		cp " "
-		jr z,fnd_nsp2
+		call find_next_argument
+		ret nz
 	
-not_sr		ld de,filename1
-cpyfnlp1	ld a,(hl)
+not_sr		ld (args_loc),hl
+		call extract_path_and_filename		;find vol:cluster of file1
+		ld a,(path_txt)
 		or a
-		jr z,bad_fn
-		cp " "
-		jr z,fnd_nspc
-		ld (de),a
-		inc hl
-		inc de
-		jr cpyfnlp1
-	
-fnd_nspc	inc hl
-		ld a,(hl)			; locate next space
-		or a
-		jr z,bad_fn
-		cp " "
-		jr z,fnd_nspc
-
-		ld de,filename2
-cpyfnlp2	ld a,(hl)
-		or a
-		jr z,bad_fn
-		cp " "
-		jr z,fn2done
-		ld (de),a
-		inc hl
-		inc de
-		jr cpyfnlp2
-
-bad_fn		ld a,$12			; bad args error
-		or a
-		ret
-
-;---------------------------------------------------------------------------------------
-
-
-fn2done		ld hl,filename1			;does file 1 exist?
-		call kjt_open_file
+		jr z,no_path1
+		ld hl,path_txt
+		call kjt_parse_path			;change dir according to the path part of the string
+		ret nz
+no_path1	ld hl,filename_txt
+		call kjt_open_file			;does file exist in this dir?
 		ret nz
 		ld (f1_len),iy
 		ld (f1_len+2),ix
+		call note_src_dirvol
+		ld hl,filename_txt
+		ld de,filename1
+		ld bc,12
+		ldir
 		
-		ld hl,filename2			;does file 2 exist?
-		call kjt_open_file
+		call restore_dir_vol			;go back to original dir for relative path base for destination 
+		
+		ld hl,(args_loc)
+		call find_next_argument
+		ret nz
+		call extract_path_and_filename		;find vol:cluster of file2
+		ld a,(path_txt)
+		or a
+		jr z,no_path2
+		ld hl,path_txt
+		call kjt_parse_path			;change dir according to the path part of the string
+		ret nz
+no_path2	ld hl,filename_txt
+		call kjt_open_file			;does file exist in this dir?
 		ret nz
 		ld (f2_len),iy
 		ld (f2_len+2),ix
+		call note_dst_dirvol
+		ld hl,filename_txt
+		ld de,filename2
+		ld bc,12
+		ldir
 
-		ld hl,(f1_len)			;are files same length?
+		ld hl,(f1_len)				;are files same length?
 		ld de,(f2_len)
 		xor a
 		sbc hl,de
@@ -114,7 +112,7 @@ notslen		ld hl,fdiff_len_txt
 		ld a,5
 		ld (line_count),a
 		
-fslen		ld hl,0				;init compare 
+fslen		ld hl,0					;init compare 
 		ld (file_pointer),hl
 		ld (file_pointer+2),hl
 		xor a
@@ -125,10 +123,11 @@ fslen		ld hl,0				;init compare
 
 ;----------------------------------------------------------------------------------------------------------
 		
-comp_loop	ld hl,buffer_size		;compare whole buffer by default
+comp_loop	ld hl,buffer_size			;compare whole buffer by default
 		ld (compare_count),hl
 
-		ld hl,filename1			;read a chunk of file 1
+		call go_src_dirvol
+		ld hl,filename1				;read a chunk of file 1
 		call kjt_open_file
 		ret nz
 		ld ix,0
@@ -141,12 +140,13 @@ comp_loop	ld hl,buffer_size		;compare whole buffer by default
 		ld b,my_bank
 		call kjt_read_from_file
 		jr z,f1loadok
-		cp $1b				;if file load 1 encountered EOF, reduce buffer compare size
+		cp $1b					;if file load 1 encountered EOF, reduce buffer compare size
 		jp nz,load_err
 		ld hl,(f1_len)		
 		ld (compare_count),hl
 		
-f1loadok	ld hl,filename2			;read a chunk of file 2
+f1loadok	call go_dst_dirvol
+		ld hl,filename2				;read a chunk of file 2
 		call kjt_open_file
 		ret nz
 		ld ix,0
@@ -159,8 +159,8 @@ f1loadok	ld hl,filename2			;read a chunk of file 2
 		ld b,my_bank
 		call kjt_read_from_file
 		jr z,f2loadok
-		cp $1b				;if file load 2 encountered EOF, reduce buffer compare size
-		jp nz,load_err			;but only if smaller than it already is
+		cp $1b					;if file load 2 encountered EOF, reduce buffer compare size
+		jp nz,load_err				;but only if smaller than it already is
 		ld hl,(compare_count)
 		ld de,(f2_len)
 		xor a
@@ -168,17 +168,17 @@ f1loadok	ld hl,filename2			;read a chunk of file 2
 		jr c,f2loadok
 		ld (compare_count),de
 		
-f2loadok	ld bc,(compare_count)		;if compare count has been reduced to zero, all done
+f2loadok	ld bc,(compare_count)			;if compare count has been reduced to zero, all done
 		ld a,b
 		or c
 		jr z,all_done
-		ld hl,buffer1			;compare the contents of the buffers
+		ld hl,buffer1				;compare the contents of the buffers
 		ld de,buffer2	
 bufcmplp	ld a,(de)
 		cp (hl)
 		jr z,byte_same
 		call byte_diff
-		jp nz,aborted			;long list was aborted
+		jp nz,aborted				;long list was aborted
 byte_same	inc hl
 		inc de
 		dec bc
@@ -187,13 +187,13 @@ byte_same	inc hl
 		jr nz,bufcmplp
 		
 		
-		ld hl,(compare_count)		;if buffer size was reduced, this was the last compare
+		ld hl,(compare_count)			;if buffer size was reduced, this was the last compare
 		ld de,buffer_size
 		xor a
 		sbc hl,de
 		jr nz,all_done
 			
-		ld hl,(file_pointer)		;move file pointer
+		ld hl,(file_pointer)			;move file pointer
 		ld de,buffer_size
 		add hl,de
 		ld (file_pointer),hl
@@ -202,7 +202,7 @@ byte_same	inc hl
 		adc hl,de
 		ld (file_pointer+2),hl
 		
-		ld hl,(f1_len)			;lessen filesizes by buffer count
+		ld hl,(f1_len)				;lessen filesizes by buffer count
 		ld de,buffer_size
 		xor a
 		sbc hl,de
@@ -362,10 +362,87 @@ cond_print_string
 		ret nz
 		call kjt_print_string
 		ret
+
+;------------------------------------------------------------------------------------------------
+		
+show_use	ld hl,usage_txt
+		call kjt_print_string
+		xor a
+		ret
 		
 ;------------------------------------------------------------------------------------------------
 
-usage_txt	db 11,"FCMP.EXE (V1.01) - Compare files",11,11
+go_src_dirvol	push bc
+		push de
+		push hl
+		ld a,(src_vol)
+		call kjt_change_volume
+		ld de,(src_cluster)
+		call kjt_set_dir_cluster
+		pop hl
+		pop de
+		pop bc
+		ret
+
+
+
+go_dst_dirvol	push bc
+		push de
+		push hl
+		ld a,(dst_vol)
+		call kjt_change_volume
+		ld de,(dst_cluster)
+		call kjt_set_dir_cluster
+		pop hl
+		pop de
+		pop bc
+		ret
+	
+
+note_src_dirvol	push bc
+		push de
+		push hl
+		call kjt_get_dir_cluster
+		ld (src_cluster),de
+		call kjt_get_volume_info
+		ld (src_vol),a
+		pop hl
+		pop de
+		pop bc
+		ret
+
+	
+	
+note_dst_dirvol	push bc
+		push de
+		push hl
+		call kjt_get_dir_cluster
+		ld (dst_cluster),de	
+		call kjt_get_volume_info
+		ld (dst_vol),a
+		pop hl
+		pop de
+		pop bc
+		ret
+
+src_vol		db 0
+dst_vol		db 0
+src_cluster	dw 0
+dst_cluster	dw 0
+
+;-------------------------------------------------------------------------------------------		
+
+include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
+
+include "FLOS_based_programs\code_library\string\inc\extract_path_and_filename.asm"
+
+include "FLOS_based_programs\code_library\string\inc\find_next_argument.asm"
+
+;----------------------------------------------------------------------------------------------
+
+args_loc	dw 0
+
+usage_txt	db 11,"FCMP.EXE (V1.02) - Compare files",11,11
 		db "Usage: FCMP [#] FILE1 FILE2",11,11,0
 
 fdiff_len_txt	db 11,"** Files are not the same length!  **",11
@@ -397,15 +474,14 @@ diff_addr	db 0,0,0,0
 
 compare_count	dw 0
 
-filename1	ds 16,0
-filename2	ds 16,0
+filename1	ds 13,0
+filename2	ds 13,0
 
 silent		db 0
 fs_diff		db 0
 line_count	db 0
 
 ;------------------------------------------------------------------------------------------------
-
 
 buffer1		db 0
 
