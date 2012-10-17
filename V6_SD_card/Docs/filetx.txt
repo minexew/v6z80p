@@ -2,6 +2,8 @@
 FILETX.EXE - Sends a file to external
 system via Serial Link protocol.
 
+[Recently renamed to: FTX.EXE]
+
 Use: FILETX filename
 
 Notes: filename can include path
