@@ -1,6 +1,6 @@
 ;=======================================================================================
 ;
-; FRX.EXE (previously FILERX.exe) V1.03
+; FRX.EXE (Recieve files to disk [previously FILERX.exe] V1.03
 ;
 ; Changes: 	V1.03 Changed name, reformatted source to TAB size = 8
 ;
@@ -385,7 +385,8 @@ internal_command_exit
 
 			db "EXIT.---",0         		; command, to exit FILERX
 
-start_text		db 11,"FRX v1.03",11,0
+start_text		db 11,"FRX v1.03",11
+			db "(Saves serial files direct to disk)",11,11,0
 		
 waiting_text		db "Waiting for file.. (ESC Quits)",11,0		
 
