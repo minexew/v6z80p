@@ -23,7 +23,12 @@ To install:
    Both support VGA.)
 
 
-2. You need a "SPECTRUM" folder in 
+2. If you copied the contents of
+   the main project's "SD_CARD"
+   folder to the root of an SD card
+   skip this step.
+
+   You need a "SPECTRUM" folder in 
    the root of a FAT 16-formatted SD
    card. Put the following files in
    this dir:
