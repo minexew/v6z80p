@@ -21,7 +21,7 @@ for the V6Z80P:
    the slot number where the config file
    was installed)
 
-   For full details see the sub folder:
+   For more info see the sub folder:
 
    FPGA_CFG\Phil\
 
@@ -45,7 +45,7 @@ for the V6Z80P:
    emulators are launched with the FLOS
    command "EMU"
 
-   For full details see the sub folder:
+   For more info see the sub folder:
 
    FPGA_CFG\Alessand\V6plusv1.1\Spec_V2\
 
