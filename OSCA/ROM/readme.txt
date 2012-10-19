@@ -1,11 +1,17 @@
 
-*************
-* Revisions *
-*************
+The ROM code is included in the actual FPGA configuration file as a 512 byte BLOCK RAM located
+at address $0. (Convert the binary file to text using the app provided and paste into the
+OSCA development .ucf file in the appropriate location). 
 
+The ROM initializes the hardware and downloads the boot code from the onboard EEPROM.
+The bootcode is loaded to $200. 3520 bytes are requested from EEPROM location $0f000,
+if that fails (timeout or CRC check), bootcode backup location $1f000 is tried. If both
+locations fail the bootcode can be loaded serially (115200 baud). Serial load is forced
+immediately if UP+RIGHT+FIRE are selected by joystick in port A. 
 
-ROM code
---------
+ROM code Revisions:
+-------------------
+
 
 v6.16 (26/03/2011):
 
