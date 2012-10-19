@@ -1,14 +1,26 @@
 
-----------------------------------
+--------------------------------------
 Quick start guide for Alessandro's
 Cycle Perfect Spectrums Emulators:
-----------------------------------
-
-1. Install the config .bin files onto
-   free slots the EEPROM
+--------------------------------------
 
 
-2. You need a folder called "Spectrum" in
+THIS EMULATOR IS FOR V6Z80P+ v1.1 ONLY
+
+
+1. Install the config .bin files from:
+   
+   FPGA_CFG\Alessand\V6plusv1.1\Spec_V2
+
+   into 2 free slots the EEPROM using
+   the FLOS command "EEPROM"
+
+
+2. If you copied the contents of the
+   main project's "SD_CARD" folder to
+   the root of an SD card, skip this step.
+
+   You need a folder called "Spectrum" in
    ROOT dir of a FAT16-formatted SD Card.
    In this folder you need:
  
@@ -27,8 +39,7 @@ Cycle Perfect Spectrums Emulators:
 
      esxdos.nvr
   
-
-3. If you want to use esxDOS, you also
+   If you want to use esxDOS, you also
    need the following folders in the
    ROOT dir of the SD card:
  
@@ -48,7 +59,8 @@ Cycle Perfect Spectrums Emulators:
    V6Z80+ V1.1\Speccy2.1.0\Support files
 -----------------------------------------    
 
-4. Start the emulator in FLOS with the
+
+3. Start the emulator in FLOS with the
    command "EMU". Chose an option from
    the menu. Upon first run you will
    be asked which slots contain the
@@ -61,7 +73,7 @@ Cycle Perfect Spectrums Emulators:
    esxDOS mode is selected.
 
 
-5. Emulator keys:
+4. Emulator keys:
 
    F1 - standard 3.5MHz mode
    F2 - 7 MHz Turbo mode
@@ -70,8 +82,10 @@ Cycle Perfect Spectrums Emulators:
    TAB - Start tape
    F11 - Scanline mode (VGA only)
    
+   Kempston Joystick in Port 0
 
-6. Residos info: You can navigate/
+
+5. Residos info: You can navigate/
    load via the commands:
 
    %cd "dir"
@@ -97,12 +111,16 @@ Cycle Perfect Spectrums Emulators:
    .tapein filename
 
    LOAD ""
+
  
+------------------------------------
 
-7. Please see the full readme files
-   in the main project archive for
-   full details:
+ Please see the full readme files
+ in the main project archive for
+ full details:
 
-   Alternative_Configs\Alessandro\
-   Cycle_Exact_Spectrum Emulator\
-   V6Z80+ V1.1\Speccy2.1.0\
+ Alternative_Configs\Alessandro\
+ Cycle_Exact_Spectrum Emulator\
+ V6Z80+ V1.1\Speccy2.1.0\
+
+------------------------------------
