@@ -1,81 +1,87 @@
+------------------------------------
+Quick Start Guide for Phil's Simple
+Spectrum 128 / 48 Emulator
+------------------------------------
 
-Spectrum 128 / 48 Emulator for V6Z80P by Phil Ruston 2009-2011
---------------------------------------------------------------
-
-This is an "approximate" ZX Spectrum emulator config - it makes
-no attempt to be cycle-perfect, but there are speed adjust keys
-for the versions of the V6Z80Ps which do not have a 14MHz oscillator
-from which to derive a 3.5MHz CPU clock. It is also limited to
-loading only .sna image files.
-
--------
-Changes
--------
-
-v x013 - Changed ROM code to better activate Spectrum 48 Snapshots
-       - Modified "Read from $0067 = Real Spectrum" logic.
-       - Added version ID to all configs
-       - Bootcode standard across all versions.
-       - Keyboard now initializes correctly.
-
----------------------------
-How to install the emulator
----------------------------
-
-1. Copy the folder "SPECTRUM" to the root of your FAT 16 SD card
-   (can be same card used for FLOS etc) (Add more Snapshots to the
-   "48snaps" and "128snaps" folders as desired).
-
-2. Install the FPGA config .bin file from the folder "FPGA_CFG"
-   to the EEPROM using FLOS command "EEPROM.EXE" (Make sure you select
-   the correct file for your version of V6 board) PAL and NTSC versions of
-   each board's config file are supplied: filenames ending in "p" are
-   for PAL and those ending in "n" are NTSC. Both support VGA.
-
-3. Start the emulator by:
-
-   a) Choosing option 2 in the EEPROM tool
-   b) Using FLOS command "boot n" command where n is the slot with the emu config
-   c) (During boot) tapping the function key corresponding to the emu slot (F1-F7 supported)
+This emulator is limited to loading
+.sna files and is not cycle-accurate.
 
 
------------
-Usage notes
+To install:
 -----------
 
-In the menu:
+1. Install the emulator FPGA config
+   .bin file from the folder "FPGA_CFG"
+   to the EEPROM using the FLOS command
+   "EEPROM.EXE". Make sure you select
+   the correct config file for your
+   version of V6 board. (PAL and NTSC
+   versions of each board's config
+   file are supplied: filenames
+   ending in "p" are for PAL and
+   those ending in "n" are NTSC.
+   Both support VGA.)
 
-* Browse snapshots with cursors and select a .sna file to load
 
-* Press B to go to spectrum 128 basic
+2. You need a "SPECTRUM" folder in 
+   the root of a FAT 16-formatted SD
+   card. Put the following files in
+   this dir:
 
-* Press shift + V to force VGA to 50Hz mode
+    ZXSPEC48.ROM
+    ZXSPE128.ROM
+    BOOTCODE.EXE
 
-* Press Shift and 1, 2 or 3 to restart the FPGA from another
+   You should also add any snapshot
+   files you want to run.
+
+
+3. Start the emulator by either:
+
+   Using FLOS command "boot n"
+   command where n is the slot
+   containing the emu config
+
+   or
+
+   During the V6 boot sequence,
+   tap the function key
+   corresponding to the slot used
+   by the emulator (F1-F7 supported)
+
+
+4. Within the emulator:
+
+  Browse snapshots with cursors
+  and select a .sna file to load
+
+  Press B to go to spectrum 128
+  basic
+
+  Press shift + V to force VGA to
+  50Hz mode
+
+  Adjust speed with F1-F9 (only
+  applicable to the V6 V1.1 and
+  V6+ v1.0 boards).
+
+  Kempston joystick is emulated
+  via Joy port 1.
+
+  Press ESC to go back to the
+  file menu.
+
+  Press Shift and 1, 2 or 3 to
+  restart the FPGA from another
   config slot
 
-* The versions for the original V6 and V6+ v1.0 boards can only approximate the
-  speed of a real Spectrum, press keys F1-F9 to adjust.
+----------------------------------
 
-* Kempston joystick is emulated (Joy port 1).
+ Please read the full readme.txt
+ in the main project archive for
+ fuller info:
 
-* Press ESC to go back to the boot menu.
+ Alternative_Configs\Phil\
+ Spectrum_Emulator\
 
-
-Known issues:
--------------
-
-* Only the first 44 files/folders in each directory are shown.
-
-* The odd snapshot does not start correctly (EG: Cauldron 2)
-
-
-----
-Tech
-----
-
-If you remove the bootcode.exe file, you can download one serially
-when the error message flashes. This is useful for testing new
-bootcode programs. (Serial comms currenty Untested on v1013)
-
-
+-----------------------------------
