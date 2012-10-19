@@ -53,7 +53,18 @@ please visit the following URL:
 
 http://www.worldofspectrum.org/residos/
 
-4. YM-2149 block
+4. ESXDOS
+=========
+
+esxDOS core is (c) Papaya Dezign
+esxDOS additional commands are (c) their respective authors
+NMI.SYS is (c) ub880d
+
+For more information about ESXDOS, please visit the following URL:
+
+http://esxdos.org/
+
+5. YM-2149 block
 ================
 
 This core makes use of the YM-2149 VHDL code developed by Mike Johnson.
@@ -62,7 +73,7 @@ Copyright (c) MikeJ - Jan 2005 - All rights reserved.
 
 Many thanks to Mike Johnson for this work!
 
-3. MANIC MINER
+6. MANIC MINER
 ==============
 
 Included as a test .tap file. According to World Of Spectrum, Matthew Smith
