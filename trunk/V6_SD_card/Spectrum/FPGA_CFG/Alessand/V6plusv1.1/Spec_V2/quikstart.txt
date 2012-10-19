@@ -1,0 +1,108 @@
+
+----------------------------------
+Quick start guide for Alessandro's
+Cycle Perfect Spectrums Emulators:
+----------------------------------
+
+1. Install the config .bin files onto
+   free slots the EEPROM
+
+
+2. You need a folder called "Spectrum" in
+   ROOT dir of a FAT16-formatted SD Card.
+   In this folder you need:
+ 
+   Essentials:
+ 
+    zxspec48.rom
+    zxspec128.rom
+
+   Optional - if want to use Residos:
+
+     resi48.nvr
+     resi128.nvr
+     residos.tap
+
+   Optional - if you want to use esxdos:
+
+     esxdos.nvr
+  
+
+3. If you want to use esxDOS, you also
+   need the following folders in the
+   ROOT dir of the SD card:
+ 
+    sys
+    bin
+   
+   Which contain code and data for
+   esxdos.
+
+----------------------------------------
+ If not present, all of these files
+ can be found in the main project
+ archive in:
+
+   Alternative_Configs\Alessandro\
+   Cycle_Exact_Spectrum Emulator\
+   V6Z80+ V1.1\Speccy2.1.0\Support files
+-----------------------------------------    
+
+4. Start the emulator in FLOS with the
+   command "EMU". Chose an option from
+   the menu. Upon first run you will
+   be asked which slots contain the
+   emulators (a list will be shown).
+   Respond as appropriate.
+
+   EMU selects Residos or esxDOS
+   depending on the state of a PCB
+   jumper. When EXP_B is installed
+   esxDOS mode is selected.
+
+
+5. Emulator keys:
+
+   F1 - standard 3.5MHz mode
+   F2 - 7 MHz Turbo mode
+   ESC - Reset
+   SCROLL - NMI
+   TAB - Start tape
+   F11 - Scanline mode (VGA only)
+   
+
+6. Residos info: You can navigate/
+   load via the commands:
+
+   %cd "dir"
+   %snapload "filname.sna"
+
+   %dir
+
+   %tapein "filename.tap"
+   LOAD ""
+
+
+   esxDOS info: The easiest way to
+   load software is by activating
+   the NMI browser (press SCROLL)
+   or you can navigate/load with:
+
+   .cd dir
+
+   .ls
+
+   .snapload filename
+
+   .tapein filename
+
+   LOAD ""
+ 
+
+7. Please see the readme.txt in the
+   main project archive for full
+   details:
+
+   Alternative_Configs\Alessandro\
+   Cycle_Exact_Spectrum Emulator\
+   V6Z80+ V1.1\Speccy2.1.0\
