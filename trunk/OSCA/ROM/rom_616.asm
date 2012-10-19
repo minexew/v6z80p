@@ -10,7 +10,8 @@
 ; if that fails (timeout or CRC check), bootcode backup location $1f000 is tried. If both
 ; locations fail the bootcode can be loaded serially (115200 baud). Serial load is forced
 ; immediately if UP+RIGHT+FIRE are selected by joystick in port A. 
-
+;
+; Source Tab size = 8
 ;---------------------------------------------------------------------------------------
 
 include "equates\OSCA_hardware_equates.asm"
@@ -28,7 +29,7 @@ reset		di				; Disable interrupts
 		ld h,a				; 
 		ld l,a				; HL = 0
 		out (sys_mem_select),a		; ensure nothing paged in
-		out (sys_alt_write_page),a		; video registers paged in at this stage
+		out (sys_alt_write_page),a	; video registers paged in at this stage
 		out (sys_low_page),a		; ensure lowr page is $00000
 		out (sys_irq_enable),a		; zero all IRQ enables
 		out (sys_audio_enable),a	; disable sound channels
