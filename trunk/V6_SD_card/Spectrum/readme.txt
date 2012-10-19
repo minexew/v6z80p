@@ -34,7 +34,7 @@ for the V6Z80P:
    (with the FLOS util "EEPROM") from the
    folder:
 
-   FPGA_CFG\Alessand\V6plusv1.1
+   FPGA_CFG\Alessand\V6plusv1.1\Spec_V2
 
    These emulators offer powerful features
    such as support for ResiDOS and esxDOS,
