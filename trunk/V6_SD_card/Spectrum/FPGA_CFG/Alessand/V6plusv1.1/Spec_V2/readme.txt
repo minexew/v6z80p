@@ -10,32 +10,33 @@ THIS EMULATOR IS FOR V6Z80P+ v1.1 ONLY
 
 1. Install the config .bin files from:
    
-   FPGA_CFG\Alessand\V6plusv1.1\Spec_V2
+  FPGA_CFG\Alessand\V6plusv1.1\Spec_V2
 
-   into 2 free slots the EEPROM using
-   the FLOS command "EEPROM"
+  into 2 free slots the EEPROM using
+  the FLOS command "EEPROM"
 
 
 2. If you copied the contents of the
    main project's "SD_CARD" folder to
-   the root of an SD card, skip this step.
+   the root of an SD card, skip this
+   step.
 
-   You need a folder called "Spectrum" in
-   ROOT dir of a FAT16-formatted SD Card.
-   In this folder you need:
+   You need a folder called "Spectrum"
+   in ROOT dir of a FAT16-formatted SD
+   Card. In this folder you need:
  
-   Essentials:
+  Essentials:
  
     zxspec48.rom
     zxspec128.rom
 
-   Optional - if want to use Residos:
+  Optional: if want to use Residos:
 
      resi48.nvr
      resi128.nvr
      residos.tap
 
-   Optional - if you want to use esxdos:
+  Optional: if you want to use esxdos:
 
      esxdos.nvr
   
@@ -49,15 +50,15 @@ THIS EMULATOR IS FOR V6Z80P+ v1.1 ONLY
    Which contain code and data for
    esxdos.
 
-----------------------------------------
- If not present, all of these files
- can be found in the main project
- archive in:
+-------------------------------------
+If not present, all of these files
+can be found in the main project
+archive in:
 
-   Alternative_Configs\Alessandro\
-   Cycle_Exact_Spectrum Emulator\
-   V6Z80+ V1.1\Speccy2.1.0\Support files
------------------------------------------    
+ Alternative_Configs\Alessandro\
+ Cycle_Exact_Spectrum Emulator\
+ V6Z80+ V1.1\Speccy2.1.0\Support files
+-------------------------------------    
 
 
 3. Start the emulator in FLOS with the
