@@ -1,5 +1,5 @@
 
-Spectrum 128 / 48 Emulator for V6Z80P+ by Phil Ruston 2009-2011
+Spectrum 128 / 48 Emulator for V6Z80P by Phil Ruston 2009-2011
 --------------------------------------------------------------
 
 This is an "approximate" ZX Spectrum emulator config - it makes
