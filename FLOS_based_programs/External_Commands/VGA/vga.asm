@@ -29,9 +29,9 @@ include 	"flos_based_programs\code_library\program_header\test_flos_version.asm"
 		ret nz
 	
 		ld a,e
-		cp 50
+		cp $50
 		jr z,go50hz
-		cp 60
+		cp $60
 		jr z,go60hz
 		
 		ld a,$1a
