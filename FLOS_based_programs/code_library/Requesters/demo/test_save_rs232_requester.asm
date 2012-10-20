@@ -115,7 +115,7 @@ rs232_error_txt
 	db "A serial error occured..",11,11,0
 		
 ;----------------------------------------------------------------------------
-include	"requesters\inc\file_requesters_with_rs232.asm"
+include	"flos_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 ;----------------------------------------------------------------------------
 
 my_filename

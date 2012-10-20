@@ -50,7 +50,7 @@ text2	db " And another",11,"     One!",0
 		
 ;---------------------------------------------------------------------------------
 
-	include	"requesters\inc\message_requester.asm"
+	include	"flos_based_programs\code_library\requesters\inc\message_requester.asm"
 	
 ;---------------------------------------------------------------------------------
 
