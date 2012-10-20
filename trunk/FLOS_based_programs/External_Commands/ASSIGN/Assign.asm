@@ -19,10 +19,10 @@ include "equates\system_equates.asm"
 
 my_location	equ $f000
 my_bank		equ $0e
-include 	"flos_based_programs\code_library\program_header\force_load_location.asm"
+include 	"flos_based_programs\code_library\program_header\inc\force_load_location.asm"
 
 required_flos	equ $607
-include 	"flos_based_programs\code_library\program_header\test_flos_version.asm"
+include 	"flos_based_programs\code_library\program_header\inc\test_flos_version.asm"
 
 ;---------------------------------------------------------------------------------------------
 
