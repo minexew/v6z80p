@@ -7,9 +7,9 @@
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
           org $5000 
 
@@ -2696,11 +2696,11 @@ disable_video
                     
 ;--------------------------------------------------------------------------------------------------
 
-                    include "sfx_routine.asm"
+                    include "flos_based_programs\games\tetris\inc\sfx_routine.asm"
 
-fx_data             incbin "sfx_data.bin"
+fx_data             incbin "flos_based_programs\games\tetris\data\sfx_data.bin"
           
-sample_data         incbin "waves.bin"
+sample_data         incbin "flos_based_programs\games\tetris\data\waves.bin"
 end_of_sample_data  db 0
 
 fx_list             dw fx_data, fx_data+$20, fx_data+$40, fx_data+$60 
@@ -2999,13 +2999,13 @@ tl_rad              dw $cc
 tl_src_coords       ds 128*4,0          
 tl_dst_coords       ds 128*4,0
 
-tetris_logo         incbin "tetris_logo.bin"
+tetris_logo         incbin "FLOS_based_programs\games\Tetris\data\tetris_logo.bin"
 
 ts_spdefs           db 0,$56,$73,$b4,$41,$45,$05,$a4
 
-sin_table           incbin "sin_table.bin"
+sin_table           incbin "FLOS_based_programs\games\Tetris\data\sin_table.bin"
 
-title_text_map      incbin "title_text.bin"
+title_text_map      incbin "FLOS_based_programs\games\Tetris\data\title_text.bin"
 
 logo_up             db 0
 ttxt_fade_in        db 0
@@ -3229,11 +3229,11 @@ solid_list          ds 8,0
 
 ;---------------------------------------------------------------------------------------------
 
-tiles               incbin    "tiles_chunky.bin"
+tiles               incbin    "FLOS_based_programs\games\Tetris\data\tiles_chunky.bin"
 
-tiles_colours       incbin    "tiles_palette.bin"
+tiles_colours       incbin    "FLOS_based_programs\games\Tetris\data\tiles_palette.bin"
 
-charmap             incbin    "map_screen.bin"
+charmap             incbin    "FLOS_based_programs\games\Tetris\data\map_screen.bin"
 
 gameover_chars      db 47,57,57,57,57,57,57,58
                     db 59,47,57,57,57,57,58,60
