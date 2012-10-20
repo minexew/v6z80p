@@ -28,20 +28,20 @@ Num2	inc a
 	jr nz,notzero
 	bit 0,e
 	ret z
-notzero	call put_char
+notzero	call putchar
 	ld e,1
 	ret 
 	
 
 
-put_char	push hl			;FLOS print char routine
+putchar	push hl			;FLOS print char routine
 	ld hl,my_char
 	ld (hl),a
 	call kjt_print_string
 	pop hl
 	ret
 	
-my_char	db 0,0			;note zero string terminator
+my_char	db 0,0				;note zero string terminator
 
 ;-----------------------------------------------------------------------------------
 	

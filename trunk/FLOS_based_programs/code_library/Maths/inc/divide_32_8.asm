@@ -8,20 +8,20 @@
 
 divide_32_8
 
-	ld 	b,32
-	xor 	a
+		ld 	b,32
+		xor 	a
 	
 div32_8lp	add	hl,hl		; 32 iterations
-	rl	e		; 
-	rl	d		; 
-	rla			; 
-	cp	c		; 
-	jr	c,$+4		; 
-	sub	c		; 
-	inc	l		; 
+		rl	e		; 
+		rl	d		; 
+		rla			; 
+		cp	c		; 
+		jr	c,$+4		; 
+		sub	c		; 
+		inc	l		; 
 
-	djnz	div32_8lp
-	ret
+		djnz	div32_8lp
+		ret
 
 ;------------------------------------------------------------------------------
 	
