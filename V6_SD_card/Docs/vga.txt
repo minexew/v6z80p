@@ -1,0 +1,7 @@
+
+VGA.EXE - Sets the VGA refresh rate
+
+Use: VGA hz
+
+Where hz = "50" or "60"
+
