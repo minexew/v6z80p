@@ -19,7 +19,7 @@ got_spc	inc hl
 	cp a			;return with zero flag set, char in A
 	ret
 	
-mis_arg	ld a,$1f			;return with zero flag unset, error code $1f
+mis_arg	ld a,$1f		;return with zero flag unset, error code $1f
 	or a
 	ret
 	
