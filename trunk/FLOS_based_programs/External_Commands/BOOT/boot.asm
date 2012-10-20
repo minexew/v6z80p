@@ -248,7 +248,7 @@ pause_lp2	djnz pause_lp2
 
 ;------------------------------------------------------------------------------------------
 
-include "FLOS_based_programs\code_library\eeprom_routines\eeprom_routines.asm"
+include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
 
 ;-------------------------------------------------------------------------------------------------
 
