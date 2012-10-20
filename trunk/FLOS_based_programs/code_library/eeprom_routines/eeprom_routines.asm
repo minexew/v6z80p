@@ -1,30 +1,40 @@
 ; V6Z80P EEPROM ROUTINES V1.01
 ; ----------------------------
 ;
-;SOURCE TAB SIZE = 10
+; Main routine list:
+; -------------------
+; Program_eeprom_page (all 256 bytes of page must be $ff prior to write)
+; read_eeprom_page    (reads 256 bytes to address label "page_buffer")
+; erase_eeprom_sector (erases a 64KB sector to all $ff)
 ;
-; Note: Uses some sofware timing loops so it's probably best to disable/re-enable
+; Subroutine list:
+; ----------------
+; send_byte_to_pic
+; wait_pic_busy
+; enter_programming_mode
+; exit_programming_mode
+;
+;
+; Note: Code uses some sofware timing loops so it's probably best to disable/re-enable
 ; interrupts around calls.
 ;  
 ; Changes:
 ;
 ; V1.01 - "Wait busy" now times out after 5 seconds (not 1 second)
 ; 
-;
-;
 ;-------- EEPROM CONSTANTS -------------------------------------------------------------
 
-pic_data_input	equ 0	; from FPGA to PIC (bit 0 of sys_pic_comms)
-pic_clock_input	equ 1	; from FPGA to PIC (bit 1 of sys_pic_comms)
+pic_data_input	 equ 0	; from FPGA to PIC (bit 0 of sys_pic_comms)
+pic_clock_input	 equ 1	; from FPGA to PIC (bit 1 of sys_pic_comms)
 
-pic_clock_output	equ 3	; from PIC to FPGA (bit 3 of sys_hw_flags) 
+pic_clock_output equ 3	; from PIC to FPGA (bit 3 of sys_hw_flags) 
 
 ;--------- EEPROM SUBROUTINES ----------------------------------------------------------
 
 program_eeprom_page
 
-	push hl
-	push de
+	push hl			;DE = 256-byte page number to write
+	push de			;HL = address of source data 
 	push bc
 	
 	ld a,d
@@ -39,13 +49,13 @@ program_eeprom_page
 	ld a,$98
 	call send_byte_to_pic
 	ld a,$00			
-	call send_byte_to_pic	;send address low
+	call send_byte_to_pic		;send address low
 	ld a,(page_med)	
-	call send_byte_to_pic	;send address mid
+	call send_byte_to_pic		;send address mid
 	ld a,(page_hi)
-	call send_byte_to_pic	;send address high
+	call send_byte_to_pic		;send address high
 	
-	ld b,64			;send 64 byte data packet to burn
+	ld b,64				;send 64 byte data packet to burn
 wdplp1	ld a,(hl)
 	call send_byte_to_pic
 	inc hl
@@ -58,13 +68,13 @@ wdplp1	ld a,(hl)
 	ld a,$98
 	call send_byte_to_pic
 	ld a,$40			
-	call send_byte_to_pic	;send address low
+	call send_byte_to_pic		;send address low
 	ld a,(page_med)	
-	call send_byte_to_pic	;send address mid
+	call send_byte_to_pic		;send address mid
 	ld a,(page_hi)
-	call send_byte_to_pic	;send address high
+	call send_byte_to_pic		;send address high
 	
-	ld b,64			;send 64 byte data packet to burn
+	ld b,64				;send 64 byte data packet to burn
 wdplp2	ld a,(hl)
 	call send_byte_to_pic
 	inc hl
@@ -77,13 +87,13 @@ wdplp2	ld a,(hl)
 	ld a,$98
 	call send_byte_to_pic
 	ld a,$80			
-	call send_byte_to_pic	;send address low
+	call send_byte_to_pic		;send address low
 	ld a,(page_med)	
-	call send_byte_to_pic	;send address mid
+	call send_byte_to_pic		;send address mid
 	ld a,(page_hi)
-	call send_byte_to_pic	;send address high
+	call send_byte_to_pic		;send address high
 	
-	ld b,64			;send 64 byte data packet to burn
+	ld b,64				;send 64 byte data packet to burn
 wdplp3	ld a,(hl)
 	call send_byte_to_pic
 	inc hl
@@ -96,13 +106,13 @@ wdplp3	ld a,(hl)
 	ld a,$98
 	call send_byte_to_pic
 	ld a,$c0			
-	call send_byte_to_pic	;send address low
+	call send_byte_to_pic		;send address low
 	ld a,(page_med)	
-	call send_byte_to_pic	;send address mid
+	call send_byte_to_pic		;send address mid
 	ld a,(page_hi)
-	call send_byte_to_pic	;send address high
+	call send_byte_to_pic		;send address high
 	
-	ld b,64			;send 64 byte data packet to burn
+	ld b,64				;send 64 byte data packet to burn
 wdplp4	ld a,(hl)
 	call send_byte_to_pic
 	inc hl
@@ -139,29 +149,29 @@ read_eeprom_page
 	ld a,e
 	ld (page_med),a
 	
-	in a,(sys_eeprom_byte)	;at outset, clear input byte shift count with a read
+	in a,(sys_eeprom_byte)		;at outset, clear input byte shift count with a read
 	
 	ld a,$88			;send "set databurst location" command
 	call send_byte_to_pic
 	ld a,$d4
 	call send_byte_to_pic
 	ld a,$00			
-	call send_byte_to_pic	;send address low
+	call send_byte_to_pic		;send address low
 	ld a,(page_med)	
-	call send_byte_to_pic	;send address mid
+	call send_byte_to_pic		;send address mid
 	ld a,(page_hi)
-	call send_byte_to_pic	;send address high
+	call send_byte_to_pic		;send address high
 	
 	ld a,$88			;send "set databurst location" command
 	call send_byte_to_pic
 	ld a,$e2
 	call send_byte_to_pic
 	ld a,$00			
-	call send_byte_to_pic	;send length low
+	call send_byte_to_pic		;send length low
 	ld a,$01	
-	call send_byte_to_pic	;send length mid
+	call send_byte_to_pic		;send length mid
 	ld a,$00
-	call send_byte_to_pic	;send length high
+	call send_byte_to_pic		;send length high
 	
 	ld a,$88			;send "start databurst" command
 	call send_byte_to_pic
@@ -169,28 +179,30 @@ read_eeprom_page
 	call send_byte_to_pic
 
 	ld hl,page_buffer		; download loop.. 
-	ld bc,$100		; page = 256 bytes                 
-nxt_byte	ld d,0			; D counts timer overflows
-	ld a,1<<pic_clock_input	; raise clock to prompt PIC to send a byte
+	ld bc,$100			; page = 256 bytes                 
+nxt_byte
+	ld d,0				; D counts timer overflows
+	ld a,1<<pic_clock_input		; raise clock to prompt PIC to send a byte
 	out (sys_pic_comms),a
-wbc_byte	in a,(sys_hw_flags)		; have 8 bits been received?		
+wbc_byte
+	in a,(sys_hw_flags)		; have 8 bits been received?		
 	bit 4,a
 	jr nz,gbcbyte
 	in a,(sys_irq_ps2_flags)	; check for timer overflow..
 	and 4
 	jr z,wbc_byte	
 	out (sys_clear_irq_flags),a	; clear timer overflow flag
-	inc d			; inc count of overflows,
+	inc d				; inc count of overflows,
 	jr nz,wbc_byte			
-	ld a,1			; timed out error
+	ld a,1				; timed out error
 	pop bc
 	pop de
 	pop hl
 	ret
 				
-gbcbyte	xor a			; drop pic clock
+gbcbyte	xor a				; drop pic clock
 	out (sys_pic_comms),a	
-	in a,(sys_eeprom_byte)	; read byte received (clears bit count)
+	in a,(sys_eeprom_byte)		; read byte received (clears bit count)
 	ld (hl),a			; copy to dest, loop back to wait for next byte
 	inc hl
 	dec bc
@@ -208,7 +220,7 @@ gbcbyte	xor a			; drop pic clock
 
 erase_eeprom_sector
 
-	push af			;put sector number to erase in A
+	push af			;put 64KB sector number to erase in A
 	ld (erase_sector),a
 
 	call enter_programming_mode
@@ -218,11 +230,11 @@ erase_eeprom_sector
 	ld a,$f5
 	call send_byte_to_pic
 	ld a,$00			
-	call send_byte_to_pic	;send address low - note: 64KB granularity
+	call send_byte_to_pic		;send address low - note: 64KB granularity
 	ld a,$00		
-	call send_byte_to_pic	;send address mid - note: 64KB granularity
+	call send_byte_to_pic		;send address mid - note: 64KB granularity
 	ld a,(erase_sector)
-	call send_byte_to_pic	;send address high - note: 64KB granularity
+	call send_byte_to_pic		;send address high - note: 64KB granularity
 	call wait_pic_busy		;wait for EEPROM burn to complete
 
 	call exit_programming_mode
@@ -241,29 +253,31 @@ send_byte_to_pic
 	push de
 	ld c,a			
 	ld d,8
-bit_loop	xor a
+bit_loop
+	xor a
 	rl c
 	jr nc,zero_bit
 	set pic_data_input,a
-zero_bit	out (sys_pic_comms),a	; present new data bit
+zero_bit
+	out (sys_pic_comms),a		; present new data bit
 	set pic_clock_input,a
-	out (sys_pic_comms),a	; raise clock line
+	out (sys_pic_comms),a		; raise clock line
 	
 	ld b,12
-psbwlp1	djnz psbwlp1		; keep clock high for 10 microseconds
+psbwlp1	djnz psbwlp1			; keep clock high for 10 microseconds
 		
 	res pic_clock_input,a
-	out (sys_pic_comms),a	; drop clock line
+	out (sys_pic_comms),a		; drop clock line
 	
 	ld b,12
-psbwlp2	djnz psbwlp2		; keep clock low for 10 microseconds
+psbwlp2	djnz psbwlp2			; keep clock low for 10 microseconds
 	
 	dec d
 	jr nz,bit_loop
 
-	ld b,60			; short wait between bytes ~ 50 microseconds
-pdswlp	djnz pdswlp		; allows time for PIC to act on received byte
-	pop de			; (PIC will wait 300 microseconds for next clock high)
+	ld b,60				; short wait between bytes ~ 50 microseconds
+pdswlp	djnz pdswlp			; allows time for PIC to act on received byte
+	pop de				; (PIC will wait 300 microseconds for next clock high)
 	pop bc
 	ret			
 
@@ -276,24 +290,26 @@ wait_pic_busy
 	push de
 	ld de,0
 	
-wait_pic	in a,(sys_irq_ps2_flags)	; check for timer overflow..
+wait_pic
+	in a,(sys_irq_ps2_flags)	; check for timer overflow..
 	and 4
 	jr z,test_pic	
 	out (sys_clear_irq_flags),a	; clear timer overflow flag
-	inc de			; inc count of overflows
+	inc de				; inc count of overflows
 	ld a,d
 	cp 5
-	jr nz,test_pic		; every 256 DE increments = 1 second		
+	jr nz,test_pic			; every 256 DE increments = 1 second		
 	pop de
-	scf			; timed out error - carry flag set
+	scf				; timed out error - carry flag set
 	ret
 	
-test_pic	in a,(sys_hw_flags)		; if PIC is holding its clock output high it is
-	bit pic_clock_output,a	; busy and cannot accept data bytes at this time
+test_pic
+	in a,(sys_hw_flags)		; if PIC is holding its clock output high it is
+	bit pic_clock_output,a		; busy and cannot accept data bytes at this time
 	jr nz,wait_pic
 	pop de
 	scf
-	ccf			; carry flag zero if OK
+	ccf				; carry flag zero if OK
 	ret
 
 
@@ -323,10 +339,10 @@ exit_programming_mode
 	
 ;-----------------------------------------------------------------------------------------
 
-page_lo	db 0
+page_lo		db 0
 page_med	db 0
-page_hi	db 0
+page_hi		db 0
 
-erase_sector db 0
+erase_sector 	db 0
 
 ;------------------------------------------------------------------------------------------
