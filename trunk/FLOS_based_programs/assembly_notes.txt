@@ -1,19 +1,8 @@
-To assemble the supplied source code with Pasmo, first add "v6z80pdir" to your
-environment variable list.  Under XP: 
 
-In System Properties..advanced..environment variables..system variables..
+To assemble the source code with Pasmo, make sure the Pasmo parameter
+string includes the base address of the V6Z80P project folder:
 
-"New"
+EG: 
 
-Variable name = v6z80pdir
+-I C:\V6Z80P\
 
-Variable value = [full path to v6z80p folder] 
-
-And reboot PC. Then to assemble .asm files, just drag them to the "assembler.bat" file
-in the same directory as the source file. A object code .bin is created in the same
-directory.
-
-My source code often does not contain paths for included data as Pasmo's command
-line options allow paths to be included automatically with the "-I" switch.
-
-I normally set my source code tab size to 10 characters.
