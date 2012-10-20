@@ -66,9 +66,9 @@ save_vram
 	sbc hl,bc
 	pop bc
 	jp nc,out_of_range
-	ld l,e				; convert linear address in C:DE to 8KB page (A) 
-	ld a,d				; and address between 2000-3fff (HL)
-	and $1f
+	ld l,e					; convert linear address in C:DE to 8KB page (A) 
+	ld a,d					; and address between 2000-3fff (HL)
+	and $1f	
 	or $20
 	ld h,a
 	srl c
@@ -98,8 +98,8 @@ save_vram
 	or c
 	or d
 	or e
-	jp z,len_zero			;abort if length = 0
-	dec de				;dec BC:DE for following calc
+	jp z,len_zero				;abort if length = 0
+	dec de					;dec BC:DE for following calc
 	ld a,d
 	and e
 	cp $ff
@@ -123,9 +123,9 @@ noundfl	ld hl,(addr_linear_lo)
 	ld hl,filename_txt			;try to make new file stub		
 	call kjt_create_file
 	jr z,new_file
-	cp 9				;if error 9, file exists already. If other error quit.
+	cp 9					;if error 9, file exists already. If other error quit.
 	ret nz			
-	ld hl,save_append_txt		;ask if want to append data to existing file
+	ld hl,save_append_txt			;ask if want to append data to existing file
 	call kjt_print_string
 	call kjt_wait_key_press
 	ld a,"y"
@@ -152,15 +152,15 @@ save_loop
 	call kjt_page_in_video
 	ld hl,video_base
 	ld de,sysram_buffer
-	ld bc,8192			;size of video page / sysram save buffer
+	ld bc,8192				;size of video page / sysram save buffer
 	ldir
 	call kjt_page_out_video
 	
-	ld hl,video_base+8192		;how many bytes from offset to end of video page?
+	ld hl,video_base+8192			;how many bytes from offset to end of video page?
 	ld de,(video_address)
 	xor a
 	sbc hl,de
-	ld (save_chunk_size),hl		;default chunk size (to end of buffer)
+	ld (save_chunk_size),hl			;default chunk size (to end of buffer)
 	
 	ld a,(length_hi)			;if length is (still) > 64KB, use default chunk size
 	or a
@@ -172,7 +172,7 @@ save_loop
 	ld a,h
 	cp ((video_base+8192)/256)
 	jr nc,save_buffer
-	ld (save_chunk_size),de		;otherwise truncate chunk size to remaining length
+	ld (save_chunk_size),de			;otherwise truncate chunk size to remaining length
 	
 
 save_buffer
@@ -184,7 +184,7 @@ save_buffer
 	ld bc,sysram_buffer
 	add hl,bc
 	push hl
-	pop ix				;sysram buffer address to save from
+	pop ix					;sysram buffer address to save from
 	ld b,my_bank
 	ld hl,filename_txt
 	ld c,0
@@ -193,8 +193,8 @@ save_buffer
 	jr nz,save_error
 	
 	ld hl,video_base		
-	ld (video_address),hl		;all following chunks save from video base addr
-	
+	ld (video_address),hl			;all following chunks save from video base addr
+		
 	ld bc,(length_hi)			;adjust remaining length
 	ld hl,(length_lo)
 	ld de,(save_chunk_size)
@@ -205,7 +205,7 @@ save_buffer
 	dec bc
 	ld (length_hi),bc
 
-lhok	ld a,c				;loop until length = 0
+lhok	ld a,c					;loop until length = 0
 	or h
 	or l
 	jp nz,save_loop
@@ -217,7 +217,9 @@ lhok	ld a,c				;loop until length = 0
 ;-------------------------------------------------------------------------------------------------
 
 
-len_zero	ld a,7				
+len_zero	
+
+	ld a,7				
 	or a
 	ret
 	
@@ -265,6 +267,7 @@ bad_hex	ld a,$0c
 	
 	
 show_use
+
 	ld hl,use_txt
 	call kjt_print_string
 	xor a
@@ -302,7 +305,7 @@ ascii_to_hex_bcde
 	ld bc,0
 	ld de,0
 	
-hexclp	ld a,(hl)			;quit on SPACE
+hexclp	ld a,(hl)		;quit on SPACE
 	cp 32
 	ret z
 	or a			;error if NULL
@@ -317,19 +320,22 @@ rollp	sla e
 	dec a
 	jr nz,rollp
 
-	ld a,(hl)			;char to hex nybble
+	ld a,(hl)		;char to hex nybble
 	cp "a"
 	jr c,loca
 	sub $20
 loca	sub $3a			
 	jr c,zeronine
 	add a,$f9
-zeronine	add a,$a
+
+zeronine
+
+	add a,$a
 	or e
 	ld e,a			;insert into double_word result, bits 3:0
 	
 	inc hl		
-	jr hexclp			;next ascii char
+	jr hexclp		;next ascii char
 	
 hexerr	xor a
 	inc a
@@ -353,7 +359,7 @@ use_txt		db 11,"USAGE:",11
 
 save_append_txt	db "File exists. Append data (y/n)",11,0
 
-arg_addr		dw 0
+arg_addr	dw 0
 
 addr_linear_lo	dw 0
 addr_linear_hi	dw 0
@@ -361,8 +367,8 @@ addr_linear_hi	dw 0
 video_page	db 0
 video_address	dw 0
 
-length_hi		dw 0
-length_lo		dw 0
+length_hi	dw 0
+length_lo	dw 0
 
 save_chunk_size	dw 0
 

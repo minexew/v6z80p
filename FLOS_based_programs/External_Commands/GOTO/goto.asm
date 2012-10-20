@@ -25,52 +25,49 @@ include 	"flos_based_programs\code_library\program_header\test_flos_version.asm"
 
 ;--------------------------------------------------------------------------------------
 	
-	ld a,(hl)			; If no arguments supplied, show usage and delete goto envar
-	or a
-	jp z,show_usage
+		ld a,(hl)			; If no arguments supplied, show usage and delete goto envar
+		or a
+		jp z,show_usage
 
-	push hl			; "source" envar name is copied to var_name
-	ld de,label_name
-	ld b,4
-evnclp	ld a,(hl)
-	cp " "
-	jr z,evncdone
-	ld (de),a
-	inc hl
-	inc de
-	djnz evnclp
+		push hl			; "source" envar name is copied to var_name
+		ld de,label_name
+		ld b,4
+evnclp		ld a,(hl)
+		cp " "
+		jr z,evncdone
+		ld (de),a
+		inc hl
+		inc de
+		djnz evnclp
 evncdone	pop hl
-	
-	ld hl,goto_txt
-	ld de,label_name
-	call kjt_set_envar
-	ret
+		
+		ld hl,goto_txt
+		ld de,label_name
+		call kjt_set_envar
+		ret
 
 show_usage
-	
-	ld hl,goto_txt
-	call kjt_delete_envar
-	
-	ld hl,usage_txt
-	call kjt_print_string
-	xor a
-	ret
+		
+		ld hl,goto_txt
+		call kjt_delete_envar
+		
+		ld hl,usage_txt
+		call kjt_print_string
+		xor a
+		ret
 
 ;-------------------------------------------------------------------------------------------
 
-label_name
-
-	ds 5,0
+label_name	ds 5,0
 
 goto_txt	db "GOTO",0
 
 usage_txt	db "-------------------------------",11
-	db "GOTO.EXE - V1.00 By Phil Ruston",11
-	db "Usage:",11
-	db "GOTO script_label",11
-	db "-------------------------------",11,0
+		db "GOTO.EXE - V1.00 By Phil Ruston",11
+		db "Usage:",11
+		db "GOTO script_label",11
+		db "-------------------------------",11,0
 	
-		
 	
 ;-------------------------------------------------------------------------------------------
 
