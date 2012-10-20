@@ -2,6 +2,8 @@
 ; Library Code: FLOS File Requesters v0.27 - By Phil Ruston
 ;--------------------------------------------------------------------------------
 ;
+;SOURCE TAB SIZE = 10
+;
 ; Requires FLOS v602
 ;-------------------
 ;

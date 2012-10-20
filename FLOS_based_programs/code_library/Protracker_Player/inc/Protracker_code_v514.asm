@@ -2,6 +2,8 @@
 ; Protracker player V5.14 - Phil Ruston - www.retroleum.co.uk
 ; ---------------------------------------------------------------------------------------
 ;
+; SOURCE TAB SIZE = 10
+;
 ; Changes in 5.14
 ; ---------------
 ; 

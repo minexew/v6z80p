@@ -12,14 +12,14 @@ include "equates\system_equates.asm"
 
 ;-----------------------------------------------------------------------------
 	
-	ld b,8			; x coord of requester (in characters)
-	ld c,2			; y coord ""
+	ld b,8				; x coord of requester (in characters)
+	ld c,2				; y coord ""
 	ld hl,my_filename		; default filename
 
 	call load_requester
 	
 	call file_error_requester	; we dont care about the real disk return code
-				; we're just forcing the appearance of the requester here.
+					; we're just forcing the appearance of the requester here.
 	xor a
 	ret
 	

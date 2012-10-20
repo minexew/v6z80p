@@ -27,7 +27,9 @@ include "equates\system_equates.asm"
 	ld a,2
 	call w_set_element_selection
 
-demo_loop	ld a,$80
+demo_loop
+
+	ld a,$80
 	call w_highlight_selected_element
 
 	call kjt_wait_key_press
@@ -41,7 +43,9 @@ demo_loop	ld a,$80
 quit	xor a
 	ret
 		
-info_txt	db "Press TAB to cycle through selectable",11,"elements.. ESC to quit.",0
+info_txt	
+
+	db "Press TAB to cycle through selectable",11,"elements.. ESC to quit.",0
 
 ;---------------------------------------------------------------------------------
 
@@ -54,14 +58,14 @@ info_txt	db "Press TAB to cycle through selectable",11,"elements.. ESC to quit."
 
 window_list	dw win_inf_load			;Window 0
 		dw win_inf_save			;Window 1
-		dw win_inf_new_dir			;Window 2
+		dw win_inf_new_dir		;Window 2
 		dw win_inf_dir_exists		;Window 3
 		dw win_inf_overwrite		;Window 4
 
 ;------ Window Info -----------------------------------------------------------
 
 win_inf_load	db 0,0			;0 - position on screen of frame (x,y) 
-		db 23,20			;2 - dimensions of frame (x,y)
+		db 23,20		;2 - dimensions of frame (x,y)
 		db 0			;4 - current element/gadget selected
 		db 0			;5 - unused at present
 		db 1,1			;6 - position of first element (x,y)
@@ -117,7 +121,9 @@ win_inf_new_dir	db 0,0
 		db 255
 
 
-win_inf_dir_exists	db 0,0
+win_inf_dir_exists	
+
+		db 0,0
 		db 10,7
 		db 0
 		db 0
@@ -128,7 +134,9 @@ win_inf_dir_exists	db 0,0
 		db 255
 
 
-win_inf_overwrite	db 0,0
+win_inf_overwrite
+
+		db 0,0
 		db 13,7
 		db 0
 		db 0
@@ -238,9 +246,9 @@ win_element15	db 2
 dir_txt		db "DIR",0
 new_txt		db "NEW",0
 filename_txt	db "FILENAME",0
-save_txt		db "SAVE",0
+save_txt	db "SAVE",0
 cancel_txt	db "CANCEL",0
-load_txt		db "LOAD",0
+load_txt	db "LOAD",0
 new_dir_txt	db "NEW DIR",11,11," NAME?",0
 alr_exists_txt	db "ALREADY",11,11," EXISTS!",0
 ok_txt		db "OK",0
@@ -248,7 +256,7 @@ no_txt		db "NO",0
 overwrite_txt	db "FILE EXISTS",11,"OVERWRITE ?",0
 
 w_filename	ds 14,0
-w_dirname		ds 14,0
+w_dirname	ds 14,0
 line_selection	db 0
 
 ;--------------------------------------------------------------------------------------

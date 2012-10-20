@@ -1,3 +1,4 @@
+;TAB SIZE = 10
 ;--------------------------------------------------------------------------------------
 ; Demo of Support code for Window drawing routines
 ; Text input / numeric (hex) input with +/- programmable inc/dec and upper/lower limits

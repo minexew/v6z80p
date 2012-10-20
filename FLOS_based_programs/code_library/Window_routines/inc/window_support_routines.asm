@@ -2,6 +2,8 @@
 ; Window support routines v0.11 - by Phil Ruston, last updated: 27-9-2012
 ;------------------------------------------------------------------------------
 ;
+; TAB SIZE = 10
+;
 ; These routines support the "Window_draw.asm" code, providing a framework of
 ; standard routines to operate simple window / requester functions.
 ;

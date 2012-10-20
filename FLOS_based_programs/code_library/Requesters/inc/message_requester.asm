@@ -2,6 +2,8 @@
 ; Library Code: FLOS Message Requestor v0.01 - By Phil Ruston
 ;---------------------------------------------------------------------------------
 ;
+; SOURCE TAB SIZE = 10
+;
 ; Routine list:
 ; -------------
 ;

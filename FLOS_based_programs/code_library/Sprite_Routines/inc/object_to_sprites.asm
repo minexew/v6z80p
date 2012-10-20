@@ -1,3 +1,4 @@
+;TAB SIZE = 10
 ;
 ; object_to_sprites.asm for OSCA-based games - By Phil Ruston (This is not optimized at all)
 ;
