@@ -77,7 +77,9 @@ type	ld a,(hl)			; examine argument text, if 0: show use
 ;============================================================================================
 
 	
-main_loop	call get_next_char
+main_loop	
+	
+	call get_next_char
 	or a
 	ret z
 	
@@ -99,7 +101,8 @@ main_loop	call get_next_char
 	cp window_cols
 	jr nz,sameline
 crlf	ld b,0
-linefeed	inc c
+linefeed
+	inc c
 	ld a,window_rows
 	cp c
 	jr nz,noscroll
@@ -109,7 +112,9 @@ linefeed	inc c
 	call kjt_scroll_up
 	pop bc
 	
-noscroll	ld a,(line_count)
+noscroll
+
+	ld a,(line_count)
 	inc a
 	ld (line_count),a
 	ld e,a
@@ -121,7 +126,9 @@ noscroll	ld a,(line_count)
 	call more_prompt		
 	ret nz
 	
-sameline	ld (cursor_pos),bc
+sameline	
+
+	ld (cursor_pos),bc
 	jr main_loop
 	
 car_ret	ld b,0
@@ -176,7 +183,8 @@ nochhi	ld hl,text_buffer			;zero text buffer
 	jr z,ltb_ok			;file system error?
 	cp $1b			
 	jr z,ltb_ok			;Dont cared if attempted to load beyond end of file
-ltb_fail	pop bc
+ltb_fail
+	pop bc
 	pop de
 	pop hl
 	xor a				;if fail, return a zero (EOF) byte
@@ -226,7 +234,9 @@ more_prompt
 	
 ;-------------------------------------------------------------------------------------------
 	
-show_use	ld hl,usage_txt
+show_use
+
+	ld hl,usage_txt
 	call kjt_print_string
 	xor a
 	ret
@@ -239,9 +249,9 @@ include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
 ;---------------------------------------------------------------------------------------
 
-usage_txt		db "TYPE v1.04 - shows ASCII text",11,"Usage: TYPE filename",11,0
+usage_txt	db "TYPE v1.04 - shows ASCII text",11,"Usage: TYPE filename",11,0
 
-more_txt		db " More? (y/n) ",13,0
+more_txt	db " More? (y/n) ",13,0
 more_gone_txt	db "             ",0
 	
 text_buffer	ds 256,0			
@@ -253,7 +263,7 @@ line_count	db 0
 textfile_offset_lo	dw 0
 textfile_offset_hi	dw 0
 
-buffer_offset	db 0
+buffer_offset		db 0
 
 new_line		db 11,0
 

@@ -30,7 +30,7 @@ include 	"flos_based_programs\code_library\program_header\test_flos_version.asm"
 	pop hl
 	
 	ld a,(hl)
-	cp '#'			; check for # = silent running (make envars OSCA,FLOS)
+	cp '#'				; check for # = silent running (make envars OSCA,FLOS)
 	jr z,make_vars
 	
 	ld hl,flos_version_txt
@@ -82,7 +82,9 @@ show_hex_word
 	
 	
 	
-new_line	ld hl,cr_txt
+new_line	
+
+	ld hl,cr_txt
 	call kjt_print_string
 	ret
 	
@@ -94,9 +96,13 @@ osca	dw 0,0
 
 flos	dw 0,0
 
-flos_version_txt	db "FLOS V:",0
+flos_version_txt
 
-osca_version_txt	db "OSCA V:",0
+	db "FLOS V:",0
+
+osca_version_txt
+
+	db "OSCA V:",0
 
 output_txt ds 5,0
 

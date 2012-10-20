@@ -33,7 +33,7 @@ include 	"flos_based_programs\code_library\program_header\test_flos_version.asm"
 		or a    
 		jr nz,got_arg
 	    
-		call show_eeprom_slot_contents	;if args = null, show slot contents etc	
+		call show_eeprom_slot_contents		;if args = null, show slot contents etc	
 		
 		ld hl,slot_prompt_txt
 		call kjt_print_string
@@ -49,7 +49,7 @@ include 	"flos_based_programs\code_library\program_header\test_flos_version.asm"
 got_arg		call kjt_ascii_to_hex_word		; is entered text a valid number (result in DE)?
 		ld a,d
 		or e
-		jr z,badslot			; cant boot from slot 0
+		jr z,badslot				; cant boot from slot 0
 		
 		ld a,(number_of_slots)	
 		dec a
@@ -72,12 +72,12 @@ op2wait		xor a
 		ld a,$b8
 		call send_byte_to_pic
 		ld a,$00			
-		call send_byte_to_pic		; send address low
+		call send_byte_to_pic			; send address low
 		ld a,$00		
-		call send_byte_to_pic		; send address mid
+		call send_byte_to_pic			; send address mid
 		ld a,(slot_number)
 		sla a
-		call send_byte_to_pic		; send address high
+		call send_byte_to_pic			; send address high
 
 		ld a,$88				; send reconfigure command
 		call send_byte_to_pic
@@ -147,7 +147,7 @@ notszero	ld h,a
 		ex de,hl
 		call read_eeprom_page
 		
-		ld hl,page_buffer+$de		;location of ID (filename ASCII)
+		ld hl,page_buffer+$de			;location of ID (filename ASCII)
 		ld a,(hl)
 		or a
 		jr z,unk_id
@@ -169,15 +169,15 @@ id_ok		call kjt_print_string
 
 get_eeprom_type
 
-		in a,(sys_eeprom_byte)		; clear shift reg count with a read
+		in a,(sys_eeprom_byte)			; clear shift reg count with a read
 
 		ld a,$88				; send PIC the command to prompt the EEPROM to
-		call send_byte_to_pic		; return its ID code byte
+		call send_byte_to_pic			; return its ID code byte
 		ld a,$53
 		call send_byte_to_pic
 			
-		ld d,32				; D counts timer overflows
-		ld a,1<<pic_clock_input		; prompt PIC to send a byte by raising PIC clock line
+		ld d,32					; D counts timer overflows
+		ld a,1<<pic_clock_input			; prompt PIC to send a byte by raising PIC clock line
 		out (sys_pic_comms),a
 wbc_byte2	in a,(sys_hw_flags)			; have 8 bits been received?		
 		bit 4,a
@@ -186,19 +186,19 @@ wbc_byte2	in a,(sys_hw_flags)			; have 8 bits been received?
 		and 4
 		jr z,wbc_byte2	
 		out (sys_clear_irq_flags),a		; clear timer overflow flag
-		dec d				; dec count of overflows,
+		dec d					; dec count of overflows,
 		jr nz,wbc_byte2					
-		xor a				; if waited too long give up (and drop PIC clock)
+		xor a					; if waited too long give up (and drop PIC clock)
 		out (sys_pic_comms),a
 		jr no_id				
 gbcbyte2	xor a			
-		out (sys_pic_comms),a		; drop PIC clock line, PIC will then wait for next high 
-		in a,(sys_eeprom_byte)		; read byte received, clear bit count
+		out (sys_pic_comms),a			; drop PIC clock line, PIC will then wait for next high 
+		in a,(sys_eeprom_byte)			; read byte received, clear bit count
+	
+		cp $bf					; If SST25VF type EEPROM is present, we'll have received
+		jr nz,got_eid				; manufacturer's ID ($BF) not the capacity
 
-		cp $bf				; If SST25VF type EEPROM is present, we'll have received
-		jr nz,got_eid			; manufacturer's ID ($BF) not the capacity
-
-		ld b,0				; wait a while to ensure PIC is ready for command
+		ld b,0					; wait a while to ensure PIC is ready for command
 deloop1		djnz deloop1
 		
 		ld a,$88				; Use alternate "Get EEPROM ID" command to find ID 
@@ -218,7 +218,7 @@ slotslp		sla a
 		ld (number_of_slots),a
 		ret
 
-no_id		xor a				;error reading eeprom ID
+no_id		xor a					;error reading eeprom ID
 		inc a
 		ret
 		
@@ -230,11 +230,11 @@ read_pic_byte
 		ld (hl),0
 		ld c,8				                 
 nxt_bit		sla (hl)
-		ld a,1<<pic_clock_input		; prompt PIC to present next bit by raising PIC clock line
+		ld a,1<<pic_clock_input			; prompt PIC to present next bit by raising PIC clock line
 		out (sys_pic_comms),a
 		ld b,128				; wait a while so PIC can keep up..
 pause_lp1	djnz pause_lp1
-		xor a				; drop clock line again
+		xor a					; drop clock line again
 		out (sys_pic_comms),a
 		in a,(sys_hw_flags)			; read the bit into shifter
 		bit 3,a
