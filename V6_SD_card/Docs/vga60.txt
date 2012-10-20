@@ -1,6 +1,6 @@
 
-VGA60.EXE - Sets the VGA mode to 60Hz
-(standard, default mode)
+VGA60.EXE - OBSOLETE COMMAND
 
-Use: VGA60 (no args)
+Replaced by VGA.EXE
+
 

@@ -1,6 +1,6 @@
 
-VGA50.EXE - Sets the VGA mode to 50Hz
-(a non-standard mode)
+VGA50.EXE - OBSOLETE COMMAND
 
-Use: VGA50 (no args)
+Replaced by VGA.EXE
+
 
