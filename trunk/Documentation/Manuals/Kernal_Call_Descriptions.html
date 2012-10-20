@@ -5,7 +5,7 @@
 <h3><span style="text-decoration: underline; font-weight: bold;">FLOS
 v608 Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
 Last updated 14-10-2012</span></h3>
-<pre><span style="text-decoration: underline; font-weight: bold;"></span><br>The following FLOS kernal routines can be executed simply by using a "CALL name"<br>instruction, with registers pre-set to the routines requirements. <br><br>EG:- <br><br>---------------------------------------------------------------------------------<br><br>         LD HL,  my_text<br>         CALL    kjt_print_string<br><br>         [rest of program..]<br>	<br>my_text  DB "HELLO WORLD!",0<br><br>----------------------------------------------------------------------------------<br><br><br><span style="text-decoration: underline;">Notes:</span><br><br>Kernal calls should not be made when the Video RAM is paged in. The only routine<br>that is guaranteed to work in that situation is "kjt_page_out_video"</pre>
+<pre><span style="text-decoration: underline; font-weight: bold;"></span><br>The following FLOS kernal routines can be executed simply by using a "CALL name"<br>instruction, with registers pre-set to the routines requirements (Remember to<br>INCLUDE the labels definitions from the equates folder.)<br><br>EG:- <br><br>---------------------------------------------------------------------------------<br><br>         LD HL,  my_text<br>         CALL    kjt_print_string<br><br>         [rest of program..]<br>	<br>my_text  DB "HELLO WORLD!",0<br><br>----------------------------------------------------------------------------------<br><br><br><span style="text-decoration: underline;">Notes:</span><br><br>Kernal calls should not be made when the Video RAM is paged in. The only routine<br>that is guaranteed to work in that situation is "kjt_page_out_video"</pre>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span>It should be assumed that Kernal calls trash all registers, unless a routine's<br>documentation says otherwise.</pre>
 <span style="text-decoration: underline; font-weight: bold;"><br>
 Kernal Call Index:</span><br>
@@ -826,9 +826,7 @@ Kernal Call Index:</span><br>
 
 <pre> A = $0c : Bad chars for hex<br>   = $1A : Number is greater than $FFFF<br>   = $1F : No chars found#<br><br></pre><hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;"><a name="kjt_ascii_to_hex32"></a>kjt_ascii_to_hex32</span>
-<br>Action: converts text string version of hex number at HL to actual hex word in BC:DE
-<br>Input Registers&nbsp; : <br><br> HL = source text (the routine scans from this location to the first&nbsp;character that is not a space)
-<br>Output Registers :<br><br> BC:DE = Result<br> HL    = If result OK, location of first space character after the hex string (IE: usually a space or null character)<br><br>&nbsp;ZF = set if all OK (also A=$00), Else:<br><br>&nbsp;A  = $0c : Bad chars for hex<br>    = $1A : Number is greater than $FFFFFFFF<br>    = $1F : No chars found<br></pre>
+<br>Action: converts text string version of hex number at HL to actual hex word in BC:DE<br><br>Input Registers&nbsp; : <br><br> HL = source text (the routine scans from this location to the first&nbsp;character that is not a space)<br><br>Output Registers :<br><br> BC:DE = Result<br> HL    = If result OK, location of first space character after the hex string (IE: usually a space or null character)<br><br>&nbsp;ZF = set if all OK (also A=$00), Else:<br><br>&nbsp;A  = $0c : Bad chars for hex<br>    = $1A : Number is greater than $FFFFFFFF<br>    = $1F : No chars found<br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_dont_store_registers"></a>kjt_dont_store_registers</span></pre>
 <pre><br>Action: Prevents the OS from noting the register values when a program exits and returns to OS.</pre>
