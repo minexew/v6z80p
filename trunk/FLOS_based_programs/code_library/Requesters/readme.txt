@@ -16,15 +16,12 @@ How to add the necessary files to a project:
 --------------------------------------------
 
 The file requester routines utilise the window draw and support code. Make sure
-the following include path is set for Pasmo: (EG: in assemble.bat)
- 
--I %v6z80pdir%\FLOS_based_programs\code_library\
+the V6Z78P project base dir is included in your assembly path and add one of the
+following lines to your .asm source:
 
-and add one of the following lines to your .asm source:
-
-include	"requesters\inc\file_requesters.asm"
+include	"flos_based_programs\code_library\requesters\inc\file_requesters.asm"
 or
-include	"requesters\inc\file_requesters_with_rs232.asm"
+include	"flos_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 
 
 Usage:
