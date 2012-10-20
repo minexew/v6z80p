@@ -26,8 +26,8 @@
 ;
 ;--------------------------------------------------------------------------
 
-	include "window_routines\inc\window_draw_routines.asm"	; comment these lines out if
-	include "window_routines\inc\window_support_routines.asm"	; any other code includes them
+	include "flos_based_programs\code_library\window_routines\inc\window_draw_routines.asm"	; comment these lines out if
+	include "flos_based_programs\code_library\window_routines\inc\window_support_routines.asm"	; any other code includes them
 
 ;--------------------------------------------------------------------------
 

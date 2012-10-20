@@ -123,8 +123,8 @@
 
 ;--------------------------------------------------------------------------
 
-	include "window_routines\inc\window_draw_routines.asm"
-	include "window_routines\inc\window_support_routines.asm"
+	include "flos_based_programs\code_library\window_routines\inc\window_draw_routines.asm"
+	include "flos_based_programs\code_library\window_routines\inc\window_support_routines.asm"
 
 ;--------------------------------------------------------------------------
 
