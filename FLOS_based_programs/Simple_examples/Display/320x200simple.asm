@@ -2,12 +2,13 @@
 ; Ultra simple OSCA video demonstration: Sets up a 320x200 pixel, single bitplane
 ; display window in linear bitmap mode. Writes a byte to it each frame to successive
 ; locations.
+; (Source tab width=8)
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
@@ -32,15 +33,15 @@ start	ld a,0
 	ld (vreg_vidpage),a		; read / writes to VRAM page 0
 
 	ld hl,0
-	ld (bitplane0a_loc),hl	; start address of video datafetch for window [15:0]
+	ld (bitplane0a_loc),hl		; start address of video datafetch for window [15:0]
 	ld a,0
-	ld (bitplane0a_loc+2),a	; start address of video datafetch for window [18:16]
+	ld (bitplane0a_loc+2),a		; start address of video datafetch for window [18:16]
 
 	
 ;---------Set up palette -----------------------------------------------------
 
 
-	ld hl,palette		; background = black, colour 1 = white
+	ld hl,palette			; background = black, colour 1 = white
 	ld (hl),0
 	inc hl
 	ld (hl),0
@@ -55,28 +56,28 @@ start	ld a,0
 
 v_loop	call kjt_wait_vrt		; wait for last line of display
 	
-	call kjt_page_in_video	; page video RAM in at $2000-$3fff
+	call kjt_page_in_video		; page video RAM in at $2000-$3fff
 	
 	ld hl,video_base		; HL = $2000
 	ld de,(offset)		
 	add hl,de			; add on offset
-	ld (hl),$ff		; write 255 to a location in video RAM
+	ld (hl),$ff			; write 255 to a location in video RAM
 	inc de
-	ld a,d			; advance offset and keep it within $0-$1fff
+	ld a,d				; advance offset and keep it within $0-$1fff
 	and $1f
 	ld d,a
 	ld (offset),de
 	
-	call kjt_page_out_video	; page video RAM out of $2000-$3fff
+	call kjt_page_out_video		; page video RAM out of $2000-$3fff
 	
 	call kjt_get_key		; check keyboard buffer, get scancode in A
-	cp $76			; check scancode and
-	jr nz,v_loop		; loop if ESC key not pressed
+	cp $76				; check scancode and
+	jr nz,v_loop			; loop if ESC key not pressed
 
 ;-------------------------------------------------------------------------------
 
-	call kjt_flos_display	; restore video registers to FLOS display
-	xor a			; quit to OS
+	call kjt_flos_display		; restore video registers to FLOS display
+	xor a				; quit to OS
 	ret
 
 ;-----------------------------------------------------------------------------------
