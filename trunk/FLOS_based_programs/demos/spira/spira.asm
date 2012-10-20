@@ -12,6 +12,8 @@ include "system_equates.asm"
 ; By Phil Ruston 08 - www.retroleum.co.uk V1.00
 ;---------------------------------------------------------------------------------------
 
+;SOURCE TAB SIZE = 10
+
 req_hw_version	equ $263
 half_vbuffer_size	equ $8000		; IE: 2nd video buffer starts at $10000
 

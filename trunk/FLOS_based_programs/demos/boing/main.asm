@@ -1,4 +1,6 @@
-
+;
+;SOURCE TAB SIZE = 10
+;
 ;---Standard header for OSCA and OS ----------------------------------------
 
 include "kernal_jump_table.asm"
