@@ -2,26 +2,28 @@
 ; LineCop example: Changes a single scanline (border) colour to white
 ;
 ; (The FLOS command "LCD 0" can be used to disassemble the linecop program once this program has run)
+; (Source tab width=8)
 
 ;---Standard header for OSCA and FLOS  -----------------------------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
+
 
 	org $5000
 
 ;--------------------------------------------------------------------------------------------------------------
 
 		ld b,end_my_linecop_list-my_linecop_list	; copy LineCop instructions to $70000+
-		ld hl,0					; IE: Locations accessible by LineCop system
+		ld hl,0						; IE: Locations accessible by LineCop system
 		ld e,7					
 		ld ix,my_linecop_list
-copyloop		ld a,(ix)
+copyloop	ld a,(ix)
 		push hl
 		push bc
 		push de
-		call kjt_write_sysram_flat			; put A @ (E:HL)
+		call kjt_write_sysram_flat		; put A @ (E:HL)
 		pop de
 		pop bc
 		pop hl

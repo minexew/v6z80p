@@ -1,11 +1,13 @@
 ; Ultra simple audio example - play a continuous tone
 ; Note: Requires OSCA v672+
+; (Source tab width=8)
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
+
 
 ;-----------------------------------------------------------------------------------------
 	org $5000		
@@ -101,12 +103,12 @@ play_sound
 ;-----------------------------------------------------------------------------------------
 
 dma_wait	in a,(sys_vreg_read)		;wait for the beginning of a scan line 
-	and $40				;(ie: after audio DMA) This is so that all the
-	ld b,a				;audio registers are cleanly initialized
+		and $40				;(ie: after audio DMA) This is so that all the
+		ld b,a				;audio registers are cleanly initialized
 dma_loop	in a,(sys_vreg_read)
-	and $40
-	cp b
-	jr z,dma_loop
-	ret
+		and $40
+		cp b
+		jr z,dma_loop
+		ret
 		
 ;-----------------------------------------------------------------------------------------

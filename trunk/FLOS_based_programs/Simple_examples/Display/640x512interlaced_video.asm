@@ -3,13 +3,14 @@
 ;  Fills with individual pixels (using a SLOW put_pixel routine)
 ;
 ; ** Hi-Res / Interlace modes work on TV-out only! **
-
+; (Source tab width=8)
 
 ;---Standard header for OSCA and FLOS ----------------------------------------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
+
 
 	org $5000
 
@@ -26,25 +27,25 @@ start	ld a,0
 	ld a,$8c
 	ld (vreg_window),a		; set x window size/position (320 pixels)
 
-	ld ix,bitplane0a_loc	; Even field pic video address
+	ld ix,bitplane0a_loc		; Even field pic video address
 	ld hl,0					
 	ld a,0 
 	ld (ix),l			;\ 
-	ld (ix+1),h		;- Video fetch start address for odd frame
-	ld (ix+2),a		;/
+	ld (ix+1),h			;- Video fetch start address for odd frame
+	ld (ix+2),a			;/
 		
 	ld ix,bitplane0b_loc	
 	ld hl,320		
 	ld a,0
 	ld (ix),l			;\ 
-	ld (ix+1),h		;- Video fetch start address for even frame
-	ld (ix+2),a		;/
+	ld (ix+1),h			;- Video fetch start address for even frame
+	ld (ix+2),a			;/
 
-	ld a,320/2		; divide by 2 as modulo skips *words*
-	ld (bitplane_modulo),a	; set modulo to skip alternate lines (so that display in VRAM is continuous)
+	ld a,320/2			; divide by 2 as modulo skips *words*
+	ld (bitplane_modulo),a		; set modulo to skip alternate lines (so that display in VRAM is continuous)
 
-	ld a,%00001100		; Set hi-res and interlace modes	
-	ld (vreg_ext_vidctrl),a	; Note: The LineCop code sets vreg_vidctrl so no there's point setting it here also 
+	ld a,%00001100			; Set hi-res and interlace modes	
+	ld (vreg_ext_vidctrl),a		; Note: The LineCop code sets vreg_vidctrl so no there's point setting it here also 
 
 
 ;--------- Copy interlace LineCop instructions to LineCop accessible RAM and start LineCop -------------------------------
@@ -52,16 +53,16 @@ start	ld a,0
 
 linecop_code_loc equ 0
 	
-	ld a,13			; $70000 (Start of LineCop RAM) = Bank 13
+	ld a,13				; $70000 (Start of LineCop RAM) = Bank 13
 	call kjt_forcebank
 
 	ld hl,my_linecop_code
-	ld de,$8000		; upper bank of CPU address space
+	ld de,$8000			; upper bank of CPU address space
 	ld bc,end_of_my_linecop_code-my_linecop_code
 	ldir
 		
-	ld hl,1			; address in LineCop accessible memory of the LineCop code	
-	ld (vreg_linecop_lo),hl	; tell OSCA the location of the LineCop list (bit 0 = enable linecop)
+	ld hl,1				; address in LineCop accessible memory of the LineCop code	
+	ld (vreg_linecop_lo),hl		; tell OSCA the location of the LineCop list (bit 0 = enable linecop)
 
 	ld a,0
 	call kjt_forcebank
@@ -71,7 +72,7 @@ linecop_code_loc equ 0
 
 
 	ld hl,colours
-	ld de,palette		; Write 16 colours to palette
+	ld de,palette			; Write 16 colours to palette
 	ld bc,32
 	ldir
 
@@ -82,9 +83,9 @@ linecop_code_loc equ 0
 
 
 	ld ix,y_offset_list		; precalculate a 512 entry y-offset look-up table
-	ld hl,0			; (could use the OSCA maths assist unit instead)
+	ld hl,0				; (could use the OSCA maths assist unit instead)
 	ld bc,512
-	ld de,320/4		; use quarter values so result fits in a 16 bit word
+	ld de,320/4			; use quarter values so result fits in a 16 bit word
 mk_tab	ld (ix),l
 	ld (ix+1),h
 	inc ix
@@ -98,18 +99,18 @@ mk_tab	ld (ix),l
 
 ;----------------------------------------------------------------------------------
 
-	ld de,0			;default x coordinate (0-639) 
+	ld de,0				;default x coordinate (0-639) 
 	ld (x_coord),de		
-	ld (y_coord),de		;default y coordinate (0-511)		
+	ld (y_coord),de			;default y coordinate (0-511)		
 	ld a,1
 	ld (pixel_colour),a		;default pixel colour
 
 
 fill_loop	
 	
-	call hires_put_pixel	;plot the pixel
+	call hires_put_pixel		;plot the pixel
 	
-	ld hl,(x_coord)		;x=x+1 (move to next pixel across..)
+	ld hl,(x_coord)			;x=x+1 (move to next pixel across..)
 	inc hl
 	ld (x_coord),hl
 	ld de,640
@@ -118,7 +119,7 @@ fill_loop
 	jr nz,adv_done
 
 	ld (x_coord),hl
-	ld hl,(y_coord)		;y=y+1 (next line down..)
+	ld hl,(y_coord)			;y=y+1 (next line down..)
 	inc hl
 	ld (y_coord),hl
 	ld de,512
@@ -134,8 +135,8 @@ fill_loop
 adv_done
 		
 	call kjt_get_key		; check keyboard buffer, get scancode in A
-	cp $76			; check scancode and
-	jr nz,fill_loop		; loop if ESC key not pressed
+	cp $76				; check scancode and
+	jr nz,fill_loop			; loop if ESC key not pressed
 
 quit	ld a,$ff			; restart FLOS on exit
 	ret
@@ -168,15 +169,15 @@ hires_put_pixel
 	add hl,hl
 	rl a			
 		
-	ld de,(x_coord)		;divide x coord by 2 as there are two pixels at each byte location
-	ld c,0			;c = left (0), right (1) nybble select
+	ld de,(x_coord)			;divide x coord by 2 as there are two pixels at each byte location
+	ld c,0				;c = left (0), right (1) nybble select
 	srl d
 	rr e
 	rr c
 	add hl,de			;hl = address in VRAM where pixel is to go [15:0]
-	adc a,0			;a  = address in VRAM where pixel is to go [16]			
+	adc a,0				;a  = address in VRAM where pixel is to go [16]			
 
-	ld b,h			;convert linear address to 8KB page and offset 0-8191 byte offset
+	ld b,h				;convert linear address to 8KB page and offset 0-8191 byte offset
 	sla b
 	rl a
 	sla b
@@ -184,10 +185,10 @@ hires_put_pixel
 	sla b
 	rl a
 	ld (vreg_vidpage),a		;select relevant 8KB video page
-	ld a,h			;adjust pixel location to position of VRAM window in Z80 space ($2000-$3FFF)
+	ld a,h				;adjust pixel location to position of VRAM window in Z80 space ($2000-$3FFF)
 	and $1f
 	or $20
-	ld h,a			;adjust 
+	ld h,a				;adjust 
 	
 	bit 7,c
 	jr nz,repl_right_pixel
@@ -197,10 +198,10 @@ hires_put_pixel
 	rrca
 	rrca
 	rrca
-	and $f0			;only colours 0-15 can be used
-	ld b,a
+	and $f0				;only colours 0-15 can be used
+	ld b,a	
 	ld a,(hl)			;read existing byte
-	and $0f			;mask off (protect) the right side pixel
+	and $0f				;mask off (protect) the right side pixel
 	or b
 	ld (hl),a			;write new byte
 	jr pixel_done
@@ -211,13 +212,13 @@ repl_right_pixel
 	and $0f
 	ld b,a
 	ld a,(hl)			;read existing byte
-	and $f0			;mask off (protext) the ledt side pixel
+	and $f0				;mask off (protext) the ledt side pixel
 	or b
 	ld (hl),a			;write new bytes
 
 pixel_done
 	
-	in a,(sys_mem_select)	; page in video RAM
+	in a,(sys_mem_select)		; page in video RAM
 	and $bf
 	out (sys_mem_select),a
 	ret
@@ -249,9 +250,9 @@ end_of_my_linecop_code
 
 ;------------------------------------------------------------------------------------
 
-colours	dw $000,$00f,$f00,$f0f,$0f0,$0ff,$ff0,$fff,$008,$800,$808,$080,$088,$880,$888
+colours		dw $000,$00f,$f00,$f0f,$0f0,$0ff,$ff0,$fff,$008,$800,$808,$080,$088,$880,$888
 
 y_offset_list
 
-	ds 512*2,0
+		ds 512*2,0
 	
