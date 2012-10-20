@@ -19,7 +19,7 @@ include "equates\system_equates.asm"
 		
 ;--------------------------------------------------------------------------
 	
-my_text	db "Hello World!",11,0	; Text followed by <CR+LF> and zero
+my_text	db "Hello World!",10,13,0	; Text followed by <CR+LF> and zero
 
 ;----------------------------------------------------------------------------
 ;----- End of program  ------------------------------------------------------
