@@ -10,11 +10,8 @@ Last updated 27/09/2012 - Window draw code version 0.11
 The routines allow the user to create and operate simple windows
 (EG: requesters) with minimal effort. 
 
-Make sure the following include path is set for Pasmo: (EG: in assemble.bat)
- 
--I %v6z80pdir%\FLOS_based_programs\code_library\
-
-and add the following line(s) to your .asm source:
+Make sure the V6Z80P project base dir is included into your assembly
+path and add the following line(s) to your .asm source:
 
 include	"Window routines/inc/window_draw_routines.asm"
 
