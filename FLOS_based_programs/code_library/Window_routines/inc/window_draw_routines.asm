@@ -556,7 +556,7 @@ w_inv_pen		db 0
 w_draw_pen	db 0
 w_active_window	db 0
 
-w_my_chars	incbin "window_routines\inc\winchrs3.fff"
+w_my_chars	incbin "flos_based_programs\code_library\window_routines\inc\winchrs3.fff"
 
 ;--------------------------------------------------------------------------------
 
