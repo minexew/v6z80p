@@ -2,8 +2,10 @@
 ; Pipes Demo (Line Sync'd Blits) - Phil Ruston 2009
 ; -------------------------------------------------
 ;
-; V1.01 - Automatic NTSC / VGA adjustments
-
+;V1.01 - Automatic NTSC / VGA adjustments
+;
+;SOURCE TAB SIZE = 10
+;
 ;---Standard header for OSCA and FLOS  -----------------------------------------------------------------------
 
 include "kernal_jump_table.asm"

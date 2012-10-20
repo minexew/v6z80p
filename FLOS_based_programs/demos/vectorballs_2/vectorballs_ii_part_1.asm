@@ -1,4 +1,6 @@
-
+;
+;SOURCE TAB SIZE = 10
+;
 ;---Standard header for OSCA and OS ----------------------------------------
 
 include "kernal_jump_table.asm"
@@ -10,7 +12,7 @@ include "system_equates.asm"
 req_hw_version	equ $263
 
 ;-----------------------------------------------------------------------------------------------------------
-; Check V5Z80P hardware revision is appropriate for code
+; Check hardware revision is appropriate for code
 ;-----------------------------------------------------------------------------------------------------------
 
 	call kjt_get_version

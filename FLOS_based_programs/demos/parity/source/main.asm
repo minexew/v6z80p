@@ -2,6 +2,8 @@
 ; * 'Parity' demo (Linecop test) - Phil Ruston. www.retroleum.co.uk 09 *
 ; **********************************************************************
 ;
+; SOURCE TAB SIZE = 10
+;
 ; Note: Code is a bit flaky :)
 ;
 ; V1.02 - Quick update to use single file loading system

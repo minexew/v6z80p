@@ -1,5 +1,7 @@
 ; creates a music player routine at $8000 for vectorballs 2 demo
-
+;
+;SOURCE TAB SIZE = 10
+;
 ;---Standard header for OSCA and OS ----------------------------------------
 
 include "kernal_jump_table.asm"
