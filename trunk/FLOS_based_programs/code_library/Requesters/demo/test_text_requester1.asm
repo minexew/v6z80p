@@ -28,7 +28,7 @@ my_text	db "Here is some text for the requester",0
 		
 ;---------------------------------------------------------------------------------
 
-	include	"requesters\inc\message_requester.asm"
+	include	"flos_based_programs\code_library\requesters\inc\message_requester.asm"
 	
 ;---------------------------------------------------------------------------------
 

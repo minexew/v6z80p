@@ -101,7 +101,7 @@ hw_error_txt
 
 	
 ;----------------------------------------------------------------------------
-include	"requesters\inc\file_requesters_with_rs232.asm"
+include	"flos_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 ;----------------------------------------------------------------------------
 
 my_filename

@@ -79,7 +79,7 @@ hw_error_txt
 
 
 ;----------------------------------------------------------------------------
-include	"requesters\inc\file_requesters.asm"
+include	"flos_based_programs\code_library\requesters\inc\file_requesters.asm"
 ;----------------------------------------------------------------------------
 
 my_filename
