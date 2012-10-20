@@ -16,18 +16,18 @@ load_buffer equ $8000
 
 ;-----------------------------------------------------------------------------
 	
-	ld b,8			; x coord of requester (in characters)
-	ld c,2			; y coord ""
+	ld b,8				; x coord of requester (in characters)
+	ld c,2				; y coord ""
 	ld hl,my_filename		; default filename
 
 	call load_requester
 	jr z,reqok
-	cp $ff			; if A = FF, the operation was aborted
+	cp $ff				; if A = FF, the operation was aborted
 	jr z,aborted
 	jr load_error
 	
 reqok	ld hl,load_buffer		; address to load data to - note: "kjt_find_file" has
-	ld b,0			; already been called by requester
+	ld b,0				; already been called by requester
 	call kjt_force_load
 	jr nz,load_error
 
@@ -45,8 +45,8 @@ aborted	ld hl,no_load_txt
 	
 load_error
 
-	or a			;if A =  0 the error was hardware related
-	jr z,hw_error		;if A <> 0 its a file system error 
+	or a				;if A =  0 the error was hardware related
+	jr z,hw_error			;if A <> 0 its a file system error 
 	push af			
 	call file_error_requester
 	ld hl,load_error_txt
@@ -55,9 +55,11 @@ load_error
 	ret
 
 
-hw_error	call hw_error_requester	;the user's program may loop back for another
+hw_error
+	
+	call hw_error_requester		;the user's program may loop back for another
 	ld hl,hw_error_txt		;attempt (following saying yes to a drive remount)
-	call kjt_print_string	;or just give up immediately, as is the case here.
+	call kjt_print_string		;or just give up immediately, as is the case here.
 	ret
 
 	

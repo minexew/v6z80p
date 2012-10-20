@@ -14,19 +14,19 @@ include "equates\system_equates.asm"
 
 ;-----------------------------------------------------------------------------
 	
-	ld b,8			; x coord of requester (in characters)
-	ld c,2			; y coord ""
+	ld b,8				; x coord of requester (in characters)
+	ld c,2				; y coord ""
 	ld hl,my_filename		; default filename
 
 	call save_requester
 	jr z,reqok
-	cp $ff			; if A = FF, the operation was aborted
+	cp $ff				; if A = FF, the operation was aborted
 	jr z,aborted
 	jr sav_error
 	
 reqok	ld ix,data_to_save		; source address
-	ld b,0			; source bank
-	ld c,0			; bits 23:16 of length
+	ld b,0				; source bank
+	ld c,0				; bits 23:16 of length
 	ld de,18			; bits 15:0 of length
 	call kjt_save_file		
 	jr c,hw_error
@@ -42,8 +42,10 @@ aborted	ld hl,no_save_txt
 	xor a
 	ret
 	
-sav_error	or a			;if A =  0 the error was hardware related
-	jr z,hw_error		;if A <> 0 its a file system error 
+sav_error	
+
+	or a				;if A =  0 the error was hardware related
+	jr z,hw_error			;if A <> 0 its a file system error 
 	push af			
 	call file_error_requester
 	ld hl,save_error_txt
@@ -51,7 +53,9 @@ sav_error	or a			;if A =  0 the error was hardware related
 	pop af
 	ret
 	
-hw_error	call hw_error_requester
+hw_error	
+	
+	call hw_error_requester
 	ld hl,hw_error_txt
 	call kjt_print_string
 	ret

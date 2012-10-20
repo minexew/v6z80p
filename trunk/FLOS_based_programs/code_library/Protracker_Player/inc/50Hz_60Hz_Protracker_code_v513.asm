@@ -4,6 +4,8 @@
 ; BEWARE: This code uses entry 0 of the hardware mult_table!
 ; ---------------------------------------------------------------------------------------
 ;
+; SOURCE TAB SIZE = 10
+;
 ; Changes in 5.13
 ; ---------------
 ;

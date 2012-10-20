@@ -14,7 +14,7 @@ include "equates\system_equates.asm"
 
 ;-----------------------------------------------------------------------------
 
-	ld a,$25			;example error code in A
+	ld a,$25		;example error code in A
 	ld b,3			;x coord of window
 	ld c,2			;y coord of window
 	call show_req1

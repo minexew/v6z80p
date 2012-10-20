@@ -1,6 +1,8 @@
 ; V6Z80P EEPROM ROUTINES V1.01
 ; ----------------------------
 ;
+;SOURCE TAB SIZE = 10
+;
 ; Note: Uses some sofware timing loops so it's probably best to disable/re-enable
 ; interrupts around calls.
 ;  

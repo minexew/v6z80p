@@ -74,13 +74,13 @@ find_fn	ld iy,16			;length of each entry in index
 	or a
 	ret
 	
-not_fnf	ld de,(fn_addr)		;compare entry filename with desired filename
+not_fnf	ld de,(fn_addr)			;compare entry filename with desired filename
 	ld b,13
 	call kjt_compare_strings
 	jr c,found_file
 	
 	ld hl,(bulk_offset)		;not a filename match, so add the length of this
-	ld de,(index_buffer+13)	;file to the offset total
+	ld de,(index_buffer+13)		;file to the offset total
 	add hl,de
 	ld (bulk_offset),hl
 	ld hl,(bulk_offset+2)
@@ -89,7 +89,7 @@ not_fnf	ld de,(fn_addr)		;compare entry filename with desired filename
 	ld d,0
 	adc hl,de
 	ld (bulk_offset+2),hl
-	jr find_fn		;and load next index entry
+	jr find_fn			;and load next index entry
 	
 
 found_file
@@ -128,8 +128,8 @@ found_file
 ;--------------------------------------------------------------------------------------------------
 
 fn_addr		dw 0
-load_addr		dw 0
-load_bank		db 0
+load_addr	dw 0
+load_bank	db 0
 
 bulk_offset	dw 0,0
 index_buffer	ds 16,0

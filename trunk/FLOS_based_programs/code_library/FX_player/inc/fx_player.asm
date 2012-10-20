@@ -6,7 +6,9 @@
 ; Call "new_fx" with SFX number in A to initialize a new effect
 ;
 ; Call "play_fx" every frame to update registers / run scripts etc.
-
+;
+;SOURCE TAB SIZE = 10
+;
 ;----------------------------------------------------------------------------------------
 
 new_fx	

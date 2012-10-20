@@ -2,6 +2,8 @@
 ; Library Code: FLOS File Requestors with RS232 RX/TX v0.06 By Phil Ruston
 ;--------------------------------------------------------------------------------
 ;
+;SOURCE TAB SIZE = 10
+;
 ; Requires FLOS v602
 ;-------------------
 ;

@@ -13,14 +13,14 @@ include "system_equates.asm"
 ;--------- INIT SPRITES -----------------------------------------------------------
 
 
-	ld a,%10000000		; page in sprite RAM
+	ld a,%10000000			; page in sprite RAM
 	out (sys_mem_select),a
 	ld hl,my_sprites		; upload sprites to sprite RAM	
 	ld de,sprite_base
 	ld bc,end_of_sprites-my_sprites
 	ldir
 	xor a
-	out (sys_mem_select),a	; page out sprite RAM
+	out (sys_mem_select),a		; page out sprite RAM
 
 	ld hl,my_colours		; upload palette
 	ld de,palette
@@ -42,7 +42,7 @@ left_border 	equ $7f ; first visible leftmost pixel on the display (currently se
 
 
 loop1	
-	ld hl,vreg_read		;wait for last line of visible disply (lower border)
+	ld hl,vreg_read			;wait for last line of visible disply (lower border)
 wait_ras1	bit 2,(hl)
 	jr z,wait_ras1
 wait_ras2	bit 2,(hl)
@@ -52,32 +52,32 @@ wait_ras2	bit 2,(hl)
 	inc (hl)
 		
 	ld hl,$800
-	ld (palette),hl		;show raster
+	ld (palette),hl			;show raster
 		
 	ld ix,sprite_registers
-	ld hl,(bird_x)		;x
-	ld de,(bird_y)		;y
-	ld a,0			;object number (bird)
+	ld hl,(bird_x)			;x
+	ld de,(bird_y)			;y
+	ld a,0				;object number (bird)
 	call object_to_sprites
 
-	ld hl,(mine_x)		;x
-	ld de,(mine_y)		;y
-	ld a,1			;object number (mine)
+	ld hl,(mine_x)			;x
+	ld de,(mine_y)			;y
+	ld a,1				;object number (mine)
 	call object_to_sprites
 
 	ld hl,$080
-	ld (palette),hl		;show raster
+	ld (palette),hl			;show raster
 
 	call clear_remaining_sprites	;remove any old sprite debris
 
 	ld hl,0
-	ld (palette),hl		;show raster
+	ld (palette),hl			;show raster
 
 
 ;--------- MOVE OBJECTS --------------------------------------------------------------
 
 
-	ld hl,(bird_x)		;move objects
+	ld hl,(bird_x)			;move objects
 	ld de,(bird_x_disp)
 	add hl,de
 	ld (bird_x),hl
@@ -186,15 +186,15 @@ object_location_list
 	dw mine	; object 1
 
 
-birdy	db 4			; number of h/w sprite resources used by this object 
-	dw 0			; base definition
+birdy	db 4				; number of h/w sprite resources used by this object 
+	dw 0				; base definition
 	db -32, -8, 0, $10		; origin offset x, origin offset y, definition offset, height for 1st sprite/ctrl bits
 	db -16,-24, 1, $30		; "" for 2nd sprite
 	db 0,  -24, 4, $30		; "" for 3rd sprite
 	db 16,  -8, 7, $10		; "" for 4th sprite
 
-mine	db 2			; number of h/w sprite resources used by this object
-	dw 8			; base definition
+mine	db 2				; number of h/w sprite resources used by this object
+	dw 8				; base definition
 	db -16,-16, 0, $20		; origin offset x, origin offset y, definition offset, height for 1st sprite/ctrl bits
 	db 0,  -16, 2, $20		; "" for 2nd sprite	
 
