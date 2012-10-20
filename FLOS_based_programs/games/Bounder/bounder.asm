@@ -1,9 +1,9 @@
 
 ;---Standard header for OSCA and FLOS -------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ;
@@ -2035,7 +2035,7 @@ enemy_specific_routines
           jp (hl)
 
 
-include "enemy_routines.asm"
+include "FLOS_based_programs\games\Bounder\inc\enemy_routines.asm"
 
 ;---------------------------------------------------------------------------------------------
           
@@ -5125,7 +5125,7 @@ clrsndlp  out (c),a
 
 ;---------------------------------------------------------------------------------------------------------
 
-include "object_list.asm"
+include "FLOS_based_programs\games\Bounder\inc\object_list.asm"
 
 ;---------------------------------------------------------------------------------------------------------
 
@@ -5527,7 +5527,7 @@ laserblast_table
           
 bone_sin_table
 
-          incbin "sin_table.bin"
+          incbin "FLOS_based_programs\games\Bounder\data\sin_table.bin"
 
 
 rock_motion_list
@@ -5545,7 +5545,7 @@ direction_offsets
 
 direction_matrix    
 
-          incbin "direction_finder.bin"
+          incbin "FLOS_based_programs\games\Bounder\data\direction_finder.bin"
 
 quadrant_conv_table
 
@@ -5555,12 +5555,12 @@ quadrant_conv_table
           db 08,09,10,11,12,00,00,00
                     
                     
-game_colours        incbin "game_palette.bin"
+game_colours        incbin "FLOS_based_programs\games\Bounder\data\game_palette.bin"
 
 
-block_id_table      incbin "block_id_table.bin"             ; bit 0 = obsticle, bit 1 = explode ball
-                                                            ; bit 2 = fall through 3 = reserved 
-                                                            ; bit 4 = water, bit 7 = normal bounce tile
+block_id_table      incbin "FLOS_based_programs\games\Bounder\data\block_id_table.bin"  ; bit 0 = obsticle, bit 1 = explode ball
+											; bit 2 = fall through 3 = reserved 
+											; bit 4 = water, bit 7 = normal bounce tile
 
 red_glow_table
 
@@ -5599,15 +5599,15 @@ level_startblock_positions
 
                     org (($ + 255) / 256) * 256
 
-scale_table         incbin "titles_scale_table.bin"
+scale_table         incbin "FLOS_based_programs\games\Bounder\data\titles_scale_table.bin"
 
 titles_tiles_fn     db "TILE_TTL.BIN",0
 titles_sprites_fn   db "SPR_TTL.BIN",0  
-sine_table          incbin "titles_sin_table.bin"
-titles_colours      incbin "titles_palette.bin"
-titles_map          incbin "titles_map.bin"
-colour_bar_palette  incbin "titles_colour_bars_palette.bin"
-maths_sin_table     incbin "maths_sin_table.bin"
+sine_table          incbin "FLOS_based_programs\games\Bounder\data\titles_sin_table.bin"
+titles_colours      incbin "FLOS_based_programs\games\Bounder\data\titles_palette.bin"
+titles_map          incbin "FLOS_based_programs\games\Bounder\data\titles_map.bin"
+colour_bar_palette  incbin "FLOS_based_programs\games\Bounder\data\titles_colour_bars_palette.bin"
+maths_sin_table     incbin "FLOS_based_programs\games\Bounder\data\maths_sin_table.bin"
 
 fade_dir            db 0
 fade_level          db 0
@@ -5625,14 +5625,14 @@ highscore           db 0,0,0,0,0,0
 
 scrolltextpointer   dw 0
 
-scroll_text         incbin "scroll_text.txt"
+scroll_text         incbin "FLOS_based_programs\games\Bounder\data\scroll_text.txt"
                     db 0,0,0,0
 
 ;---------------------------------------------------------------------------------------------------
 ;   "LOADING" LOGO DATA
 ;---------------------------------------------------------------------------------------------------
 
-loading_colours     incbin "loading_palette.bin"
+loading_colours     incbin "FLOS_based_programs\games\Bounder\data\loading_palette.bin"
 load_sprites_fn     db "SPR_LOAD.BIN",0
 
 ;---------------------------------------------------------------------------------------------------
@@ -5646,14 +5646,14 @@ src_z_coords        ds 56*3,0           ;must remain in this sequence
 
 star_sprites_fn     db "SPR_STAR.BIN",0
 congrats_tiles_fn   db "TILE_TTL.BIN",0
-star_colours        incbin "congrats_palette.bin"
-congrats_map        incbin "congrats_map.bin"
+star_colours        incbin "FLOS_based_programs\games\Bounder\data\congrats_palette.bin"
+congrats_map        incbin "FLOS_based_programs\games\Bounder\data\congrats_map.bin"
 
 ;---------------------------------------------------------------------------------------------------
 ; SOUND FX
 ;--------------------------------------------------------------------------------------------------
 
-sfx_data            incbin "sfx_03.bin"
+sfx_data            incbin "FLOS_based_programs\games\Bounder\data\sfx_03.bin"
 
 fx_list             dw sfx_data+0                 ;1  - arc
                     dw sfx_data+$20               ;2  - bonus
@@ -5672,7 +5672,7 @@ fx_list             dw sfx_data+0                 ;1  - arc
                     dw sfx_data+$1a0              ;15 - volcano launch
                     dw sfx_data+$1b0              ;16 - shorter boing
                     
-include             "sfx_routine.asm"
+include             "FLOS_based_programs\games\Bounder\Inc\sfx_routine.asm"
 
 sfx_filename        db "SFX.SAM",0
 sfx_samples_addr    equ $8000
@@ -5686,11 +5686,11 @@ music_samples_addr  equ $8000
 music_samples_bank  equ 6
 ttmod_samp_filename db "TUNE.SAM",0
 
-include             "z80_protracker_player.asm"
-include             "Amiga_audio_to_v5z80p.asm"
+include             "FLOS_based_programs\games\Bounder\Inc\z80_protracker_player.asm"
+include             "FLOS_based_programs\games\Bounder\Inc\Amiga_audio_to_v5z80p.asm"
 
                     org (($+2)/2)*2               ;WORD align tracker module in RAM
 
-music_module        incbin "tune.pat"
+music_module        incbin "FLOS_based_programs\games\Bounder\data\tune.pat"
 
 ;----------------------------------------------------------------------------------------------------
