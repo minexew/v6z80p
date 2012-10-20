@@ -17,7 +17,7 @@ window_width_pixels           equ 320
 ;---------------------------------------------------------------------------------------------
 
 required_osca       equ $672
-include             "flos_based_programs\code_library\program_header\test_osca_version.asm"
+include             "flos_based_programs\code_library\program_header\inc\test_osca_version.asm"
 
 ;-------- Parse command line arguments ---------------------------------------------------------
 
