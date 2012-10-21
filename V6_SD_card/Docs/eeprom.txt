@@ -56,7 +56,7 @@ XS2S150 FPGA config .bin file
 EEPROM TOOL Menu Options
 -------------------------
 
-1: Reprogram a slot.
+1. Reprogram a slot.
 --------------------
 
 Simply follow the prompts to upload an
@@ -74,7 +74,7 @@ onto the end of the config file when
 written to the EEPROM.
 
 
-2: Reconfigure the FPGA now.
+2. Reconfigure the FPGA now.
 ----------------------------
 
 Temporarily (until power off) changes
@@ -82,7 +82,7 @@ the slot pointer and reprograms
 (restarts) the FPGA.
 
 
-3: Change active slot.
+3. Change active slot.
 ----------------------
 
 The active slot is that which the FPGA
@@ -106,21 +106,31 @@ back this may be a problem. See
 the end of this document.
 
 
-4: Install OS to EEPROM
+4. Erase slot
+-------------
+
+Used to erase one of the 128KB
+eeprom slots. This option will
+give a warning if slot 0 or the
+currently active slot is selected
+for erasure, but will allow it.
+
+
+5. Install OS to EEPROM
 -----------------------
 
 Writes a file to $00800 (to $EFFF max)
 in the EEPROM.
 
 
-5: Uninstall OS from EEPROM
+6. Uninstall OS from EEPROM
 ---------------------------
 
 Deletes the signature of an OS file
 in EEPROM (writes $FF to $00800-$008FF)
 
 
-6: Update the bootcode
+7. Update the bootcode
 ----------------------
 
 Writes a file to either $0F000
@@ -132,7 +142,7 @@ An incorrect file will prevent FLOS
 from starting up.
 
 
-7: Insert arbitrary data into block
+8. Insert arbitrary data into block
 -----------------------------------
 
 This is used to store small files in
@@ -151,14 +161,20 @@ Programming a block should take less
 than 30 seconds.
 
 
-8. Erase slot
--------------
+9. Save data from block
+-----------------------
 
-Used to erase one of the 128KB
-eeprom slots. This option will
-give a warning if slot 0 or the
-currently active slot is selected
-for erasure, but will allow it.
+Reads data from the EEPROM and saves
+it to disk or sends it over serial
+link. This routine works with block
+granularity (64KB) so the maximum
+data that can be saved in one go is
+64KB (IE: from the start of a block).
+You will be prompted for a block
+number, address within the block
+where the save is to start and the
+save length.
+
 
 
 ===================================
