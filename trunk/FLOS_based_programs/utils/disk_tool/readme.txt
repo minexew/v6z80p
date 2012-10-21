@@ -1,8 +1,8 @@
 
-Disktool.exe for FLOS by Phil Ruston 2010
-------------------------------------------
+Disktool.exe for FLOS by Phil Ruston 2010-2012
+----------------------------------------------
 
-v0.03
+v0.08
 
 
 Info
@@ -27,6 +27,3 @@ partitions, with "logical drives" etc. Instead, the four primary partition
 "slots" in the MBR are used. Generally speaking, Windows (XP) will only see
 the first partition, Linux and other OSes may well recognize the others.
 
-Higher partitions may be slower when saving data. It seems some cards have
-optimization for the lower sectors perhaps because they're expected to
-receive a lot of traffic (FAT table updates etc)

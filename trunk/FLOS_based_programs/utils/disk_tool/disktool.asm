@@ -1,8 +1,12 @@
 ; ****************************************************************************
-; * DISK TOOL (PARTION/FORMATTER) V0.07 by P.Ruston '08 - '11                *
+; * DISK TOOL (PARTION/FORMATTER) V0.08 by P.Ruston '08 - '12                *
 ; ****************************************************************************
 
-; Changes: v0.07 - restarts FLOS on exit
+; Changes:
+;
+; v0.08 - Aligns partitions to 32KB clusters
+;
+; v0.07 - restarts FLOS on exit
 ;
 ; v0.06 - fixed for FLOS v593 (kjt_get_input_string limiter)
 ;
@@ -363,15 +367,25 @@ mfirstp   push hl
           ld h,(ix+$9)
           ld e,(ix+$c)                            ; length lo
           ld d,(ix+$d)
-          add hl,de                               ; new loc lo
-          ex de,hl
+          add hl,de                               
+          ex de,hl				   ; de = new loc lo
           ld l,(ix+$a)                            ; location hi
           ld h,(ix+$b)
           ld c,(ix+$e)                            ; length hi
           ld b,(ix+$f)
-          adc hl,bc
-          push hl                                 ; new loc hi
-                    
+          adc hl,bc				   ; hl = new loc hi
+                                       
+	  ex de,hl				   ; de:hl = new partition location
+	  ld bc,$3f 
+	  add hl,bc
+	  jr nc,nplnc
+	  inc de
+nplnc	  ld a,l
+	  and $c0
+	  ld l,a
+	  ex de,hl                                ; hl:de = new partition aligned to 32KB granularity 
+	  push hl	                            
+          
           ld a,(partition_count)                  ; put data in relevent partition entry (in sector buffer)
           ld l,a
           ld h,0
@@ -1022,7 +1036,7 @@ mbr_data            incbin "flos_based_programs\utils\disk_tool\data\mbr_data.bi
 
 app_banner
 
-          db "  DISK TOOL V0.07 by Phil Ruston 2011",11
+          db "  DISK TOOL V0.08 by Phil Ruston 2012",11
           db "  ===================================",11,11,0
           
 
@@ -1077,7 +1091,7 @@ new_ptn_size_mb
 
 first_partition_info
 
-          db 0,0,0,0, 0,0,0,0, $00,$00,$00,$00, $3e,$00,$00,$00
+          db 0,0,0,0, 0,0,0,0, $00,$00,$00,$00, $40,$00,$00,$00
 
           
 partitions_txt
