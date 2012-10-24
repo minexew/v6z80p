@@ -203,10 +203,11 @@ first option in the ZX Spectrum 128K startup menu, and then "TAB".
 -Real Tape (.wav) Input
 -----------------------
 Using the EAR->Serial cable (available from Phil Ruston, or see schematic: "tape_interface_circuit.png") 
-you can load software exactly like an original Spectrum. If desired, existing .tap files can be converted
-to .wav format and these can played from a PC etc into the V6Z80P via the headphone socket. To use the
-real tape cable it is probably best to boot into a plain Spectrum (EXP_B jumper OPEN, option 1 in EMU),
-then simply enter LOAD "" and start the tape / play the .wav file.
+you can load software exactly like an original Spectrum.If you want to play in .tap or .tzx files
+as audio from the PC headphone socket, the Windows apps TAPIR (http://newton.sunderland.ac.uk/~mikie/) or
+WINTZV (http://www.wintzx.fr) are recommended.  To use the real tape cable it is probably best to boot
+into a plain Spectrum (EXP_B jumper OPEN, option 1 in EMU), then simply enter LOAD "" and start the
+tape / play the .wav file.
 
 - Reset
 -------
