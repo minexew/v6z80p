@@ -1,9 +1,9 @@
 
 ; FMOVE.EXE command - MOVE FILE - for FLOS, By Phil @ retroleum.co.uk
 ;
-; USE: FMOVE src dst
+; USE: FMOVE path_filename path
 ;
-; Changes: 0.02 - first version
+; Changes: 0.01 - first version
 ;
 ; Notes: Source TAB size = 8
 ;
@@ -37,13 +37,13 @@ max_path_length 	equ 40
 
 
 		call save_dir_vol
-		call move_file_cmd
+		call copy_file_cmd
 		call restore_dir_vol
 		ret
 		
 ;------------------------------------------------------------------------------------------------
 
-move_file_cmd	ld (args_loc),hl
+copy_file_cmd	ld (args_loc),hl
 		ld a,(hl)				;if args = null, show use
 		or a    
 		jp z,show_use
@@ -56,10 +56,6 @@ move_file_cmd	ld (args_loc),hl
 		call kjt_parse_path			;change dir according to the path part of the string
 		ret nz
 no_path1	ld hl,filename_txt
-		ld de,src_filename_txt
-		ld bc,12
-		ldir	
-		ld hl,src_filename_txt
 		call kjt_open_file			;does file exist in current dir?
 		ret nz
 		call note_src_dirvol
@@ -68,36 +64,11 @@ no_path1	ld hl,filename_txt
 				
 		ld hl,(args_loc)			;find dest dir (if none specified, use current dir)
 		call find_next_argument
-		ret nz
-		call extract_path_and_filename		;split dir and file 
-		ld a,(path_txt)
-		or a
-		jr z,no_path2
-		ld hl,path_txt
 		call kjt_parse_path			;change dir according to the path part
 		ret nz
-		
-no_path2	ld hl,filename_txt
-		ld a,(hl)				;if no dest filename supplied, use source filename for dest
-		or a
-		jr nz,dstfn_supplied
-		ld hl,src_filename_txt
-dstfn_supplied	ld de,dst_filename_txt
-		ld bc,12
-		ldir	
 		call note_dst_dirvol
 		
-		xor a					;are src and dst filenames the same?
-		ld (same_fn),a	
-		ld hl,src_filename_txt			
-		ld de,dst_filename_txt
-		ld b,12
-		call kjt_compare_strings
-		jr nc,notsame_fn		
-		ld a,1
-		ld (same_fn),a
-		
-notsame_fn	ld a,(src_vol)				;are src and dst dirs the same?
+		ld a,(src_vol)				;check to ensure source and dest dirs are not the same
 		ld hl,dst_vol
 		cp (hl)
 		jr nz,notsame_dv
@@ -105,89 +76,58 @@ notsame_fn	ld a,(src_vol)				;are src and dst dirs the same?
 		ld de,(dst_cluster)
 		xor a
 		sbc hl,de
-		jr nz,notsame_dv			
-		ld a,(same_fn)
-		or a					;if so, are src+dst filenames the same?
-		jr z,notsame_dv		
-		ld hl,same_file_txt			;if so, report same and..
+		jr nz,notsame_dv			;report same paths and..
+		ld hl,same_paths_txt
 		call kjt_print_string
 		ld a,$80				;return with silent error code $80
 		or a
 		ret
 	
-notsame_dv	ld hl,dst_filename_txt
+notsame_dv	ld hl,filename_txt
 		call kjt_open_file			;does a file of same name already exist in the dest?
 		jr z,file_exists
 		cp 2
-		jr z,new_dst_file			;ok to proceed if "file not found"
+		jr z,ok_to_copy				;ok to proceed if "file not found"
 		cp 6
 		ret nz
 		ld a,$25				;if a dir exists with this filename, return "filename mismatch"
 		or a
 		ret
-
-file_exists	ld hl,file_exists_txt			;if dest file already exists, ask if want to append data, overwrite or cancel
+		
+file_exists	ld hl,file_exists_txt
 		call kjt_print_string
 		ld a,1
 		call kjt_get_input_string	
-		call new_line
+		push af
+		push hl
+		ld hl,new_line_txt
+		call kjt_print_string
+		pop hl
+		pop af
 		or a
 		jr z,aborted
 		ld a,(hl)
-		cp "o"
+		cp "y"
 		jr z,overwrite
-		cp "O"
+		cp "Y"
 		jr z,overwrite
-		cp "a"
-		jr z,append
-		cp "A"
-		jr z,append
 aborted		ld a,$2d				;return "Aborted" error
 		or a
 		ret
-		
-new_dst_file	ld hl,moving_txt
-		call kjt_print_string
-		ld hl,src_filename_txt
-		call kjt_print_string
-		ld a,(same_fn)
-		or a
-		jr nz,create_dest			;if same filenames src+dst, no need to show " to dest"
-		ld hl,to_txt
-		call kjt_print_string		
-		jr show_destfn
 
-append		ld hl,appending_txt
-		call kjt_print_string
-		ld hl,src_filename_txt
-		call kjt_print_string
-		ld a,(same_fn)
-		or a
-		jr nz,ok_to_copy			;if same filenames src+dst, no need to show " to dest"
-		ld hl,to_txt
-		call kjt_print_string		
-		ld hl,dst_filename_txt
-		call kjt_print_string
-		jr ok_to_copy
-		
-overwrite	ld hl,dst_filename_txt			;erase existing file in dest dir
+overwrite	ld hl,filename_txt			;erase existing file in dest dir
 		call kjt_erase_file			
 		ret nz
-		ld hl,overwriting_txt
-		call kjt_print_string
 
-show_destfn	ld hl,dst_filename_txt
+ok_to_copy	ld hl,moving_txt
 		call kjt_print_string
-create_dest	ld hl,dst_filename_txt			;create new file on dest dir
-		call kjt_create_file
-		ret nz
-
-ok_to_copy	call new_line
-		
-		call copy_file
+		ld hl,filename_txt
+		call kjt_print_string
+	
+		call copy_file				;copy file 
 		ret nz
 		call go_src_dirvol
-		ld hl,src_filename_txt			;and erase original
+		ld hl,filename_txt			;and erase original
 		call kjt_erase_file
 		ret nz
 		
@@ -205,7 +145,7 @@ copy_file
 
 		call go_src_dirvol
 	
-		ld hl,src_filename_txt			
+		ld hl,filename_txt			
 		call kjt_open_file
 		ret nz
 		ld (file_length_hi),ix			;note the file length
@@ -216,9 +156,15 @@ copy_file
 		ld (file_pointer_lo),hl			;zero the file pointer
 		ld (file_pointer_hi),hl
 
+		call go_dst_dirvol
+	
+cf_mkf		ld hl,filename_txt			;create new file on dest dir
+		call kjt_create_file
+		ret nz
+			
 fc_loop		call go_src_dirvol
 	
-		ld hl,src_filename_txt			;set up pointers (in)to source file	
+		ld hl,filename_txt			;set up pointers (in)to source file	
 		call kjt_open_file
 		ret nz
 	
@@ -262,7 +208,7 @@ fc_ufl		ld de,(file_length_lo)			;otherwise use bytes remaining as the write len
 		ld a,1
 		ld (fc_eof),a				;set end of file flag
 fc_ufbl		ld b,file_buffer_bank
-		ld hl,dst_filename_txt
+		ld hl,filename_txt
 		ld ix,file_buffer
 		call kjt_write_to_file			;append buffer bytes to dest file
 		ret nz
@@ -367,52 +313,27 @@ dst_cluster	dw 0
 	
 ;----------------------------------------------------------------------------------------------
 
-new_line	push af
-		push hl
-		ld hl,newline_txt
-		call kjt_print_string
-		pop hl
-		pop af
-		ret
-
-;----------------------------------------------------------------------------------------------
-		
-
 show_use	ld hl,no_args_txt			
 		call kjt_print_string
 		xor a
 		ret
-
-;----------------------------------------------------------------------------------------------
 		
-no_args_txt	db 11,"FMOVE.EXE (FILE MOVE) V0.02",11
-		db "USE: FMOVE src dest",11,11,0
+no_args_txt	db 11,"FMOVE.EXE (FILE MOVE) V0.01",11
+		db "USE: FMOVE filename [dest_dir]",11,11,0
 
-same_file_txt	db 11,"ERROR: The source and destination",11
-		db "cannot be the same file.",11,0
+same_paths_txt	db "ERROR: The source and destination",11
+		db "dirs cannot be the same.",11,0
 
-file_exists_txt	db 11,"A file with this name already exists",11
-		db "in the destination dir.",11,11 
-		db "[O]verwrite, [A]ppend or [C]ancel? ",0
+file_exists_txt	db "A file with this name exists in the",11
+		db "destination dir. Overwrite? (Y/N) ",0
 
 moving_txt	db "Moving ",0
-to_txt		db " to ",0
-
-overwriting_txt db "Replacing ",0
-
-appending_txt	db "Appending ",0
-
-ok_txt		db 11,"OK",11,0
+ 
+ok_txt		db 11,"OK.",11,0
 
 dot_txt		db ".",0
 
-newline_txt	db 11,0
-
-src_filename_txt	ds 13,0
-
-dst_filename_txt	ds 13,0
-
-same_fn		db 0
+new_line_txt	db 11,0
 		
 ;-------------------------------------------------------------------------------------------		
 
