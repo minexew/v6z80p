@@ -2,10 +2,14 @@
 FMOVE.EXE - Move a file from one dir
 to another.
                                    
-Use: FMOVE [path/]filename [path]
+Use: FMOVE src dst
+
+src and dst = [path/]filename
 
 Notes:
 
-If destination path is not supplied
-the current dir is used.
+If destination filename is not supplied
+the source filename is used.
 
+The directories in the paths must exist,
+(they will not be created).
