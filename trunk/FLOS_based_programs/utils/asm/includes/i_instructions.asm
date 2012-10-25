@@ -1,6 +1,6 @@
 ;----------------------------------------------------------------------------------------------------------
 
-i_code	ld a,(ix+1)		;is it an "INC" instruction?
+i_code	ld a,(ix+1)				;is it an "INC" instruction?
 	cp "n"
 	jp nz,not_incx
 	ld a,(ix+2)
@@ -21,11 +21,11 @@ i_code	ld a,(ix+1)		;is it an "INC" instruction?
 	or a
 	jr z,inc8bit
 	
-	ld a,%00000011		; 16 bit "inc" instruction stem
+	ld a,%00000011				; 16 bit "inc" instruction stem
 	ld (opcode_stem),a
 	jp type_2_16bit_opcode
 	
-inc8bit	ld a,$04			; 8 bit "inc" instruction stem
+inc8bit	ld a,$04				; 8 bit "inc" instruction stem
 	ld (opcode_stem),a
 	jp shifted_r_alu_instruction
 
@@ -34,7 +34,7 @@ inc8bit	ld a,$04			; 8 bit "inc" instruction stem
 ; NON-Z80 OPCODE: INCLUDE directive
 ;--------------------------------------------------------------------------------------------------------
 
-not_inc	ld a,(ix+3)			; is this an include instruction?
+not_inc	ld a,(ix+3)				; is this an include instruction?
 	cp "l"
 	jr nz,not_include
 	ld a,(ix+4)
@@ -52,9 +52,17 @@ not_inc	ld a,(ix+3)			; is this an include instruction?
 
 	call push_working_file_info		; stash the current file
 	ret nz
-	ld de,working_src_filename		; copy the new filename from arg1
-	call copy_filename_no_quotes
-	ld hl,1				; reset working line count for new file
+	call copy_fnpath_no_quotes		; copy the new path:filename from hl arg1 to long string
+	call find_file_all_included_dirs	; this will change the dir vol to correct location for file
+	jr nz,fferr
+	ld hl,filename_txt
+	ld de,working_src_filename
+	ld bc,12
+	ldir
+	call get_dir_vol
+	ld (working_src_vol),a
+	ld (working_src_cluster),de
+	ld hl,1					; reset working line count for new file
 	ld (working_src_line_count),hl
 	ld hl,0
 	ld (working_src_file_pointer),hl
@@ -62,39 +70,75 @@ not_inc	ld a,(ix+3)			; is this an include instruction?
 	
 	call fill_source_buffer
 	ret z
-	cp 5				; if "file not found", pop previous details so error message is correct
+	cp 5					; if "file not found", pop previous details so error message is correct
 	ret nz			
-	call pop_working_file_info	
+fferr	call pop_working_file_info	
 	ld a,5
 	or a
 	ret
 	
 	
+;--------------------------------------------------------------------------------------------------------------------------
 		
 not_include
 	
-	ld a,(ix+3)			; is this an incbin instruction?
+	ld a,(ix+3)				; is this an incbin instruction?
 	cp "b"
-	jr nz,not_include
+	jr nz,not_incbin
 	ld a,(ix+4)
 	cp "i"
-	jr nz,not_include		
+	jr nz,not_incbin		
 	ld a,(ix+5)
 	cp "n"
-	jr nz,not_include
+	jr nz,not_incbin
 	ld a,(ix+6)
 	or a
 	jr nz,not_incbin
-	ld de,incbin_filename		; copy the incbin filename from arg1
-	call copy_filename_no_quotes
+	call copy_fnpath_no_quotes		; copy the incbin filename from arg1
 	call handle_incbin
 	ret
 
+;--------------------------------------------------------------------------------------------------------------------------
+
 not_incbin
+	
+	ld a,(ix+3)				;is it an incdir directive?
+	cp "d"
+	jr nz,not_incdir
+	ld a,(ix+4)
+	cp "i"
+	jr nz,not_incdir
+	ld a,(ix+5)
+	cp "r"
+	jr nz,not_incdir
+	ld a,(ix+6)
+	or a
+	jr nz,not_incdir
+	call copy_fnpath_no_quotes		; copy the incdir path from arg1
+	ld a,(src_base_vol)			; all paths are relative to project base dir
+	ld de,(src_base_cluster)
+	call set_dir_vol
+	ld hl,pathfn
+	call kjt_parse_path          		; change dir according to the path part of the string
+	jr z,incdirpok
+	ld a,$28
+	or a
+	ret
+		
+incdirpok
+
+	call get_dir_vol
+	call add_incl_dir
+	ret
+
+
+not_incdir
 
 ;-------------------------------------------------------------------------------------------------------
 
-not_incx	ld a,(ix+1)			;is it an "IM" instruction?
+not_incx
+
+	ld a,(ix+1)			;is it an "IM" instruction?
 	cp "m"
 	jr nz,not_im
 	ld a,(ix+2)
@@ -202,25 +246,5 @@ not_in_a_n
 ;------------------------------------------------------------------------------------------------------
 	
 not_in	jp invalid_instruction
-
-
-;=======================================================================================================
-
-copy_filename_no_quotes
-
-; set DE to dest filename string
-
-	ld hl,opcode_arg1_string
-	ld b,12
-cinclfn	ld a,(hl)
-	inc hl
-	cp $22				; skip any quotes
-	jr z,cinclfn
-	ld (de),a
-	inc de
-	or a
-	ret z
-	djnz cinclfn
-	ret
 
 ;======================================================================================================

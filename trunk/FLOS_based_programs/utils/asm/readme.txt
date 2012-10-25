@@ -1,13 +1,18 @@
 ASM.EXE by Phil Ruston - A native Z80 assembler for FLOS
 --------------------------------------------------------
 
-V0.01 
+Changes:
+
+V0.02 - Paths now allowed in INCBIN and INCLUDE
+        INCDIR directive added.
+        Command line path allowed.
 
 Usage:
 
-ASM source_filename [%include assigned dir #1] [%include assigned dir #2] etc
+ASM source_filename path path 
 
-A binary file is produced with the same filename but with extension ".exe"
+A binary file is produced in the same directory as the source, and with the same
+filename except with the extension ".exe"
 
 
 Directives supported:
@@ -16,6 +21,7 @@ Directives supported:
 ORG	- set code assembly location
 INCLUDE	- include a source file at current location
 INCBIN	- include a binary file at current location
+INCDIR  - add a directory to the search path (EG: INCDIR test/equates)
 DB	- data byte(s) EG: 'DB 1,2,3,some_symbol' , 'DB "string1"' or mixed
 DW	- data word(s)
 DS	- data string (EG: "DS 10,5" (enters 10 bytes, each with value 5))
@@ -67,7 +73,7 @@ Numbers/Maths/expressions:
 
 * ORG using symbols: The symbol cannot be a forward reference (IE: Must be defined prior to the ORG directive.)
 	
-* ORG cannot specify an address lower than the current assembly location. If not ORG exists, assembly starts at 0.
+* ORG cannot specify an address lower than the current assembly location. If no ORG exists, assembly starts at 0.
 	
 * Instructions/symbols/etc are NOT case sensitive
 
@@ -95,10 +101,10 @@ Files:
 		
 * Output file starts from the lowest defined address (where data has been placed) 64KB max.
 
-* No paths permitted in filenames however, the directories that should be scanned for
-  component files can be specified on the command line via FLOS directory assignments,
-  EG: "ASM MY_PROJ.ASM %INC %DAT"
-  
+* Paths are now permitted for INCBINs and INCLUDEs (upto 255 characters). Every path is taken to be
+  relative to the source directory, but absolute locations can be used by using  "/" ".." "VOLx:" etc
+  Up to 10 paths can also be added using INCDIR path or arguments on the command line.  
+
 * Any quotes around filenames are ignored (spaces are not allowed in filenames)
 	
 		
@@ -106,7 +112,8 @@ Files:
 To do:
 ------
 
-More instruction syntax checking is required (extraneous args, illegal arg
-combinations etc.)
+More instruction syntax checking is required (extraneous args, illegal arg combinations etc.)
 
 Optimization for speed and code size.
+
+Add undocumented z80 op codes.
