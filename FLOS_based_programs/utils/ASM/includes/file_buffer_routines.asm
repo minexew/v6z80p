@@ -102,29 +102,23 @@ find_file_all_included_dirs
 	ret z
 	
 	ld hl,dirvol_include_list			;look in included dirs too
-	ld (inc_list_addr),hl
-	
-findfile_lp
-
-	ld hl,(inc_list_addr)				;scan the assign list for included dirs
-scnilst ld a,(hl)
-	cp $ff
-	jr z,file_error
-	ld (inc_list_addr),hl
+scnilst ld a,(hl)					;scan the assign list for included dirs
+	cp $fe
+	jr nc,file_error
 	ld a,(hl)					;get vol in A
 	inc hl
 	ld e,(hl)
 	inc hl
 	ld d,(hl)					;get cluster in DE
 	inc hl
-	ld (inc_list_addr),hl
+	push hl
 	call set_dir_vol
-	
 	ld hl,filename_txt
 	call kjt_open_file
-	ret z
-	jr findfile_lp
-			
+	pop hl
+	jr nz,scnilst
+	ret
+	
 		
 ;---------------------------------------------------------------------------------------------------------------
 
@@ -170,14 +164,10 @@ pwf_mswok
 	ld (iy+17),e
 	ld (iy+18),d
 	
-	push iy
-	call kjt_get_dir_cluster
-	pop iy
+	ld de,(working_src_cluster)
+	ld a,(working_src_vol)
 	ld (iy+19),e
 	ld (iy+20),d
-	push iy
-	call kjt_get_volume_info
-	pop iy
 	ld (iy+21),a
 	
 	ld a,(stack_level)
