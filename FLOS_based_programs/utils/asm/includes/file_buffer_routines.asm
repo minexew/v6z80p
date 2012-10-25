@@ -1,15 +1,17 @@
 
 fill_source_buffer
 	
-	call get_dir
-	
 	ld hl,source_buffer
-	ld (working_src_buffer_addr),hl	;restart at beginning of memory buffer
+	ld (working_src_buffer_addr),hl			;restart at beginning of memory buffer
+	
+	ld a,(working_src_vol)
+	ld de,(working_src_cluster)
+	call set_dir_vol
 	
 	ld hl,working_src_filename	
-	call find_file_all_included_dirs
+	call kjt_find_file
 	jr nz,file_error
-	
+		
 	ld (working_src_file_size),iy
 	ld (working_src_file_size+2),ix
 	
@@ -22,12 +24,12 @@ fill_source_buffer
 	call kjt_set_read_length
 	
 	ld b,0
-	ld hl,source_buffer			; load to bank 0
+	ld hl,source_buffer				; load to bank 0
 	call kjt_read_from_file
 	jr z,file_ok
-	cp $1b				; attempted to read beyond end of file?
+	cp $1b						; attempted to read beyond end of file?
 	jr nz,file_error
-	ld de,(working_src_file_pointer)	; if yes: zero-terminate source in buffer
+	ld de,(working_src_file_pointer)		; if yes: zero-terminate source in buffer
 	ld hl,(working_src_file_size)
 	xor a
 	sbc hl,de
@@ -36,14 +38,12 @@ fill_source_buffer
 	xor a
 	ld (hl),a
 
-file_ok	call restore_dir
-	xor a
+file_ok	xor a
 	ret
 
 
 file_error
 	
-	call restore_dir
 	ld a,5
 	or a
 	ret
@@ -66,45 +66,63 @@ restore_dir
 	ret
 	
 	
+set_dir_vol
+
+	push de
+	call kjt_change_volume
+	pop de
+	call kjt_set_dir_cluster
+	ret
+
+
+get_dir_vol
+
+	call kjt_get_dir_cluster
+	push de
+	call kjt_get_volume_info
+	pop de
+	ret
+	
 ;---------------------------------------------------------------------------------------------------------------
 	
 	
 find_file_all_included_dirs
  	
- 	ld (fn_addr),hl
-	ld hl,dir_include_list
+	ld a,(src_base_vol)				;all paths are relative to project base dir
+	ld de,(src_base_cluster)
+	call set_dir_vol
+	
+	ld hl,pathfn	
+	call extract_path_and_filename		
+        ld hl,path_txt
+        call kjt_parse_path          			;change dir according to the path part of the string
+        ret nz
+	ld hl,filename_txt
+	call kjt_open_file
+	ret z
+	
+	ld hl,dirvol_include_list			;look in included dirs too
 	ld (inc_list_addr),hl
 	
 findfile_lp
 
-	ld hl,(fn_addr)
-	call kjt_open_file
-	ret z
-	
-	ld hl,(inc_list_addr)		;scan the assign list for included dirs
-scanilst	ld a,(hl)
-	cp "%"
-	jr z,gotasn
+	ld hl,(inc_list_addr)				;scan the assign list for included dirs
+scnilst ld a,(hl)
 	cp $ff
 	jr z,file_error
-	inc hl
-	jr scanilst
-	
-gotasn	inc hl
 	ld (inc_list_addr),hl
-	dec hl
-	call kjt_get_envar
-	jr nz,scanilst
-	ld e,(hl)				;get dir cluster in DE
+	ld a,(hl)					;get vol in A
 	inc hl
-	ld d,(hl)
+	ld e,(hl)
 	inc hl
-	ld a,(hl)				;get volume in A
-	push de
-	call kjt_change_volume
-	pop de
-	jr nz,scanilst
-	call kjt_set_dir_cluster
+	ld d,(hl)					;get cluster in DE
+	inc hl
+	ld (inc_list_addr),hl
+	call set_dir_vol
+	
+	ld hl,filename_txt
+	call kjt_open_file
+	ret z
 	jr findfile_lp
 			
 		
@@ -115,11 +133,13 @@ push_working_file_info
 	ld a,(stack_level)
 	cp max_stack_levels
 	jr nz,stklevok
-	ld a,7				; ERROR 7 - too many nested includes
-	or a
+	ld a,7						; ERROR 7 - too many nested includes
+	or a	
 	ret
 	
-stklevok	ld hl,(working_src_buffer_addr)	;adjust file pointer by depth into RAM source buffer
+stklevok	
+
+	ld hl,(working_src_buffer_addr)			;adjust file pointer by depth into RAM source buffer
 	ld de,source_buffer
 	xor a
 	sbc hl,de
@@ -129,7 +149,10 @@ stklevok	ld hl,(working_src_buffer_addr)	;adjust file pointer by depth into RAM 
 	add hl,de
 	jr nc,pwf_mswok
 	inc bc
-pwf_mswok	ld (working_src_file_pointer),hl
+
+pwf_mswok
+	
+	ld (working_src_file_pointer),hl
 	ld (working_src_file_pointer+2),bc
 	
 	ld de,(stack_addr)
@@ -146,6 +169,17 @@ pwf_mswok	ld (working_src_file_pointer),hl
 	ld de,(working_src_file_pointer+2)
 	ld (iy+17),e
 	ld (iy+18),d
+	
+	push iy
+	call kjt_get_dir_cluster
+	pop iy
+	ld (iy+19),e
+	ld (iy+20),d
+	push iy
+	call kjt_get_volume_info
+	pop iy
+	ld (iy+21),a
+	
 	ld a,(stack_level)
 	inc a
 	ld (stack_level),a
@@ -181,20 +215,22 @@ pop_working_file_info
 	ld e,(iy+17)
 	ld d,(iy+18)
 	ld (working_src_file_pointer+2),de
+	
+	ld e,(iy+19)
+	ld d,(iy+20)
+	ld a,(iy+21)
+	ld (working_src_vol),a
+	ld (working_src_cluster),de
 	xor a
 	ret
 	
 ;----------------------------------------------------------------------------------------------------------------
 
-
 handle_incbin
-	
-	call get_dir
 	
 	ld hl,0
 	ld (incbin_file_pointer),hl
 
-	ld hl,incbin_filename	
 	call find_file_all_included_dirs
 	jp nz,file_error
 	ld (incbin_file_size),iy
@@ -204,8 +240,7 @@ handle_incbin
 	or l
 	jr z,ibfsok
 
-	call restore_dir
-	ld a,9				;Error 9 - incbin file > 64KB
+	ld a,9					;Error 9 - incbin file > 64KB
 	or a
 	ret
 	
@@ -224,35 +259,36 @@ ibfsok	ld ix,0
 	ld hl,incbin_buffer			; load to bank 0
 	ld a,(pass_count)
 	or a
-	jr z,ibfrne			; on pass zero, dont bother actually reading the data
+	jr z,ibfrne				; on pass zero, dont bother actually reading the data
 	call kjt_read_from_file
 	jr z,ibfrne
 	cp $1b
-	jr nz,incbflerr			; dont care about read beyond eof error
+	jr nz,incbflerr				; dont care about read beyond eof error
 ibfrne	ld hl,(incbin_file_size)
 	ld de,incbin_buffer_size		
-	xor a				; filesize - buffersize = bytes left to read
+	xor a					; filesize - buffersize = bytes left to read
 	sbc hl,de
 	ld (incbin_file_size),hl		;
-	jr z,incblast			; if zero all the bytes were read
-	jr c,incblast			; if borrow all the bytes were read
+	jr z,incblast				; if zero all the bytes were read
+	jr c,incblast				; if borrow all the bytes were read
 	
 	ld bc,incbin_buffer_size
 	call incbin_data_copy
 	jr nz,incbflerr
-	ld hl,incbin_filename	
+	ld hl,filename_txt	
 	call kjt_find_file
 	jp nz,file_error			; note: file will need to be reopened if output byte routine saves
 	jr ibfsok				; data prior to end of assembly (currently it does not).
 					
-incblast	add hl,de
+incblast	
+
+	add hl,de
 	push hl
 	pop bc
 	call incbin_data_copy		
 
-incbflerr	push af
-	call restore_dir
-	pop af
+incbflerr	
+
 	ret	
 		
 
@@ -260,81 +296,105 @@ incbflerr	push af
 	
 incbin_data_copy
 	
-	ld hl,incbin_buffer
+		ld hl,incbin_buffer
 incbloop	ld a,(hl)
-	push hl
-	push bc
-	call output_data_byte
-	pop bc
-	pop hl
-	ret nz
-	inc hl
-	dec bc
-	ld a,b
-	or c
-	jr nz,incbloop
-	xor a
-	ret
+		push hl
+		push bc
+		call output_data_byte
+		pop bc
+		pop hl
+		ret nz
+		inc hl
+		dec bc
+		ld a,b
+		or c
+		jr nz,incbloop
+		xor a
+		ret
 	
+	
+;----------------------------------------------------------------------------------------------------------------
+
+copy_fnpath_no_quotes
+
+; set DE to dest filename string
+
+		ld de,pathfn
+		ld hl,opcode_arg1_string
+		ld b,255
+cinclfn		ld a,(hl)
+		inc hl
+		cp $22				; skip any quotes
+		jr z,cinclfn
+		ld (de),a
+		inc de
+		or a
+		ret z
+		djnz cinclfn
+		ret
 
 ;----------------------------------------------------------------------------------------------------------------
 	
 	
 save_assembled_binary
 
-	ld hl,working_src_filename		;convert source filename.asm to filename.exe
-	ld b,8
+		ld a,(src_base_vol)		;save in main project base dir
+		ld de,(src_base_cluster)
+		call set_dir_vol
+
+		ld hl,working_src_filename	;convert source filename.asm to filename.exe
+		ld b,8
 find_dot	ld a,(hl)
-	cp "."
-	jr z,got_dot
-	inc hl
-	djnz find_dot
-got_dot	ld (hl),"."
-	inc hl
-	ld (hl),"E"
-	inc hl
-	ld (hl),"X"
-	inc hl
-	ld (hl),"E"
+		cp "."
+		jr z,got_dot
+		inc hl
+		djnz find_dot
+got_dot		ld (hl),"."
+		inc hl
+		ld (hl),"E"
+		inc hl
+		ld (hl),"X"
+		inc hl
+		ld (hl),"E"
 
-	ld hl,working_src_filename		;delete a file with this .exe name (if exists)
-	call kjt_erase_file			;dont care about errors
+		ld hl,working_src_filename	;delete a file with this .exe name (if exists)
+		call kjt_erase_file		;dont care about errors
 
-	ld hl,(bin_addr)
-	ld de,(min_addr)
-	ld c,0
-	xor a
-	sbc hl,de
-	jr nz,save_flok			;if save = 0 bytes dont attempt save unless overflow set
-	ld a,(mem_overflow)			;then save 65536 bytes
-	or a
-	jr z,nothing_to_save
-	ld c,1
-save_flok	ex de,hl				;C:DE length of file
-	xor a
-	ld hl,(min_addr)			;convert flat mem to bank+addr
-	sla h
-	rla
-	scf
-	rr h
-	inc a
-	ld b,a				;B = bank to save from
-	push hl
-	pop ix				;IX = address to save from
-	ld hl,working_src_filename
-	call kjt_save_file
-	ret z
+		ld hl,(bin_addr)
+		ld de,(min_addr)
+		ld c,0
+		xor a
+		sbc hl,de
+		jr nz,save_flok			;if save = 0 bytes dont attempt save unless overflow set
+		ld a,(mem_overflow)		;then save 65536 bytes
+		or a
+		jr z,nothing_to_save
+		ld c,1
+save_flok	ex de,hl			;C:DE length of file
+		xor a
+		ld hl,(min_addr)		;convert flat mem to bank+addr
+		sla h
+		rla
+		scf
+		rr h
+		inc a
+		ld b,a				;B = bank to save from
+		push hl
+		pop ix				;IX = address to save from
+		ld hl,working_src_filename
+		call kjt_save_file
+		ret z
 
-	ld a,11				;error 11 - save problem
-	or a
-	ret
+		ld a,11				;error 11 - save problem
+		or a
+		ret
 
 nothing_to_save
 
-	ld a,12				;error 12 - nothing to save
-	or a
-	ret
-		
+		ld a,12				;error 12 - nothing to save
+		or a
+		ret
+			
 ;----------------------------------------------------------------------------------------------------------------
 	
 
