@@ -1,7 +1,7 @@
 
- include "osca.asm"
- include "kernal.asm"
- include "system.asm"
+ include "../equates/osca.asm"
+ include "../equates/kernal.asm"
+ include "../equates/system.asm"
  
  ld hl,palette
  ld a,(keymaps)
@@ -9,7 +9,7 @@
  xor a
  ret
  db "stuff:"
- incbin junk.bin
+ incbin vol0:asmtest/data/junk.bin
  db ":end of stuff"
 
  

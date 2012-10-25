@@ -2,6 +2,8 @@
 ; * DISK TOOL (PARTION/FORMATTER) V0.05 by P.Ruston '08 - '11 	       *
 ; ****************************************************************************
 
+	incdir "../EQUATES"
+
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
 

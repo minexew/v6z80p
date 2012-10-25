@@ -4,7 +4,7 @@
 	incbin bin2.bin	
 	incbin bin3.bin
 	db "STUFF!"
-	incbin "junk.bin"
+	incbin "../DATA/junk.bin"
 	db "G'BYE NOW!"
 	
 	
