@@ -1,35 +1,28 @@
 
-ASM.EXE - Z80 assembler
+ASM.EXE - Z80 assembler V0.02
 
-Use: ASM source.asm %INCDIR1 %INCDIR2 
+Use: ASM [path]filename.asm [path] [path] 
 
-Produces a binary file (same name as
-source but with .exe extension)
+Produces a binary Z80 file (same name
+as source but with .exe extension)
 
-The optional "%INCDIR"s allow the
-assembler to check other folders
-for files which are to be included
-into the source (paths are not
-supported in INCLUDE or INCBIN
-statements). The %names are FLOS
-ASSIGN proxy names. EG: To make
-ASM.EXE check a dir called EQUATES,
-you'd first make the proxy:
-
-ASSIGN INC VOL0:EQUATES ("INC" can
-be any three letters)
-
-then enter:
-
-ASM source.asm %INC
-
-
+Paths can be added as extra arguments
+on the command line to allow the
+assembler to check folders for files
+(used by INCBIN / INCLUDE) which
+have no specific path within the
+source. Such paths can also be
+added in-source, with the INCDIR 
+directive. All paths are relative
+to the folder that contains the
+main source file.
 
 
 Directives supported:
 ---------------------
 
 ORG	- set assembly location
+INCDIR  - Add a path
 INCLUDE	- include a source file
 INCBIN	- include a binary file
 DB	- data byte(s) 
@@ -159,13 +152,8 @@ Files:
   defined address (where data has been
   placed) 64KB max.
 
-* No paths permitted in filenames
-  however, the directories that
-  should be scanned for component
-  files can be specified on the
-  command line via FLOS directory
-  assignments,
-  EG: "ASM MY_PROJ.ASM %INC %DAT"
+* Paths are permitted in INCBIN,
+  INCLUDE and INCDIR directives.
   
 * Any quotes around filenames are
   ignored (spaces are not allowed
@@ -182,3 +170,4 @@ combinations etc.)
 
 Optimization for speed and code size.
 
+Add undocumented Opcodes.
