@@ -4,9 +4,9 @@
 
 ;---Standard header for OSCA and OS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;======================================================================================
 ; MAIN PROGRAM CODE STARTS HERE
@@ -49,6 +49,8 @@ notquit	ld a,b
 	jp z,rec_test
 	cp "4"
 	jp z,rx_byte_test
+	cp "5"
+	jp z,send_string
 	jp mainloop
 
 ;---------------------------------------------------------------------------------------
@@ -316,6 +318,36 @@ rx_byte	ld hl,hex_text+1
 
 ;----------------------------------------------------------------------------------
 
+send_string
+
+	ld hl,prompt_txt
+	call kjt_print_string
+
+	ld a,40
+	call kjt_get_input_string
+	or a
+	jr z,endss
+
+	ld b,a
+
+comlp	ld a,(hl)
+	or a
+	jr z,endss
+	
+	push bc
+	push hl
+	call kjt_serial_tx_byte
+	pop hl
+	pop bc
+	
+	inc hl
+	djnz comlp
+	
+endss	jp start
+
+;----------------------------------------------------------------------------
+
+prompt_txt	db "Enter a string to send and press ENTER",11,11,0
 
 serial_headertag	db "Z80P.FHEADER"		;12 chars
 
@@ -324,7 +356,8 @@ start_text	db "Serial link diagnostic tool v0.01",11,11,0
 menu_text		db 11,11,"Press:",11,11
 		db "1 - BAUD = 115200",11,"2 - BAUD = 57600",11
 		db "3 - Test file transfer - receive",11
-		db "4 - Display individual bytes received",11,11,0
+		db "4 - Display individual bytes received",11
+		db "5 - Send text string to serial port",11,11,0
 		db "ESC - quit",11,11,0
 
 waiting_text	db "Waiting for serial file transfer..",11,0
