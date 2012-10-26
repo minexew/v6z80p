@@ -1,8 +1,10 @@
 ;--------------------------------------------------------------------------------------------------------
 ; SerialSend: A PureBasic app for Windows to send a file to V6Z80P via serial RS232 from command line.
 ; Use: "SerialTX filename <com> <baud>" (and RX or FILERX in FLOS to receive)
-; A quick mod of Serial Link by Phil @ retroleum.co.uk v0.01
+; A quick mod of Serial Link by Phil @ retroleum.co.uk v0.02
 ; COM spec 8-N-1, no hardware flow control
+;
+; V0.02 - closes serial port immediately upon error
 ;--------------------------------------------------------------------------------------------------------
   
 OpenConsole()
@@ -12,9 +14,10 @@ com$ = ProgramParameter()
 baud$ = ProgramParameter()
 
 If srcfile$=""
- PrintN("SerialSend.exe - Send file via command line FLOS")
+ PrintN("SerialTX.exe v0.02 - Send file via command line to FLOS")
  PrintN(" ")
  PrintN("USE: SerialTX filename [com] [baud]")
+ PrintN(" ")
  PrintN ("    com = 'COM1' To 'COM9', if not supplied first working COM port will be used.")
  PrintN ("    baud = 57600 or 115200, if not supplied baud set at 115200")
  Delay (5000)
@@ -249,7 +252,7 @@ If ackstring$ = "WW"
   
 Until bytestogo <= 0
 
-return
+Return
 
 ;
  ;------ Make a CRC checksum ----------------------------------------------------- 
@@ -347,35 +350,30 @@ Return
 ;------------------------------------------------------------------------------------------ 
  
 error_quit:
-
+ 
+ CloseSerialPort(0)
+ 
  PrintN(" ")
  PrintN("FAILED!")
- Delay(10000)
- 
-normal_quit:
 
+ Delay(10000)
+
+ CloseConsole()
+ End
+ 
+ ;-------------------------------------------------------------------------------------------
+
+normal_quit:
+ 
+ CloseSerialPort(0)
  CloseConsole()
  End
 
 ;-------------------------------------------------------------------------------------------
 
- 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
 ; IDE Options = PureBasic 4.30 (Windows - x86)
-; CursorPosition = 16
+; CursorPosition = 19
+; FirstLine = 3
 ; Folding = -
 ; EnableXP
 ; Executable = serialsend.exe
