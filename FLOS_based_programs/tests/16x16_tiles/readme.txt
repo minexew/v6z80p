@@ -1,1 +1,0 @@
-For OSCA 660+ (location of tilemaps changed)
