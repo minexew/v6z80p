@@ -1,1 +1,0 @@
-For OSCA 660+ (new 8x8 tile mode)
