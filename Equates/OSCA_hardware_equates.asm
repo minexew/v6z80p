@@ -76,9 +76,9 @@ mult_write          equ $208            ; SIGNED WORD
 mult_index          equ $20a            ; BYTE
 linedraw_colour     equ $20b
 vreg_ext_vidctrl    equ $20c
-vreg_linecop_addr0  equ $20d
-vreg_linecop_addr1  equ $20e
-vreg_linecop_addr2  equ $20f
+linecop_addr0  	    equ $20d
+linecop_addr1       equ $20e
+linecop_addr2       equ $20f
 vreg_palette_ctrl   equ $20f
 
 blit_src_loc        equ $210            ; blitter set-up registers
