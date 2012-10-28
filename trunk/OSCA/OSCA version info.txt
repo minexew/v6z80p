@@ -7,6 +7,10 @@ Both support VGA output.
 Updates to OSCA
 ---------------
 
+673 - Linecop programs can now be placed anywhere in system RAM (on even byte boundaries)
+      so can be upto 212KB in length. Register $20f doubles as Linecop add bits 18:16 when
+      written with bit 7 set.
+
 672 - Audio system can now see all 512KB of System RAM (new location_hi register ports $24-$27)
       Simplified flood filler to XOR (as proposed by Daniel)
 
