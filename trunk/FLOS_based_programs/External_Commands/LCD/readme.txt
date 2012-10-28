@@ -1,12 +1,11 @@
-Linecop Debug (LCD.exe) By Phil'09
-----------------------------------
+Linecop Debug (LCD.exe) By Phil'09-12
+-------------------------------------
 
-Disassembles in-memory linecop programs. 
+Disassembles linecop programs from
+system RAM.
 
-Command line usage: LCD.EXE address (0-fffe)
+Command line usage: LCD.EXE address
 
-NOTE: 
 
-"address" = 0-FFFE linecop memory, IE: 70000-7FFFF system RAM (8000-FFFF Z80 Memory
-in the two uppermost banks)
-
+address is a linear address in system
+RAM (range 0-7FFFE)
