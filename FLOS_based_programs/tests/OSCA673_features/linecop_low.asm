@@ -9,7 +9,7 @@ include "equates\system_equates.asm"
 
 		org $5000
 
-		ld ix,vreg_linecop_lo
+		ld ix,linecop_addr0
 		ld de,my_linecop_list
 		ld (ix+2),%10000000		; set bits [18:16] of linecop address (bit 7 must be set when writing linecop address)
 		ld (ix+1),d			; set bits [15:8] of linecop address
@@ -21,7 +21,7 @@ include "equates\system_equates.asm"
 		call kjt_wait_key_press		; wait for any key
 
 		ld a,0
-		ld (vreg_linecop_lo),a		; disable linecop
+		ld (linecop_addr0),a		; disable linecop
 
 		xor a				; and quit
 		ret
