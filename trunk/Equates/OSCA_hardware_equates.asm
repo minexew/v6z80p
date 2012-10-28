@@ -76,8 +76,9 @@ mult_write          equ $208            ; SIGNED WORD
 mult_index          equ $20a            ; BYTE
 linedraw_colour     equ $20b
 vreg_ext_vidctrl    equ $20c
-vreg_linecop_lo     equ $20d
-vreg_linecop_hi     equ $20e
+vreg_linecop_addr0  equ $20d
+vreg_linecop_addr1  equ $20e
+vreg_linecop_addr2  equ $20f
 vreg_palette_ctrl   equ $20f
 
 blit_src_loc        equ $210            ; blitter set-up registers
@@ -141,5 +142,12 @@ mult_read           equ $704            ; SIGNED WORD
 
 sprite_base         equ $1000           ; 4KB when banked in
 video_base          equ $2000           ; 8KB when banked in
+
+;--------------------------------------------------------------------------
+
+; Old / alternative labels:
+
+vreg_linecop_lo     equ $20d
+vreg_linecop_hi     equ $20e
 
 ;--------------------------------------------------------------------------
