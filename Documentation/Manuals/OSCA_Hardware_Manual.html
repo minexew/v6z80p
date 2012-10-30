@@ -10,18 +10,19 @@ A:vlink {text-decoration: none}
 A:visited {text-decoration: none}
 A:hover {color: #00ffff}
 -->
-</style></head>
+</style>
+</head>
 <body>
 <h1 style="text-decoration: underline;">OSCA - An FPGA
 Config For The V6Z80P</h1>
 <pre style="font-style: italic;">By Phil Ruston 2008-2012 - Last updated 29-10-2012 (OSCA v673)</pre>
-<pre><br>OSCA (Old School Computer Architecture) provides a home-computer era hardware platform for<br>the V6Z80P. As well as basic memory and peripheral control, its features include bitmap and<br>character mapped displays, sprites, a raster line synchronized co-pro ("LineCop"), blitter,<br>hardware line draw and four channels of 8 bit digital sound.<br>  <br><span style="font-weight: bold;">Quick Links:</span></pre>
-
+<pre><br>OSCA (Old School Computer Architecture) provides a home-computer era hardware platform for<br>the V6Z80P. As well as basic memory and peripheral control, its features include bitmap and<br>character mapped displays, sprites, a raster line synchronized co-pro ("LineCop"), blitter,<br>hardware line draw and four channels of 8 bit digital sound.<br> <br><span style="font-weight: bold;">Quick Links:</span></pre>
 <ul>
 <li><a href="#Port_List:">Port Index</a></li>
 <li><a href="#Video_Register_List:">Video Register
 Index</a></li>
-<li><a href="#The_Video_System:">Video System</a></li><li><a href="#Display_Window:">Display Window</a></li>
+<li><a href="#The_Video_System:">Video System</a></li>
+<li><a href="#Display_Window:">Display Window</a></li>
 <li><a href="#Sprites:">Sprite System</a></li>
 <li><a href="#Sound_System_Detail:">Audio System</a></li>
 <li><a href="#Blitter:">Blitter</a></li>
@@ -34,10 +35,10 @@ Index</a></li>
 <pre>In OSCA, memory and peripheral controls are accessed via the Z80's In/Out Ports. Video<br>settings such as the palette, display controls, sprite registers etc are accessed via<br>locations in Z80 address space (these can be paged in and out as desired). Sections of<br>Z80 address space are also assigned to video RAM etc.<br></pre>
 <pre style="text-decoration: underline;"><br>Z80 Address Space Overview:</pre>
 <pre>As the V6Z80P has 512KB of system RAM (and the Z80 can only see 64KB at a time), OSCA<br>allows the user to select the sections of System RAM that appear in Z80 address space.<br>The page size is 32KB and both the lower and upper halves of the Z80 address space can<br>be assigned different pages of system RAM. In addition, the upper memory area can direct<br>CPU writes to an alternative page, making data copying quicker and easier.</pre>
-<pre>Depending on the memory control settings, certain sections of Z80 address space<br>will - instead of system RAM - access components such as video/sprite memory, the video<br>palette etc. <br>  <br>  <br><span style="text-decoration: underline;">Diagram of Z80 Address space options under OSCA (not to scale):</span></pre>
-<pre><img style="width: 798px; height: 997px;" alt="Memory Map Diagram" src="images/memory_map.png"><br><br><span style="text-decoration: underline;"><br>Z80 Address Space 'Partitions':</span><br><br>$0000-$07FF: First 2KB section of the lower 32KB System RAM Page. Or ROM, Palette, Video Registers,<br> Sprite Control Registers and Maths Table (this is the default mode)</pre>
-<pre>$0800-$0FFF: The next 2KB Section of the lower 32KB System RAM page (Note: OSCA's default ROM code<br> stipulates that IRQ Mode 1 vector jumps to $A00, and NMI vector jumps to $A03)<br><br>$1000-$1FFF: The next 4KB Section of the lower 32KB System RAM page or a write-only 4KB page of<br> sprite definition RAM (note: Reads between $1000-$1fff always fetch data<br> from System RAM).</pre>
-<pre>$2000-$3FFF: Next 8KB section of the lower 32KB system RAM page (or the default location<br> of the video RAM access window.)<br><br>$4000-$7fff: The remaining 16KB Section of the lower 32KB System RAM page</pre>
+<pre>Depending on the memory control settings, certain sections of Z80 address space<br>will - instead of system RAM - access components such as video/sprite memory, the video<br>palette etc. <br> <br> <br><span style="text-decoration: underline;">Diagram of Z80 Address space options under OSCA (not to scale):</span></pre>
+<pre><img style="width: 798px; height: 997px;" alt="Memory Map Diagram" src="images/memory_map.png"><br><br><span style="text-decoration: underline;"><br>Z80 Address Space 'Partitions':</span><br><br>$0000-$07FF: First 2KB section of the lower 32KB System RAM Page. Or ROM, Palette, Video Registers,<br>             Sprite Control Registers and Maths Table (this is the default mode)</pre>
+<pre>$0800-$0FFF: The next 2KB Section of the lower 32KB System RAM page (Note: OSCA's default ROM code<br>             stipulates that IRQ Mode 1 vector jumps to $A00, and NMI vector jumps to $A03)<br><br>$1000-$1FFF: The next 4KB Section of the lower 32KB System RAM page or a write-only 4KB page of<br>             sprite definition RAM (note: Reads between $1000-$1fff always fetch data<br>             from System RAM).</pre>
+<pre>$2000-$3FFF: Next 8KB section of the lower 32KB system RAM page (or the default location<br>             of the video RAM access window.)<br><br>$4000-$7fff: The remaining 16KB Section of the lower 32KB System RAM page</pre>
 <pre>$8000-$FFFF: The Upper 32KB System RAM page</pre>
 <pre><br><span style="font-weight: bold;"></span><span style="text-decoration: underline;"><br>Paged RAM areas in Detail:</span></pre>
 <pre><span style="font-weight: bold;">System Memory:</span> The System RAM chip is 512KB. OSCA allows separate 32KB pages of<br>this memory to appear at Z80 $0000-$7fff and $8000-$ffff. The 32KB chunk of system RAM<br>that appears to the Z80 at $0000-$7FFF is set with the port "<a href="#Port_20">sys_low_page</a>" and the 32KB<br>of system RAM that appears to the Z80 at $8000-$FFFF is set with the port "<a href="#Port:_00">sys_mem_select</a>".<br>If required, WRITES between $8000-$FFFF can access a different page to that of READS <br>in the same range - the write page is set with port "<a href="#Port_0B">sys_alt_write_page</a>", and this feature<br>is enabled with bit 4 of "<a href="#Port:_00">sys_mem_select</a>".</pre>
@@ -59,18 +60,18 @@ Ports:</span></h3>
 <pre>Bit 0:3 - Upper 32KB memory page select (see table below)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 - Use alternate page for upper memory writes **<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 - Set Direct Video Write Mode (All Z80 address space memory writes go to VRAM).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6 - Page in Video RAM at selected location (In DVW Mode: 1 = exclude $0000-$0FFF).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7 - Page Sprite RAM in at $1000-$1FFF for writes (Ignored in DVW Mode)</pre>
 <pre>&nbsp;</pre>
 <pre>System RAM Upper Page Selection Table:</pre>
-<pre><span style="text-decoration: underline;">Bits:&nbsp;3 2 1 0&nbsp;&nbsp;|&nbsp;Area of System RAM paged into Z80 $8000-$FFFF</span><br><br>     0 0 0 0&nbsp; =&nbsp;$08000 - $0FFFF #<br>     0 0 0 1&nbsp; =&nbsp;$08000 - $0FFFF #<br>     0 0 1 0&nbsp; =&nbsp;$10000 - $17FFF<br>     0 0 1 1&nbsp; =&nbsp;$18000 - $1FFFF<br>     0 1 0 0&nbsp; =&nbsp;$20000 - $27FFF <br>     0 1 0 1&nbsp; =&nbsp;$28000 - $2FFFF <br>     0 1 1 0&nbsp; =&nbsp;$30000 - $37FFF <br>     0 1 1 1&nbsp; =&nbsp;$38000 - $3FFFF <br>     1 0 0 0&nbsp; =&nbsp;$40000 - $47FFF <br>     1 0 0 1&nbsp; =&nbsp;$48000 - $4FFFF <br>     1 0 1 0&nbsp; =&nbsp;$50000 - $57FFF<br>     1 0 1 1&nbsp; =&nbsp;$58000 - $5FFFF<br>     1 1 0 0&nbsp; =&nbsp;$60000 - $67FFF <br>     1 1 0 1&nbsp; =&nbsp;$68000 - $6FFFF<br>     1 1 1 0&nbsp; =&nbsp;$70000 - $77FFF<br>     1 1 1 1&nbsp; =&nbsp;$78000 - $7FFFF</pre>
+<pre><span style="text-decoration: underline;">Bits:&nbsp;3 2 1 0&nbsp;&nbsp;|&nbsp;Area of System RAM paged into Z80 $8000-$FFFF</span><br><br>      0 0 0 0&nbsp; =&nbsp;$08000 - $0FFFF #<br>      0 0 0 1&nbsp; =&nbsp;$08000 - $0FFFF #<br>      0 0 1 0&nbsp; =&nbsp;$10000 - $17FFF<br>      0 0 1 1&nbsp; =&nbsp;$18000 - $1FFFF<br>      0 1 0 0&nbsp; =&nbsp;$20000 - $27FFF <br>      0 1 0 1&nbsp; =&nbsp;$28000 - $2FFFF <br>      0 1 1 0&nbsp; =&nbsp;$30000 - $37FFF <br>      0 1 1 1&nbsp; =&nbsp;$38000 - $3FFFF <br>      1 0 0 0&nbsp; =&nbsp;$40000 - $47FFF <br>      1 0 0 1&nbsp; =&nbsp;$48000 - $4FFFF <br>      1 0 1 0&nbsp; =&nbsp;$50000 - $57FFF<br>      1 0 1 1&nbsp; =&nbsp;$58000 - $5FFFF<br>      1 1 0 0&nbsp; =&nbsp;$60000 - $67FFF <br>      1 1 0 1&nbsp; =&nbsp;$68000 - $6FFFF<br>      1 1 1 0&nbsp; =&nbsp;$70000 - $77FFF<br>      1 1 1 1&nbsp; =&nbsp;$78000 - $7FFFF</pre>
 <pre><br>Notes: </pre>
 <pre># Notice 0000 and 0001 both select SYS_RAM $08000-$0FFFF at Z80: $8000-$FFFF. This prevents<br> system RAM locations $00000-$07FFF being paged into the upper memory area. However, it is<br> possible to override this prohibition by setting the &#8220;Any Page Mode&#8221; bit (bit 5 of port<br> &#8220;<a href="#Port_0B">sys_alt_write_page</a>&#8221;) - selection 0000 will then select SYS_RAM $00000-$07FFF at Z80<br> $8000-$FFFF</pre>
 <pre>* The System RAM area where Linecop programs need to be placed are normal memory<br> locations as far as the CPU is concerned, IE: they are not dedicated to the Linecop. </pre>
-<pre>** When bit 4 (Alternate Write Page) is set, the UPPER 32KB page selection DURING<br> CPU WRITES is taken from Port $0B (<a href="#Port_0B">sys_alt_write_page</a>).</pre>
+<pre>** When bit 4 (Alternate Write Page) is set, the UPPER 32KB page selection DURING<br>   CPU WRITES is taken from Port $0B (<a href="#Port_0B">sys_alt_write_page</a>).</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><br><a name="Port:_01_-_Read"></a>Port: $01 - Read: "<span style="font-weight: bold;">sys_irq_ps2_flags</span>" - Interrupt status flags and PS2 port line status: </pre>
 <pre>Bit: 0 - Keyboard IRQ flag (1 = interrupt occurred)<br> &nbsp;&nbsp;&nbsp; 1 - Mouse IRQ flag ("")<br> &nbsp;&nbsp;&nbsp; 2 - Timer IRQ flag ("")<br> &nbsp;&nbsp;&nbsp; 3 - Video IRQ flag ("")<br> &nbsp;&nbsp;&nbsp; 4 - Keyboard Clock line status (input)<br> &nbsp;&nbsp;&nbsp; 5 - Keyboard Data line status (input)<br> &nbsp;&nbsp;&nbsp; 6 - Mouse Clock status (input)<br> &nbsp;&nbsp;&nbsp; 7 - Mouse Data status (input)<br><br></pre>
 <pre><a name="Port_01_-_Write"></a>Port $01 - Write: "<span style="font-weight: bold;">sys_irq_enable</span>"</pre>
 <pre>Interrupt masks: Allow devices to interrupt CPU. (Note: The video IRQ enable bit is<br>in the video register <a href="#204">vreg_rasthi</a>)</pre>
-<pre>Bit: 0 - Keyboard IRQ enable (1 = allow interrupt)<br>  &nbsp;&nbsp; 1 - Mouse IRQ enable ("")<br> &nbsp;&nbsp;&nbsp; 2 - Timer IRQ enable ("")<br> &nbsp;&nbsp;&nbsp; 3 - Audio IRQ enable ("")<br> &nbsp;&nbsp;&nbsp; 4 - n/u<br>&nbsp; &nbsp;&nbsp; 5 - n/u<br>&nbsp; &nbsp;&nbsp; 6 - n/u<br>&nbsp; &nbsp;&nbsp; 7 - Master IRQ enable (must be set to allow ANY interrupt to occur)</pre>
+<pre>Bit: 0 - Keyboard IRQ enable (1 = allow interrupt)<br> &nbsp;&nbsp;  1 - Mouse IRQ enable ("")<br> &nbsp;&nbsp;&nbsp; 2 - Timer IRQ enable ("")<br> &nbsp;&nbsp;&nbsp; 3 - Audio IRQ enable ("")<br> &nbsp;&nbsp;&nbsp; 4 - n/u<br>&nbsp; &nbsp;&nbsp; 5 - n/u<br>&nbsp; &nbsp;&nbsp; 6 - n/u<br>&nbsp; &nbsp;&nbsp; 7 - Master IRQ enable (must be set to allow ANY interrupt to occur)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><br><a name="Port:_02_-_Read"></a>Port: $02 - Read:&nbsp; "<span style="font-weight: bold;">sys_keyboard_data</span>"<br><br>&nbsp;&nbsp;&nbsp; 0:7 - Data byte received from keyboard<br><br><br><a name="Port:_02_-_Write"></a>Port: $02 - Write: "<span style="font-weight: bold;">sys_clear_irq_flags</span>"</pre>
@@ -137,7 +138,7 @@ Ports:</span></h3>
 <pre><br><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
 <pre><a name="Port_0D_-_Read"></a>Port&nbsp; $0D - Read: "<span style="font-weight: bold;">sys_eeprom_byte</span>"</pre>
-<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This port contains data bytes from the SPI FPGA configuration EEPROM, which<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; can be read under CPU control. It should be read only when the "serializer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status flag" (bit 4 of port "<a href="#Port_09_-_Read">sys_hw_flags</a>") is 1. Reading this port clears<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the internal bit count and status flag. </pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;  This port contains data bytes from the SPI FPGA configuration EEPROM, which<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; can be read under CPU control. It should be read only when the "serializer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status flag" (bit 4 of port "<a href="#Port_09_-_Read">sys_hw_flags</a>") is 1. Reading this port clears<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the internal bit count and status flag. </pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Handshaking: When a databurst has been initiated (see PIC comms section) the<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PIC issues a new byte every time the PIC CLOCK (bit 1 of "<a href="#Port_0D_-_Write">sys_pic_comms</a>") is raised.</pre>
 <pre><a name="Port_0D_-_Write"></a><br>Port&nbsp; $0D - Write: "<span style="font-weight: bold;">sys_pic_comms</span>"</pre>
 <pre>Bit: 0 - Write to Configuration PIC port RB1 (data to PIC)<br>     1 - Write to Configuration PIC port RA5 (clock to PIC)<br>   2:7 - Not used, write with zeroes</pre>
@@ -150,15 +151,15 @@ Ports:</span></h3>
 <hr style="width: 100%; height: 2px;">
 <pre><br><a name="Port_0F_-_Read"></a>Port $0F - Read: No function</pre>
 <pre><a name="Port_0F_-_Write"></a>Port $0F - Write: "<span style="font-weight: bold;">sys_io_dir</span>" </pre>
-<pre>Bit: 0 - Data direction for IO pin A (0 = output, 1 = input)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 - Data direction for IO pin B ( &#8220;&#8221; )<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 - Data direction for IO pin C (on PCBs that support it)<br> 3:7 - n/u</pre>
+<pre>Bit: 0 - Data direction for IO pin A (0 = output, 1 = input)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 - Data direction for IO pin B ( &#8220;&#8221; )<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 - Data direction for IO pin C (on PCBs that support it)<br>   3:7 - n/u</pre>
 <pre><br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><a name="Port_20"></a>Port $20 &#8211; Read / Write: &#8220;<span style="font-weight: bold;">sys_low_page</span>&#8221;</pre>
 <pre>&nbsp;Bit: 0:3 &#8211; Lower 32KB page select<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4:7 &#8211; Not Used &#8211; mask / ignore these undefined bits.</pre>
 <pre> This port selects which 32KB page from the 512KB system RAM appears at Z80 $0000-$7fff<br>&nbsp;(see table below). Bear in mind the ROM/Palette, video registers and sprite page will<br> still occupy Z80 address space locations: $0000-$01ff, $0200-$07ff and $1000-$1fff<br> respectively regardless of which 32KB page is selected UNLESS these locations are<br> specifically banked out of the address space with their respective control bits.</pre>
 <pre><br>System RAM Lower Page Selection Table:</pre>
-<pre><span style="text-decoration: underline;">Bits: 3 2 1 0&nbsp;&nbsp;|&nbsp;System RAM paged into Z80 $0000-$7FFF</span><br><br>     0 0 0 0&nbsp;&nbsp;= $00000 - $07FFF <br>     0 0 0 1&nbsp;&nbsp;= $08000 - $0FFFF <br>     0 0 1 0&nbsp;&nbsp;= $10000 - $17FFF<br>     0 0 1 1&nbsp;&nbsp;= $18000 - $1FFFF<br>     0 1 0 0&nbsp;&nbsp;= $20000 - $27FFF<br>     0 1 0 1&nbsp;&nbsp;= $28000 - $2FFFF<br>     0 1 1 0&nbsp;&nbsp;= $30000 - $37FFF<br>     0 1 1 1 &nbsp;=&nbsp;$38000 - $3FFFF<br>     1 0 0 0&nbsp;&nbsp;= $40000 - $47FFF <br>     1 0 0 1&nbsp;&nbsp;= $48000 - $4FFFF<br>     1 0 1 0&nbsp;&nbsp;= $50000 - $57FFF<br>     1 0 1 1&nbsp;&nbsp;= $58000 - $5FFFF<br>     1 1 0 0&nbsp;&nbsp;= $60000 - $67FFF <br>     1 1 0 1&nbsp;&nbsp;= $68000 - $6FFFF<br>     1 1 1 0&nbsp;&nbsp;= $70000 - $77FFF / LineCop program area ($0000 - $7fff)<br>     1 1 1 1 &nbsp;= $78000 - $7FFFF / LineCop program area ($8000 - $ffff)</pre>
-<pre><br><br></pre>
+<pre><span style="text-decoration: underline;">Bits: 3 2 1 0&nbsp;&nbsp;|&nbsp;System RAM paged into Z80 $0000-$7FFF</span><br><br>      0 0 0 0&nbsp;&nbsp;= $00000 - $07FFF <br>      0 0 0 1&nbsp;&nbsp;= $08000 - $0FFFF <br>      0 0 1 0&nbsp;&nbsp;= $10000 - $17FFF<br>      0 0 1 1&nbsp;&nbsp;= $18000 - $1FFFF<br>      0 1 0 0&nbsp;&nbsp;= $20000 - $27FFF<br>      0 1 0 1&nbsp;&nbsp;= $28000 - $2FFFF<br>      0 1 1 0&nbsp;&nbsp;= $30000 - $37FFF<br>      0 1 1 1 &nbsp;=&nbsp;$38000 - $3FFFF<br>      1 0 0 0&nbsp;&nbsp;= $40000 - $47FFF <br>      1 0 0 1&nbsp;&nbsp;= $48000 - $4FFFF<br>      1 0 1 0&nbsp;&nbsp;= $50000 - $57FFF<br>      1 0 1 1&nbsp;&nbsp;= $58000 - $5FFFF<br>      1 1 0 0&nbsp;&nbsp;= $60000 - $67FFF <br>      1 1 0 1&nbsp;&nbsp;= $68000 - $6FFFF<br>      1 1 1 0&nbsp;&nbsp;= $70000 - $77FFF / LineCop program area ($0000 - $7fff)<br>      1 1 1 1 &nbsp;= $78000 - $7FFFF / LineCop program area ($8000 - $ffff)</pre>
+<span style="font-family: monospace;"><br></span>
 <hr style="width: 100%; height: 2px;">
 <pre><br><a name="Port_21_&#8211;_Read"></a>Port $21 &#8211; Read - No function</pre>
 <pre><br><a name="Port_21_-_Write"></a>Port $21 - Write: &#8220;<span style="font-weight: bold;">sys_vram_location</span>&#8221;</pre>
@@ -235,9 +236,697 @@ Video System:</span> </h3>
 <pre>&nbsp;&nbsp; $00000-$6FFFF: Tile definitions (64 bytes each)<br>&nbsp;&nbsp; $70000-$707FF: Playfield A Buffer 0 tilemap LSBs<br>&nbsp;&nbsp; $70800-$70FFF: Playfield A Buffer 0 tilemap MSBs (incl. flip control)<br>&nbsp;&nbsp; $71000-$717FF: Playfield A Buffer 1 tilemap LSBs<br>&nbsp;&nbsp; $71800-$71FFF: Playfield A Buffer 1 tilemap MSBs (incl. flip control)<br>&nbsp;&nbsp; $72000-$727FF: Playfield B Buffer 0 tilemap LSBs<br>&nbsp;&nbsp; $72800-$72FFF: Playfield B Buffer 0 tilemap MSBs (incl. flip control)<br>&nbsp;&nbsp; $73000-$737FF: Playfield B Buffer 1 tilemap LSBs<br>&nbsp;&nbsp; $73800-$73FFF: Playfield B Buffer 1 tilemap MSBs (incl. flip control)<br><br>(Notice that the LSB/MSB arrangement is slightly different to that of the 16x16 mode.)</pre>
 <pre>In 8x8 tilemap mode, the width of each horizontal map line is 64 bytes no matter what the<br>size of display window. The hardware scroll registers still provide a 0-15 pixel offset.</pre>
 <pre>Each tilemap has room for 32 rows of tiles (ie: a 256 scanline display), however<br>when using vertical hardware scroll, the maximum y window should be 248 lines to<br>mask off the last tile-line (where the internal tilemap line pointer wraps back to 0)</pre>
-<pre><br></pre>
+<pre></pre>
 <hr style="width: 100%; height: 2px;">
-<pre><br></pre>
+<h3><a name="Colour_palette:"></a>Colour
+palette:</h3>
+<pre>The V6Z80P's colour resolution is 12 bit, with 4 bits for red, green and blue (allowing a<br>choice of 4096 colours). OSCA uses an indexed colour system with 256 colour registers.<br>Each palette entry is a 16 bit word with bits arranged as follows:<br><br>[15:12] Unused<br> [11:8] Red intensity<br>  [7:4] Green intensity<br>  [3:0] Blue intensity<br><br><br><span style="text-decoration: underline;">Example palette writes:</span><br><br>EG:  LD HL,$0F0F        <br>     LD (PALETTE),HL    ; Set colour0 (background) to magenta<br><br>EG:  LD HL,$00F0        <br>     LD (PALETTE+2),HL  ; Set colour1 to green<br><br><br>Notes:<br><br>There are actually two palettes, allowing buffering etc. Either palette can be set to "live"<br>status (IE: accessed by the video hardware to build the video frame) or "target" (IE: receives<br>writes from the CPU / LineCop). This is set with the register "<a href="OSCA_Hardware_Manual.html#20f">vreg_palette_ctrl</a>"<br><br>The palettes are write-only and located in the same memory space (0-$1ff) as the FPGA-based ROM.<br>This is convenient since the ROM is read-only and palette is write-only. However, system RAM<br>can be paged into this location if desired, see: <a href="#Port_0B">sys_alt_write_page</a><br><br></pre>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="Display_Window:"></a>Programmable
+Display
+Window:</h3>
+<br>
+<img style="width: 673px; height: 472px;" alt="" src="images/display_window.png"><br>
+<br>
+<pre>The position of the edges of the display window within the maximum visible TV screen<br>are programmable (which - of course - sets the size of the window). There are 16 possible<br>locations each for "X Start", "X Stop", "Y Start" and "Y Stop". Each horizontal step is <br>16 pixels wide, and each vertical step is 8 lines tall.</pre>
+<pre>The register <a href="OSCA_Hardware_Manual.html#202">vreg_window</a> sets the position of the display window. Note: both vertical and<br>horizontal location settings are written this same register, its function changes depending<br>on bit 2 of <a href="OSCA_Hardware_Manual.html#204">vreg_rasthi</a> (see the example at the end of this section)<br></pre>
+<pre><br><span style="text-decoration: underline;"><a name="Horizontal_Positions"></a>Horizontal Positions - X_START and X_STOP</span><span style="text-decoration: underline;"></span><br><br>When writing to the <a href="OSCA_Hardware_Manual.html#202">vreg_window</a> register to set the horizontal positioning, the byte should<br>be composed as follows:</pre>
+<pre>Bits: [7:4] X_START value<br> &nbsp;    [3:0] X_STOP value</pre>
+<pre>(Make sure <a href="OSCA_Hardware_Manual.html#204">vreg_rasthi</a> was previously written with a value that has bit 2 set.)</pre>
+<pre>The table below shows all the possible combinations of X_START (green: columns) and X_STOP<br>(blue: rows). Where a column and row intersect, the value is the width of the display in<br>pixels. Note: X_Start values 0-4 (in red) are positioned well off the left hand side of the<br>display so should not be used. A good, centralized 320 pixel wide display choice would be<br>the value $8C. </pre>
+<br>
+<table style="text-align: left; width: 50%;" border="1" cellpadding="2" cellspacing="2">
+<tbody>
+<tr>
+<td></td>
+<td style="background-color: rgb(153, 255, 255);">$x0</td>
+<td style="background-color: rgb(153, 255, 255);">$x1</td>
+<td style="background-color: rgb(153, 255, 255);">$x2</td>
+<td style="background-color: rgb(153, 255, 255);">$x3</td>
+<td style="background-color: rgb(153, 255, 255);">$x4</td>
+<td style="background-color: rgb(153, 255, 255);">$x5</td>
+<td style="background-color: rgb(153, 255, 255);">$x6</td>
+<td style="background-color: rgb(153, 255, 255);">$x7</td>
+<td style="background-color: rgb(153, 255, 255);">$x8</td>
+<td style="background-color: rgb(153, 255, 255);">$x9</td>
+<td style="background-color: rgb(153, 255, 255);">$xA</td>
+<td style="background-color: rgb(153, 255, 255);">$xB</td>
+<td style="background-color: rgb(153, 255, 255);">$xC</td>
+<td style="background-color: rgb(153, 255, 255);">$xD</td>
+<td style="background-color: rgb(153, 255, 255);">$xE</td>
+<td style="background-color: rgb(153, 255, 255);">$xF</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 102, 102);">$0x</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+<td>400</td>
+<td>416</td>
+<td>432</td>
+<td>464</td>
+<td>480</td>
+<td>496</td>
+<td>512</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 102, 102);">$1x</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+<td>400</td>
+<td>416</td>
+<td>432</td>
+<td>464</td>
+<td>480</td>
+<td>496</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 102, 102);">$2x</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+<td>400</td>
+<td>416</td>
+<td>432</td>
+<td>464</td>
+<td>480</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 102, 102);">$3x</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+<td>400</td>
+<td>416</td>
+<td>432</td>
+<td>464</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 102, 102);">$4x</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+<td>400</td>
+<td>416</td>
+<td>432</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$5x</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+<td>400</td>
+<td>416</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$6x</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+<td>400</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$7x</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+<td>384</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$8x</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+<td>368</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$9x</td>
+<td>112</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+<td>352</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Ax</td>
+<td>96</td>
+<td>112</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+<td>336</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Bx</td>
+<td>80</td>
+<td>96</td>
+<td>112</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+<td>320</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Cx</td>
+<td>64</td>
+<td>80</td>
+<td>96</td>
+<td>112</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+<td>304</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Dx</td>
+<td>48</td>
+<td>64</td>
+<td>80</td>
+<td>96</td>
+<td>112</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+<td>288</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Ex</td>
+<td>32</td>
+<td>48</td>
+<td>64</td>
+<td>80</td>
+<td>96</td>
+<td>112</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+<td>272</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Fx</td>
+<td>16</td>
+<td>32</td>
+<td>48</td>
+<td>64</td>
+<td>80</td>
+<td>96</td>
+<td>112</td>
+<td>128</td>
+<td>144</td>
+<td>160</td>
+<td>176</td>
+<td>192</td>
+<td>208</td>
+<td>224</td>
+<td>240</td>
+<td>256</td>
+</tr>
+</tbody>
+</table>
+<br>
+<pre>Theory: The X_Start and X_Stop values correspond to bits [7:4] of an<br>internal low-res pixel clock counter (which counts from 0-511 on each<br>scanline). X_Start values cover the count range 0,16,32,48 etc (the beam<br>actually enters the left side of the visible (PAL TV) display somewhere<br>around count = 96) </pre>
+<pre><br>X_Stop values cover the count range 256,272,288,304 etc (the raster beam<br>leaves the display somewhere around count 496)&nbsp;Note: X_Stop 0 (count = 256) is<br>not the exact middle of the visible display because the TV's raster beam does<br>not advance during sync periods (at the extreme left of the display).</pre>
+<br>
+<pre><span style="text-decoration: underline;"><a name="Vertical_Positions:"></a>Vertical Positions:</span></pre>
+<pre><span style="text-decoration: underline;"></span>When writing to the <a href="OSCA_Hardware_Manual2.html#202">vreg_window</a> register, the byte should be composed as follows:</pre>
+<pre>Bits: [7:4] Y_START value<br>     &nbsp;[3:0] Y_STOP value<br><br>(Make sure <a href="OSCA_Hardware_Manual.html#204">vreg_rasthi</a> was previously written with a value that has bit 2 clear.)</pre>
+<pre>The table below shows all the possible combinations of Y_START (green: columns) and Y_STOP<br>(blue: rows). Where a column and row intersect, the value is the height of the display in<br>scanlines. Note: Y_Start values 0-1 (in red) are above the top of the display so should<br>not be used. A good, centralized 200 line wide display choice would be the value $5A.</pre>
+<br>
+<table style="text-align: left; width: 50%;" border="1" cellpadding="2" cellspacing="2">
+<tbody>
+<tr>
+<td></td>
+<td style="background-color: rgb(153, 255, 255);">$x0</td>
+<td style="background-color: rgb(153, 255, 255);">$x1</td>
+<td style="background-color: rgb(153, 255, 255);">$x2</td>
+<td style="background-color: rgb(153, 255, 255);">$x3</td>
+<td style="background-color: rgb(153, 255, 255);">$x4</td>
+<td style="background-color: rgb(153, 255, 255);">$x5</td>
+<td style="background-color: rgb(153, 255, 255);">$x6</td>
+<td style="background-color: rgb(153, 255, 255);">$x7</td>
+<td style="background-color: rgb(153, 255, 255);">$x8</td>
+<td style="background-color: rgb(153, 255, 255);">$x9</td>
+<td style="background-color: rgb(153, 255, 255);">$xA</td>
+<td style="background-color: rgb(153, 255, 255);">$xB</td>
+<td style="background-color: rgb(153, 255, 255);">$xC</td>
+<td style="background-color: rgb(153, 255, 255);">$xD</td>
+<td style="background-color: rgb(153, 255, 255);">$xE</td>
+<td style="background-color: rgb(153, 255, 255);">$xF</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 102, 102);">$0x</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+<td>232</td>
+<td>240</td>
+<td>256</td>
+<td>264</td>
+<td>272</td>
+<td>280</td>
+<td>288</td>
+</tr>
+<tr>
+<td style="background-color: rgb(255, 102, 102);">$1x</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+<td>232</td>
+<td>240</td>
+<td>256</td>
+<td>264</td>
+<td>272</td>
+<td>280</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$2x</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+<td>232</td>
+<td>240</td>
+<td>256</td>
+<td>264</td>
+<td>272</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$3x</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+<td>232</td>
+<td>240</td>
+<td>256</td>
+<td>264</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$4x</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+<td>232</td>
+<td>240</td>
+<td>256</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$5x</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+<td>232</td>
+<td>240</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$6x</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+<td>232</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$7x</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+<td>224</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$8x</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+<td>216</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$9x</td>
+<td>88</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+<td>208</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Ax</td>
+<td>80</td>
+<td>88</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+<td>200</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Bx</td>
+<td>72</td>
+<td>80</td>
+<td>88</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+<td>192</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Cx</td>
+<td>64</td>
+<td>72</td>
+<td>80</td>
+<td>88</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+<td>184</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Dx</td>
+<td>56</td>
+<td>64</td>
+<td>72</td>
+<td>80</td>
+<td>88</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+<td>176</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Ex</td>
+<td>48</td>
+<td>56</td>
+<td>64</td>
+<td>72</td>
+<td>80</td>
+<td>88</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+<td>168</td>
+</tr>
+<tr>
+<td style="background-color: rgb(153, 255, 153);">$Fx</td>
+<td>40</td>
+<td>48</td>
+<td>56</td>
+<td>64</td>
+<td>72</td>
+<td>80</td>
+<td>88</td>
+<td>96</td>
+<td>104</td>
+<td>112</td>
+<td>120</td>
+<td>128</td>
+<td>136</td>
+<td>144</td>
+<td>152</td>
+<td>160</td>
+</tr>
+</tbody>
+</table>
+<br>
+<br>
+<pre><span style="text-decoration: underline;">PAL/NTSC/VGA:</span></pre>
+<pre><br>Because PAL/NTSC/VGA use differing amounts of scanlines to make up a full display,<br>if Y_START and Y_STOP values are chosen to vertically <span style="font-weight: bold;">centre</span> a window, that window<br>will be offset in other video modes. If vertical centring is important, a program<br>must detect the video mode and adjust Y_Start and Y_Stop accordingly - note that<br>this will also adjusting your Sprite and Linecop coordinates. The 60Hz mode flag<br>in the Video Status Register can assist if the correction is to be done automatically,<br>else a display adjust routine can be provided in user programs.</pre>
+<pre>Example code: Display Window setting:<br><br>To set the vertical start and stop positions of the display window, first write<br><a href="OSCA_Hardware_Manual.html#204">vreg_rasthi</a> with bit 2 clear, then write an appropriate value from the tables<br>above to <a href="OSCA_Hardware_Manual.html#202">vreg_window</a>. To set the horizontal positions, write <a href="OSCA_Hardware_Manual.html#204">vreg_rasthi</a> with<br>bit 2 set, then write an appropriate value for the horizontal setting to <a href="OSCA_Hardware_Manual.html#202">vreg_window</a>.</pre>
+<pre><br>EG:<br>&nbsp;&nbsp; &nbsp;ld a,$00<br>&nbsp;&nbsp; &nbsp;ld (vreg_rasthi),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; selects vertical window setting<br>&nbsp;&nbsp; &nbsp;ld a,$5a<br>&nbsp;&nbsp; &nbsp;ld (vreg_window),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; sets vertical window size/position (200 lines)<br>&nbsp;&nbsp; &nbsp;ld a,$04<br>&nbsp;&nbsp; &nbsp;ld (vreg_rasthi),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; selects horizontal window setting<br>&nbsp;&nbsp; &nbsp;ld a,$8c<br>&nbsp;&nbsp; &nbsp;ld (vreg_window),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; sets horizontal window size/position (320 pixels</pre>
+<span style="font-family: monospace;"><br>
+</span>
+<hr style="width: 100%; height: 2px;">
 <h3><a name="Sprites:"></a>Sprites:</h3>
 <pre>There is 128KB of dedicated RAM for sprite definitions (enough space for 512 16x16 256<br>colour sprite blocks). This (write only) memory is accessed in 4KB pages through a<br>window in Z80 address space located at $1000-$1FFF. The 4KB page from within the total<br>128KB sprite RAM is selected by the register <a href="#206">vreg_vidpage</a> (write the page number 0-31,<br>with bit 7 set). The 4KB window is opened and closed with Bit 7 of the port "<a href="#Port:_00">sys_mem_select</a>".<br>(Note: When the CPU reads from $1000-$1FFF, data is ALWAYS returned from system RAM<br>regardless of the setting in <a href="#Port:_00">sys_mem_select</a>.)</pre>
 <pre>Sprite definition memory accepts writes at full speed when the sprites are disabled.<br>When sprites are enabled, writes from the CPU are forced to wait until the sprite<br>hardware releases the RAM buses. The length of the wait during contention depends<br>how busy the sprite hardware is on any given scanline. Access to the sprite control<br>registers is never subject to contention.</pre>
@@ -262,68 +951,48 @@ Video System:</span> </h3>
 <pre>&nbsp; or</pre>
 <pre>&nbsp;$400-$4fb (Register bank 0) (63 registers - double buffered register mode)<br>&nbsp;$500-$5fb (Register bank 1) (63 registers - double buffered register mode)</pre>
 <pre><br>Each sprite register is 4 sequential bytes:</pre>
-<pre>$00 : X coordinate (low 8 bits)</pre>
-<pre>$01 : Bits 7:4 = Height of sprite (in blocks of 16 lines) - If the four height<br> bits are zero, the sprite is 240 pixels tall.</pre>
-<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3 = X Mirror enable<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 = Definition MSB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 = Y coordinate MSB <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 = X coordinate MSB</pre>
-<pre><br>$02 : Y coord (low 8 bits)</pre>
-<pre>$03 : Sprite definition number (low 8 bits)<br><br><br><span style="text-decoration: underline;">Coordinates:</span></pre>
-
-<pre><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span>X and Y coordinates are 9 bits in size (the MSBs are stored in the second byte of the register).<br>The coordinate origin positions are fixed, IE: they not relative to the display window position<br>and instead are based on the internal line counter and horizontal pixel counter (see display<br>window section).<br><br>The X_START and Y_START values obviously determine how much of a sprite can be masked by the<br>border. Horizontally, the full width of an individual sprite can be masked many times over.<br>More critically, the Y_START value allows a minimum of 16 lines of vertical (top border) masking<br>(when using the recommended minimum Y_START of 2).<br><span style="text-decoration: underline;"><br><br>Size</span>:<br><br>As mentioned, sprites are always 16 pixels wide, but can normally be up to 240 pixels high,<br>with a granularity of 16 lines (as set by bits 7:4 of the second byte in each sprites<br>control register). However, some height control bits can be sacrificed for other features:<br><br>If "<span style="font-weight: bold;">modify_colour_MSBs</span>" mode is enabled (bit 4 in <a href="#207">vreg_sprctrl</a> = 1) the four bits normally<br>assigned to height work as follows:</pre>
+<pre> $00 : X coordinate (low 8 bits)<br> $01 : Height, MSBs and Mirror control (see below)<br> $02 : Y coordinate (low 8 bits)<br> $03 : Definition block number (low 8 bits)<br></pre>
+<pre> Breakdown of sub-register $01:<br><br> Bits 7:4 = Height of sprite (in blocks of 16 lines) If 0000, the sprite is 240 pixels tall.<br>        3 = X Mirror enable<br>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 = Definition MSB<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 = Y coordinate MSB <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 = X coordinate MSB</pre>
+<pre><br><br><span style="text-decoration: underline;">Sprite Coordinates:</span></pre>
+<pre><span style="font-family: monospace;"></span><span style="font-family: monospace;"></span>Sprite X and Y coordinate registers are 9 bits in size (the MSBs are stored in the second byte of<br>the sprite's register group as shown above). The coordinate origin positions are based on the internal<br>line counter and horizontal pixel counter as follows:<br><br>* A sprite's leftmost pixel position coincides with the leftmost display window pixel when its<br>  x coordinate = (Window_X_START * 16) - 1<br><br>* A sprite's topmost line position coincides with first display scanline when its<br>  y coordinate = (Window_Y_START * 8) + 1<br><br>EG: When using a display window [X_START=8, Y_START=5], a sprite appears in the extreme<br>    top/left of the display window when its coordinates are: x=127, y=41<br><br>Values below these positions hide parts of the sprite "behind" the border. The Window's X_START<br>and Y_START values naturally determine how much of a sprite can be masked by the border. Horizontally,<br>the full width of an individual sprite can be masked many times over on the left. The Y_START value<br>allows a minimum of 16 lines of vertical (top border) masking (when using the recommended minimum<br>Y_START of 2). If more data of a tall sprite is to be masked, then its starting definition block and<br>height can be adjusted.<br><span style="text-decoration: underline;"><br><br>Sprite Size</span>:<br><br>As mentioned, sprites are always 16 pixels wide, but can normally be up to 240 pixels high,<br>with a granularity of 16 lines (as set by bits 7:4 of the second byte in each sprites<br>control register). However, some height control bits can be sacrificed for other features:<br><br>If "<span style="font-weight: bold;">modify_colour_MSBs</span>" mode is enabled (bit 4 in <a href="#207">vreg_sprctrl</a> = 1) the four bits normally<br>assigned to height work as follows:</pre>
 <pre>bit 7 - Use priority mask set 0 or 1<br>&nbsp;&nbsp;&nbsp; 6 - Height (bit 2)<br>&nbsp;&nbsp;&nbsp; 5 - Height (bit 1)<br>&nbsp;&nbsp;&nbsp; 4 - Height (bit 0)</pre>
 <pre>Therefore in this mode sprites can be 16,32,48,64,80,96,112 (or 240 when the three height<br>bits are all zero) lines tall.</pre>
 <pre><br>If <span style="font-weight: bold;">"matte_mode</span>" is enabled (bit 5 in <a href="#207">vreg_sprctrl</a> = 1) the four bits normally assigned to<br>height work as follows: </pre>
 <pre>bit 7 - Height (bit 3)<br>&nbsp;&nbsp;&nbsp; 6 - Force non-zero colours to 127 or 255<br>&nbsp;&nbsp;&nbsp; 5 - Height (bit 1)<br>&nbsp;&nbsp;&nbsp; 4 - Height (bit 0)</pre>
 <pre>Therefore in this mode sprites can be 16,32,48,64, and 128,144,160,176 lines tall<br>(64 lines are used when bit 0 and 1 are zero)</pre>
 <pre><br>If both "<span style="font-weight: bold;">matte_mode</span>" and "<span style="font-weight: bold;">modify_colour_MSBs</span>" modes are selected, the four bits normally<br>used for height are interpreted as follows:</pre>
-<pre>bit 7 - Use priority mask set 0 or 1<br>&nbsp;&nbsp;&nbsp; 6 - Force non-zero colours to either 127 or 255<br>&nbsp;&nbsp;&nbsp; 5 - Height (bit 1)<br>&nbsp;&nbsp;&nbsp; 4 - Height (bit 0)<br><br>In this mode sprites can be 16,32,48,64 lines tall (64 lines are used when bit 0 and<br>1 are zero).<br><br></pre>
-<hr style="width: 100%; height: 2px;">
+<pre>bit 7 - Use priority mask set 0 or 1<br>&nbsp;&nbsp;&nbsp; 6 - Force non-zero colours to either 127 or 255<br>&nbsp;&nbsp;&nbsp; 5 - Height (bit 1)<br>&nbsp;&nbsp;&nbsp; 4 - Height (bit 0)<br><br>In this mode sprites can be 16,32,48,64 lines tall (64 lines are used when bit 0 and<br>1 are zero).</pre>
 <pre><br></pre>
-<h3><a name="Display_Window:"></a>Programmable Display
-Window:</h3>
-<pre><br><img style="width: 673px; height: 472px;" alt="" src="images/display_window.png">
-<br><br>The position of the edges of the display window within the maximum visible TV screen<br>are programmable (which - of course - sets the size of the window). There are 16 possible<br>locations each for "X Start", "X Stop", "Y Start" and "Y Stop". Each horizontal step is <br>16 pixels wide, and each vertical step is 8 lines tall.<br><br>The register <a href="#202">vreg_window</a> sets the position of the display window. Note: both vertical and<br>horizontal location settings are written this same register, its function changes depending<br>on bit 2 of <a href="#204">vreg_rasthi</a>  (see the example at the end of this section)</pre>
-<pre><br><span style="text-decoration: underline;"><a name="Horizontal_Positions"></a>Horizontal Positions - X_START and X_STOP</span></pre><span style="text-decoration: underline;"></span>
-<pre>When writing to the <a href="#202">vreg_window</a> register to set the horizontal positioning, the byte should<br>be composed as follows:<br><br>Bits: [7:4] X_START value<br>      [3:0] X_STOP value<br><br>(Make sure <a href="#204">vreg_rasthi</a> was previously written with a value that has bit 2 set.)<br><br>The table below shows all the possible combinations of X_START (green: columns) and X_STOP<br>(blue: rows). Where a column and row intersect, the value is the width of the display in<br>pixels. Note: X_Start values 0-4 (in red) are positioned well off the left hand side of the<br>display so should not be used. A good, centralized 320 pixel wide display choice would be<br>the value $8C. <br><br></pre><table style="text-align: left; width: 50%;" border="1" cellpadding="2" cellspacing="2"><tbody><tr><td></td><td style="background-color: rgb(153, 255, 255);">$x0</td><td style="background-color: rgb(153, 255, 255);">$x1</td><td style="background-color: rgb(153, 255, 255);">$x2</td><td style="background-color: rgb(153, 255, 255);">$x3</td><td style="background-color: rgb(153, 255, 255);">$x4</td><td style="background-color: rgb(153, 255, 255);">$x5</td><td style="background-color: rgb(153, 255, 255);">$x6</td><td style="background-color: rgb(153, 255, 255);">$x7</td><td style="background-color: rgb(153, 255, 255);">$x8</td><td style="background-color: rgb(153, 255, 255);">$x9</td><td style="background-color: rgb(153, 255, 255);">$xA</td><td style="background-color: rgb(153, 255, 255);">$xB</td><td style="background-color: rgb(153, 255, 255);">$xC</td><td style="background-color: rgb(153, 255, 255);">$xD</td><td style="background-color: rgb(153, 255, 255);">$xE</td><td style="background-color: rgb(153, 255, 255);">$xF</td></tr><tr><td style="background-color: rgb(255, 102, 102);">$0x</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td><td>400</td><td>416</td><td>432</td><td>464</td><td>480</td><td>496</td><td>512</td></tr><tr><td style="background-color: rgb(255, 102, 102);">$1x</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td><td>400</td><td>416</td><td>432</td><td>464</td><td>480</td><td>496</td></tr><tr><td style="background-color: rgb(255, 102, 102);">$2x</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td><td>400</td><td>416</td><td>432</td><td>464</td><td>480</td></tr><tr><td style="background-color: rgb(255, 102, 102);">$3x</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td><td>400</td><td>416</td><td>432</td><td>464</td></tr><tr><td style="background-color: rgb(255, 102, 102);">$4x</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td><td>400</td><td>416</td><td>432</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$5x</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td><td>400</td><td>416</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$6x</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td><td>400</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$7x</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td><td>384</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$8x</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td><td>368</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$9x</td><td>112</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td><td>352</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Ax</td><td>96</td><td>112</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td><td>336</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Bx</td><td>80</td><td>96</td><td>112</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td><td>320</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Cx</td><td>64</td><td>80</td><td>96</td><td>112</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td><td>304</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Dx</td><td>48</td><td>64</td><td>80</td><td>96</td><td>112</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td><td>288</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Ex</td><td>32</td><td>48</td><td>64</td><td>80</td><td>96</td><td>112</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td><td>272</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Fx</td><td>16</td><td>32</td><td>48</td><td>64</td><td>80</td><td>96</td><td>112</td><td>128</td><td>144</td><td>160</td><td>176</td><td>192</td><td>208</td><td>224</td><td>240</td><td>256</td></tr></tbody></table><pre><br>Theory: The X_Start and X_Stop values correspond to bits [7:4] of an<br>internal low-res pixel clock counter (which counts from 0-511 on each<br>scanline). X_Start values cover the count range 0,16,32,48 etc (the beam<br>actually enters the left side of the visible (PAL TV) display somewhere<br>around count = 96)  <br><br>X_Stop values cover the count range 256,272,288,304 etc (the raster beam<br>leaves the display somewhere around count 496)&nbsp;Note: X_Stop 0 (count = 256) is<br>not the exact middle of the visible display because the TV's raster beam does<br>not advance during sync periods (at the extreme left of the display).<br><br><br><br><span style="text-decoration: underline;"><a name="Vertical_Positions:"></a>Vertical Positions:<br><br></span>When writing to the <a href="OSCA_Hardware_Manual2.html#202">vreg_window</a> register, the byte should be composed as follows:<br><br>Bits: [7:4] Y_START value<br>      [3:0] Y_STOP value<br><br>(Make sure <a href="#204">vreg_rasthi</a> was previously written with a value that has bit 2 clear.)<br><br>The table below shows all the possible combinations of Y_START (green: columns) and Y_STOP<br>(blue: rows). Where a column and row intersect, the value is the height of the display in<br>scanlines.  Note: Y_Start values 0-1 (in red) are above the top of the display so should<br>not be used. A good, centralized 200 line wide display choice would be the value $5A.<br></pre>
-<table style="text-align: left; width: 50%;" border="1" cellpadding="2" cellspacing="2"><tbody><tr><td></td><td style="background-color: rgb(153, 255, 255);">$x0</td><td style="background-color: rgb(153, 255, 255);">$x1</td><td style="background-color: rgb(153, 255, 255);">$x2</td><td style="background-color: rgb(153, 255, 255);">$x3</td><td style="background-color: rgb(153, 255, 255);">$x4</td><td style="background-color: rgb(153, 255, 255);">$x5</td><td style="background-color: rgb(153, 255, 255);">$x6</td><td style="background-color: rgb(153, 255, 255);">$x7</td><td style="background-color: rgb(153, 255, 255);">$x8</td><td style="background-color: rgb(153, 255, 255);">$x9</td><td style="background-color: rgb(153, 255, 255);">$xA</td><td style="background-color: rgb(153, 255, 255);">$xB</td><td style="background-color: rgb(153, 255, 255);">$xC</td><td style="background-color: rgb(153, 255, 255);">$xD</td><td style="background-color: rgb(153, 255, 255);">$xE</td><td style="background-color: rgb(153, 255, 255);">$xF</td></tr><tr><td style="background-color: rgb(255, 102, 102);">$0x</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td><td>232</td><td>240</td><td>256</td><td>264</td><td>272</td><td>280</td><td>288</td></tr><tr><td style="background-color: rgb(255, 102, 102);">$1x</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td><td>232</td><td>240</td><td>256</td><td>264</td><td>272</td><td>280</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$2x</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td><td>232</td><td>240</td><td>256</td><td>264</td><td>272</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$3x</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td><td>232</td><td>240</td><td>256</td><td>264</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$4x</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td><td>232</td><td>240</td><td>256</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$5x</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td><td>232</td><td>240</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$6x</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td><td>232</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$7x</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td><td>224</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$8x</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td><td>216</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$9x</td><td>88</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td><td>208</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Ax</td><td>80</td><td>88</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td><td>200</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Bx</td><td>72</td><td>80</td><td>88</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td><td>192</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Cx</td><td>64</td><td>72</td><td>80</td><td>88</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td><td>184</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Dx</td><td>56</td><td>64</td><td>72</td><td>80</td><td>88</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td><td>176</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Ex</td><td>48</td><td>56</td><td>64</td><td>72</td><td>80</td><td>88</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td><td>168</td></tr><tr><td style="background-color: rgb(153, 255, 153);">$Fx</td><td>40</td><td>48</td><td>56</td><td>64</td><td>72</td><td>80</td><td>88</td><td>96</td><td>104</td><td>112</td><td>120</td><td>128</td><td>136</td><td>144</td><td>152</td><td>160</td></tr></tbody></table>
-<pre><br><br><span style="text-decoration: underline;">Y_START and Sprite Y coordinates / Linecop:</span><br><br>The Y_START value does not affect the y coordinate origin of sprites (or Linecop wait lines)<br>which are based on an internal line counter. This line count starts 16 lines above the first<br>possible (visible) line of the display. Y_START and LINECOUNT align as follows:<br><br>  .----------------------.<br>  |Y_START | LINE COUNTER|<br>  |--------|-------------|  <br>  |   0*   |     1       |<br>  |   1*   |     9       |<br>  |   2    |     17      |<br>  |   3    |     25      |<br>  |   4    |     33      |<br>  |   5    |     41      |<br>   ----------------------<br></pre><span style="text-decoration: underline;"></span><pre>..and so on..<br><br>(* These Y_Start values are outside the top of display and therefore are of no use)<br><br><br><span style="text-decoration: underline;">PAL/NTSC/VGA:</span><br><br>Because PAL/NTSC/VGA use differing amounts of scanlines to make up a full display,<br>if Y_START and Y_STOP values are chosen to vertically <span style="font-weight: bold;">centre</span> a window, that window<br>will be offset in other video modes. If vertical centring is important, a program<br>must detect the video mode and adjust Y_Start and Y_Stop accordingly - note that<br>this will also adjusting your Sprite and Linecop coordinates. The 60Hz mode flag<br>in the Video Status Register can assist if the correction is to be done automatically,<br>else a display adjust routine can be provided in user programs.<br><br><br></pre><pre style="text-decoration: underline;">Example code: Display Window setting:</pre>
-<pre>To set the vertical start and stop positions of the display window, first write<br><a href="#204">vreg_rasthi</a> with bit 2 clear, then write an appropriate value from the tables<br>above to <a href="#202">vreg_window</a>. To set the horizontal positions, write <a href="#204">vreg_rasthi</a> with<br>bit 2 set, then write an appropriate value for the horizontal setting to <a href="#202">vreg_window</a>.<br><br>EG:<br>&nbsp;&nbsp; &nbsp;ld a,$00<br>&nbsp;&nbsp; &nbsp;ld (vreg_rasthi),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; selects vertical window setting<br>&nbsp;&nbsp; &nbsp;ld a,$5a<br>&nbsp;&nbsp; &nbsp;ld (vreg_window),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; sets vertical window size/position (200 lines)<br>&nbsp;&nbsp; &nbsp;ld a,$04<br>&nbsp;&nbsp; &nbsp;ld (vreg_rasthi),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; selects horizontal window setting<br>&nbsp;&nbsp; &nbsp;ld a,$8c<br>&nbsp;&nbsp; &nbsp;ld (vreg_window),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; sets horizontal window size/position (320 pixels</pre>
-<pre><br></pre>
-<hr style="width: 100%; height: 2px;">
-<h3><a name="Blitter:"></a>Blitter:</h3>
-<pre>OSCA&#8217;s blitter can transfer data around video memory much faster than the CPU (it copies one<br>byte every 2 system clocks, compared with the CPU's LDIR instruction @ 1 byte per 21 clocks).<br>It can work in ascending or descending address order and also has modulo registers so that<br>rectangular areas within larger overall arrays can be shifted in one go. It can, however,<br>only operate within video memory. There is the option to skip the writing of source bytes<br>that equal zero, this is mainly useful in Chunky pixel mode where it can be used to mask<br>out "transparent" pixels (eg: drawing "bobs").<br><br>The blitter takes priority over access to video RAM from the CPU (but obviously the video<br>datafetch still impedes its performance) and the CPU is forced to wait for the blitter to<br>finish its operation if it tries to access video memory whilst a blit is under way.<br>Otherwise, a blit can be started and the CPU can continue with another task.<br><br>The blitter's registers are located at <a href="#210">$200-21a</a>, see the register list for more information.<br><br></pre>
-<hr style="width: 100%; height: 2px;">
-<h3>Line Draw:</h3>
-<pre>The hardware line draw unit can be used in chunky pixel mode. In a similar fashion to the<br>blitter, this system&nbsp;takes priority over access to video memory and leaves the CPU free<br>to do other things (it cannot run concurrently with the blitter, however).<br><br>Using this system involves setting up a table of constants (common to all lines) and<br>setting start address, length, colour and Bresenham values for each line. There are two<br>sets of line draw registers, allowing registers to be loaded for a new line whilst<br>another line is being drawn. The line draw system's registers are located at: <a href="#2201">$220-$23f</a>,<br>see the register list for more details.<br><br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <h3>Line Sync'd Co-Pro ("<a name="LineCop"></a>LineCop"):</h3>
 <pre>This simple co-processor allows changes to be made to the display at specific scan lines<br>without having to use manual CPU interrupts (it operates using DMA cycle-stealing in a<br>similar manner to the sound system). The LineCop system follows a program, there are 3<br>main instructions and each instruction is two bytes long. The upper bits of the MSB<br>determines what kind of instruction it is:</pre>
 <pre><br><span style="text-decoration: underline;">Bit: 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00</span><br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp; 1&nbsp; x&nbsp; x&nbsp; x&nbsp; x&nbsp; x&nbsp; L&nbsp; L&nbsp; L&nbsp; L&nbsp; L&nbsp; L&nbsp; L&nbsp; L&nbsp; L&nbsp; = Wait for line L</pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp; 0&nbsp; x&nbsp; x&nbsp; x&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; R&nbsp; = Select Register R</pre>
 <pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; a&nbsp; b&nbsp; c&nbsp; x&nbsp; x&nbsp; x&nbsp; x&nbsp; D&nbsp; D&nbsp; D&nbsp; D&nbsp; D&nbsp; D&nbsp; D&nbsp; D&nbsp; = Write D to Register</pre>
-<pre><br>x = Dont care<br>L = Line to wait for<br>R = Register to update ($0-$7FF)<br>D = Data byte to write to selected register <br>a = If set: After Write, increment selected register<br>b = If set: After write, increment wait line (and wait)<br>c = If set: After write, reload LineCop Program Counter from Start Location Registers<br><br>Wait and Register Select instructions take 2 clock cycles, Register Writes take 3 cycles.</pre>
-<pre>The start address of the Linecop program is held in registers $20D: <a href="#20d">vreg_linecop_addr0</a> (bits 7:0)<br>$20E: <a href="#20e">vreg_linecop_addr1</a> (bits 15:8) and $20F: <a href="#20f__vreg_linecop_addr2">vreg_linecop_addr2</a> (18:16) - there are some special<br>considerations when writing to these registers:<br><br>1. Linecop programs must be aligned at even bytes in memory, however bit 0 of the address (as written<br>   to vreg_linecop_addr0) is the Linecop hardware enable control. Therefore, the value written to<br>   this register needs be an ODD number if the linecop is to run.<br><br>2. Hardware register $20f (<a href="#20f__vreg_linecop_addr2">vreg_linecop_addr2</a>) uses the same physical address as <a href="#20f">vreg_palette_ctrl</a>.<br>   Bit 7 selects which register is updated: 1 = write to Linecop address, 0 = Write to the palette<br>   register.<br><br>3. Write to <a href="#20d">vreg_linecop_addr0</a> last, so that all the other address bytes are populated whilst the<br>   linecop is inactive.<br><br>An example of setting the linecop address:<br><br>	LD C,$02			<br>	LD DE,$468A			;Linecop address in system memory (C:DE) is $02468A<br><br>	LD IX,vreg_linecop_addr0<br>	SET 7,c				;Make sure linecop register selected (set bit 7 of MSB)<br>	SET 0,E				;Make sure linecop enable bit is set (set bit 0 of LSB)<br>	LD (IX+2),C<br>	LD (IX+1),D<br>	LD (IX+0),E<br><br>The LineCop's internal Program Counter is reloaded from the address held in <a href="#20d">vreg_linecop_addr0-2</a> <br>at the end of every frame and also when forced by a LineCop write instruction which has bit 12 set.<br>As the LineCop can write to its own location pointers and restart itself, automatic list cycling / page<br>flipping can be achieved. Linecop programs should end with a wait for a line that is never reached,<br>IE: $1FF (Use the instruction code hexcode $C1FF)</pre>
+<pre><br>x = Dont care<br>L = Line to wait for<br>R = Register to update ($0-$7FF)<br>D = Data byte to write to selected register <br>a = If set: After Write, increment selected register<br>b = If set: After write, increment wait line (and wait)<br>c = If set: After write, reload LineCop Program Counter from Start Location Registers<br><br>Wait and Register Select instructions take 2 clock cycles to perform, Register Writes take 3 cycles.</pre>
+<pre>The start address of the Linecop program is held in registers $20D: <a href="#20d">linecop_addr0</a> (bits 7:0)<br>$20E: <a href="#20e">linecop_addr1</a> (bits 15:8) and $20F: <a href="#20f__vreg_linecop_addr2">linecop_addr2</a> (18:16) - there are some special<br>considerations when writing to these registers:<br><br>1. Linecop programs must be aligned at even bytes in memory, however bit 0 of the address (as written<br>   to linecop_addr0) is the Linecop hardware enable control. Therefore, the value written to<br>   this register needs be an ODD number if the linecop is to run.<br><br>2. Hardware register $20f (<a href="#20f__vreg_linecop_addr2">linecop_addr2</a>) uses the same physical address as <a href="#20f">vreg_palette_ctrl</a>.<br>   Bit 7 selects which register is updated: 1 = write to Linecop address, 0 = Write to the palette<br>   register.<br><br>3. Write to <a href="#20d">linecop_addr0</a> last, so that all the other address bytes are populated whilst the<br>   linecop is inactive.<br><br>An example of setting the linecop address:<br><br>  LD C,$02 <br>  LD DE,$468A ;Linecop address in system memory (C:DE) is $02468A<br><br>  LD IX,linecop_addr0<br>  SET 7,c ;Make sure linecop register selected (set bit 7 of MSB)<br>  SET 0,E ;Make sure linecop enable bit is set (set bit 0 of LSB)<br>  LD (IX+2),C<br>  LD (IX+1),D<br>  LD (IX+0),E<br><br>The LineCop's internal Program Counter is reloaded from the address held in <a href="#20d">linecop_addr0-2</a> <br>at the end of every frame and also when forced by a LineCop write instruction which has bit 12 set.<br>As the LineCop can write to its own location pointers and restart itself, automatic list cycling / page<br>flipping can be achieved. Linecop programs should end with a wait for a line that is never reached,<br>IE: $1FF (Use the instruction code hexcode $C1FF)</pre>
 <pre>When the raster reaches a scanline that matches that set by a LineCop wait instruction, the<br>LineCop steals time from the CPU until it reaches the next Wait instruction. If the end of<br>the scanline is reached first, the Linecop becomes inactive until the next frame.</pre>
-<pre>Whilst writes to the palette etc have immediate effect, some video register changes will<br>not take effect until the start of the next scanline, or sometimes the line following<br>that. This is due to the way the internal scanline buffers are generated. It is advisable<br>to use the double-buffered registers whilst making changes to the sprites or bitmap locations<br>as the write will occur some time during the linebuffer generation period. &nbsp;</pre>
-<pre>As the LineCop can access all the video registers including blitter etc, beware of malformed<br>LineCop programs causing undesired effects. The linecop only ever writes to the hardware<br>registers - never system RAM - EG: bit 7 of the port &#8220;<a href="#Port_0B">sys_alt_write_page</a>&#8221; is irrelevent to<br>the LineCop.</pre>
-<pre style="text-decoration: underline;"><br>An example LineCop program:</pre>
+<pre>As the LineCop can access all the video registers including blitter etc, beware of malformed<br>LineCop programs causing undesired effects. The linecop only ever writes to the hardware<br>registers - never system RAM - EG: bit 7 of the port &#8220;<a href="#Port_0B">sys_alt_write_page</a>&#8221; is irrelevent to<br>the LineCop.<br><br><br><span style="text-decoration: underline;">Linecop scanline alignment</span><br><br>Although the Linecop uses the same internal line counter as the sprite system, there can<br>be a difference in the values required to achieve visual alignment between the two systems.<br>This is because each line of sprite data (like the background video) is buffered and displayed<br>on the next line (see <a href="#Video_Hardware_Timing">hardware timing</a>). Other systems, like the colour palette, however<br>will respond immediately to changes and show effects on the "live" scanline. &nbsp;In addition,<br>some register writes are buffered until the end of a scanline so the effect of a change<br>may not be visible until 2 scanlines later.<br><br>An example:<br><br> A sprite y coordinate is set at $29, and appears at the top line of the display. If we<br> wanted the Linecop to change one of its colours on its top row of pixels we should actually<br> wait for line $2a with the Linecop. (The sprite data line is generated and buffered on<br> line $29, but its pixels only appear a line later on line $2a). Note: It is possible to<br> use the dual palettes to get around this issue.<br><br><br><span style="text-decoration: underline;">Simple LineCop program:</span></pre>
 <pre>Change the background colour to white at scanline $50, and black at scan line $51</pre>
 <pre>Location | Instruction<br>----------------------</pre>
 <pre>$08000:&nbsp;&nbsp; &nbsp;$c050&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Wait for line $50<br>$08002: &nbsp; &nbsp;$8000&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Select video register $000 (background colour)<br>$08004:&nbsp;&nbsp; &nbsp;$40ff&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Write $ff to colour LSB, increment video register<br>$08006:&nbsp;&nbsp; &nbsp;$20ff&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Write $ff to colour MSB, increment wait line (and wait)<br>$08008:&nbsp;&nbsp; &nbsp;$8000&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Select video register $000 (background colour)<br>$0800A:&nbsp;&nbsp; &nbsp;$4000&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Write $00 to colour LSB, increment video register<br>$0800C:&nbsp;&nbsp; &nbsp;$0000&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Write $00 to colour MSB<br>$0800E:&nbsp;&nbsp; &nbsp;$C1FF&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; Wait for line $1FF (Never reached - end of LineCop program)</pre>
 <pre>Note that LineCop instruction WORDS are shown for clarity above - the BYTE ordering is<br>Z80 standard little endian, therefore - as bytes - the code above would be listed:</pre>
 <pre>$08000: $50,$c0, $00,$80, $ff,$40, $ff,$20, $00,$80, $00,$40, $00,$00, $ff,$c1</pre>
-<pre>The above LineCop program can be started with the Z80 code:</pre>
-<pre> LD A,$0<br> LD HL,$8000                      ; LineCop program Address in A:HL = $08000 <br> SET 7,A                          ; bit 7 of MSB must be set for writing to vreg_linecop_addr2 <br> SET 0,L                          ; bit 0 of LSB must be set if the linecop is to run<br> LD IX,vreg_linecop_addr0<br>&nbsp;LD (IX+2),A                      ; Set address MSB <br> LD (IX+1),H<br> LD (IX+0),L                      ; Set address LSB and start</pre>
+<pre><br>The LineCop program above can be started with the Z80 code:</pre>
+<pre> LD A,$0<br> LD HL,$8000             ; LineCop program Address in A:HL = $08000 <br> SET 7,A                 ; bit 7 of MSB must be set for writing to vreg_linecop_addr2 <br> SET 0,L                 ; bit 0 of LSB must be set if the linecop is to run<br> LD IX,linecop_addr0<br>&nbsp;LD (IX+2),A             ; Set address MSB <br> LD (IX+1),H<br> LD (IX+0),L             ; Set address LSB and start</pre>
 <pre><br>The LineCop can be stopped with the Z80 code:</pre>
-<pre> LD A,$0                           ; Zero the accumulator<br> LD (vreg_linecop_addr0),A&nbsp;&nbsp;     &nbsp; ; When bit 0 of this register is zero, the linecop is stopped.</pre>
+<pre> LD A,$0                 ; Zero the accumulator<br> LD (linecop_addr0),A&nbsp;&nbsp; &nbsp;; When bit 0 of this register is zero, the linecop is stopped.</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
-<h3><a name="Colour_palette"></a>Colour
-palette:</h3>
-<pre>The V6Z80P's colour resolution is 12 bit, with 4 bits for red, green and blue (a choice<br>of 4096 colours). The indexed pixel colour system used by OSCA allows up to 256 colours<br>on screen at once (without using mid-screen register reloading). There are two sets of<br>palette registers, each holding 256 entries (words). The palette currently being accessed<br>by the video hardware to build the video frame and that which receives writes from the<br>CPU / LineCop can be independently set (see "<a href="#20f">vreg_palette_ctrl</a>")</pre>
-<pre>Both palettes are located at memory locations $000 - $1FF, with the following format:</pre>
-<pre> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="text-decoration: underline;">Colour 0&nbsp;&nbsp;&nbsp; Colour 1&nbsp;&nbsp;&nbsp; Colour 2&nbsp;&nbsp;&nbsp;&nbsp; etc..</span><br><br>Location:&nbsp; $00,$01,&nbsp;&nbsp;&nbsp; $02,$03,&nbsp;&nbsp;&nbsp;&nbsp; $04,$05,&nbsp;&nbsp;&nbsp; etc..<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GB&nbsp; 0R&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GB&nbsp; 0R&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GB&nbsp; 0R&nbsp;&nbsp;&nbsp;&nbsp; etc..</pre>
-<pre><br>Where R, G &amp; B are the 4 bit intensity values of Red, Green and Blue. (The 4 MSBs [15:12]<br>of each entry are not used and should be written with zeroes).</pre>
-<pre><br></pre>
+<h3><a name="Blitter:"></a>Blitter:</h3>
+<pre>OSCA&#8217;s blitter can transfer data around video memory much faster than the CPU (it copies one<br>byte every 2 system clocks, compared with the CPU's LDIR instruction @ 1 byte per 21 clocks).<br>It can work in ascending or descending address order and also has modulo registers so that<br>rectangular areas within larger overall arrays can be shifted in one go. It can, however,<br>only operate within video memory. There is the option to skip the writing of source bytes<br>that equal zero, this is mainly useful in Chunky pixel mode where it can be used to mask<br>out "transparent" pixels (eg: drawing "bobs").</pre>
+<pre><br>The blitter takes priority over access to video RAM from the CPU (but obviously the video<br>datafetch still impedes its performance) and the CPU is forced to wait for the blitter to<br>finish its operation if it tries to access video memory whilst a blit is under way.<br>Otherwise, a blit can be started and the CPU can continue with another task.</pre>
+<pre>The blitter's registers are located at <a href="OSCA_Hardware_Manual.html#210">$200-21a</a>, see the register list for more information.</pre>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3>Line Draw:</h3>
+<pre>The hardware line draw unit can be used in chunky pixel mode. In a similar fashion to the<br>blitter, this system&nbsp;takes priority over access to video memory and leaves the CPU free<br>to do other things (it cannot run concurrently with the blitter, however).</pre>
+<pre><br>Using this system involves setting up a table of constants (common to all lines) and<br>setting start address, length, colour and Bresenham values for each line. There are two<br>sets of line draw registers, allowing registers to be loaded for a new line whilst<br>another line is being drawn. The line draw system's registers are located at: <a href="OSCA_Hardware_Manual.html#2201">$220-$23f</a>,<br>see the register list for more details.<br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <h3>Resolution:</h3>
 <pre>The normal horizontal pixel resolution in TV mode is 8MHz and 16MHz in VGA mode - this<br>means there can be approximately a maximum of 368 pixels visible on any one scan line.<br>As there is spare bandwidth in TV mode, there is the option to increase the pixel rate<br>to 16MHz, at the expense of colour depth (reduced to 16 colours max) &#8211; see bit 3 of<br>&#8220;<a href="#20c">vreg_ext_vidctrl</a>&#8221; - this is referred to as Hi-Res Mode. In this mode, the colour index<br>of each normal pixel is split into two 4-bit indices (7:4 = Leftside hi-res pixel,<br>3:0&nbsp; = Rightside hi-res pixel).&nbsp; This process is applied at final output stage of the<br>pixel colour look-up and is merely a &#8220;filter&#8221; instead of a "real" hi-res mode. Because<br>the sprite priority system is unaware of this filter, it still processes priorities<br>based on 8 bit pixel values - therefore sprite interleaving should not be used in<br>hi-res mode.</pre>
@@ -335,31 +1004,31 @@ Hardware Timing:</h3>
 <pre>As can be seen from the diagram below, each video line is internally buffered until the<br>next scan line when it actually displayed. The sprites and background video layers are<br>generated simultaneously to separate buffers and combined when the line is eventually<br>clocked out to the display.<br><br><br><img style="width: 436px; height: 200px;" alt="Linebuffer timing" src="images/linebuffer_timing.png"><br>&nbsp;</pre>
 <pre>Writing to most video registers will have an immediate visible effect (EG: writes to<br>the colour palette, unless double buffered) but some will not visibly change anything<br>until the following scan line as changes are automatically synchronized to the start<br>of a new scan line, these include:</pre>
 <pre>* &#8220;Live Palette Select&#8221; (in <a href="#20f">vreg_palette_ctrl</a>)</pre>
-<pre>*&nbsp;&#8220;Live Bitplane Location Register Set Select&#8221; (also &#8220;Playfield A map buffer select&#8221;<br> when in Tilemap mode) (bit 5 in <a href="#201">vreg_vidctrl</a>)</pre>
+<pre>*&nbsp;&#8220;Live Bitplane Location Register Set Select&#8221; (also &#8220;Playfield A map buffer select&#8221;<br>   when in Tilemap mode) (bit 5 in <a href="#201">vreg_vidctrl</a>)</pre>
 <pre>*&nbsp;&#8220;Tilemap Mode Select&#8221; (bit 0 in <a href="#201">vreg_vidctrl</a>)</pre>
-<pre>*&nbsp;&#8220;Chunky or Planar Bitmap Mode Select&#8221; (also &#8220;Dual Playfield On/Off Select&#8221; when<br> in Tile Map mode) (bit 7 in <a href="#201">vreg_vidctrl</a>)</pre>
+<pre>*&nbsp;&#8220;Chunky or Planar Bitmap Mode Select&#8221; (also &#8220;Dual Playfield On/Off Select&#8221; when<br>   in Tile Map mode) (bit 7 in <a href="#201">vreg_vidctrl</a>)</pre>
 <pre>*&nbsp;&#8220;Display Window Right Side Position&#8221; (in <a href="#202">vreg_window</a>)</pre>
 <pre><br>A note concerning updating bitmap location pointers: Each line begins generation<br>before the LineCop DMA starts, therefore even if the bitmap location registers are<br>changed with the linecop at the start of a line (IE: immediately following a LineCop<br>WAIT instruction) there will be some pixels at the start of the displayed line that<br>were fetched before the pointers were changed. This can be avoided using double buffering<br>via the 2nd bitmap location register set, alternatively the unwanted pixels can be<br>masked with a wide border etc.</pre>
 <pre><br><span style="text-decoration: underline;">Scan Line Timing Detail:</span></pre>
 <pre>Each scanline lasts for 1024 16MHz clock cycles in PAL TV mode (1016 cycles in NTSC or VGA<br>modes). At the start of each line the CPU is taken offline by a BUSREQ signal for audio DMA.<br>(There is short, variable delay of a few cycles following a Bus Request whilst waiting for an<br>acknowledgment from the CPU). Once the audio system is online, it lasts around 20 clock cycles.<br>Following on, the LineCop has control of the main system bus for as long as the necessary to<br>complete the LineCop operations required on that line. Afterwards, the CPU continues normally<br>(as long as it not forced to wait by it accessing video or sprite memory during active display<br>lines).</pre>
 <pre><br>Scanline Timing:<br><img style="width: 449px; height: 147px;" alt="Scanline timing diagram" src="images/scanline_timing.png"><br><br>Bitmap and sprite video data is fetched simultaneously and concurrently with the CPU<br>running normally as the three systems have their own memory buses. The time each<br>system requires to build its internal buffer is variable and depends on the amount of<br>data on a particular scan line.&nbsp; As mentioned, the CPU only has to wait if it tries to<br>access bitmap or sprite memory whilst data is being fetched by the relevant system.<br><br>The blitter and linedraw systems are also forced to wait during the bitmap fetch part<br>of a scan line. These systems have priority over the CPU in accessing video memory when<br>its free (not being read by the video system) and force the CPU to wait if the CPU<br>is trying access bitmap video memory at the same time. Active blits are paused at the<br>&#8220;last 16 cycles&#8221; point, ensuring the CPU is not waiting at the start of a scanline<br>(which could cause complications with the DMA functions). A paused blit continues<br>after the bitmap layer data fetch period.</pre>
 <pre><br><span style="text-decoration: underline;">Video Frequencies etc:</span></pre>
-<pre><br>Video output:<br><br> PAL non-interlaced : 50.0801 Hz, 312 lines per frame.</pre>
-<pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;PAL interlaced : 50 Hz, 625 lines (312 / 313 lines)</pre>
-<pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;Horizontal frequency : 15625 Hz</pre>
-<pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;Pixel clock : 8Mhz (Lo res) or 16MHz (Hi-res mode)</pre>
-<pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br> NTSC non-interlaced&nbsp; : 60.106 Hz, 262 lines per frame.</pre>
-<pre>	NTSC interlaced : 59.99 Hz, 525 lines (262 / 263 lines)</pre>
-<pre>	Horizontal frequency : 15748 Hz<br>	<br>	Pixel clock : 8Mhz (Lo res) or 16MHz (Hi-res mode)</pre>
-<pre>&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; <br>	<br>	VGA 60Hz : 60.106 Hz, 262 double-lines per frame<br><br>	Horizontal Frequency : 31496 Hz (line doubled)<br><br>	Pixel Clock : 16 Mhz (Low res only)</pre>
-<pre>	VGA 50Hz* : 50.4 Hz, 312 double-lines per frame<br><br>	Horizontal Frequency : 31496 Hz (line doubled)<br><br>	Pixel Clock : 16 Mhz (Low res only)</pre>
+
+
+
+<pre><br>Video output:<br><br> PAL non-interlaced   : 50.0801 Hz, 312 lines per frame.<br>&nbsp;PAL interlaced       : 50 Hz, 625 lines (312 / 313 lines)<br>&nbsp;Horizontal frequency : 15625 Hz<br>&nbsp;Pixel clock          : 8Mhz (Lo res) or 16MHz (Hi-res mode)</pre>
+
+
+<pre>&nbsp;<br>&nbsp;NTSC non-interlaced&nbsp; : 60.106 Hz, 262 lines per frame.<br>&nbsp;NTSC interlaced      : 59.99 Hz, 525 lines (262 / 263 lines)<br>&nbsp;Horizontal frequency : 15748 Hz<br> Pixel clock          : 8Mhz (Lo res) or 16MHz (Hi-res mode)</pre>
+
+<pre>&nbsp;VGA 60Hz             : 60.106 Hz, 262 double-lines per frame<br> Horizontal Frequency : 31496 Hz (line doubled)<br> Pixel Clock          : 16 Mhz (Low res only) <br> <br> VGA 50Hz*            : 50.4 Hz, 312 double-lines per frame<br> Horizontal Frequency : 31496 Hz (line doubled)<br> Pixel Clock          : 16 Mhz (Low res only)</pre>
 <pre><br>* This is a non-standard mode and may not work on all VGA monitors.</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <h3 style="text-decoration: underline;">Video Registers -
 Details:</h3>
 <pre>Notes:</pre>
-<pre>* The Video Registers are located between $0200-$07ff in Z80 address space, unless paged<br> out using the port: sys_alt_write_page</pre>
+<pre>* The Video Registers are located between $0200-$07ff in Z80 address space, unless paged<br>  out using the port: sys_alt_write_page</pre>
 <pre>* All video registers are WRITE ONLY.</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
@@ -396,7 +1065,6 @@ Details:</h3>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
 <pre><br><span style="font-weight: bold;"><a name="204"></a>$204 =&nbsp; "vreg_rasthi"</span> - Raster IRQ MSB, enable, clear &amp; Window XY switch </pre>
-
 <pre>&nbsp;&nbsp; 7 - Clear Raster IRQ flag *<br>&nbsp;6:3 - Not Used<br>&nbsp;&nbsp; 2 - <a href="#202">vreg_window</a> register X/Y switch (0 = Vertical, 1 = Horizontal)<br>&nbsp;&nbsp; 1 - Enable Raster IRQ<br>&nbsp;&nbsp; 0 - Raster IRQ Scanline Position MSB</pre>
 <pre>* When this register is written with bit 7 set, the video IRQ flag is cleared and the<br> rest of the register's contents are unchanged</pre>
 <pre><br></pre>
@@ -437,16 +1105,15 @@ Details:</h3>
 <hr style="width: 100%; height: 2px;">
 <pre></pre>
 <pre><br><span style="font-weight: bold;"><a name="20c"></a>$20c = "vreg_ext_vidctrl"</span> - Extended Video Mode Control Bits</pre>
-<pre>&nbsp;&nbsp; &nbsp;7:4 &#8211; n/u<br>&nbsp;&nbsp; &nbsp;&nbsp; 3 &#8211; Enable Hi-Res 16 colour TV mode (no effect in VGA mode)<br>&nbsp;&nbsp; &nbsp;&nbsp; 2 - Enable interlaced TV mode (no effect on VGA output)<br>&nbsp;&nbsp; &nbsp;&nbsp; 1 - Flip Dual Playfield priorities (1 = PF B appears behind PF A)<br>&nbsp;&nbsp; &nbsp;&nbsp; 0 - Use extended tile indexes (1 = on, 0 = "legacy" 8 bit tile indexes)</pre>
+<pre>&nbsp;&nbsp;7:4 &#8211; n/u<br>&nbsp;&nbsp;&nbsp; 3 &#8211; Enable Hi-Res 16 colour TV mode (no effect in VGA mode)<br>&nbsp;&nbsp;&nbsp; 2 - Enable interlaced TV mode (no effect on VGA output)<br>&nbsp;&nbsp;&nbsp; 1 - Flip Dual Playfield priorities (1 = PF B appears behind PF A)<br>&nbsp;&nbsp;&nbsp; 0 - Use extended tile indexes (1 = on, 0 = "legacy" 8 bit tile indexes)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre></pre>
 <pre><br><span style="font-weight: bold;"><a name="20d"></a>$20d = "linecop_addr0"</span>- LineCop list address bits 7:1 (bit = enable)</pre>
-<pre>&nbsp;&nbsp; &nbsp;7:1 - Linecop program location bits: 7:1 (LSB)<br>&nbsp;&nbsp; &nbsp;&nbsp; 0 - LineCop on/off (1 = enable)</pre>
-
+<pre>&nbsp;&nbsp;&nbsp;7:1 - Linecop program location bits: 7:1 (LSB)<br>&nbsp;&nbsp;&nbsp;&nbsp; 0 - LineCop on/off (1 = enable)</pre>
 <pre><br><br><span style="font-weight: bold;"><a name="20e"></a>$20e = "linecop_addr1"</span>- LineCop list address bits 15:8</pre>
 <pre>&nbsp; <br></pre>
-<pre><span style="font-weight: bold;"><a name="20f__vreg_linecop_addr2"></a>$20f = "linecop_addr2"</span> - Linecop list address bits 18:16<br><br>   7   - Always set to 1 when writing a linecop address (otherwise vreg_palette_ctrl is selected)<br>   6:3 - Not currently used (write with zeroes)<br>   2:0 - Linecop list address bits 18:16 (MSB)</pre>
+<pre><span style="font-weight: bold;"><a name="20f__vreg_linecop_addr2"></a>$20f = "linecop_addr2"</span> - Linecop list address bits 18:16<br><br>    7 - Always set to 1 when writing a linecop address (otherwise vreg_palette_ctrl is selected)<br>  6:3 - Not currently used (write with zeroes)<br>  2:0 - Linecop list address bits 18:16 (MSB)</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br></pre>
@@ -519,7 +1186,7 @@ ROM</span> </h3>
 <pre>(All ports are 8 bit unless stated)<span style="text-decoration: underline;"><br><br>Port: Dir: Name:</span><br> <br><a href="#Port:_00">$00</a> R/W <a href="#Port:_00">sys_mem_select</a><br><a href="#Port:_01_-_Read">$01</a> R <a href="#Port:_01_-_Read">sys_irq_ps2_flags</a><br><a href="#Port_01_-_Write">$01</a> W <a href="#Port_01_-_Write">sys_irq_enable</a><br><a href="#Port:_02_-_Read">$02</a> R <a href="#Port:_02_-_Read">sys_keyboard_data</a><br><a href="#Port:_02_-_Write">$02</a> W <a href="#Port:_02_-_Write">sys_clear_irq_flags</a><br><a href="#Port:_03_-_Read">$03</a> R <a href="#Port:_03_-_Read">sys_mouse_data</a><br><a href="#Port:_03_-_Write">$03</a> W <a href="#Port:_03_-_Write">sys_ps2_joy_control</a><br><a href="#Port_04">$04</a> R/W <a href="#Port_04">sys_serial_port</a><br><a href="#Port_05_-_Read">$05</a> R <a href="#Port_05_-_Read">sys_joy_com_flags</a><br><a href="#Port_05_-_Write">$05</a> W <a href="#Port_05_-_Write">sys_sdcard_ctrl1</a> <br><a href="#Port_06">$06</a> R/W <a href="#Port_06">sys_sdcard_ctrl2</a> <br><a href="#Port:_07_-_Read">$07</a> R <a href="#Port:_07_-_Read">sys_vreg_read</a><br><a href="#Port:_07_-_Write">$07</a> W <a href="#Port:_07_-_Write">sys_timer </a><br><a href="#Port:_08_-_Read">$08</a> R <a href="#Port:_08_-_Read">sys_audio_flags</a><br><a href="#Port:_08_-_Write">$08</a> W <a href="#Port:_08_-_Write">sys_audio_enable</a><br><a href="#Port_09_-_Read">$09</a> R <a href="#Port_09_-_Read">sys_hw_flags</a> <br><a href="#Port_09_-_Write">$09</a> W <a href="#Port_09_-_Write">sys_hw_settings </a><br><a href="#Port_0A">$0a</a> R/W <a href="#Port_0A">sys_spi_port</a> <br><a href="#Port_0B">$0b</a> R/W <a href="#Port_0B">sys_alt_write_page</a><br><a href="#Port_0C_-_Write">$0c</a> W <a href="#Port_0C_-_Write">sys_baud_rate</a> <br><a href="#Port_0D_-_Read">$0d</a> R <a href="#Port_0D_-_Read">sys_eeprom_byte</a> <br><a href="#Port_0D_-_Write">$0d</a> W <a href="#Port_0D_-_Write">sys_pic_comms </a><br><a href="#Port_0E">$0e</a> R/W <a href="#Port_0E">sys_io_pins</a> <br><a href="#Port_0F_-_Read">$0f</a> R/W <a href="#Port_0F_-_Read">sys_io_dir </a><br><br><a href="#Port_10">$10</a> W <a href="#Port_10">audchan0_loc</a> (16 bit)<br><a href="#Port_11">$11</a> W <a href="#Port_11">audchan0_len</a> (16 bit) <br><a href="#Port_12">$12</a> W <a href="#Port_12">audchan0_per</a> (16 bit)<br><a href="#Port_13">$13</a> W <a href="#Port_13">audchan0_vol</a><br><a href="#14-17">$14</a> W <a href="#14-17">audchan1_loc</a> (16 bit)<br><a href="#14-17">$15</a> W <a href="#14-17">audchan1_len</a> (16 bit)<br><a href="#14-17">$16</a> W <a href="#14-17">audchan1_per</a> (16 bit)<br><a href="#14-17">$17</a> W <a href="#14-17">audchan1_vol</a><br><a href="#18-1b">$18</a> W <a href="#14-17">audchan2_loc</a> (16 bit)<br><a href="#18-1b">$19</a> W <a href="#14-17">audchan2_len</a> (16 bit)<br><a href="#18-1b">$1a</a> W <a href="#14-17">audchan2_per</a> (16 bit)<br><a href="#18-1b">$1b</a> W <a href="#14-17">audchan2_vol</a><br><a href="#1c-1f">$1c</a> W <a href="#14-17">audchan3_loc</a> (16 bit)<br><a href="#1c-1f">$1d</a> W <a href="#14-17">audchan3_len</a> (16 bit)<br><a href="#1c-1f">$1e</a> W <a href="#14-17">audchan3_per</a> (16 bit)<br><a href="#1c-1f">$1f</a> W <a href="#14-17">audchan3_vol</a><br><br><a href="#Port_20">$20</a> R/W <a href="#Port_20">sys_low_page</a> <br><a href="#Port_21_%3F_Read">$21</a> R/W <a href="#Port_21_%3F_Read">sys_vram_location</a><br><a href="#Port_22">$22</a> W <a href="#Port_22">sys_audio_panning </a><br><br><a href="#Port_24">$24</a> W <a href="#Port_24">audchan0_loc_hi</a><br><a href="#Port_25">$25</a> W <a href="#Port_25">audchan1_loc_hi</a><br><a href="#Port_26">$26</a> W <a href="#Port_26">audchan2_loc_hi</a><br><a href="#Port_27">$27</a> W <a href="#Port_27">audchan3_loc_hi</a><br><br><br></pre>
 <h3 style="text-decoration: underline;"><a name="Video_Register_List:"></a>Video Register
 List:</h3>
-<pre>($000-$6FF are write only registers)<br><br><br><span style="text-decoration: underline;">Addr:   Name:      Size (bits):</span><br><br><a href="#Colour_palette">$0000 palette</a>         256 * 16 <br><br><a href="#200">$0200 vreg_xhws</a>          8<br><a href="#201">$0201 vreg_vidctrl</a>       8<br><a href="#202">$0202 vreg_window </a>       8<br><a href="#203">$0203 vreg_yhws_bplcount</a> 8<br><a href="#204">$0204 vreg_rasthi</a>        8<br><a href="#205">$0205 vreg_rastlo</a>        8<br><a href="#206">$0206 vreg_vidpage </a>      8<br><a href="#207">$0207 vreg_sprctrl </a>      8<br><a href="#208__209">$0208 mult_write</a>         8<br><a href="#20A">$020a mult_index </a>        8 <br><a href="#20B">$020b linedraw_colour</a>    8<br><a href="#20c">$020c vreg_ext_vidctrl</a>   8<br><a href="#20d">$020d vreg_linecop_addr0</a> 8<br><a href="#20e">$020e vreg_linecop_addr1</a> 8<br><a href="#20f__vreg_linecop_addr2">$020f vreg_linecop_addr2</a> 8         ; Note: same register location as below, set bit 7 for this function<br><a href="#20f">$020f vreg_palette_ctrl</a>  8         ; Note: same register location as above, reset bit 7 for this function<br><br><a href="#210">$0210 blit_src_loc</a>       16<br><a href="#212">$0212 blit_dst_loc</a>       16<br><a href="#214">$0214 blit_src_mod</a>       8<br><a href="#215">$0215 blit_dst_mod</a>       8<br><a href="#216">$0216 blit_height</a>        8<br><a href="#217">$0217 blit_width</a>         8<br><a href="#218">$0218 blit_misc</a>          8 <br><a href="#219">$0219 blit_src_msb</a>       8<br><a href="#21a">$021a blit_dst_msb</a>       8<br><br><a href="#2201">$0220 linedraw_reg0</a>     16<br><a href="#2245">$0222 linedraw_reg1 </a>    16<br><a href="#2245">$0224 linedraw_reg2</a>     16<br><a href="#2267">$0226 linedraw_reg3</a>     16<br><a href="#2289">$0228 linedraw_reg4</a>     16<br><a href="#22ab">$022a linedraw_reg5 </a>    16<br><a href="#22cd">$022c linedraw_reg6 </a>    16<br><a href="#22ef">$022e linedraw_reg7</a>     16<br><br><a href="#2301">$0230 linedraw_lut0</a>     16<br><a href="#2323">$0232 linedraw_lut1 </a>    16<br><a href="#2345">$0234 linedraw_lut2</a>     16<br><a href="#2367">$0236 linedraw_lut3</a>     16<br><a href="#2389">$0238 linedraw_lut4</a>     16<br><a href="#23ab">$023a linedraw_lut5 </a>    16<br><a href="#23cd">$023c linedraw_lut6 </a>    16<br><a href="#23ef">$023e linedraw_lut7 </a>    16<br><br><a href="#240">$0240 bitplane0a_loc</a>    24<br><a href="#Reset_internal_offset">$0243 bitplane_reset</a>    8<br><a href="#244">$0244 bitplane1a_loc </a>   24<br><a href="#Set_Modulo">$0247 bitplane_modulo</a>   8<br><a href="#248">$0248 bitplane2a_loc</a>    24<br><a href="#24c">$024c bitplane3a_loc </a>   24<br><a href="#250">$0250 bitplane4a_loc</a>    24<br><a href="#254">$0254 bitplane5a_loc </a>   24<br><a href="#258">$0258 bitplane6a_loc </a>   24<br><a href="#25c">$025c bitplane7a_loc</a>    24<br><br><a href="#260-27f">$0260 bitplane0b_loc</a>    24<br><a href="#260-27f">$0264 bitplane1b_loc </a>   24<br><a href="#260-27f">$0268 bitplane2b_loc </a>   24<br><a href="#260-27f">$026c bitplane3b_loc </a>   24<br><a href="#260-27f">$0270 bitplane4b_loc</a>    24<br><a href="#260-27f">$0274 bitplane5b_loc </a>   24<br><a href="#260-27f">$0278 bitplane6b_loc</a>    24<br><a href="#260-27f">$027C bitplane7b_loc</a>    24<br><br><a href="#280_-_28F">$0280 priority_registers</a>  16 * 8<br><br><a href="#Sprite_Control_Registers">$0400 sprite_registers</a>   128 * 32<br><br><a href="#Hardware_Maths_Assist_%3F_multiply__scale">$0600 mult_table</a>         256 * 16<br><br><a href="#700">$0700 8 vreg_read </a>      8 (read only)<br><a href="#704-705">$0704 8 mult_read </a>     16 (read only)<br><br><span style="text-decoration: underline;"></span><br></pre>
+<pre>($000-$6FF are write only registers)<br><br><br><span style="text-decoration: underline;">Addr: Name: Size (bits):</span><br><br><a href="#Colour_palette">$0000 palette</a> 256 * 16 <br><br><a href="#200">$0200 vreg_xhws</a>          8<br><a href="#201">$0201 vreg_vidctrl</a>       8<br><a href="#202">$0202 vreg_window </a>       8<br><a href="#203">$0203 vreg_yhws_bplcount</a> 8<br><a href="#204">$0204 vreg_rasthi</a>        8<br><a href="#205">$0205 vreg_rastlo</a>        8<br><a href="#206">$0206 vreg_vidpage </a>      8<br><a href="#207">$0207 vreg_sprctrl </a>      8<br><a href="#208__209">$0208 mult_write</a>         8<br><a href="#20A">$020a mult_index </a>        8 <br><a href="#20B">$020b linedraw_colour</a>    8<br><a href="#20c">$020c vreg_ext_vidctrl</a>   8<br><a href="#20d">$020d vreg_linecop_addr0</a> 8<br><a href="#20e">$020e vreg_linecop_addr1</a> 8<br><a href="#20f__vreg_linecop_addr2">$020f vreg_linecop_addr2</a> 8 ; Note: same register location as below, set bit 7 for this function<br><a href="#20f">$020f vreg_palette_ctrl</a>  8 ; Note: same register location as above, reset bit 7 for this function<br><br><a href="#210">$0210 blit_src_loc</a>     16<br><a href="#212">$0212 blit_dst_loc</a>     16<br><a href="#214">$0214 blit_src_mod</a>      8<br><a href="#215">$0215 blit_dst_mod</a>      8<br><a href="#216">$0216 blit_height</a>       8<br><a href="#217">$0217 blit_width</a>        8<br><a href="#218">$0218 blit_misc</a>         8 <br><a href="#219">$0219 blit_src_msb</a>      8<br><a href="#21a">$021a blit_dst_msb</a>      8<br><br><a href="#2201">$0220 linedraw_reg0</a>    16<br><a href="#2245">$0222 linedraw_reg1 </a>   16<br><a href="#2245">$0224 linedraw_reg2</a>    16<br><a href="#2267">$0226 linedraw_reg3</a>    16<br><a href="#2289">$0228 linedraw_reg4</a>    16<br><a href="#22ab">$022a linedraw_reg5 </a>   16<br><a href="#22cd">$022c linedraw_reg6 </a>   16<br><a href="#22ef">$022e linedraw_reg7</a>    16<br><br><a href="#2301">$0230 linedraw_lut0</a>   16<br><a href="#2323">$0232 linedraw_lut1 </a>  16<br><a href="#2345">$0234 linedraw_lut2</a>   16<br><a href="#2367">$0236 linedraw_lut3</a>   16<br><a href="#2389">$0238 linedraw_lut4</a>   16<br><a href="#23ab">$023a linedraw_lut5 </a>  16<br><a href="#23cd">$023c linedraw_lut6 </a>  16<br><a href="#23ef">$023e linedraw_lut7 </a>  16<br><br><a href="#240">$0240 bitplane0a_loc</a>  24<br><a href="#Reset_internal_offset">$0243 bitplane_reset</a>   8<br><a href="#244">$0244 bitplane1a_loc </a> 24<br><a href="#Set_Modulo">$0247 bitplane_modulo</a>  8<br><a href="#248">$0248 bitplane2a_loc</a>  24<br><a href="#24c">$024c bitplane3a_loc </a> 24<br><a href="#250">$0250 bitplane4a_loc</a>  24<br><a href="#254">$0254 bitplane5a_loc </a> 24<br><a href="#258">$0258 bitplane6a_loc </a> 24<br><a href="#25c">$025c bitplane7a_loc</a>  24<br><br><a href="#260-27f">$0260 bitplane0b_loc</a>  24<br><a href="#260-27f">$0264 bitplane1b_loc </a> 24<br><a href="#260-27f">$0268 bitplane2b_loc </a> 24<br><a href="#260-27f">$026c bitplane3b_loc </a> 24<br><a href="#260-27f">$0270 bitplane4b_loc</a>  24<br><a href="#260-27f">$0274 bitplane5b_loc </a> 24<br><a href="#260-27f">$0278 bitplane6b_loc</a>  24<br><a href="#260-27f">$027C bitplane7b_loc</a>  24<br><br><a href="#280_-_28F">$0280 priority_registers</a> 16 * 8<br><br><a href="#Sprite_Control_Registers">$0400 sprite_registers</a> 128 * 32<br><br><a href="#Hardware_Maths_Assist_%3F_multiply__scale">$0600 mult_table</a> 256 * 16<br><br><a href="#700">$0700 8 vreg_read </a> 8 (read only)<br><a href="#704-705">$0704 8 mult_read </a> 16 (read only)<br><br><span style="text-decoration: underline;"></span><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><br><br>[END]</pre>
 </body></html>
