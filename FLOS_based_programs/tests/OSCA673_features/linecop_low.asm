@@ -30,12 +30,19 @@ include "equates\system_equates.asm"
 		
 		org ($+1) & $FFFE		; Linecop lists must be aligned to even bytes
 			
-my_linecop_list	dw $c028			; wait for line $28
+my_linecop_list	dw $c029			; wait for line $29
 		dw $8000			; set register 0 (colour 0 lo)
-		dw $0088			; write $88 to register
+		dw $0080			; write $88 to register
 		dw $8001			; set register 1
 		dw $0008			; write $08 to register
-		dw $c029			; wait for line $29
+		
+		dw $c02a			; wait for line $2a
+		dw $8000			; set register 0
+		dw $0008			; write $00 to register
+		dw $8001			; set register 1
+		dw $0008			; write $00 to register
+		
+		dw $c02b			; wait for line $2b
 		dw $8000			; set register 0
 		dw $0000			; write $00 to register
 		dw $8001			; set register 1
