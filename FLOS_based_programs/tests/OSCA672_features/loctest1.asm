@@ -225,16 +225,16 @@ four_len	dw 0
 
 
 one_wav	dw 0
-	incbin "\FLOS_based_programs\tests\osca672\data\one.raw"
+	incbin "\FLOS_based_programs\tests\osca672_features\data\one.raw"
 
 two_wav	dw 0
-	incbin "\FLOS_based_programs\tests\osca672\data\two.raw"
+	incbin "\FLOS_based_programs\tests\osca672_features\data\two.raw"
 
 three_wav	dw 0
-	incbin "\FLOS_based_programs\tests\osca672\data\three.raw"
+	incbin "\FLOS_based_programs\tests\osca672_features\data\three.raw"
 
 four_wav	dw 0
-	incbin "\FLOS_based_programs\tests\osca672\data\four.raw"
+	incbin "\FLOS_based_programs\tests\osca672_features\data\four.raw"
 
 end_wav	db 0
 
