@@ -1,7 +1,8 @@
 FLOS Load and Save Requesters for user programs - By Phil Ruston
 ----------------------------------------------------------------
 
-Requires FLOS v602+ / Last update 11-10-2012
+Requires FLOS v602+ / Last update v0.28 31-10-2012
+
 
 Purpose:
 ---------
@@ -16,7 +17,7 @@ How to add the necessary files to a project:
 --------------------------------------------
 
 The file requester routines utilise the window draw and support code. Make sure
-the V6Z78P project base dir is included in your assembly path and add one of the
+the V6Z80P project base dir is included in your assembly path and add one of the
 following lines to your .asm source:
 
 include	"flos_based_programs\code_library\requesters\inc\file_requesters.asm"
@@ -43,7 +44,8 @@ When control is returned to the host program, the following registers are set up
    Zero Flag: If set, the requester operation encountered no errors. In this case:
 
               A =  $00 : Ready to load file from disk, IX:IY = Length of file. 
-                         HL = Address of selected filename. 
+              
+              HL = Address of selected filename. 
 
    Zero Flag: Not set, in this case:
  
@@ -54,26 +56,25 @@ When control is returned to the host program, the following registers are set up
                       IX+$00 = Filename ASCII 
                       IX+$10 = Length of file (low word)
                       IX+$12 = Length of file (high word)
-                 Note that serial loads accept the header of ANY file offered, it is
-                 up to the user's program to examine the filename in the header (if it
-                 cares what it is.)
+                 
+		Note that serial loads accept the header of ANY file offered, it is
+		up to the user's program to examine the filename in the header (if it
+		cares what it is.)
        
-              A = $xx : Any other value: A standard FLOS error code. If A = 0,
-                        there was a disk hardware error during requester activity.
-                        (This can be reported with the call "hw_error_requester")
-                        Other errors (file system related) can be reported with
-                        the call "file_error_requester" if required)
+              A = $xx : Any other value: A standard FLOS error code.
+                        This can be reported with the call "file_error_requester"
+                        if required)
    
 Disk-loads check the requested file exists before leaving the requester (by calling
 "kjt_find_file") if the filename does not exist, a window message is shown and
 control goes back to the main load requester. Therefore the user program can use
-"kjt_force_load" immediately (IE: without its own "kjt_find_file") if desired.
+"kjt_load_from_file" immediately (IE: without a "kjt_open_file") if desired.
 
 File system errors appart from "File Not Found" are not automatically reported.
 If the program wishes to display a disk error message using the window routines,
 just call "file_error_requester" with the error code in A. If you wish to report a
 disk hardware error call "hw_error_requester". The hardware error requester
-offers a "Remount drives?" button.
+has a "Remount drives?" button.
 
 
 When your program wants to save a file, set..
@@ -89,7 +90,9 @@ When control is passed back to the host program, the following registers are set
 
    Zero Flag: If set, the requester operation encountered no errors. In this case:
 
-              A =  $00 : Ready to save file from disk, HL = Address of selected filename. 
+              A =  $00 : Ready to save file from disk
+              
+              HL = Address of selected filename. 
 
    Zero Flag: Not set, in this case:
  
@@ -99,11 +102,8 @@ When control is passed back to the host program, the following registers are set
               A = $FE : (Requesters with RS232 support only) all OK, ready to send file serially.
                         HL: address of selected filename
 
-              A = $xx : Any other value: A standard FLOS error code. If A = 0,
-                        there was a disk hardware error during requester activity.
-                        (This can be reported with the call "hw_error_requester")
-                        Other errors (file system related) can be reported with
-                        the call "file_error_requester" if required)
+              A = $xx : Any other value: A standard FLOS error code.
+                        (This can be reported with the call "file_error_requester" if required)
 
 The user program should then proceed to create and save the required data using
 the usual kernal routines.  The save requester checks if a file already exists
@@ -117,8 +117,15 @@ just call "file_error_requester" with the error code in A. If you wish to report
 disk hardware error call "hw_error_requester". The hardware error requester
 offers a "Remount drives?" button.
 
+
 Notes:
 ------
+
+See the examples of use in "FLOS_based_programs\code_library\Requesters\demo"
+
+Remember, the requesters can change the current dir and volume whilst browsing
+so the parent program must take this into account if it needs to load/save other
+data without using a requester.
 
 The requester code expects a normal FLOS display, so if the host program uses a
 custom display mode, the routine KJT_FLOS_DISPLAY should be called prior to
