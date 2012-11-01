@@ -2,8 +2,6 @@
 ; Demonstration of the save file requester (RS232 included)
 ;-----------------------------------------------------------------------------
 ;
-; REQUIRES FLOS v562+
-;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
 include "equates\kernal_jump_table.asm"
@@ -29,9 +27,9 @@ include "equates\system_equates.asm"
 dsaveok	ld ix,data_to_save		; source address
 	ld b,0				; source bank
 	ld c,0				; bits 23:16 of length
-	ld de,18			; bits 15:0 of length
+	ld de,end_of_data-data_to_save	; bits 15:0 of length
 	call kjt_save_file		
-	jr c,hw_error
+	jr nz,sav_error
 	
 	ld hl,saved_ok_txt
 	call kjt_print_string	
@@ -40,7 +38,7 @@ dsaveok	ld ix,data_to_save		; source address
 
 sav_error	
 
-	or a			;if A =  0 the error was hardware related
+	or a				;if A =  0 the error was hardware related
 	jr z,hw_error			;if A <> 0 its a file system error 
 	push af	
 	call file_error_requester
@@ -70,7 +68,7 @@ rs232_save
 	ld ix,data_to_save		; source address
 	ld b,0				; source bank
 	ld c,0				; bits 23:16 of length
-	ld de,18			; bits 15:0 of length
+	ld de,end_of_data-data_to_save	; bits 15:0 of length
 	call kjt_serial_send_file	; HL has been set to the filename by requester routine
 	push af
 	call w_restore_display
@@ -90,6 +88,15 @@ ser_error
 	ret
 
 
+my_filename	db "Test.txt",0
+
+data_to_save	db "Test-Test-Test-Test_End",10,13,0
+end_of_data	
+
+;---------------------------------------------------------------------------	
+	
+	
+	
 saved_ok_txt
 
 	db "File saved to disk OK..",11,0
@@ -117,16 +124,8 @@ rs232_error_txt
 ;----------------------------------------------------------------------------
 include	"flos_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 ;----------------------------------------------------------------------------
-
-my_filename
-
-	db "Blah.txt",0
 	
-	
-data_to_save
-
-	db "BlahBlahBlahBlah",11,0
 
 
-;---------------------------------------------------------------------------	
+
 
