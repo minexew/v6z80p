@@ -2,7 +2,7 @@
 ; Library Code: FLOS Message Requestor v0.01 - By Phil Ruston
 ;---------------------------------------------------------------------------------
 ;
-; SOURCE TAB SIZE = 10
+; SOURCE TAB SIZE = 8
 ;
 ; Routine list:
 ; -------------
@@ -33,52 +33,52 @@
 
 message_requester
 
-	ld ix,win_inf_message
-	ld iy,win_msg_element_a
-	ld (iy+1),d			;set dims of text area
-	ld (iy+2),e
-	ld (iy+5),l			;set location of text to display in window
-	ld (iy+6),h
-	ld a,e	
-	inc e				;add y lines for OK button			
-	inc e
-	inc e
-	ld (ix+2),d			;set dims of window frame
-	ld (ix+3),e
-	ld e,a
-	srl d
-	dec d
-	ld (ix+10),d			;set location of OK button based on dims
-	inc e
-	ld (ix+11),e
-	xor a
-	call draw_window
-	ld a,1
-	call w_set_element_selection
-	
+		ld ix,win_inf_message
+		ld iy,win_msg_element_a
+		ld (iy+1),d			;set dims of text area
+		ld (iy+2),e
+		ld (iy+5),l			;set location of text to display in window
+		ld (iy+6),h
+		ld a,e	
+		inc e				;add y lines for OK button			
+		inc e
+		inc e
+		ld (ix+2),d			;set dims of window frame
+		ld (ix+3),e
+		ld e,a
+		srl d
+		dec d
+		ld (ix+10),d			;set location of OK button based on dims
+		inc e
+		ld (ix+11),e
+		xor a
+		call draw_window
+		ld a,1
+		call w_set_element_selection
+		
 ;--------------------------------------------------------------------------------
 
 
 mreq_loop	ld a,$80
-	call w_highlight_selected_element
-	call kjt_wait_vrt
-	call w_unhighlight_selected_element
+		call w_highlight_selected_element
+		call kjt_wait_vrt
+		call w_unhighlight_selected_element
 
-	call kjt_get_key
-	cp $5a
-	jp z,mreq_enter_pressed
-	cp $76
-	jr z,mreq_esc_pressed
-	jr mreq_loop
+		call kjt_get_key
+		cp $5a
+		jp z,mreq_enter_pressed
+		cp $76
+		jr z,mreq_esc_pressed
+		jr mreq_loop
 
 ;----------------------------------------------------------------------------------------------	
 
 mreq_esc_pressed
 mreq_enter_pressed
 
-	xor a
-	ret
-		
+		xor a
+		ret
+			
 		
 ;------ My Window Descriptions --------------------------------------------------------
 
@@ -100,13 +100,17 @@ win_inf_message	db 0,0			;0 - position on screen of frame (x,y)
 ;---- Window Elements ---------------------------------------------------------------------
 
 		
-win_msg_element_a	db 2			;0 = Element Type: 0=button, 1=data area, 2=display info (text)
+win_msg_element_a
+
+		db 2			;0 = Element Type: 0=button, 1=data area, 2=display info (text)
 		db 1,1			;1/2 = dimensions of element x,y
 		db 0			;3 = control bits (b0=selectable, b1=special line selection, b2=accept ascii input)
 		db 0			;4 = event flag
 		dw 0			;5/6 = location of associated data
 		
-win_msg_element_b	db 0			;OK button
+win_msg_element_b	
+
+		db 0			;OK button
 		db 2,1
 		db 1
 		db 0
