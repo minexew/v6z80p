@@ -15,11 +15,15 @@ extract_path_and_filename
 
 ; USE:
 ; ----
-; Set up "max_path_length" equate (normally 40)
+; Main body of code needs to set the "max_path_length" equate (normally 40)
 ;
 ; Set HL to path/filename string (null or space terminates parsing)
 ; HL/DE/BC preserved
 ; If ZF set on return, OK, else path was too long for buffer (A=$15, error "Filename too long")
+;
+;
+; Last edited 30-10-2012: Allows backslashes as well as forwardslashes for dir separators.
+;
 ;------------------------------------------------------------------------------------------------------
 ; source tab size = 8
 ;------------------------------------------------------------------------------------------------------
@@ -52,6 +56,8 @@ pth_lp1		ld a,(hl)
 		inc hl
 		cp $2f				;ie: "/"
 		jr z,pth_mark
+		cp $5c
+		jr z,pth_mark			;ie: "\"
 		cp ":"
 		jr z,pth_mark
 		jr pth_lp1
