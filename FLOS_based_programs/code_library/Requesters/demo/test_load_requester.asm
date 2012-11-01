@@ -1,6 +1,8 @@
-; Demonstration of using the Load Requester library
+; -----------------------------------------
+; Demonstration of using the Load Requester
+; -----------------------------------------
 ;
-; Requires FLOS v562
+; Requires FLOS v602
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
@@ -8,33 +10,34 @@ include "equates\kernal_jump_table.asm"
 include "equates\osca_hardware_equates.asm"
 include "equates\system_equates.asm"
 
-
-load_buffer equ $8000
-
-
 	org $5000
 
-;-----------------------------------------------------------------------------
+;----- MAIN REQUESTER CALL ----------------------------------------------------------------------------
 	
 	ld b,8				; x coord of requester (in characters)
 	ld c,2				; y coord ""
-	ld hl,my_filename		; default filename
-
-	call load_requester
-	jr z,reqok
-	cp $ff				; if A = FF, the operation was aborted
-	jr z,aborted
-	jr load_error
+	ld hl,my_filename		; location of filename
+	call load_requester		; envoke the load requester
+	jr z,reqok			; if ZF set on return all OK, ready to load file
+	cp $ff				; otherwise, there was an error: 
+	jr z,aborted			; if A = FF, the operation was aborted
+	jr load_error			; if A is any other value, its a file system error
 	
-reqok	ld hl,load_buffer		; address to load data to - note: "kjt_find_file" has
-	ld b,0				; already been called by requester
-	call kjt_force_load
-	jr nz,load_error
+reqok	ld hl,load_buffer		; OK, load the actual file data 
+	ld b,0				; 
+	call kjt_read_from_file		; the load requester has already opened the file
+	jr nz,load_error		; if ZF not set, handle any errors resulting from file load
 
-load_ok	ld hl,loaded_ok_txt
+load_ok	ld hl,loaded_ok_txt		; Show success message
 	call kjt_print_string	
 	xor a
 	ret
+
+my_filename
+
+	db "Blah.txt",0
+	
+;--- OPTIONAL ERROR HANDLING ------------------------------------------------------------------------
 
 
 aborted	ld hl,no_load_txt
@@ -62,7 +65,7 @@ hw_error
 	call kjt_print_string		;or just give up immediately, as is the case here.
 	ret
 
-	
+;---------------------------------------------------------------------------------------------	
 	
 loaded_ok_txt
 
@@ -85,11 +88,6 @@ hw_error_txt
 include	"flos_based_programs\code_library\requesters\inc\file_requesters.asm"
 ;----------------------------------------------------------------------------
 
-my_filename
-
-	db "Blah.txt",0
-	
-;---------------------------------------------------------------------------	
-	
+load_buffer	db 0
 
 

@@ -1,7 +1,5 @@
 ; Demonstration of using the Load Requester library (RS232 included)
 ;
-; REQUIRES FLOS v562+
-;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
 include "equates\kernal_jump_table.asm"
@@ -12,9 +10,6 @@ include "equates\system_equates.asm"
 
 ;-----------------------------------------------------------------------------
 
-load_buffer equ $8000
-
-	
 	ld b,8				; x coord of requester (in characters)
 	ld c,2				; y coord ""
 	ld hl,my_filename		; default filename
@@ -29,7 +24,7 @@ load_buffer equ $8000
 	
 dloadok	ld hl,load_buffer		; address to load data to note: "kjt_find_file" has
 	ld b,0				; already been called by requester
-	call kjt_force_load
+	call kjt_read_from_file
 	jr nz,load_error		
 	ld hl,loaded_ok_txt		;loaded ok
 	call kjt_print_string	
@@ -77,7 +72,12 @@ hw_error
 	ret
 
 
-	
+
+my_filename
+
+	db "Blah.txt",0
+		
+;---------------------------------------------------------------------------	
 	
 loaded_ok_txt
 
@@ -103,13 +103,7 @@ hw_error_txt
 ;----------------------------------------------------------------------------
 include	"flos_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 ;----------------------------------------------------------------------------
-
-my_filename
-
-	db "Blah.txt",0
 	
-
-;---------------------------------------------------------------------------	
-	
+load_buffer db 0
 
 
