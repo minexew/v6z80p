@@ -14,6 +14,8 @@ include "equates\system_equates.asm"
 
 ;-----------------------------------------------------------------------------
 
+	call w_backup_display
+	
 	ld a,$25		;example error code in A
 	ld b,3			;x coord of window
 	ld c,2			;y coord of window
@@ -22,6 +24,8 @@ include "equates\system_equates.asm"
 	ld b,16			;x coord of window
 	ld c,10			;y coord of window
 	call show_req2
+	
+	call w_restore_display
 	xor a
 	ret
 	
@@ -37,6 +41,7 @@ show_req1
 	
 		
 show_req2
+
 	ld d,13			;x size in chars
 	ld e,2			;y size in chars
 	ld hl,text2		;location of text for window
