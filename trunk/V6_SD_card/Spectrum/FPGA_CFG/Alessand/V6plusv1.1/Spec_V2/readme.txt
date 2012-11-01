@@ -5,7 +5,7 @@ Cycle Perfect Spectrums Emulators:
 --------------------------------------
 
 
-THIS EMULATOR IS FOR V6Z80P+ v1.1 ONLY
+THESE EMULATORS ARE FOR V6Z80P+ v1.1 ONLY
 
 
 1. Install the config .bin files from:
@@ -57,7 +57,7 @@ archive in:
 
  Alternative_Configs\Alessandro\
  Cycle_Exact_Spectrum Emulator\
- V6Z80+ V1.1\Speccy2.1.0\Support files
+ V6Z80+ V1.1\
 -------------------------------------    
 
 
@@ -122,6 +122,6 @@ archive in:
 
  Alternative_Configs\Alessandro\
  Cycle_Exact_Spectrum Emulator\
- V6Z80+ V1.1\Speccy2.1.0\
+ V6Z80+ V1.1\
 
 ------------------------------------

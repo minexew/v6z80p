@@ -36,10 +36,13 @@ for the V6Z80P:
   (as  they require clocking features
   only available on this board). Please
   install the config .bin files (using
-  the FLOS util "EEPROM") from the
-  folder:
+  the FLOS util "EEPROM") from:
 
   FPGA_CFG\Alessand\V6plusv1.1\Spec_V2
+
+  and:
+  
+  FPGA_CFG\Alessand\v6plus1.1\Pentagon
 
   These emulators offer powerful
   features such as support for ResiDOS
@@ -51,7 +54,5 @@ for the V6Z80P:
   emulators are launched with the FLOS
   command "EMU"
 
-  For more info see the sub folder:
-
-  FPGA_CFG\Alessand\V6plusv1.1\Spec_V2\
+  More info is in the config subfolders
 
