@@ -2,7 +2,7 @@
 ; Z80 FAT16 File System code for FLOS by Phil @ Retroleum
 ;----------------------------------------------------------------------------------------------
 ;
-; Changes:1.23 - Removed "/" detect in filename copy - seemed pointless
+; Changes:1.23 - Added backslash detect in "fs_hl_to_filename"
 ;	1.22 - Bugfix: Previously, when a file load ended on last byte of RAM, memory error $08 was being returned.
 ;	1.21 - Removed "fs_z80_working_bank" (was unused) and "fs_z80_working_address" (only
 ;	       "fs_z80_address" is used now and is updated after a file read)
@@ -1840,6 +1840,10 @@ csfnlp2	ld a,(hl)				; now copy filename, upto 8 characters
 	ret z				; is char a zero?
 	cp 32
 	ret z				; is char a space?
+	cp $2f
+	ret z				; is char a fwd slash?
+	cp $5c
+	ret z				; is char a back slash?
 	cp "."
 	jr z,dofn_ext			; is char a dot?
 	call os_uppercasify
@@ -1852,6 +1856,8 @@ find_ext	ld a,(hl)
 	cp "."				; ninth char should be a dot
 	jr z,dofn_ext	
 	cp " "				; if space, zero or forward slash, no extension
+	ret z
+	cp $2f
 	ret z
 	or a
 	ret z
