@@ -1,8 +1,8 @@
 ;-----------------------------------------------------------------------
-;"H" - Hunt in memory command V6.09
+;"H" - Hunt in memory command V6.10
 ;-----------------------------------------------------------------------
 
-find_hexstringascii equ scratch_pad
+find_hexstringascii equ scratch_pad+4	; (cmdopstart and cmdopend are at scratchpad+0,scratchpad+2)
 
 os_cmd_h
 
@@ -22,20 +22,21 @@ os_cmd_h
 	ld a,(hl)			; are we dealing with text or hex?
 	cp $22			; quote char?
 	jr nz,cntfbyts
-hcchars	inc hl
+
+
+;---------Search for text string ------------------------------------------------------------------------
+
+
+hcchars	inc hl			; search for a text string
 	inc b			; b = chars in string
 	ld a,(hl)
 	or a
 	jp z,os_bad_args_error
-	cp $22
+	cp $22			; string must have closing quotes
 	jr nz,hcchars
 	dec b
 	jp z,os_bad_args_error
 
-
-;---------Search for text -------------------------------------------------------------------------------
-	
-	
 	ld de,(cmdop_start_address)	; compare range with ascii string
 h_txtlp	ld hl,(find_hexstringascii)
 	inc hl			; skip quote
