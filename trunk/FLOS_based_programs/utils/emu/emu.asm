@@ -1,15 +1,18 @@
 ; EMU.exe - A boot util for emulators (only useful for V6Z80P v1.1)
 ; -----------------------------------------------------------------
 ;
-; Currently supports:
-; -------------------
+; Currently configured to support:
+; --------------------------------
 ;
-; Alessandro's Cycle Perfect Spectrum 48 and 128 Emulators for V6Z80P v1.1
-;
+; Spectrum 48   - By Alessandro Dorigatti
+; Spectrum 128  - ""                    "
+; Pentagon 128  - ""                    "
+; 
 ;
 ; Changes:
 ; --------
 ;
+; v0.08 - More easily customizable, supports up to 10 machines
 ; v0.07 - Allows boot (to residos/esxdos) via arguments ("EMU M0" = machine0, "EMU M1" = machine1)
 ; V0.06 - Tests OSCA version on boot
 ; V0.05 - Options 1/2 disabled in ESXDOS mode
@@ -31,60 +34,53 @@ include "equates\system_equates.asm"
 
           org $5000
 
-required_flos       equ $602
-include             "flos_based_programs\code_library\program_header\inc\test_flos_version.asm"
+required_flos   equ $608
+include         "flos_based_programs\code_library\program_header\inc\test_flos_version.asm"
 
-required_osca       equ $671
-include             "flos_based_programs\code_library\program_header\inc\test_osca_version.asm"
+required_osca   equ $672
+include         "flos_based_programs\code_library\program_header\inc\test_osca_version.asm"
+
+max_path_length	equ 255
 
 ;----------------------------------------------------------------------------------------------
 
 buffer_size         equ 512                       
 buffer_bank         equ 0
 
-spectrum_rom_addr   equ $8000
-spectrum_rom_bank   equ 1
+machine_rom_addr   equ $8000
+machine_rom_bank   equ 1
 
 ;----------------------------------------------------------------------------------------------
-          
-          ld (arg_string),hl
+
+
+          call save_dir_vol
+          call emu_go
+          call restore_dir_vol
+          ret
+
+;----------------------------------------------------------------------------------------------
+                   
+emu_go    ld (arg_string),hl
           
           call kjt_get_pen
           ld (pen_colour),a
-          
-          call kjt_get_dir_cluster                ; save current dir
-          push de
-          
+                  
           xor a
-          call kjt_force_bank
+          call kjt_set_bank
           
-          call kjt_root_dir
-          ld hl,settings_dir
-          call kjt_change_dir 
-          jr nz,lcfgbad
-          
-          ld hl,cfg_fn                            ; load config file (if available)
-          ld b,0
-          ld ix,cfg_line1_txt
-          call kjt_load_file                                
-
-          call update_vars_from_cfg_file          
-
-lcfgbad   pop de
-          call kjt_set_dir_cluster                ; restore original dir
-
-
-;----------------------------------------------------------------------------------------------
-
+          call load_config_file      		 ; load config file, if exists                      
+          jr nz,nocfg
+	  call parse_config_file
+	  call set_default_slot_ascii_hex
+nocfg	  
           ld a,2
-          out (sys_io_dir),a                      ;make sure exp B jumper is in input mode
-          call read_expb
-          ld (residos_esxdos),a                   ;0 = residos, 1 = esxdos
-          
+          out (sys_io_dir),a                     ; make sure exp B jumper is in input mode
+          call compare_exp_pin			  ; sets default value
+	  
 ;----------------------------------------------------------------------------------------------
           
           ld hl,(arg_string)
-          ld a,(hl)                               ;was run via arg string?
+          ld a,(hl)                               ;was this run via arg string?
           or a
           jr z,no_args
           
@@ -102,7 +98,7 @@ last_arg  ld a,(args_set)
           or a
           ret
 
-args_ok   jp option3                              ;boot to residos/esxdos
+args_ok   jp boot_nvr                             ;boot to residos/esxdos
           
 notlarg   cp "M"
           jr z,config_arg
@@ -117,16 +113,15 @@ config_arg
           inc hl
           ld a,(hl)
           push hl
-          and $01
-          push af
-          call set_machine
-          pop af
-          ld e,a
-          call update_settings_string
-          ld a,(args_set)
+          sub $30
+	  jr c,bad_mach
+          cp number_of_machines
+	  jr nc,bad_mach
+	  ld (machine_selection),a
+	  ld a,(args_set)
           inc a
           ld (args_set),a
-          pop hl
+bad_mach  pop hl
           inc hl
           jr nxtarg
 
@@ -135,18 +130,16 @@ no_args
           
           
 ;-----------------------------------------------------------------------------------------------    
+; Menu is customized depending on machine type settings
+;-----------------------------------------------------------------------------------------------    
           
-start     call update_vars_from_cfg_file
+start     
 
 menu_text call kjt_clear_screen
-          call show_menu
+          call show_custom_menu
           
-menu_wait call read_expb                          ;has jumper exp_b changed?
-          ld hl,residos_esxdos
-          cp (hl)
-          jr z,read_key                           
-          ld (hl),a
-          jr menu_text                  
+menu_wait call compare_exp_pin			; redraw menu if Hw jumper pins changed
+          jr nz,menu_text                  
                     
 read_key  call kjt_get_key
           cp $76
@@ -155,102 +148,77 @@ read_key  call kjt_get_key
           ret
           
 not_quit  ld a,b
-          cp "1"
-          jr z,option1
-          cp "2"
-          jr z,option2
-          cp "3"
-          jr z,option3
-          cp "4"
-          jr z,option4
-          cp "5"
-          jr z,option5
-          cp "6"
-          jr z,option6
+	  ld c,"1"
+	  ld ix,custom_menu_jps
+	  ld b,8
+cmelp	  cp c
+	  jr z,cust_option_selected
+	  inc c
+	  inc ix
+	  inc ix
+	  djnz cmelp
+	  
+          cp "s"
+          jp z,s_option
+          cp "c"
+          jp z,c_option
+          cp "m"
+          jp z,m_option
           jr menu_wait
 
+cust_option_selected
+	
+	  ld l,(ix)
+	  ld h,(ix+1)
+	  jp (hl)
+	  
+;------------------------------------------------------------------------------------------
+
           
-option1   ld a,(residos_esxdos)
-          or a
-          jr nz,menu_wait
-          call reconfigure
+go_basic  call basic_reconfigure
           jr error_menu       
-          
-option2   ld a,(residos_esxdos)
-          or a
-          jr nz,menu_wait
-          call load_tap_reconf
+        
+;------------------------------------------------------------------------------------------
+  
+preload_tap
+
+	  call load_tap_reconf
           jr nz,error_menu
           jr menu_wait                            ;no need to redraw menu, requester code replaces previous chars
-          
-option3   call residos_reconf 
+
+;------------------------------------------------------------------------------------------
+
+boot_nvr  call nvr_reconfig 
           jr nz,error_menu
           jr menu_text
-          
-option4   call change_machine 
-          jr nz,error_menu
-          jr start
-          
-option5   call set_cfg_slot
+
+;------------------------------------------------------------------------------------------
+
+s_option  call select_machine 
           jr nz,error_menu
           jr start
 
-option6   call save_config_file
+;------------------------------------------------------------------------------------------
+
+c_option  call set_machines_config_slot
           jr nz,error_menu
-          jr start
+       	  jr start
+
+;------------------------------------------------------------------------------------------
+
+m_option  call set_default_slot_ascii_hex
+	  call save_config_file
+          jr nz,error_menu
+	  jr start
+
+;------------------------------------------------------------------------------------------
 
 error_menu
 
           ld hl,error_txt
           call kjt_print_string
-
           call press_a_key
           jp start
-
-
-;-----------------------------------------------------------------------------------------
-
-
-show_menu
-          call inverse_video
-          ld hl,banner_txt
-          call kjt_print_string
-          call normal_video
-
-          ld hl,machine_txt
-          call kjt_print_string
-
-          ld hl,m0_txt
-          ld a,(machine_selection)
-          or a
-          jr z,shws48
-          ld hl,m1_txt
-shws48    call kjt_print_string
-          
-          call show_slot
-          
-          ld hl,menu_txt_norm           ;options 1/2 only work in Residos mode
-          ld a,(residos_esxdos)
-          or a
-          jr z,mt_norm
-          ld hl,menu_txt_esxdos
-mt_norm   call kjt_print_string
-                    
-          ld a,(residos_esxdos)
-          ld l,a
-          ld h,0
-          add hl,hl
-          ld de,menu_nvr_list
-          add hl,de
-          ld e,(hl)
-          inc hl
-          ld d,(hl)
-          ex de,hl
-          call kjt_print_string
-          ld hl,menu_txt2
-          call kjt_print_string
-          ret
-          
 
 ;-----------------------------------------------------------------------------------------
 
@@ -285,12 +253,12 @@ press_a_key
 ;------------------------------------------------------------------------------------------
           
           
-reconfigure
+basic_reconfigure
 
           call check_reconf_slot                  
           ret nz                                  ; if not set up correctly exit
 
-          call load_rom                           ; load the appropriate ROM
+          call load_machine_rom                   ; load the appropriate ROM for machine
           ret nz                                  
 
           call copy_bank_switch_code_to_vram
@@ -307,7 +275,7 @@ go_cfg    ld a,$88                                ; send "set config base" comma
           ld a,(machine_selection)
           ld e,a
           ld d,0
-          ld hl,slot_list
+          ld hl,machine_slot_list
           add hl,de
           ld a,(hl)
           sla a
@@ -330,6 +298,10 @@ load_tap_reconf
           call check_reconf_slot                  ; if config slot not set up correctly exit
           ret nz
           
+	  call kjt_root_dir
+	  ld hl,spectrum_txt
+	  call kjt_change_dir
+	  
 retrylr   ld b,8                                  ; invoke load requester
           ld c,2
           xor a
@@ -374,8 +346,10 @@ ldreq_ok1 call copy_filename
           
           call kjt_clear_screen
           
-          call load_rom                           ; load the [spectrum] ROM
-          ret nz
+	  call push_dir_vol			  ; Load in machine's ROM, saving the directory postion around the ROM load
+          call load_machine_rom                   
+          call pop_dir_vol
+	  ret nz
 
           call show_loading_msg
           
@@ -425,195 +399,7 @@ load_quit xor a
           inc a
           ret
           
-;------------------------------------------------------------------------------------------
 
-
-residos_reconf
-          
-          call check_reconf_slot
-          ret nz                                  ; if  not set up correctly, exit
-          
-          ld a,(residos_esxdos)
-          or a
-          jr z,resimode
-          ld hl,restore_esx_fn
-          jr gotnvrfn         
-          
-resimode  ld hl,restore_48_fn
-          ld a,(machine_selection)
-          or a
-          jr z,gotnvrfn
-          ld hl,restore_128_fn
-gotnvrfn  ld (restore_fn_addr),hl
-          
-          call kjt_root_dir                       ; look in root dir and root:spectrum dir
-          
-          ld hl,(restore_fn_addr)
-          push hl
-          call kjt_find_file
-          pop hl
-          jp z,ldreq_ok1
-          
-          ld hl,spectrum_dir
-          call kjt_change_dir
-          jr nz,norestf
-          
-          ld hl,(restore_fn_addr)
-          push hl
-          call kjt_find_file
-          pop hl
-          jp z,ldreq_ok1
-          
-norestf   ld hl,cannot_find_txt
-          call kjt_print_string
-          ld hl,(restore_fn_addr)
-          call kjt_print_string
-          xor a
-          inc a
-          ret
-          
-
-;------------------------------------------------------------------------------------------
-
-          
-check_reconf_slot
-          
-          ld a,(machine_selection)
-          ld e,a
-          ld d,0
-          ld hl,slot_list
-          add hl,de
-          ld a,(hl)
-          or a
-          jr z,set_cfg_slot                       ; If Spectrum Emu slot for the chosen machine hasnt been set.
-          xor a                                   ; prompt for slot
-          ret
-          
-
-set_cfg_slot
-          
-          call show_eeprom_slot_contents
-          
-          ld hl,slot_prompt_txt
-          call kjt_print_string
-          
-          ld hl,slot_prompt_m0_txt
-          ld a,(machine_selection)
-          or a
-          jr z,gslotm0
-          ld hl,slot_prompt_m1_txt
-gslotm0   call kjt_print_string
-          
-          ld a,2
-          call kjt_get_input_string
-          or a
-          jr nz,gotstr
-          inc a                                   ; return with ZF not set: error
-          ret
-          
-gotstr    push hl
-          call kjt_ascii_to_hex_word              ; is entered text a valid number (result in DE)?
-          pop hl
-          or a
-          ret nz
-
-          call update_settings_string   
-          call update_vars_from_cfg_file
-          
-          
-save_config_file
-          
-          call kjt_root_dir                       ;save config file "EMU.CFG" in ROOT:SETTINGS dir
-          
-gsdir     ld hl,settings_dir
-          call kjt_change_dir 
-          jr z,setdok
-          cp $23
-          ret nz
-          ld hl,settings_dir                      ;make the dir
-          call kjt_make_dir
-          jr gsdir
-          
-setdok    ld hl,cfg_fn                            ;remove old cfg file (if exists)
-          call kjt_erase_file
-          
-          ld hl,saving_cfg_txt
-          call kjt_print_string
-          
-          ld hl,cfg_fn
-          ld ix,cfg_line1_txt
-          ld b,0
-          ld c,0
-          ld de,cfg_txt_end-cfg_line1_txt
-          call kjt_save_file
-          ret nz
-
-          call kjt_root_dir   
-                              
-          xor a
-          ret
-
-;-----------------------------------------------------------------------------------------
-          
-          
-update_settings_string
-
-          ld hl,cfg_line2_txt                     ; copy value to appropriate line in config file
-          ld a,(machine_selection)
-          or a
-          jr z,prin48
-          ld hl,cfg_line3_txt
-prin48    ld a,e
-          call kjt_hex_byte_to_ascii
-          ret
-          
-;---------------------------------------------------------------------------------------
-          
-          
-change_machine
-
-          ld a,(machine_selection)
-          xor 1
-
-set_machine
-
-          ld (machine_selection),a
-          add a,$30
-          ld (cfg_line1_txt+1),a
-          xor a
-          ret
-
-                    
-;---------------------------------------------------------------------------------------
-
-
-update_vars_from_cfg_file
-
-          ld hl,cfg_line1_txt
-          call kjt_ascii_to_hex_word
-          or a
-          ret nz
-          ld a,e
-          ld (machine_selection),a
-
-          ld hl,cfg_line2_txt           
-          call kjt_ascii_to_hex_word
-          or a
-          ret nz
-          ld a,e
-          ld (slot_list),a
-          
-          ld hl,cfg_line3_txt
-          call kjt_ascii_to_hex_word
-          or a
-          ret nz
-          ld a,e
-          ld (slot_list+1),a
-          
-          xor a
-          ret
-          
-;----------------------------------------------------------------------------------------
 
 
 copy_filename
@@ -635,26 +421,185 @@ cpyfndone pop hl
           pop bc
           ret
 
-;----------------------------------------------------------------------------------------
+;------------------------------------------------------------------------------------------
 
-show_slot
 
-          ld a,(machine_selection)
-          ld e,a
-          ld d,0
-          ld hl,slot_list
-          add hl,de
-          ld a,(hl)
-          or a
-          ret z
-          ld hl,slot_value_txt
-          call kjt_hex_byte_to_ascii
+nvr_reconfig
           
-          ld hl,slot_txt
+          call check_reconf_slot
+          ret nz                                  ; if  not set up correctly, exit
+          
+	  ld a,(machine_selection)
+          call get_machine_nvr_filename
+          call extract_path_and_filename
+	  ld hl,path_txt
+	  call kjt_parse_path
+	  ld hl,filename_txt
+	  call kjt_open_file
+	  ld hl,filename_txt
+	  jp z,ldreq_ok1
+          
+          ld hl,cannot_find_txt
           call kjt_print_string
+	  ld a,(machine_selection)
+          call get_machine_nvr_filename
+          call kjt_print_string
+          xor a
+          inc a
           ret
           
 
+;------------------------------------------------------------------------------------------
+
+         
+check_reconf_slot
+          
+          ld a,(machine_selection)
+          call get_machines_slot_address
+	  ld a,(hl)
+          or a
+          jr z,set_machines_config_slot           ; If slot for the chosen machine hasnt been set
+          xor a                                   ; prompt for slot number
+          ret
+          
+
+set_machines_config_slot
+          
+          call show_eeprom_slot_contents
+          
+          ld hl,slot_prompt_txt
+          call kjt_print_string
+	  ld a,(machine_selection)
+          call get_machine_name
+	  call kjt_print_string
+          ld hl,slot_prompt2_txt
+	  call kjt_print_string
+	  ld a,2
+          call kjt_get_input_string
+          or a
+          jr nz,gotstr
+          inc a                                   ; return with ZF not set: error
+          ret
+
+gotstr    call kjt_ascii_to_hex_word              ; is entered text a valid number (result in DE)?
+          or a
+          ret nz
+      	  ld a,(machine_selection)
+	  call get_machines_slot_address
+	  ld (hl),e
+	   	  
+	  
+save_config_file
+
+          call build_new_config_file
+
+          call kjt_root_dir                       ;save config file "EMU.CFG" in ROOT:SETTINGS dir
+          
+gsdir     ld hl,settings_dir
+          call kjt_change_dir 
+          jr z,setdok
+          cp $23
+          ret nz
+          ld hl,settings_dir                      ;make the dir
+          call kjt_make_dir
+          jr gsdir
+          
+setdok    ld hl,cfg_fn                            ;remove old cfg file (if exists)
+          call kjt_erase_file
+          
+          ld hl,saving_cfg_txt
+          call kjt_print_string
+          
+          ld hl,cfg_fn
+          ld ix,config_file_buffer
+          ld b,0
+          ld c,0
+          ld de,(config_file_size)
+          call kjt_save_file
+          ret nz
+
+          call kjt_root_dir   
+                              
+          xor a
+          ret
+
+;---------------------------------------------------------------------------------------
+          
+          
+select_machine
+
+	ld a,(machine_selection)		;simple flip through selection
+	inc a
+	cp number_of_machines
+	jr nz,msok
+	xor a
+msok	ld (machine_selection),a
+	xor a					;so no error on return
+	ret
+	
+
+
+
+	  call kjt_clear_screen			; alterntaive menu based selection
+	  
+	  call inverse_video
+          ld hl,banner_txt
+          call kjt_print_string
+          call normal_video
+
+	  ld hl,machine_list_txt
+	  call kjt_print_string
+	  ld b,number_of_machines
+	  ld c,$31
+maclistlp push bc
+	  ld a,c
+	  ld hl,menu_numchr_txt+1
+	  ld (hl),a
+	  dec hl
+	  call kjt_print_string
+	  ld a,c
+	  sub $31
+	  call get_machine_name
+	  call kjt_print_string
+	  call new_line
+	  pop bc
+	  inc c
+	  djnz maclistlp
+	  
+	  call kjt_wait_key_press
+	  ld a,b
+	  or a
+	  ret z
+	  sub $31
+	  jr c,ms_bad
+	  cp number_of_machines
+	  jr nc,ms_bad
+	 
+          ld (machine_selection),a
+
+ms_bad    xor a
+          ret
+           
+	   
+machine_list_txt
+
+	  db 11,"Select a machine:",11,11,0
+
+;----------------------------------------------------------------------------------------
+
+
+new_line	
+
+	push hl
+	ld hl,cr_txt
+	call kjt_print_string
+	pop hl
+	ret
+
+cr_txt	db 11,0
+
+
+;----------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------- 
           
@@ -816,13 +761,28 @@ pause_lp2 djnz pause_lp2
 
 ;----------------------------------------------------------------------------------------
 
-read_expb 
+compare_exp_pin
+	  
+	  call read_exp_pin
+	  ld hl,exp_pin_status
+	  cp (hl)
+	  ld (exp_pin_status),a
+	  ret
+	  
+	  
+read_exp_pin
+	  
           in a,(sys_io_pins)                      
           cpl
           rrca
           and 1
           ret
 
+
+exp_pin_status
+
+	  db 0
+	 
 ;-----------------------------------------------------------------------------------------
 
 load_to_vram
@@ -987,39 +947,24 @@ bad_addr  call kjt_page_out_video
           
 ;----------------------------------------------------------------------------------------------
 
-load_rom
+load_machine_rom
 
-;         ld hl,load_rom_txt                      ;Commented out as there is barely time for
-;         call kjt_print_string                   ;it to be displayed before the system reconfigures
-
-          call kjt_get_dir_cluster
-          ld (dir_cache),de
-          call kjt_root_dir
-          ld hl,spectrum_dir
-          call kjt_change_dir
-
-          ld hl,spectrum48_rom_fn
           ld a,(machine_selection)
-          or a
-          jr z,s48romreq
-          ld hl,spectrum128_rom_fn
-s48romreq ld ix,spectrum_rom_addr
-          ld b,spectrum_rom_bank
+          call get_machine_rom_filename
+	  call extract_path_and_filename
+	  ld hl,path_txt
+	  call kjt_parse_path
+	  ld hl,filename_txt
+	  ld ix,machine_rom_addr
+          ld b,machine_rom_bank
           call kjt_load_file
-          push af   
-          ld de,(dir_cache)
-          call kjt_set_dir_cluster
-          pop af
           ret z
           
           ld hl,cannot_find_txt                   ;Couldn't find ROM file message
           call kjt_print_string
-          ld hl,spectrum48_rom_fn
-          ld a,(machine_selection)
-          or a
-          jr z,s48romnf
-          ld hl,spectrum128_rom_fn
-s48romnf  call kjt_print_string
+	  ld a,(machine_selection)
+	  call get_machine_rom_filename
+	  call kjt_print_string
           xor a
           inc a
           ret
@@ -1091,12 +1036,58 @@ bank_switch_code
 
 end_of_bank_switch_code
 
+;-----------------------------------------------------------------------------------------------------
 
-;-------------------------------------------------------------------------------------------------
+push_dir_vol
+
+	push af
+	push hl
+	push de
+	push bc
+	
+	call kjt_get_volume_info
+	ld (prior_vol),a
+	call kjt_get_dir_cluster
+	ld (prior_dir),de
+	
+	pop bc
+	pop de
+	pop hl
+	pop af
+	ret
+	
+	
+pop_dir_vol
+
+	push af
+	push hl
+	push de
+	push bc
+
+	ld a,(prior_vol)
+	call kjt_change_volume
+	ld de,(prior_dir)
+	call kjt_set_dir_cluster
+
+	pop bc
+	pop de
+	pop hl
+	pop af
+	ret
+	
+
+prior_dir	dw 0
+prior_vol	db 0
+
+;-----------------------------------------------------------------------------------------------------
 
 include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
 
 include "FLOS_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
+
+include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
+
+include "flos_based_programs\code_library\string\inc\extract_path_and_filename.asm"
 
 ;----------------------------------------------------------------------------------------
 
@@ -1155,87 +1146,600 @@ gfxlp     xor a
           call kjt_page_out_video       ; page video RAM out of $2000-$3fff
           ret
 
-;-----------------------------------------------------------------------------------
-
-loading_msg
-
-          incbin    "FLOS_based_programs\utils\emu\data\loading_txt.bin"
-
-;------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------
 
 
-cfg_fn              db "EMU.CFG",0
+load_config_file
 
-spectrum_dir        db "spectrum",0
-settings_dir        db "settings",0
+	 ld hl,config_file_buffer
+	 ld bc,512
+	 xor a
+	 call kjt_bchl_memfill
+	 
+         call kjt_root_dir
+         ld hl,settings_dir
+         call kjt_change_dir 
+         ret nz
+          
+         ld hl,cfg_fn                            
+         ld b,0
+         ld ix,config_file_buffer
+         call kjt_load_file                                
+	 ret
+	 
+
+;-------------------------------------------------------------------------------------------------
+
+
+set_default_slot_ascii_hex
+	
+	ld a,(machine_selection)
+	ld hl,cfg_file_line1_txt
+	call kjt_hex_byte_to_ascii
+	ret
+	
+build_new_config_file
+
+	ld de,config_file_buffer
+	ld hl,cfg_file_line1_txt
+	call copy_to_zero
+	
+	ld ix,machine_slot_list
+	ld b,number_of_machines
+	ld c,0
+	
+bcfgflp	push bc
+	ld a,c
+	add a,$30
+	ld hl,cfg_file_line_b_txt
+	ld (hl),a
+	
+	ld hl,cfg_file_line_a_txt
+	ld a,(ix)
+	call kjt_hex_byte_to_ascii
+	dec hl
+	dec hl	
+	call copy_to_zero
+	
+	inc ix
+	pop bc
+	inc c
+	djnz bcfgflp
+	
+	ld hl,config_file_buffer
+	ex de,hl
+	xor a
+	sbc hl,de
+	ld (config_file_size),hl
+	ret
+	
+	
+copy_to_zero
+
+	ld a,(hl)
+	or a
+	ret z
+	ld (de),a
+	inc hl
+	inc de
+	jr copy_to_zero
+
+
+config_file_size dw 0
+
+;------------------------------------------------------------------------------------------------
+
+
+parse_config_file
+
+	ld hl,config_file_buffer
+	call kjt_ascii_to_hex_word
+	ret nz
+	ld a,e
+	ld (machine_selection),a
+	
+	ld ix,machine_slot_list
+	ld b,number_of_machines
+pcfgflp	call find13
+	ret z
+	push bc
+	push ix
+	call kjt_ascii_to_hex_word
+	pop ix
+	pop bc
+	ret nz
+	ld (ix),e
+	inc ix
+	djnz pcfgflp
+	ret
+	
+find13	ld a,(hl)
+	cp 13
+	jr z,got13
+	inc hl
+	jr find13
+got13	inc hl
+	ld a,(hl)
+	or a
+	ret
+
+
+;------------------------------------------------------------------------------------------------
+
+get_machine_name
+
+; Set machine in A
+; Result: Address of machine name at HL
+
+	push de
+	sla a
+	ld e,a
+	ld d,0
+	ld hl,machine_name_addrs
+	add hl,de
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	ex de,hl
+	pop de
+	ret
+	
+	
+	
+get_machine_rom_filename
+
+; Set machine in A
+; Result: Address of machine name at HL
+
+	push de
+	sla a
+	ld e,a
+	ld d,0
+	ld hl,machine_romfn_addrs
+	add hl,de
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	ex de,hl
+	pop de
+	ret
+		
+
+
+get_machine_bits
+
+; Set machine in A
+; Result in A
+
+	push de
+	push hl
+	ld e,a
+	ld d,0
+	ld hl,machine0_bits
+	add hl,de
+	ld a,(hl)
+	pop hl
+	pop de
+	ret
+	
+	
+get_machine_nvr_name
+
+; Set nvr type in A
+; Result: Address of nvr filename at HL
+	
+	push de
+	ld a,(machine_selection)
+	call get_nvr_type
+	sla a
+	ld e,a
+	ld d,0
+	ld hl,nvr_name_addrs
+	add hl,de
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	ex de,hl
+	pop de
+	ret
+	
+	
+get_machine_nvr_filename
+
+; Set nvr type in A
+; Result: Address of nvr filename at HL
+	
+	push de
+	ld a,(machine_selection)
+	call get_nvr_type
+	sla a
+	ld e,a
+	ld d,0
+	ld hl,nvr_filename_addrs
+	add hl,de
+	ld e,(hl)
+	inc hl
+	ld d,(hl)
+	ex de,hl
+	pop de
+	ret
+	
+	
+	
+get_nvr_type
+
+; set machine in A
+; A out = nvr type
+	
+	push bc
+	call get_machine_bits				;returns NVR type in A
+	bit 7,a
+	jr nz,nvrpa
+	and 7
+	pop bc
+	ret
+
+nvrpa	and 7
+	ld b,a
+	call read_exp_pin
+	add a,b
+	pop bc
+	ret
+
+
+
+get_nvr_menu_mask_bits
+
+;set A to nvr type
+;A = nvr bits
+
+	push hl
+	push de
+	ld e,a
+	ld d,0
+	ld hl,nvr_type0_opt_mask
+	add hl,de
+	ld a,(hl)
+	pop de
+	pop hl
+	ret
+
+
+
+get_machines_slot_address
+
+; set machine in A
+; HL = slot address
+
+        push de
+	ld e,a
+        ld d,0
+        ld hl,machine_slot_list
+        add hl,de
+	pop de
+	ret
+	
+;-------------------------------------------------------------------------------------------------
+
+show_custom_menu
+	
+	ld de,menu_wait
+	ld hl,custom_menu_jps
+	ld b,8
+clmjplp	ld (hl),e
+	inc hl
+	ld (hl),d
+	inc hl
+	djnz clmjplp
+	
+        call inverse_video
+        ld hl,banner_txt
+        call kjt_print_string
+        call normal_video
+
+        ld hl,machine_txt
+        call kjt_print_string
+
+	ld a,(machine_selection)
+        call get_machine_name
+	call kjt_print_string
+          
+        call show_slot
+	
+	call new_line
+	call new_line
+	
+	ld a,(machine_selection)
+	call get_nvr_type
+	call get_nvr_menu_mask_bits
+	ld e,a
+	
+	ld d,$31
+	ld ix,maskable_menu_addrs
+	ld iy,custom_menu_jps
+	
+mmloop	srl e
+	jr nc,nomline
+	
+	ld l,(ix)
+	ld h,(ix+1)
+	inc hl
+	inc hl
+	ld a,(hl)
+	or a
+	jr z,restofmenu
+	dec hl
+	dec hl
+	
+	push hl
+	ld a,d
+	ld hl,menu_numchr_txt+1
+	ld (hl),a
+	dec hl
+	call kjt_print_string
+	pop hl
+	
+	ld a,(hl)
+	ld (iy),a
+	inc hl
+	ld a,(hl)
+	inc hl
+	ld (iy+1),a
+	inc iy
+	inc iy
+		
+	ld a,(hl)
+	cp "*"
+	jr nz,normtxt
+	ld hl,boot_into_txt
+	call kjt_print_string
+	ld a,(machine_selection)
+	call get_machine_nvr_name
+	call kjt_print_string
+	ld hl,cr_txt
+normtxt	call kjt_print_string
+	inc d
+	
+nomline	inc ix
+	inc ix
+	jr mmloop
+
+
+restofmenu
+	
+	ld hl,fixed_menu_txt
+	call kjt_print_string
+	ret
+	
+;----------------------------------------------------------------------------------------
+
+show_slot
+
+	  ld a,(machine_selection)
+	  call get_machines_slot_address
+	  ld a,(hl)
+          or a
+          ret z
+          ld hl,slot_value_txt
+          call kjt_hex_byte_to_ascii
+          ld hl,slot_txt
+          call kjt_print_string
+          ret
+
+slot_txt            db " [Slot:"
+slot_value_txt      db "00]",0
+         
+;-----------------------------------------------------------------------------------------------------------
+
+
+maskable_menu1	dw go_basic
+		db " Reset/boot machine (BASIC)",11,0
+
+maskable_menu2  dw preload_tap
+		db " Load .tap / .bin file & boot",11,0
+
+maskable_menu3  dw boot_nvr
+		db "*",0					;* = token, substituted by "BOOT INTO [NVR NAME]"
+		
+maskable_menu4	dw menu_wait
+		db 0
+		
+maskable_menu5	dw menu_wait
+		db 0
+		
+maskable_menu6	dw menu_wait
+		db 0
+		
+maskable_menu7	dw menu_wait
+		db 0
+		
+maskable_menu8	dw menu_wait
+		db 0
+		                              
+fixed_menu_txt	db 11," S. Select a machine"
+                db 11," C. Choose config slot for this machine"
+                db 11," M. Make machine selection default"
+
+                db 11,11," ESC - Quit to FLOS.",11,11,0
+
+menu_numchr_txt db " x.",0
+
+
+maskable_menu_addrs
+
+		dw maskable_menu1
+		dw maskable_menu2
+		dw maskable_menu3
+		dw maskable_menu4
+		dw maskable_menu5
+		dw maskable_menu6
+		dw maskable_menu7
+		dw maskable_menu8
+	
+	
+custom_menu_jps	dw menu_wait
+		dw menu_wait
+		dw menu_wait
+		dw menu_wait
+		dw menu_wait
+		dw menu_wait
+		dw menu_wait
+		dw menu_wait
+
+
+;----------------------------------------------------------------------------------------
+
+machine_selection	db 0              
+
+machine_slot_list	ds 10,0             ;slot for machine 0, slot for machine 1, etc
+			
+;-------------------------------------------------------------------------------------------------
+
+
+number_of_machines	equ 3			;max = 10 machines
+
+machine0_name		db "Spectrum 48K",0
+machine1_name  	 	db "Spectrum 128K",0
+machine2_name   	db "Pentagon 128K",0
+machine3_name		db " ",0
+machine4_name		db " ",0
+machine5_name		db " ",0
+machine6_name   	db " ",0
+machine7_name		db " ",0
+machine8_name		db " ",0
+machine9_name		db " ",0
+
+machine0_romfn		db "vol0:spectrum/zxspec48.rom ",0
+machine1_romfn		db "vol0:spectrum/zxspe128.rom ",0
+machine2_romfn		db "vol0:spectrum/zxspe128.rom ",0
+machine3_romfn		db " ",0
+machine4_romfn		db " ",0
+machine5_romfn		db " ",0
+machine6_romfn		db " ",0
+machine7_romfn		db " ",0
+machine8_romfn		db " ",0
+machine9_romfn		db " ",0
+
+machine0_bits		db $80	; bit7=Sense EXP_B for NVR select offset (0 or 1), bits 2:0=NVR type
+machine1_bits		db $82
+machine2_bits		db $82
+machine3_bits		db 0
+machine4_bits		db 0
+machine5_bits		db 0
+machine6_bits		db 0
+machine7_bits		db 0
+machine8_bits		db 0
+machine9_bits		db 0
+
+nvr_type0_fn		db "vol0:spectrum/resi48k.nvr ",0
+nvr_type1_fn		db "vol0:spectrum/esxdos.nvr ",0	
+nvr_type2_fn		db "vol0:spectrum/resi128k.nvr ",0	
+nvr_type3_fn		db "vol0:spectrum/esxdos.nvr ",0	
+nvr_type4_fn		db " ",0
+nvr_type5_fn		db " ",0	
+nvr_type6_fn		db " ",0
+nvr_type7_fn		db " ",0
+
+nvr_type0_name	        db "RESIDOS (48K)",0
+nvr_type1_name		db "ESXDOS",0
+nvr_type2_name	        db "RESIDOS (128K)",0
+nvr_type3_name		db "ESXDOS",0
+nvr_type4_name		db " ",0
+nvr_type5_name		db " ",0
+nvr_type6_name		db " ",0
+nvr_type7_name		db " ",0
+
+nvr_type0_opt_mask	db %1111111
+nvr_type1_opt_mask	db %1111100
+nvr_type2_opt_mask	db %1111111
+nvr_type3_opt_mask	db %1111100
+nvr_type4_opt_mask	db %1111111
+nvr_type5_opt_mask	db %1111100
+nvr_type6_opt_mask	db %1111111
+nvr_type7_opt_mask	db %1111111
+
+;--------------------------------------------------------------------------------------------------------------------
+
+nvr_filename_addrs	dw nvr_type0_fn
+			dw nvr_type1_fn
+			dw nvr_type2_fn
+			dw nvr_type3_fn
+			dw nvr_type4_fn
+			dw nvr_type5_fn
+			dw nvr_type6_fn
+			dw nvr_type7_fn
+
+nvr_name_addrs		dw nvr_type0_name
+			dw nvr_type1_name
+			dw nvr_type2_name
+			dw nvr_type3_name
+			dw nvr_type4_name
+			dw nvr_type5_name
+			dw nvr_type6_name
+			dw nvr_type7_name
+
+machine_romfn_addrs	dw machine0_romfn
+			dw machine1_romfn
+			dw machine2_romfn
+			dw machine3_romfn
+			dw machine4_romfn
+			dw machine5_romfn
+			dw machine6_romfn
+			dw machine7_romfn
+			dw machine8_romfn
+			dw machine9_romfn	
+
+machine_name_addrs	dw machine0_name
+			dw machine1_name
+			dw machine2_name
+			dw machine3_name
+			dw machine4_name
+			dw machine5_name
+			dw machine6_name
+			dw machine7_name
+			dw machine8_name
+			dw machine9_name
+		
+
+;----------------------------------------------------------------------------------------
+
+settings_dir        	db "settings",0
+cfg_fn              	db "EMU.CFG",0
+
+cfg_file_line1_txt	db "00 ;Active machine",10,13,0
+cfg_file_line_a_txt	db "00 ;Machine "
+cfg_file_line_b_txt	db "0 Slot",10,13,0
+
+cfg_file_size		dw 0
+
+;----------------------------------------------------------------------------------------
+
 
 cannot_find_txt     db "Cannot find: ",0
-restore_48_fn       db "RESI48K.NVR",0
-restore_128_fn      db "RESI128K.NVR",0
-restore_esx_fn      db "ESXDOS.NVR",0
-
-spectrum48_rom_fn   db "ZXSPEC48.ROM",0
-spectrum128_rom_fn  db "ZXSPE128.ROM",0
-
-load_rom_txt        db 11,"Loading ROM file..",11,11,0
 
 press_a_key_txt     db 11,11,"Press any key.",11,0
 
 saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 
-filename_txt        ds 16,0   
-
 bad_fn_txt          db 11,"Can't find that file.",11,11,0
 
 banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.07   ",11
+                    db "   Emulator Kickstart V0.08   ",11
                     db "                              ",11,0
           
 machine_txt         db 11,"Selected machine: ",11,11," ",0
 
-m0_txt              db "SPECTRUM 48",0                      ;machine type $00
-m1_txt              db "SPECTRUM 128",0                     ;machine type $01
+boot_into_txt	    db " Boot into ",0
 
-
-
-                    
-menu_txt_norm       db 11,11," 1. Reset/boot machine (BASIC)",11
-                    db " 2. Load .tap /.bin file & boot",11,0
-                    
-menu_txt_esxdos     db 11,11," 1. N/A in ESXDOS mode",11
-                    db " 2. N/A in ESXDOS mode",11,0
-                    
-menu_nvr0           db " 3. Boot into RESIDOS (.nvr)",11,0
-menu_nvr1           db " 3. Boot into ESXDOS (.nvr)",11,0
-                    
-                    
-menu_txt2           db " 4. Change selected machine",11
-                    db " 5. Set config slot for this machine",11
-                    db " 6. Set machine selection as default",11,11
-
-                    db " ESC - Quit to FLOS.",11,11,0
-
-menu_nvr_list       dw menu_nvr0,menu_nvr1
-
-
-
-
+;---------------------------------------------------------------------------------------------
 
 eeprom_contents_txt db 11,"EEPROM contents:",11,11,0        
 
-slot_prompt_txt     db 11,11,"Please enter the slot which contains..",11,11,0
-                    
-slot_prompt_m0_txt  db "Spectrum 48 FPGA config file :",0             ;machine type $00
-slot_prompt_m1_txt  db "Spectrum 128 FPGA config file :",0            ;machine type $01
-                    
-cfg_line1_txt       db "00 ;Active machine",10,13
-cfg_line2_txt       db "00 ;Spectrum 48 Slot",10,13
-cfg_line3_txt       db "00 ;Spectrum 128 Slot",10,13
-cfg_txt_end         db 0
+slot_prompt_txt     db 11,11,"Please enter the slot which contains",11
+		    db "FPGA Config file for:" ,11,11,0
 
-slot_txt            db " [Slot:"
-slot_value_txt      db "00]",0
-
+slot_prompt2_txt    db 11,11,"SLOT? :",0
+	                  
 error_txt           db 11,11,"THERE HAS BEEN AN ERROR!",0
 
 slot_text           db " ",0
@@ -1245,10 +1749,12 @@ bootcode_text       db "BOOTCODE ETC",0
 
 ;-------------------------------------------------------------------------------------------------
 
+loading_msg         incbin    "FLOS_based_programs\utils\emu\data\loading_txt.bin"
+
+;------------------------------------------------------------------------------------------------
+
 args_set            db 0
 arg_string          dw 0
-
-residos_esxdos      db 0
 
 pen_colour          db 0
 cursor_pos          dw 0
@@ -1256,9 +1762,6 @@ cursor_pos          dw 0
 eeprom_id_byte      db 0
 number_of_slots     db 4
 working_slot        db 0
-
-machine_selection   db 0                ;0=Spec 48, 1= Spec 128
-slot_list           db 0,0              ;slot for 48, slot for 128
 
 video_page          db 0
 page_address        dw 0
@@ -1269,6 +1772,8 @@ length_lo           dw 0
 read_bytes          dw 0
 
 filename            ds 16,0
+
+spectrum_txt	    db "SPECTRUM",0
 
 restore_fn_addr     dw 0
 
@@ -1281,4 +1786,7 @@ page_buffer         ds 256,0
 
 load_buffer         ds buffer_size,0
 
-;-------------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------------
+
+config_file_buffer ds 512,0
+
