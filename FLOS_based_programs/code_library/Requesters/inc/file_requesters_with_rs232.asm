@@ -812,52 +812,6 @@ req_fill_in_filename
 		
 ;----------------------------------------------------------------------------------------------
 
-req_goto_top_of_dir
-
-		push de				; ** NEW **
-		call kjt_get_dir_cluster		; Allows a "fake" dir entry to be inserted at top
-		ld a,d					; of dir listing: [ VOLUME LIST ] so volumes can be changed
-		or e					;
-		pop de					;
-		jr z,req_root_dir			;
-		xor a					;
-		jr req_not_root				;
-req_root_dir	ld a,1					;
-req_not_root	ld (suplimentary_dir_entries),a		;
-		call kjt_dir_list_first_entry		;
-		ret					;
-							;
-							;
-req_next_dir_entry					;
-							;
-		ld a,(suplimentary_dir_entries)		;
-		or a					;
-		jr z,req_norm_dent			;
-		dec a					;
-		ld (suplimentary_dir_entries),a		;
-		jr req_ret_vollist			;
-req_norm_dent	call kjt_dir_list_next_entry		;
-		ret					;
-							;
-							;
-req_get_dir_entry					;
-							;
-		ld a,(suplimentary_dir_entries)		;
-		or a					;
-		jr z,req_norm_dent2			;
-req_ret_vollist	ld hl,vol_list_txt			;
-		xor a					;
-		ret					;
-req_norm_dent2	call kjt_dir_list_get_entry		;
-		ret					;
-							;
-vol_list_txt	db "[ VOLUMES ]",0			;
-							;
-							;
-suplimentary_dir_entries	db 0			;
-
-
-
 
 req_new_dir_preamble
 
@@ -878,24 +832,50 @@ req_show_dir_page
 		or a					;
 		jp nz,req_show_vol_list			; NEW NEW NEW
 
-	  	
-		call req_goto_top_of_dir		; find starting point in dir list
-		ret nz
-		ld hl,(req_dlp)				; skip "HL" entries
-req_fdsp	ld a,h
+		xor a
+		ld (req_dl_offset),a
+		call kjt_get_dir_cluster		; ROOT DIR? 
+		ld a,d
+		or e
+		jr nz,req_dnotr
+		
+		ld hl,(req_dlp)				;If so show "[ VOLUMES ]" at top
+		ld a,h
+		or l
+		jr z,req_shvols
+		dec hl
+		jr req_skipvols
+req_shvols	ld a,3
+		call w_get_element_a_coords
+		call kjt_set_cursor_position
+		ld hl,vol_list_txt
+		call kjt_print_string
+	  	ld a,1
+		ld (req_dl_offset),a
+				
+req_dnotr	ld hl,(req_dlp)
+req_skipvols	push hl
+		call kjt_dir_list_first_entry		; find starting point in dir list
+		pop hl
+		jp nz,req_eodl
+
+req_fdsp	ld a,h					; skip "HL" entries
 		or l
 		jr z,req_dsp
 		dec hl
 		push hl
-		call req_next_dir_entry
+		call kjt_dir_list_next_entry
 		jp nz,req_dlhe
 		pop hl
 		jr req_fdsp
 	
 req_dsp		ld a,3
 		call w_get_element_a_data_location
-		ld b,(ix+2)				; b = lines in element (text window)
-		ld c,0					; line offset
+		ld a,(req_dl_offset)
+		ld c,a
+		neg
+		add a,(ix+2)				; b = lines in element (text window)
+		ld b,a					; c = line offset
 req_fdplp	ld e,c
 		push bc			
 		ld a,3
@@ -919,8 +899,8 @@ req_dirbl	ld a,32					; blank string
 		ld a,(req_eodf)
 		or a
 		jr nz,req_neod
-		call req_get_dir_entry
-		jr c,req_dlhe
+		call kjt_dir_list_get_entry
+		jr nz,req_dlhe
 		cp $24					; end of dir?
 		jr z,req_lde
 
@@ -963,7 +943,7 @@ req_df		ld bc,(req_dircurpos)
 		ld hl,req_fn_len
 		call kjt_print_string			; show file length
 		
-req_denaf	call req_next_dir_entry
+req_denaf	call kjt_dir_list_next_entry
 		jr z,req_neod				; dir entry advance ok?
 		or a
 		jr z,req_dlhe
@@ -974,11 +954,11 @@ req_neod	pop bc
 		dec b
 		jp nz,req_fdplp
 		
-		call req_get_dir_entry			; check if reached end of dir on last line
+		call kjt_dir_list_get_entry		; check if reached end of dir on last line
 		jr z,req_neod2
 		or a			
 		jr z,req_dlhwe
-		ld a,1
+req_eodl	ld a,1
 		ld (req_eodf),a
 req_neod2	xor a					; ZF set = all ok
 		ret
@@ -989,7 +969,9 @@ req_dlhwe	xor a
 		ret
 	
 
-root_char_txt	db "/",0
+root_char_txt	db "/",0				;
+vol_list_txt	db "[ VOLUMES ]",0			;
+req_dl_offset	db 0					;
 
 ;----------------------------------------------------------------------------------------------
 
