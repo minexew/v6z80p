@@ -3,8 +3,8 @@
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>FLOS Kernal Calls</title></head>
 <body>
 <h3><span style="text-decoration: underline; font-weight: bold;">FLOS
-v608 Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
-Last updated 14-10-2012</span></h3>
+v609 Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
+Last updated 30-10-2012</span></h3>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span><br>The following FLOS kernal routines can be executed simply by using a "CALL name"<br>instruction, with registers pre-set to the routines requirements (Remember to<br>INCLUDE the labels definitions from the equates folder.)<br><br>EG:- <br><br>---------------------------------------------------------------------------------<br><br>         LD HL,  my_text<br>         CALL    kjt_print_string<br><br>         [rest of program..]<br>	<br>my_text  DB "HELLO WORLD!",0<br><br>----------------------------------------------------------------------------------<br><br><br><span style="text-decoration: underline;">Notes:</span><br><br>Kernal calls should not be made when the Video RAM is paged in. The only routine<br>that is guaranteed to work in that situation is "kjt_page_out_video"</pre>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span>It should be assumed that Kernal calls trash all registers, unless a routine's<br>documentation says otherwise.</pre>
 <span style="text-decoration: underline; font-weight: bold;"><br>
@@ -261,7 +261,7 @@ Kernal Call Index:</span><br>
 <pre><br>Input registers:</pre>
 <pre>If A = 1, mount quietly (no text output)</pre>
 <pre><br>Output registers :None</pre>
-<pre><br></pre>
+<pre><br>Notes:<br> <br>   Also attempts to create the assign Envar 'EX0' for VOL0:COMMANDS (FLOS v609+)<br><br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><span style="font-weight: bold;"><a name="kjt_get_volume_info"></a>kjt_get_volume_info</span></pre>
 <pre><br>Action: Returns info about the volumes mounted.</pre>
