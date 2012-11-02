@@ -20,6 +20,7 @@ Visible differences between boards
   switch is in the DOWN POSITION but when set UP, the V6Z80P+ v1.1 is compatible
   with the config files for the V6Z80P+ v1.0.
 
+
 * The V6Z80P+ 1.1b does NOT have an OSC SEL switch, the CPU clock is now always
   sourced from the FPGA. The SD card connector is a push-push, enclosed type.
 
