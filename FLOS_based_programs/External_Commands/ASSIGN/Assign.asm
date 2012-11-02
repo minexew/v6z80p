@@ -77,9 +77,9 @@ fnd_spc		inc hl
 		jr nz,fnd_spc
 
 fnd_para2	ld a,(hl)			; examine path argument text, if encounter 0: give up and use
-		or a			; the current dir for path
+		or a				; the current dir for path
 		jp z,set_var
-		cp " "			; ignore leading spaces...
+		cp " "				; ignore leading spaces...
 		jr nz,para2_ok
 		inc hl
 		jr fnd_para2
@@ -92,7 +92,7 @@ para2_ok	call kjt_parse_path
 		call kjt_get_volume_info
 		ld (var_data+2),a
 
-set_var		ld hl,var_name		;set the environment variable
+set_var		ld hl,var_name			;set the environment variable
 		ld de,var_data
 		call kjt_set_envar
 		ret z
