@@ -95,6 +95,7 @@ lp1       ld (hl),a
           
           ld hl,confirm_txt             
           call kjt_print_string
+	  ld a,1
           call kjt_get_input_string
           or a
           jp z,quit
