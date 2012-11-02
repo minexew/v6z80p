@@ -1,7 +1,8 @@
 ; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.22 - P.Ruston '08 - '12    *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.23 - P.Ruston '08 - '12    *
 ; ****************************************************************************
 ;
+; V1.23 - Requester code 0.28
 ; v1.22 - Added Save data from block, moved data buffer to banks 1-4
 ; V1.21 - newer requester code - requires FLOS 6.02
 ; V1.20 - fixed for FLOS v593 (call to KJT_GET_INPUT_STRING)
@@ -1806,7 +1807,7 @@ include "FLOS_based_programs\code_library\requesters\inc\file_requesters_with_rs
 
 
 start_text1         db    " ************************************ ",11
-                    db    " * V6Z80P ONBOARD EEPROM TOOL V1.22 * ",11
+                    db    " * V6Z80P ONBOARD EEPROM TOOL V1.23 * ",11
                     db    " ************************************ ",11,0
                     
 start_text2         db 11
