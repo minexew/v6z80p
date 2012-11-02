@@ -16,17 +16,17 @@ Contents of default.bin
 
 [SLOT 0]
 
-$00800-$047FF - FLOS v587
-$0F000-$0FFFF - Bootcode 6.14 (primary)
-$1F000-$1FFFF - Bootcode 6.14 (backup)
+$00800-$047FF - FLOS v609
+$0F000-$0FFFF - Bootcode 6.16 (primary)
+$1F000-$1FFFF - Bootcode 6.16 (backup)
 
 [SLOT 1]
 
-$20000-$3FFFF - OSCA 669 (PAL)
+$20000-$3FFFF - OSCA 673 (PAL)
 
 [SLOT 2]
 
-$40000-$5FFFF - OSCA 668 (NTSC)
+$40000-$5FFFF - OSCA 672 (NTSC)
 
 
 
