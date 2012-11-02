@@ -1,0 +1,55 @@
+
+EMU.EXE - Emulator Launcher v0.08
+
+Used to start Alessandro's cycle
+perfect Spectrum emulators.
+
+Use: EMU (options)
+
+If supplied, Options can be:
+
+"M0" (IE: Machine 0 Spectrum 48)
+"M1" (IE: Machine 1 Spectrum 128)
+"M2" (IE: Machine 2 Pentagon 128)
+
+(When arguments are supplied, you
+can only boot into an alterate OS
+from an .nvr file.)
+
+Notes:
+
+If the program has not been run
+before you will be prompted to set
+the config slot for each emulator
+that is to be used.
+
+The settings (slots used, currently
+selected emulator) are saved in a
+file called emu.cfg in a root folder
+named SETTINGS (both are created if
+necessary).
+
+Emulators can use the status of
+the expansion pin EXT_B to determine
+hardware configuration (EG: The
+Spectrum 48/128 emulators select
+virtual hardware expansion devices
+(zxMMC, divIDE etc) depending on
+this pins. EMU also reads the pin
+status to load an OS appropriate for
+the hardware.
+
+For the Spectrum 48/128 emulators:
+
+If this pin is low (pulled down by a
+fitted jumper) the system restores
+to ESXDOS - If the pin is high (no
+jumper) RESIDOS is used.
+
+For this automatic feature to work
+
+a) OSCA v671+ must be installed and
+
+b) the Spectrum emulator configs must
+be versions 048K2715.bin/128K2715.bin
+or above.
