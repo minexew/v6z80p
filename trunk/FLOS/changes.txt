@@ -2,6 +2,27 @@
 Current FLOS version:
 ---------------------
 
+v6.09 - 31/10/2012  
+
+        Improvement : Internal commands' paths can now use both "/" and "\" as separators.
+
+     Added for OSCA : Upon running a command, the linecop hi register is restored to $7, so that existing programs
+                      get their linecop programs from $7ffff (the audio high registers are also restored to $1
+                      at this point now instead of upon return to FLOS).
+                    
+          Optimized : Obsolete code removed.
+
+            Changed : KJT_MOUNT_VOLUMES now always attempts to create the envar "EX0" (VOL:COMMANDS)
+
+             Bugfix : H command fixed, a bug had been introduced whereby the search started at a random point
+                      instead of the address supplied.
+
+
+
+Previous changes:
+-----------------
+
+
 v6.08 - 15/10/2012  
 
         Improvement : Path is now allowed with all internal commands' arguments: DEL, EXEC, LB, MD, RD, RN, SB
@@ -26,11 +47,8 @@ v6.08 - 15/10/2012
 
         Bugfix	    : Corrected mangled text in FORMAT command
 
-	
 
 
-Previous changes:
------------------
 
 
 v6.07 - 01/10/2012

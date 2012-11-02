@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"cd" - Change Dir command. V6.12
+;"cd" - Change Dir command. V6.13
 ;-----------------------------------------------------------------------
 
 os_cmd_cd	
@@ -65,9 +65,11 @@ cd_parse_path
 	call cd_store_vol_dir
 	
 	ld a,(hl)				
+	cp $5c				; if "\" = go root
+	jr z,cd_goroot
 	cp $2f			
 	jr nz,cd_nogor			; if "/" = go root
-	push hl
+cd_goroot	push hl
 	call kjt_root_dir	
 	pop hl
 	ret nz
@@ -138,11 +140,13 @@ cd_gdn	push hl
 	call kjt_change_dir			;step through args changing dirs as apt
 	pop hl
 	jr nz,cd_dcherr
-cd_mol	ld a,(hl)				;move to next dir name in args (after "/") if no more found, quit
+cd_mol	ld a,(hl)				;move to next dir name in args (after "/" or "\") if no more found, quit
 	inc hl
 	or a
 	ret z
 	cp $2f				;"/"?
+	jr z,cd_nchvol
+	cp $5c				;"\"?
 	jr z,cd_nchvol
 	jr cd_mol
 		
