@@ -3742,13 +3742,13 @@ path_finder
 					;split path and filename from HL
 	ld a,(hl)
 	or a
-	jr z,pf_end
+	jr z,pf_end			;look for end of path/filename string (space or null)
 	cp " "
 	jr z,pf_end
 	inc hl
 	jr path_finder
 
-pf_end	dec hl
+pf_end	dec hl				;now go back and look for seperator ":", "/" or "\"
 	ld a,(hl)
 	cp ":"
 	jr z,pf_start
@@ -3768,6 +3768,7 @@ pf_start	inc hl
 	inc hl
 	ld b,(hl)
 	ld (hl),0
+	
 	pop hl				; retrieve original HL
 	
 	push hl
@@ -3782,6 +3783,7 @@ pf_haspth	push bc
 	call cd_parse_path
 	pop hl
 	pop de
+	
 	ld (hl),e				; restore characters at split point (dont use B reg, as may be used
 	inc hl				; for driver error code)
 	ld (hl),d
