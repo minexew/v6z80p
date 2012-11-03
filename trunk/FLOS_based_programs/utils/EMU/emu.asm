@@ -12,7 +12,7 @@
 ; Changes:
 ; --------
 ;
-; v0.09 - Requester code 0.28
+; v0.10 - Requester code 0.28
 ; v0.08 - More easily customizable, supports up to 10 machines
 ; v0.07 - Allows boot (to residos/esxdos) via arguments ("EMU M0" = machine0, "EMU M1" = machine1)
 ; V0.06 - Tests OSCA version on boot
@@ -271,8 +271,12 @@ goto_settings_dir
 make_settings_dir
   
 	  ld a,0
-	  call kjt_change_volume
+	  call kjt_change_volume		  ;change to vol0:
 	  ret nz
+
+          call kjt_root_dir			  ;go to root
+          ret nz
+	  
           ld hl,settings_txt                      ;make the dir
           call kjt_make_dir
           ret
@@ -1753,7 +1757,7 @@ saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 bad_fn_txt          db 11,"Can't find that file.",11,11,0
 
 banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.09   ",11
+                    db "   Emulator Kickstart V0.10   ",11
                     db "                              ",11,0
           
 machine_txt         db 11,"Selected machine: ",11,11," ",0
