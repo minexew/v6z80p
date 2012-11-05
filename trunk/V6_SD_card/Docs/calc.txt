@@ -1,0 +1,43 @@
+
+CALC.EXE - A simple calculator
+
+Usage: CALC expression
+
+The result is shown in hex, decimal
+and binary with leading zeroes
+supressed.
+                                       
+"expression" can contain the following
+operators:
+
+ +  Add
+ -  Subtract
+ *  Multiply
+ /  Divide
+ &  Logical AND
+ |  Logical OR
+ >> Shift right
+ << Shift left
+
+Numbers are interpreted as hex by
+default (or when "$" prefix is used)
+Other number base symbols are:
+
+ # Decimal
+ % Binary
+ "Between quotes" - ASCII value
+
+Brackets can be used - parsing will
+be in a simple left to right fashion.
+
+Limitations: 
+
+Only integers can be used.
+
+Internal registers are 16 bit so any
+time a value exceeds 65535 an
+overflow error will occur.
+
+Underflows are allowed to occur
+if the result is no smaller than
+-32767
