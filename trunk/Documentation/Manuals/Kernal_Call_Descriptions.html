@@ -3,8 +3,8 @@
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>FLOS Kernal Calls</title></head>
 <body>
 <h3><span style="text-decoration: underline; font-weight: bold;">FLOS
-v609 Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
-Last updated 30-10-2012</span></h3>
+v610 Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
+Last updated 16-11-2012</span></h3>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span><br>The following FLOS kernal routines can be executed simply by using a "CALL name"<br>instruction, with registers pre-set to the routines requirements (Remember to<br>INCLUDE the labels definitions from the equates folder.)<br><br>EG:- <br><br>---------------------------------------------------------------------------------<br><br>         LD HL,  my_text<br>         CALL    kjt_print_string<br><br>         [rest of program..]<br>	<br>my_text  DB "HELLO WORLD!",0<br><br>----------------------------------------------------------------------------------<br><br><br><span style="text-decoration: underline;">Notes:</span><br><br>Kernal calls should not be made when the Video RAM is paged in. The only routine<br>that is guaranteed to work in that situation is "kjt_page_out_video"</pre>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span>It should be assumed that Kernal calls trash all registers, unless a routine's<br>documentation says otherwise.</pre>
 <span style="text-decoration: underline; font-weight: bold;"><br>
@@ -836,13 +836,13 @@ Kernal Call Index:</span><br>
 <pre><br><span style="font-weight: bold;"><a name="kjt_get_version"></a></span></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;">kjt_get_version</span></pre>
-<pre><br>Action: Returns FLOS and OSCA version values</pre>
+<pre><br>Action: Returns FLOS / OSCA / BOOTCODE version values (also the V6Z80P PCB version if OSCA &gt; version $673.</pre>
 <pre><br>Input Registers&nbsp; : none</pre>
 <pre><br>Output Registers :</pre>
 <pre>&nbsp;HL = OS version word</pre>
-<pre>&nbsp;DE = Hardware version word</pre>
-<pre><br>Trashes: BC</pre>
-<pre><br><a name="kjt_compare_strings"></a></pre>
+<pre>&nbsp;DE = Hardware version word<br><br>  B = V6Z80P PCB version <br><br>    0 = OSCA &lt; 673 or FLOS &lt; 610: cannot tell<br>    1 = Original V6Z80P<br>   &nbsp;2 = V6Z80P+<br>    3 = V6Z80P+ V1.1<br><br> Also, if C = 0:</pre>
+
+<pre>   IX = Location of bootcode info data structure:<br><br>     $0 [WORD] - Bootcode version (BCD) (if $0000 = Bootcode is &lt; version $617)<br>     $2 [BYTE] - Devices available at boot time (Bit 0 = SD card)<br>     $3 [BYTE] - Device OS booted from (1=SD CARD, 2=EEPROM, 3=SERIAL)<br><br> (if C &lt;&gt; 0 : FLOS &lt; 610 = data not available)<br><br><a name="kjt_compare_strings"></a></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;">kjt_compare_strings</span></pre>
 <pre><br>Action: Compares two ASCII strings (not case sensitive)</pre>
