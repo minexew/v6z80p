@@ -35,6 +35,8 @@ menu_loop	call kjt_wait_key_press
 		jr z,test_audio
 		cp "7"
 		jr z,test_memory
+		cp "8"
+		jr z,show_sysinfo
 		jr menu_loop
 
 quit		ld a,1			
@@ -56,9 +58,11 @@ test_video	call video_tests
 		jr main_menu
 test_audio	call audio_tests
 		jr main_menu
+show_sysinfo	call system_info
+		jr main_menu
 		
 		
-menu_txt	db "V6Z80P System Tester V1.00",11
+menu_txt	db "V6Z80P System Tester V1.01",11
 		db "--------------------------",11,11
 		db "Press:",11,11
 		db "1. For keyboard tests",11
@@ -67,7 +71,8 @@ menu_txt	db "V6Z80P System Tester V1.00",11
 		db "4. For serial tests",11
 		db "5. For video tests",11
 		db "6. For audio tests",11
-		db "7. For memory tests",11,11
+		db "7. For memory tests",11
+		db "8. For system info",11,11
 		db "ESC - Quit",11,11,0
 
 ;--------------------------------------------------------------------------------------------------------
@@ -79,5 +84,6 @@ menu_txt	db "V6Z80P System Tester V1.00",11
 	include "FLOS_based_programs\utils\checksys\memory_tests.asm"
 	include "FLOS_based_programs\utils\checksys\video_tests.asm"
 	include "FLOS_based_programs\utils\checksys\audio_tests.asm"
+	include "FLOS_based_programs\utils\checksys\system_info.asm"
 		
 ;--------------------------------------------------------------------------------------------------------
