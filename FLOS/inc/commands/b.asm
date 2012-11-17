@@ -32,6 +32,9 @@ shwbnk2	push af			;show bank number (and sysram section paged)
 	call hexbyte_to_ascii
 	
 	ld hl,sysram_banked_txt
+
+print_and_return
+
 	call kjt_print_string
 	xor a
 	ret

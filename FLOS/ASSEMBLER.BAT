@@ -13,7 +13,7 @@ rem ** assemble os source **
 
 %v6z80pdir%\pasmo\pasmo.exe -d -I %v6z80pdir%\equates -I %v6z80pdir%\FLOS\data -I %v6z80pdir%\FLOS\inc %1 %1.bin %1.symbol
 
-%v6z80pdir%\FLOS\apps\Add_os_crc_header.exe
+rem %v6z80pdir%\FLOS\apps\Add_os_crc_header.exe
 
 pause
 

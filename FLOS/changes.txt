@@ -2,6 +2,32 @@
 Current FLOS version:
 ---------------------
 
+v6.10 - 15/11/2012
+
+        Improvement: DE,HL,BC are now pushed and popped around "scroll up" - there was an inconsitancy
+                     in that KJT_PRINT_STRING normally preserves registers, but if a line caused
+                     the screen to scroll, DE was trashed.
+
+        New:         KJT_GET_VERSION retrieves PCB version in B (previously B was zero on exit from
+                     this routine) V6Z80P = 1, v6z80p+ = 2, v6z80p+1.1 = 3. Also, IX points to
+                     a data structure that contains bootcode version, boot device ID etc. See
+                     kernal call docs for info.
+
+        Improvement: Mouse driver tests bit3 in byte received for packet index 0, if this is not 1
+                     then the byte is ignored. This can help cure misaligned packets.
+        
+        Improvement: Directory scans end when 1st byte of a line entry = 0
+
+        Changed    : The source code actually starts at OS_START instead of OS_START+16. The header
+                     data is now part of the source, only the CRC needs to be inserted by the external app
+                     (which has been updated to suit). An offset word to an OS label is now placed at header $0E
+
+
+
+Previous changes:
+-----------------
+
+
 v6.09 - 31/10/2012  
 
         Improvement : Internal commands' paths can now use both "/" and "\" as separators.
@@ -19,8 +45,6 @@ v6.09 - 31/10/2012
 
 
 
-Previous changes:
------------------
 
 
 v6.08 - 15/10/2012  

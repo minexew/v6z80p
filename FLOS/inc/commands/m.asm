@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"m" - Show memory as hex bytes command. V6.02
+;"m" - Show memory as hex bytes command. V6.03
 ;-----------------------------------------------------------------------
 
 os_cmd_m	
@@ -26,10 +26,7 @@ mmbllp:	ld (hl)," "
 	ld (hl),11
 	inc hl
 	ld (hl),0
-	ld hl,output_line
-	push de
-	call os_print_string
-	pop de
+	call os_print_output_line
 	pop bc
 	djnz smbllp
 	ld (memmonaddrl),de

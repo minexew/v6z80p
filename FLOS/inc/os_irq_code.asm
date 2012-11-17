@@ -114,7 +114,7 @@ qualklist	db $2f,$27,$59,$11,$1f,$14,$12
 
 
 ;-----------------------------------------------------------------------------------------
-; Mouse IRQ code v5.02
+; Mouse IRQ code v5.03
 ;-----------------------------------------------------------------------------------------
 
 mouse_irq_code
@@ -136,10 +136,16 @@ mouse_irq_code
 	ld e,a
 	ld hl,mouse_packet	
 	add hl,de
-	in a,(sys_mouse_data)
-	ld (hl),a
-	inc e			; was this the third and last byte of packet?
-	ld a,e
+	ld c,sys_mouse_data
+	in e,(c)			 
+	ld (hl),e
+	
+	or a			; if this is packet index 0, we can check if bit 3 is set
+	jr nz,not_idx0		; as should always be case. If it is not we know the byte
+	bit 3,e			; received is not actually the first of the packet so we
+	jr z,mbotok		; should ignore it. This can help with misaligned packets.
+		
+not_idx0	inc a			; was this the third and last byte of packet?
 	cp 3
 	jr nz,msubpkt
 
