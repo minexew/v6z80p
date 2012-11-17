@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"lb" - Load binary file command. V6.05
+;"lb" - Load binary file command. V6.06
 ;-----------------------------------------------------------------------
 
 os_cmd_lb
@@ -45,18 +45,9 @@ os_lbnao	ld hl,(lb_load_addr)		;load the file
 	or a
 	ret
 	
-
-lb_fl_ok	ld de,filesize_cache_msw		
-show_bl	ld hl,os_hex_prefix_txt		;show "$"
-	call os_print_string	
-	ld hl,output_line
-	ld b,3
-	call n_hexbytes_to_ascii
-	ld (hl),0	
-	ld b,5				;skip leading zeros
-	call os_print_output_line_skip_zeroes	;show hex figures 
+lb_fl_ok	call print_filesize
 	
-	ld hl,bytes_loaded_msg		;show " bytes loaded" return message
+show_bl	ld hl,bytes_loaded_msg		;show " bytes loaded" return message
 	call show_packed_text_and_cr
 	xor a
 	ret

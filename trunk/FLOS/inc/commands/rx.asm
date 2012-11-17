@@ -1,5 +1,5 @@
 ;---------------------------------------------------------------------------------------------------
-;"RX" - Receive binary file via serial port command. V6.07
+;"RX" - Receive binary file via serial port command. V6.08
 ;---------------------------------------------------------------------------------------------------
 ;
 ;  6.06 - Bugfix: If comms error encountered in file header the error code is now properly returned
@@ -60,7 +60,8 @@ serl_dfb	ld b,e
 	call serial_receive_file
 	ret nz			
 
-	ld de,serial_fileheader+18
+	ld de,serial_fileheader+$13
+	call print_double_word
 	jp show_bl		; show bytes loaded (use end of LB routine)
 
 

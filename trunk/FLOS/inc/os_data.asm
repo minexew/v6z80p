@@ -17,9 +17,13 @@ boot_script_fn	db " BOOT_RUN.SCR ",0	;note: surrounding spaces are required for 
 
 os_hex_prefix_txt	db "$",0
 
-flos_version_txt	db "FLOS V:$"
-flos_version_hex	db "xxxx / OSCA V:$"
-osca_version_hex	db "xxxx"
+flos_version_txt	db "FLOS V:$0"
+		db $30+((flos_version>>8)&$f)
+		db $30+((flos_version>>4)&$f)
+		db $30+(flos_version&$f)
+		db 0
+
+osca_version_txt	db " / OSCA V:$",0
 crlfx2_txt	db 11,11,0
 
 loading_txt	db "Loading..",11,0
@@ -224,7 +228,7 @@ os_cmd_locs	dw os_cmd_colon	;command 0
 		dw os_cmd_b	;2
 		dw os_cmd_c	;3
 		dw os_cmd_cd	;4
-		dw os_cmd_cls	;5	
+		dw os_clear_screen	;5	
 		dw os_cmd_colour	;6
 		dw os_cmd_d	;7
 
@@ -393,20 +397,27 @@ serial_headertag	db "Z80P.FHEADER"		;12 chars
 
 
 ;----------------------------------------------------------------------------------
+; BOOT INFO
+;----------------------------------------------------------------------------------
+
+bootcode_version	dw 0
+
+boot_info		db 0		; Devices present at bootcode time, bit 0 = SD Card
+		db 0		; OS boot device: 1 = SD card, 2 = EEPROM, 3 = Serial
+
+;----------------------------------------------------------------------------------
 ; FILE SYSTEM RELATED VARIABLES
 ;----------------------------------------------------------------------------------
 
-boot_drive	db 0
-
 current_volume	db 0
 	
-current_driver	db 0		;normally updated by the "change volume" routine
+current_driver	db 0		; normally updated by the "change volume" routine
 
-device_count	db 0		;IE: the number of devices that initialized
+device_count	db 0		; IE: the number of devices that initialized
 
 volume_count	db 0
 				
-vol_txt		db " VOL0:",0	;space prefix intentional
+vol_txt		db " VOL0:",0	; space prefix intentional
 dev_txt		db "DEV0:",0
 
 

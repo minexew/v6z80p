@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-; "dir" - show directory command. v6.08
+; "dir" - show directory command. v6.09
 ;-----------------------------------------------------------------------
 
 os_cmd_dir
@@ -52,20 +52,10 @@ os_dfllp	call os_get_dir_entry		;line list loop starts here
 	ld hl,dir_txt			;write [dir] next to name
 	jr os_dpl
 	
-os_deif	ld hl,os_hex_prefix_txt		;its a file - write length next to name
-	call os_print_string
-	ld hl,output_line
-	push hl
-	push ix
-	pop de
-	call hexword_to_ascii
-	push iy
-	pop de
-	call hexword_to_ascii
-	ld (hl),0
-	pop hl
-	ld b,7				;skip only 7 out of 8 hex digits
-	call os_skip_leading_ascii_zeros
+os_deif	ld (filesize_cache_msw),ix
+	ld (filesize_cache_lsw),iy
+	call print_filesize	
+
 os_dpl	call os_print_string
 	call os_new_line
 	
@@ -100,9 +90,8 @@ dir_gotr	ld a,c
 	call os_print_decimal
 
 	ld hl,xb_spare_txt
-	call os_print_string
-	xor a
-	ret
+	jp print_and_return
+	
 
 ;-----------------------------------------------------------------------
 
@@ -113,4 +102,21 @@ div_line	ld bc,$132d			;2d = "-"
 
 ;-----------------------------------------------------------------------
 
+print_filesize
+
+	ld de,filesize_cache_msw+1		
+
+print_double_word
+
+	ld hl,os_hex_prefix_txt		;show "$"
+	call os_print_string	
+	ld hl,output_line
+	ld b,4
+	call n_hexbytes_to_ascii
+	ld (hl),0	
+	ld b,7				;skip leading zeros
+	call os_print_output_line_skip_zeroes	;show hex figures 
+	ret
+
+;-----------------------------------------------------------------------
 	
