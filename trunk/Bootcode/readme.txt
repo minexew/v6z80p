@@ -13,7 +13,7 @@ contents of the file). $0FC0-$0FFF is reserved for the stack. Address range $200
 is system RAM when the ROM passes control to  this routine.
 
  * Updating the bootcode CRC checksum: It is necessary to manually set this word after
-   assemling the bootcode. Use the PC App: "New_Bootcode_CRC.exe" in the apps
+   assemling the bootcode. Use the PC App: "Bootcode_CRC_maker.exe" in the apps
    subdirectory supplied (An incorrect CRC word results in the display flashing
    magenta on power up).
 
@@ -39,6 +39,25 @@ he backup copy.
 * Revisions *
 *************
 
+Current version:
+----------------
+
+6.17 (15-11-2012)
+
+* Gives the option of not resetting the keyboard on boot if a file in the root dir
+  called SYSTEM.CFG contains the line "RESETKB=0" 
+
+* shows only 3 digits of OSCA version (for OSCA 674+)
+
+* Passes bootcode version to OS in HL
+
+* Boot device and available device codes changed (not previously used) and passed to OS
+  in BC (A = 1 to signify valid, previously A=0)
+
+
+Previous versions:
+------------------
+
 6.16 (18-10-2012)
 
 Minor mod to SD card driver for compatibility with the OSCA emulator (Not an issue
@@ -54,46 +73,3 @@ to crystal timing variations)
 6.14 (18-08-2011)
 
 Added SDHC support.
-
-6.13 (31-07-2010)
-
-Bug fix: Restored missing "jr nz" after find file which was causing loader
-to try loading from card even when no .osf was present.
-
-6.12 (20-07-2010) 
-
-This update became necessary due to changes in ROM 6.14 (as used in OSCA
-v661 onwards)
-
-Bootcode is no longer dependant on routines in ROM (no longer uses RST
-instructions)
-
-Initializes system registers and ports, sets up and clears screen
-(previously done by ROM)
-
-Can now press F1-F7 to select configs (only F1-F3 previously)
-
-Removed PQFS support code
-
-V6.11 (27-08-2009)
-
-The OS is now loaded from disk as a normal file, not directly from
-reserved sectors. This has removed the need for the INSTALL.EXE
-application. Both FAT16 and PQFS formats are supported. The bootcode
-loads the first file called "*.OSF" (* being anything) from the
-root directory. The OS now needs the 16 byte Z80P*OS* header
-attached - this is also required for serially downloaded code
-(although the contents are ignored in this case).
-
-The bootcode font is copied to Video RAM.
-
-V6.03:
-
-On boot, pressing F1, F2 or F3 reconfigures the FPGA to slot 1, 2 or 3.
-(Not permanent - Reverts back to default slot next power cycle).
-
-Serial port speed no longer set automatically (FPGA sets it 115200
-by default in OSCA 619+). An option is provided to manually set
-BAUD on boot with Function keys F11 (slow) and F12 (fast)
-
-

@@ -4,12 +4,16 @@
 ; "********.OSF" from root directory.
 ;----------------------------------------------------------------------------------------------
 
-find_os_file_fat16
+find_file_fat16
 
+	  ld (search_fn),hl
+	  
+	  ld hl,OS_location
+	  ld (fs_z80_working_address),hl
+	  
 ; Set "fs_z80_working_address" to load location before calling
-
 ; Output Carry set = Hardware error
-;        Zero flag set = OK, else A = error code $1= Not FAT16, $2=File not found, $3= EOF encountered
+; Zero flag set = OK, else A = error code $1= Not FAT16, $2=File not found, $3= EOF encountered
 
           xor a                                   ; first, check disk format. 
           ld h,a
@@ -87,18 +91,44 @@ ffnnxtsec ld hl,(fs_root_dir_loc_lba)             ; set up LBA for a root dir sc
 
           ld b,16                                 ; sixteen 32 byte entries per sector
           ld ix,sector_buffer
-ndirentr  ld a,$e5
-          cp (ix)
+ndirentr  ld a,(ix)
+          or a
+	  jr z,fnnotfnd				  ; end of dir?
+	  cp $e5
           jr z,fnnotsame                          ; ignore dir entry if file deleted      
-          ld a,"O"
-          cp (ix+8)
+	  
+	  push ix
+	  pop iy
+          ld de,8
+	  add iy,de
+	  push ix
+	  pop hl
+	  	  
+	  ld c,8
+	  ld de,(search_fn)
+fnlp	  ld a,(de)
+	  inc de
+	  cp "*"
+	  jr z,exten1
+	  cp "."
+	  jr z,exten2
+	  cp (hl)
           jr nz,fnnotsame
-          ld a,"S"
-          cp (ix+9)
-          jr nz,fnnotsame
-          ld a,"F"
-          cp (ix+10)
-          jr z,fnsame
+	  inc hl
+	  dec c
+	  jr nz,fnlp
+
+exten1    inc de
+exten2	  ld c,3
+fnxlp	  ld a,(de)
+          cp (iy)
+	  jr nz,fnnotsame
+	  inc iy
+	  inc de
+	  dec c
+	  jr nz,fnxlp       
+          jr fnsame
+
 fnnotsame ld de,32                                ; move to next filename entry in dir
           add ix,de
           djnz ndirentr                           ; all entries in this sector scanned?
@@ -142,7 +172,7 @@ fs_flnc   ld a,(fs_cluster_size)                  ; find_os_file must be called 
 fs_flns   ld a,c                                  
           ld hl,(fs_file_working_cluster) 
           call cluster_and_offset_to_lba
-          call fs_read_sector           ;read first sector of file
+          call fs_read_sector           	   ;read first sector of file
           ret c                                   ;h/w error?
 
           push bc                                 ;stash sector pos / countdown
