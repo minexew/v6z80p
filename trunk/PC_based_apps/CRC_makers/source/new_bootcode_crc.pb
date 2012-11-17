@@ -8,7 +8,7 @@
 ; Get the bootcode file
 ;-------------------------------------------------------------------------------------
 
-  srcfile2$ = OpenFileRequester("Select a Z80 bootcode file","",".bin files(*.bin)|*.bin",0)
+  srcfile2$ = OpenFileRequester("Select a Z80 bootcode file","",".exe files (.exe)|*.exe|All Files(*.*)|*.*",0)
     
     If ReadFile(0,srcfile2$) 
       sourcesize_bc = Lof(0)                                  ; get the length of opened file
@@ -59,5 +59,6 @@ MessageRequester("Phils utils","Done." + Chr(13) , 0)
 End
 
 ; IDE Options = PureBasic 4.30 (Windows - x86)
-; CursorPosition = 34
+; CursorPosition = 10
 ; Folding = -
+; Executable = ..\New_bootcode_CRC_maker.exe
