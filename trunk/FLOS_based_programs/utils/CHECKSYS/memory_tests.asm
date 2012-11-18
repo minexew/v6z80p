@@ -70,7 +70,7 @@ loop2		push bc
 		ld e,c
 		call test_ram_fill
 		pop bc
-		jr nz,sysmem_fail
+		jp nz,sysmem_fail
 		inc c
 		djnz loop2
 		
@@ -79,7 +79,38 @@ loop2		push bc
 		ld hl,random_txt			;part 2 - read/write random bytes
 		call kjt_print_string
 
-		ld c,1					;test $8000-$ffff every bank
+		di					;test first 32KB of system RAM - need to move FLOS (and this program) to higher in RAM
+		ld a,1
+		out (sys_mem_select),a			;make sure sysram $08000-$0ffff is banked at CPU: $8000		
+		ld a,%11000000
+		out (sys_alt_write_page),a		;select sysram @ CPU:$0-$7ff for reading
+		ld hl,$0								
+		ld de,$8000
+		ld bc,$8000
+		ldir					;copy sysram $00000-$07fff to $08000-$0ffff
+		ld a,1
+		out (sys_low_page),a			;bank sysram $08000-0ffff into CPU: $0-$7fff
+		ld a,%00100000
+		out (sys_alt_write_page),a		;allow first 32KB of system RAM to appear at CPU $8000 for testing
+		ld a,0
+		out (sys_mem_select),a			;page first 32KB of sysRAM into CPU ($8000-$7fff)
+		call rand_test_sysram
+		push af
+		push de
+		ld hl,$0				;copy sysRAM $08000-$0ffff back to sysRAM $00000
+		ld de,$8000
+		ld bc,$8000
+		ldir			
+		ld a,0
+		out (sys_low_page),a			;page sysram $00000-$07fff back to CPU:$0000-$7fff (as default)
+		out (sys_alt_write_page),a
+		ei
+		pop de					;c:de = address if failed
+		ld c,0
+		pop af
+		jp nz,sysmem_fail
+
+		ld c,1					;now test rest of sysram -  $8000-$ffff for every bank 
 		ld b,15
 loop3		push bc
 		ld a,c			
