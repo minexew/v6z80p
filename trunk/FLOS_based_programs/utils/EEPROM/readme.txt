@@ -1,5 +1,5 @@
 
-V6Z80P EEPROM TOOL V1.22 - Phil Ruston www.retroleum.co.uk 2008-12
+V6Z80P EEPROM TOOL V1.24 - By Phil www.retroleum.co.uk 2008-12
 ------------------------------------------------------------------
 
 *******************************************************************
@@ -15,8 +15,112 @@ V6Z80P EEPROM TOOL V1.22 - Phil Ruston www.retroleum.co.uk 2008-12
 *******************************************************************
 
 
-The EEPROM TOOL program treats the SPI EEPROM memory as 64KB blocks
-and/or 128KB "slots" (each slot consists of two blocks).
+The EEPROM tool divides the EEPROM memory into several 128KB slots,
+each of which (except slot 0) can store an FPGA config file.
+
+Slot 0 is reserved for the OS / bootcode / user data. The other slots
+can each take a spartan II XS2S150 FPGA config file (or user data).
+
+
+EEPROM TOOL Menu Options
+-------------------------
+
+1: (Re)Program a slot.
+----------------------
+
+Simply follow the prompts to upload a raw FPGA config .bin file (as
+produced by the Xilinx Webpack software) or a processed .v6c file
+(custom made for the V6Z80P - essentially these are the Xilinx config
+.bin files with extra data (label, PCB version requirement) appended.
+
+These files can be be downloaded with the serial link app from the PC or
+loaded from disk. Flashing should take less than 1 minute. Note: The entire
+128KB slot is erased prior to flashing. If a .bin file used, its
+filename (up to the extension) is tagged onto the end for later
+identification. If a .v6c file is used, it's native label data is used
+for identification and additionally, a PCB version check is performed
+before flashing. 
+
+Writing to the current power-up boot slot is not recommended. Instead
+it is safer to write to an inactive slot - this can be tested with option [2] 
+("Reconfigure FPGA now"). If all is OK, the change can be made "permanent"
+later with Option [3]. 
+
+
+2: Reconfigure the FPGA now.
+----------------------------
+
+Temporarily (until power off) changes the slot pointer and reprograms
+(restarts) the FPGA.
+
+
+3: Change power-on boot slot.
+-----------------------------
+
+This is the slot from which the FPGA configures from on power up. The
+setting is held in the config PIC's flash memory - use this option to change
+it.
+
+Remember, if the power-up Slot pointer is changed to point to a config which
+does not work or a config which provides no means of changing the slot back,
+this will be a problem. See "Emergency recovery" instructions at the end of
+this document to resolve such issues.
+
+
+4. Erase slot
+-------------
+
+Used to erase one of the 128KB eeprom slots. This option will give a warning
+if slot 0 or the currently active boot slot is selected for erasure, but wil
+allow the operation to proceed.
+
+
+5. Install OS to EEPROM
+-----------------------
+
+Writes a file to $00800 (to $EFFF max) in the EEPROM.
+
+
+6. Uninstall OS from EEPROM
+---------------------------
+
+Deletes the signature of an OS file in EEPROM (writes $FF to $00800-$008FF)
+
+
+7. Update the bootcode
+----------------------
+
+Writes a file to either $0F000 (primary bootcode in Block 0) or $1F000
+(backup bootcode in Block 1) The bootcode (.epr file) should be 3520 bytes
+max. BE CAREFUL updating the bootcode! An incorrect file will prevent
+OSCA from starting up.
+
+
+8. Insert arbitary data into block
+----------------------------------
+
+This is used to store small files in blocks that are not being used for FPGA
+config data. The new file must fit within the 64KB block. When you insert a file,
+the existing data from the block is first read into a buffer, the new file
+overwrites the locations in the buffer that it occupies, the block in the EEPROM
+is erased and finally the entire block rewritten. This way, seperate files can
+coexist in any one block. 
+
+
+9. Save data from block
+-----------------------
+
+Reads data from the EEPROM and saves it to disk or sends it over serial link.
+The routine works with block granularity (64KB) so the maximum data that can
+be saved in one go is 64KB (IE: from the start of a block). You will be prompted
+for a block number, address within the block where the save is to start
+and the save length.
+
+
+
+EEPROM Memory map
+-----------------
+
 
 
         .---------------. <-$00000
@@ -39,104 +143,27 @@ SLOT 3  !---------------! <-$70000
         ! etc etc etc   !
 
 
-Slot 0 is reserved for the OS / bootcode / user data. The other slots can
-each take a spartan II XS2S150 FPGA config .bin file (or user data).
+SLOT 0 (blocks 0+1) cannot contain an FPGA config file. Instead it is utilized as follows:
 
 
-EEPROM TOOL Menu Options
--------------------------
+Block 0: $00000 : free for use by user
+       : $00800 : OS can be stored here
+       : $0F000 : Primary bootcode is stored here
 
-1: Reprogram a slot.
---------------------
+Block 1: $10000 : free for use by user
+       : $1F000 : Backup bootcode is stored here
 
-Simply follow the prompts to upload an FPGA config .bin file (as produced by
-the Xilinx Webpack software) These files are 130012 bytes in length and can
-be be downloaded with the serial link app from the PC or loaded from disk.
-Writing to the currently Active Slot is not recommended. Flashing should
-take less than 1 minute. Note: The ENTIRE 128KB slot is erased prior to
-flashing and the filename is tagged onto the end of the config file when
-written to the EEPROM.
+All other /slots can contain FPGA config files
 
-
-2: Reconfigure the FPGA now.
-----------------------------
-
-Temporarily (until power off) changes the slot pointer and reprograms
-(restarts) the FPGA.
-
-
-3: Change active slot.
-----------------------
-
-The active slot is that which the FPGA configures from on power up. The value
-is held in the config PIC's flash memory and this option updates that value.
-
-When writing a slot with option [1] it is recommended that an inactive
-slot is chosen, the config can then be tested with option [2] "Configure
-FPGA now". If all is OK, the change can be made "permanent" later with Option [3]. 
-
-Remember, if the Active Slot pointer is changed to point to a config which
-provides no means of changing the slot back this may be a problem. See
-"Emergency recovery" instructions at the end of this document.
-
-
-4. Erase slot
--------------
-
-Used to erase one of the 128KB eeprom slots. This option will give a warning
-if slot 0 or the currently active slot is selected for erasure, but will allow
-it.
-
-
-
-5. Install OS to EEPROM
------------------------
-
-Writes a file to $00800 (to $EFFF max) in the EEPROM.
-
-
-6. Uninstall OS from EEPROM
----------------------------
-
-Deletes the signature of an OS file in EEPROM (writes $FF to $00800-$008FF)
-
-
-7. Update the bootcode
-----------------------
-
-Writes a file to either $0F000 (primary bootcode in Block 0) or $1F000
-(backup bootcode in Block 1) The bootcode should be 3520 bytes max.
-BE VERY CAREFUL updating the bootcode! An incorrect file will prevent
-OSCA from starting up.
-
-
-8. Insert arbitary data into block
-----------------------------------
-
-This is used to store small files in blocks that are not being used for FPGA
-config data. The new file must fit within the 64KB block. When you insert a file,
-the existing data from the block is first read into a buffer, the new file
-overwrites the locations in the buffer that it occupies, the block in the EEPROM
-is erased and finally the entire block rewritten. This way, seperate files can
-coexist in any one block. Programming a block should take less than 30 seconds.
-
-
-9. Save data from block
------------------------
-
-Reads data from the EEPROM and saves it to disk or sends it over serial link.
-The routine works with block granularity (64KB) so the maximum data that can
-be saved in one go is 64KB (IE: from the start of a block). You will be prompted
-for a block number, address within the block where the save is to start
-and the save length.
 
 
 ===============================================================================
 Emergency Recovery: If the Active Slot points to an invalid / undesired config.
 ===============================================================================
 
-*** For the original V6Z80P Board ***
---------------------------------------
+---------------------------------------------------
+*** Recovery Instructions original V6Z80P Board ***
+---------------------------------------------------
 
 OPTION 1: With Config PIC firmware v616+ the Active Slot can be changed manually.
 Assuming there is a working config in Slot 1, 2 or 3 and the problem is just that
@@ -182,9 +209,9 @@ OPTION 3: JTAG config. If none of the first 3 slots contain OSCA:
  from the EEPROM.
 
 
-
-Recovery Instructions for the V6Z80P+ Board
--------------------------------------------
+--------------------------------------------
+Recovery Instructions for the V6Z80P+ Boards
+--------------------------------------------
 
 OPTION 1: Assuming there is a working config in Slot 1 - 7 and the problem is just that
 the Active Slot selection is pointing at a bad config:
@@ -240,41 +267,3 @@ UP+RIGHT+FIRE on a joystick in port A. (Note: The transfer must be at 115200 BAU
 
 ==========================================================================================
 
-
-Update History:
----------------
-
-v1.22 - Added "save data from block" option
-        Removed the need for code to end before $8000
-
-v1.20 - Fixed for FLOS v593 (KJT_GET_INPUT_STRING required limit in A.)
-
-v1.18 - Fixed Success text after using "change slot" option.
-      - Fixed bug where wrong slot was erased when active slot chosen
-
-v1.16 - Added "Erase Slot" option
-        Added progress indication (replaced animated dots)
-        Added confirmation to "Remove OS" option
-        Fixed bug where invalid block figures were shown if > block 9
-
-v1.15 - "EEPROM Busy" timeout in EEPROM routine increased to 5 seconds.
-      - If write / verify fails writing data to EEPROM blocks, the option is
-        given to retry the write.
-
-v1.14 - Added file requesters.
-
-v1.13 - Reports Config PIC firmware (if 618+)
-
-v1.12 - If PIC firmware is v617+, the EEPROM type and the current
-        Active Slot will be reported.
-
-v1.11 - Filenames are tagged onto FPGA config files. Once tagged
-        configs have been written they will be identified by the
-        EEPROM tool later.
-      - FPGA config writes to slot 0 are now prohibited.
- 
-v1.10 - Can install/uninstall OS to EEPROM.
-      - Bootcode update option added.
-      - Protection for critical areas added.
-
-v1.03 - Can load files from disk

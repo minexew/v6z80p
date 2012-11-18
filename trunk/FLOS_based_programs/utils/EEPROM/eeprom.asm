@@ -1,11 +1,12 @@
-; ****************************************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.23 - P.Ruston '08 - '12    *
-; ****************************************************************************
+; ***************************************************
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.24 *
+; ***************************************************
+;
+; v1.24 - Supports .v6c files to aid correct config installation.
+;         Reports Bootcode and OS on-EEPROM status
 ;
 ; V1.23 - Requester code 0.28
-; v1.22 - Added Save data from block, moved data buffer to banks 1-4
-; V1.21 - newer requester code - requires FLOS 6.02
-; V1.20 - fixed for FLOS v593 (call to KJT_GET_INPUT_STRING)
+;
 ;
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
@@ -28,7 +29,7 @@ include             "flos_based_programs\code_library\program_header\inc\test_fl
 
 ;-------- CONSTANTS ----------------------------------------------------------
 
-data_buffer         equ $8000 		; Banks 1,2,3,4 - Dont change this
+data_buffer         equ $8000 			; Banks 1,2,3,4 - Dont change this
 data_bank  	    equ 1
 
 ;-----------------------------------------------------------------------------
@@ -39,12 +40,12 @@ data_bank  	    equ 1
 
 clear_slot_buffer
 
-	  ld a,data_bank                ; fill 128KB data buffer with $ff
+	  ld a,data_bank              	  	; fill 128KB data buffer with $ff
           call kjt_set_bank
           ld b,4
 fbloop    push bc
           ld a,$ff
-          ld bc,$8000                   ; databuffer = 4 x 32KB upper RAM pages
+          ld bc,$8000                   	; databuffer = 4 x 32KB upper RAM pages
           ld hl,data_buffer
           call kjt_bchl_memfill
           call kjt_incbank
@@ -56,7 +57,7 @@ fbloop    push bc
 	  
 check_xilinx_cfg
 
-	  ld a,data_bank                ; is it a Xilinx cfg file?
+	  ld a,data_bank               		 ; is it a Xilinx cfg file?
           call kjt_set_bank
           ld hl,data_buffer
           ld de,cfg_id
@@ -70,21 +71,74 @@ bank0ret  push af
 
 
 
+check_pcb_version
+
+          ld a,data_bank+3
+	  call kjt_set_bank
+          Call kjt_get_version
+	  ld a,b
+	  or a
+	  jr nz,gotosca			
+	  
+	  ld hl,non_auto_txt			; if cannot detect pcb version ask for confirmation
+	  call kjt_print_string
+	  ld a,(data_buffer+$7bdd)
+	  ld hl,pcb_types
+	  ld bc,end_pcb_types-pcb_types
+	  cpir
+	  call kjt_print_string  
+	  ld hl,sure_txt
+	  call kjt_print_string
+	  call yn_response
+	  push af
+	  call new_line
+	  pop af
+	  jr bank0ret
+	  
+gotosca   ld a,(data_buffer+$7bdd)
+	  cp b
+	  jr bank0ret
+	  
+
+
 insert_fn_into_cfg
 	  
 	  ld a,data_bank+3
           call kjt_set_bank
-          ld hl,filename_txt            ; attach the filename to the end of the cfg string
+	  
+	  ld hl,filename_txt            	; attach the filename to the end of the cfg string
           ld de,data_buffer+$7bde
-          ld bc,18
-          ldir 
+          ld b,16
+cfntclp   ld a,(hl)
+	  cp "."				; end on dot
+	  jr z,end_of_fn
+	  cp $61				; uppercasify
+	  jr c,alupca
+	  sub $20
+alupca	  ld (de),a
+	  inc hl
+	  inc de
+	  djnz cfntclp
+          xor a
+	  ld (de),a
 	  jr bank0ret
+	  
+end_of_fn 
+
+spclp	  ld a," "	
+	  ld (de),a
+	  inc de
+	  djnz spclp
+	  xor a
+	  ld (de),a  
+	  jr bank0ret  
+
           
 
 
 data_buffer_to_page_buffer	  
 	  
-	  ld a,b			; set b to bank, HL to data location
+	  ld a,b				; set b to bank, HL to data location
 	  call kjt_force_bank
 	  push bc
 	  ld de,page_buffer
@@ -103,7 +157,7 @@ data_buffer_to_page_buffer
 	  
 data_buffer_to_verify_buffer	  
 	  
-	  ld a,b			; set b to bank, HL to data location
+	  ld a,b				; set b to bank, HL to data location
 	  call kjt_set_bank
 	  push bc
 	  ld de,verify_buffer
@@ -113,10 +167,10 @@ data_buffer_to_verify_buffer
 
 	  ld a,h                   
           or a
-	  jr nz,bank0ret
+	  jp nz,bank0ret
           ld h,$80
           inc b
-	  jr bank0ret
+	  jp bank0ret
 	
 
 
@@ -124,18 +178,18 @@ wipe_os_sig_in_buffer
 
     	  ld a,data_bank
           call kjt_set_bank            
-          ld hl,data_buffer+$800       ; replace first 256 bytes of OS file with $FFs
+          ld hl,data_buffer+$800       		; replace first 256 bytes of OS file with $FFs
           ld b,0
 ufp0      ld (hl),$ff
           inc hl
           djnz ufp0   
-	  jr bank0ret
+	  jp bank0ret
 	 
  
  
 page_buffer_to_data_buffer
 
-	  ld a,b			; set b to bank, de to data dest location
+	  ld a,b				; set b to bank, de to data dest location
 	  call kjt_set_bank
 	  push bc
 	  ld hl,page_buffer
@@ -144,17 +198,78 @@ page_buffer_to_data_buffer
 	  pop bc 
 	  ld a,d                   
           or a
-	  jr nz,bank0ret
+	  jp nz,bank0ret
           ld d,$80
           inc b
-	  jr bank0ret
+	  jp bank0ret
+
+
+
+
+yn_response
+
+          ld a,1
+          call kjt_get_input_string     	; and ask for confirmation - ZF set if response = Yes
+          or a
+          jr z,respbad
+          ld a,(hl)
+          cp "Y"
+          jr nz,respbad
+	  xor a
+	  ret
+respbad	  xor a
+	  inc a
+	  ret
+
+
 	  
-;------------------------------------------------------------------------------
+;------------------------------------------------------------------------------------------------------------------
+
+cfg_id              db $ff,$ff,$ff,$ff,$aa,$99,$55,$66		;Xilinx ID string
+
+filename_txt        ds 18,0
+
+non_auto_txt	    db 11,"Note: Cannot determine your PCB version",11
+		    db "(not supported with current OSCA)",11
+		    db 11,"Config file is compatible with:",11,11,0
+		    
+sure_txt	    db 11,11,"Is this your PCB version? (y/n) ",0
+
+pcb_types	    db 0,"?? Missing PCB ID!",0
+                    db 1,"V6Z80P (original)",0
+	            db 2,"V6Z80P+ V1.0",0
+		    db 3,"V6Z80P+ V1.1",0
+end_pcb_types	    db "Unknown PCB",0
+
+newline_txt         db 11,0
 	  
 page_buffer         ds 256,0
 verify_buffer       ds 256,0
+
+page_count          dw 0
+cursor_pos          dw 0
+
+file_size           dw 0
+slot_number         db 0
+block_number        db 0
+inblock_addr        dw 0
+dload_address       dw 0
+dload_bank          db 0
+
+backup_cursor_position        dw 0
+
+save_length_lo	    dw 0
+save_length_hi      dw 0
+
+eeprom_id_byte      db 0
+working_slot        db 0
+number_of_slots     db 4             ;including slot 0
+active_slot         db 0
+
+pic_fw_byte         db 0
+
 	
-;======== END OF CODE/DATA THAT MUST BE KEPT IN UNPAGED RAM ====================
+;======== END OF CODE/DATA THAT MUST BE KEPT IN UNPAGED RAM =====================================================
 
 
 
@@ -248,12 +363,7 @@ write_slot
           jr nz,ok_to_wr
           ld hl,warning_1_text
           call kjt_print_string
-          ld a,1
-          call kjt_get_input_string     ; and ask for confirmation
-          or a
-          jp z,begin
-          ld a,(hl)
-          cp "Y"
+          call yn_response		; and ask for confirmation
           jp nz,begin
 
 ok_to_wr  call clear_slot_buffer
@@ -276,11 +386,27 @@ hw_err1   call hw_error_requester
           jr retrylr
           
 ldreq_ok1 call copy_filename
-          push ix
+          call test_v6c_extension
+	  jr nz,notv6c
+	  push ix			;check file length for .v6c file
+	  pop bc
+	  push iy
+	  pop de
+	  ld hl,$fbf0
+	  xor a
+	  sbc hl,de
+	  jr nz,flenerr
+	  ld hl,1
+	  xor a
+	  sbc hl,bc
+	  jr nz,flenerr
+	  jr flen_ok
+	  
+notv6c	  push ix
           pop bc
           push iy
           pop de
-          ld hl,$fbdc                   ;check file length
+          ld hl,$fbdc                   ;check file length for .bin file
           xor a
           sbc hl,de
           jr nz,flenerr
@@ -323,12 +449,20 @@ sdownload ld l,(ix+18)                  ;check serial file header
           call w_restore_display
           pop af
           jp nz,serial_error
-
+	  call new_line
+	  
 cfgloaded call check_xilinx_cfg
 	  jp nc,not_cfg_error          
-          call insert_fn_into_cfg  
           
-          ld a,(slot_number)            
+	  call test_v6c_extension
+	  jr z,is_v6c
+          call insert_fn_into_cfg  	; if a raw .bin file, copy filename to label 
+          jr skippcbt
+  
+is_v6c	  call check_pcb_version
+	  jp nz,not_right_pcb_error  
+	  
+skippcbt  ld a,(slot_number)            
           ld hl,erase_chars
           call kjt_hex_byte_to_ascii
           ld hl,erasing_text            ; show "erasing slot xx" text
@@ -469,7 +603,12 @@ slot_zero
 
           ld hl,slot_zero_text
           jr do_end
-                    
+
+not_right_pcb_error
+                   
+	  ld hl,pcb_error_text
+	  jr do_end
+	  
 ;------------------------------------------------------------------------
 ;--------  Reconfigure the FPGA from a slot now -------------------------
 ;------------------------------------------------------------------------
@@ -566,13 +705,8 @@ change_active_slot
           ld hl,warning_2_text
           call kjt_print_string
 
-          ld a,1
-          call kjt_get_input_string     ; ask for confirmation
-          or a
-          jp z,begin
-          ld a,(hl)
-          cp "Y"
-          jp nz,begin
+          call yn_response
+	  jp nz,begin
 
 is_zero   ld a,$88                      ; send "set config base" command
           call send_byte_to_pic
@@ -622,9 +756,13 @@ install_os
 
 	  call show_banner
           
+	  call show_eeprom_os_status
+	  
           ld hl,install_os_txt
           call kjt_print_string
-                              
+	  call yn_response
+          jp nz,begin
+                    
           xor a
           ld (block_number),a
           
@@ -683,15 +821,18 @@ uninstall_os
 
           call show_banner
 
-          ld hl,uninstall_os_txt
+	  call show_eeprom_os_status
+	  jr z,os_inst
+	   
+	  ld hl,pressanykey_txt 
+          call kjt_print_string
+	  call kjt_wait_key_press
+	  jp begin
+
+os_inst   ld hl,uninstall_os_txt
           call kjt_print_string
           
-          ld a,1
-          call kjt_get_input_string     ; and ask for confirmation
-          or a
-          jp z,begin
-          ld a,(hl)
-          cp "Y"
+          call yn_response
           jp nz,begin
                               
           xor a
@@ -742,6 +883,12 @@ update_bootcode
  
           call show_banner
           
+	  ld a,0
+	  call show_eeprom_bootcode
+	  ld a,1
+	  call show_eeprom_bootcode
+
+	  
           ld hl,update_bootcode_txt     ; ask which bootcode to update
           call kjt_print_string
           
@@ -860,14 +1007,9 @@ as_unk    ld hl,block_prompt_text                 ; write data to block - ask wh
           
 as_unk2   ld hl,cfg_warning_txt
           call kjt_print_string
-          ld a,1
-          call kjt_get_input_string               ; ask for confirmation
-          or a                                    
-          jp z,aborted
-          ld a,(hl)
-          cp "Y"
-          jp nz,aborted
-          
+          call yn_response
+	  jp nz,aborted
+                    
 selpzero  call read_in_block
           ld hl,eeprom_error_text
           jp nz,op7end
@@ -907,12 +1049,7 @@ selpzero  call read_in_block
           jr op7end
 allowwarn ld hl,bbc_warning_txt
           call kjt_print_string
-          ld a,1
-          call kjt_get_input_string               
-          or a                                    
-          jp z,begin
-          ld a,(hl)
-          cp "Y"
+          call yn_response
           jp nz,aborted
 
 fsokop7   ld a,(block_number)                     ;warn about OS..
@@ -920,14 +1057,9 @@ fsokop7   ld a,(block_number)                     ;warn about OS..
           jr nz,osissafe
           ld hl,os_warn_txt
           call kjt_print_string
-          ld a,1
-          call kjt_get_input_string               
-          or a                                    
-          jp z,aborted
-          ld a,(hl)
-          cp "Y"
-          jp nz,aborted
-          
+          call yn_response
+	  jp nz,aborted
+                    
 osissafe  call erase_block
 
           call write_block
@@ -992,12 +1124,7 @@ erase_slot
           jr nz,ok_to_er
           ld hl,er_warning_1_text
           call kjt_print_string
-          ld a,1
-          call kjt_get_input_string     ; and ask for confirmation
-          or a
-          jp z,begin
-          ld a,(hl)
-          cp "Y"
+          call yn_response
           jp nz,begin
 
 ok_to_er  ld a,(slot_number)
@@ -1005,12 +1132,7 @@ ok_to_er  ld a,(slot_number)
           jr nz,ne_slot0                ; confirm slot 0 erase 
           ld hl,er_warning_2_text
           call kjt_print_string
-          ld a,1
-          call kjt_get_input_string     ; and ask for confirmation
-          or a
-          jp z,begin
-          ld a,(hl)
-          cp "Y"
+          call yn_response
           jp nz,begin
 
 ne_slot0  ld a,(slot_number)            
@@ -1230,8 +1352,7 @@ riedplp   push bc
           djnz riedplp
           
  	  call show_progress
-          ld hl,new_line
-          call kjt_print_string
+          call new_line
           xor a
           ret
 
@@ -1284,7 +1405,11 @@ dwrpagelp exx
           inc de
           djnz dwrpagelp
           call show_progress
-          ld hl,new_line
+          call new_line
+	  xor a
+	  ret
+
+new_line  ld hl,newline_txt
           call kjt_print_string
           xor a
           ret
@@ -1339,7 +1464,8 @@ verblp2	  ld a,(de)
           djnz dvrpagelp
           
 	  call show_progress
-          ld hl,new_line
+	  
+          ld hl,newline_txt
           call kjt_print_string
           xor a
           ret
@@ -1794,7 +1920,182 @@ cpyfndone pop hl
           pop bc
           ret
           
-                    
+	  
+test_v6c_extension
+
+	ld hl,filename_txt
+	ld a,"."
+	ld bc,9
+	cpir
+	ret nz
+
+	ld a,(hl)
+	cp "v"
+	jr z,exok1
+	cp "V"
+	ret nz
+exok1	inc hl
+	ld a,(hl)
+	cp "6"
+	ret nz
+	inc hl
+	ld a,(hl)
+	cp "c"
+	ret z
+	cp "C"
+	ret
+
+;----------------------------------------------------------------------------------------------------------------
+	
+	
+hex_to_ascii_word
+
+		ld a,d
+		call kjt_hex_byte_to_ascii
+		ld a,e
+		call kjt_hex_byte_to_ascii
+		ret
+
+
+;----------------------------------------------------------------------------------------------------------------
+	
+		
+show_eeprom_bootcode
+
+		ld d,a
+		ld hl,pebc_txt
+		or a
+		jr z,pribc
+		ld hl,bebc_txt
+pribc		call kjt_print_string
+			
+		ld e,$fd
+		call read_eeprom_page
+		ld ix,page_buffer+$bc
+		ld e,(ix)
+		ld d,(ix+1)
+		ld a,d					;if $0000, assume its a version before 617
+		or e
+		jr nz,ebc_ok1
+		ld hl,old_ebc_txt
+		call kjt_print_string
+		ret
+		
+ebc_ok1		ld a,d					;if $ffff, assume its blank
+		and e
+		inc a
+		jr nz,ebc_ok2
+		ld hl,no_ebc_txt
+		call kjt_print_string
+		ret
+		
+ebc_ok2		ld hl,ebc_txt
+		push hl
+		call hex_to_ascii_word
+		pop hl
+		call kjt_print_string
+		ret
+
+	
+pebc_txt	db 11,11,"Primary bootcode on EEPROM: ",0
+bebc_txt	db 11,"Backup bootcode on EEPROM : ",0
+ebc_txt		db "????",0		
+
+old_ebc_txt	db "< 0617",0
+
+no_ebc_txt	db "None",0
+
+
+;--------------------------------------------------------------------------------------------------------------------
+
+
+show_eeprom_os_status
+
+		ld hl,os_txt
+		call kjt_print_string
+		
+		ld de,$8
+		call read_eeprom_page			;load from EEPROM $00800
+		ld hl,page_buffer			; check if 
+		ld de,z80_OS_txt			; bytes 0-7 are "Z80P*OS*"
+		ld b,8					
+cmposn		ld a,(de)				 
+		cp (hl)
+		jr nz,noeos				
+		inc de
+		inc hl
+		djnz cmposn
+		
+		ld de,(page_buffer+$e)			;any label location?
+		ld a,d
+		or e
+		jr nz,gotoslab
+unkeos		ld hl,unkos_txt
+		call kjt_print_string
+		xor a
+		ret
+		
+gotoslab	ld hl,$0800				;move to page offset of label
+		add hl,de
+		jr c,unkeos
+		ld e,h
+		ld d,0
+		push hl
+		call read_eeprom_page
+		pop hl
+		ld h,0
+		ld bc,page_buffer
+		add hl,bc				;in-page label address
+		ld bc,oslabel_txt
+cpylab1		ld a,(bc)
+		or a
+		jr z,showoslab
+		ld a,(hl)
+		ld (bc),a
+		or a
+		jr z,showoslab
+		inc bc
+		inc l
+		jr nz,cpylab1
+		inc de					;in case label crosses page
+		push bc
+		call read_eeprom_page
+		pop bc
+		ld hl,page_buffer
+cpylab2		ld a,(bc)
+		or a
+		jr z,showoslab
+		ld a,(hl)
+		ld (bc),a
+		or a
+		jr z,showoslab
+		inc bc
+		inc l
+		jr nz,cpylab2
+		
+showoslab	ld hl,oslabel_txt
+		call kjt_print_string
+		xor a
+		ret
+		
+		
+noeos		ld hl,noos_txt
+		call kjt_print_string
+		xor a
+		inc a
+		ret
+		
+
+os_txt		db 11,"OS currently on EEPROM: ",11,11,0
+z80_OS_txt	db "Z80P*OS*"
+
+noos_txt	db "No OS installed.",0
+unkos_txt	db "Yes, but no label.",0
+
+oslabel_txt	ds 32,$ff					;label can be 32 chars max
+		db 0
+		
+		
 ;----------------------------------------------------------------------------------------
 
 include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
@@ -1806,16 +2107,16 @@ include "FLOS_based_programs\code_library\requesters\inc\file_requesters_with_rs
 
 
 
-start_text1         db    " ************************************ ",11
-                    db    " * V6Z80P ONBOARD EEPROM TOOL V1.23 * ",11
-                    db    " ************************************ ",11,0
+start_text1         db    "                                      ",11
+                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.24   ",11
+                    db    "                                      ",11,0
                     
 start_text2         db 11
                     db    "Select:",11
                     db    "-------",11,11
                     db    "1 - Write FPGA config file to a slot",11
                     db    "2 - Reconfigure the FPGA now",11
-                    db    "3 - Change the active slot",11
+                    db    "3 - Change the power-up boot slot",11
 		    db    "4 - Erase a slot",11
                     db 11
                     db    "5 - Install OS to EEPROM",11
@@ -1898,21 +2199,16 @@ input_error_text    db 11,11,"Invalid input - Press any key",0
 
 wildcard_filename   db "*",0
 
-cfg_id              db $ff,$ff,$ff,$ff,$aa,$99,$55,$66
-
 cfg_file_error_text db 11,11,"Not a valid Xilinx config file!",11,11
                     db "Press any key",11,0
-
-filename_txt        ds 20,0
 
 load_error_text     db 11,11,"Load error - Press any key",0
           
 loading_txt         db 11,"Loading...",11,0
 
-install_os_txt      db 11,"Install OS..",0
+install_os_txt      db 11,11,"Sure you want to update OS? (y/n) ",0
 
-uninstall_os_txt    db 11,"Remove OS from EEPROM...",11,11
-                    db "Sure you want to continue? (y/n) ",0
+uninstall_os_txt    db 11,11,"Sure you want to remove OS? (y/n) ",0
 
 os_size_error_txt   db "File to big for EEPROM page!",11
                     db "OS must be $E800 bytes or less",11,0
@@ -1931,8 +2227,9 @@ verifying_data_txt  db 11,"Verifying data..",11,0
 
 delpage_txt         db 11,"Removing OS signature..",11,0
 
-update_bootcode_txt db 11,"Update Bootcode..",11,11
-                    db "Primary [0] or backup [1] (0/1) ",0
+update_bootcode_txt db 11,11,"Update:",11,11
+                    db "[0] Primary bootcode",11,"[1] Backup bootcode",11,11
+		    db "Enter 0 or 1 (or ESC to cancel) :",0
 
 pbc_warning_txt     db 11,"Error! This would overwrite the primary",11
                     db "bootcode at $0f000 which is not allowed.",11,11
@@ -1980,13 +2277,6 @@ eeprom_id_list      db "20 (256KB)",11,0,0,0,0,0  ;id = $11
 
 no_id_text          db 11,"EEPROM: Unknown - Assuming 25x40 (512KB)",0
 
-eeprom_id_byte      db 0
-working_slot        db 0
-
-number_of_slots     db 4                          ;including slot 0
-
-
-active_slot         db 0
 act_slot_text       db 11,11,"Current active slot:",0
 act_slot_figures    db "xx",0
 
@@ -2005,7 +2295,6 @@ restart_text        db 11,11,"Reconfiguring...",0
 pic_fw_text         db 11,"Config PIC firmware: ",0
 pic_fw_figures      db "6xx",11,0
 pic_fw_unknown_text db "Unknown",11,0
-pic_fw_byte         db 0
 
 retry_txt           db 11,"Do you want to re-write the data (y/n)? ",0
 
@@ -2013,34 +2302,21 @@ erase_prompt_text   db 11,11,"Erase which slot? ",0
 
 prog_figures        db "--- KB complete..",13,0
 
-new_line            db 11,0
-
-save_length_lo	    dw 0
-save_length_hi      dw 0
 data_fn		    db "DATA.BIN",0
 src_addr_prompt     db 11,"Save from what address 0-FFFF? ",0
 len_prompt          db 11,11,"Save how many bytes? ",0
-block_oflow_txt     db 11,11,"Error: Too many bytes requested",0
+block_oflow_txt     db 11,11,"ERROR: Too many bytes requested",0
 read_block_prompt   db 11,11,"Save data from which 64KB block? ",0
 save_error_text     db 11,11,"Save error!",0
 upload_error_text   db 11,11,"Serial Upload error!",0
 sending_text	    db 11,11,"Sending...",0
 
-page_count          dw 0
+pcb_error_text	    db 11,11,"ERROR: This config file is not",11
+		    db "compatible with your V6Z80P PCB.",11,11
+		    db "Press any key.",11,0
 
-cursor_pos          dw 0
+pressanykey_txt	    db 11,11,"Press any key..",0
 
-;---------------------------------------------------------------------------------------
 
-file_size           dw 0
-slot_number         db 0
-block_number        db 0
-inblock_addr        dw 0
-dload_address       dw 0
-dload_bank          db 0
-
-;-----------------------------------------------------------------------------------------
-
-backup_cursor_position        dw 0
 
 ;------------------------------------------------------------------------------------------
