@@ -1,7 +1,0 @@
-COMDIAG
--------
-
-When using option 4, only send data a byte at a time to the V6
-or bytes will be missed. This is because FLOS is not fast enough
-to read and display bytes from a stream (single byte buffer too!)
-
