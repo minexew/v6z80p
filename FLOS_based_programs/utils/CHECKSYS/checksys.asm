@@ -62,7 +62,8 @@ show_sysinfo	call system_info
 		jr main_menu
 		
 		
-menu_txt	db "V6Z80P System Tester V1.01",11
+		
+menu_txt	db "V6Z80P System Tester V1.02",11
 		db "--------------------------",11,11
 		db "Press:",11,11
 		db "1. For keyboard tests",11
@@ -85,5 +86,5 @@ menu_txt	db "V6Z80P System Tester V1.01",11
 	include "FLOS_based_programs\utils\checksys\video_tests.asm"
 	include "FLOS_based_programs\utils\checksys\audio_tests.asm"
 	include "FLOS_based_programs\utils\checksys\system_info.asm"
-		
+	
 ;--------------------------------------------------------------------------------------------------------
