@@ -1,10 +1,12 @@
 
 ASM.EXE - Z80 assembler V0.02
 
-Use: ASM [path]filename.asm [path] [path] 
+Use: 
 
-Produces a binary Z80 file (same name
-as source but with .exe extension)
+ASM [path]filename.asm [path] [path] 
+
+This produces a binary Z80 file (same
+name as source but with .exe extension)
 
 Paths can be added as extra arguments
 on the command line to allow the
