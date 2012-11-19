@@ -7,8 +7,8 @@ Use: EEPROM (no arguments)
 *                                   *
 *             CAUTION!              *
 *                                   *
-* Incorrect use of this app can     *
-*  prevent the V6Z80P from starting * 
+*  Incorrect use of this app can    *
+*  prevent the V6Z80P from starting *
 *                                   *
 *  Worse, reconfiguring the FPGA    *
 *  with a third party design that   *
@@ -20,61 +20,57 @@ Use: EEPROM (no arguments)
 *************************************
 
 
-The EEPROM TOOL program treats the SPI
-EEPROM memory as 64KB blocks and/or
-128KB "slots" (each slot consists of
-two blocks).
+The EEPROM tool divides the EEPROM
+memory into several 128KB slots, each
+of which (except slot 0) can store an
+FPGA config file.
+
+Slot 0 is reserved for OS / bootcode 
+or user data. The other slots can
+each take a spartan II XS2S150 FPGA
+config file (or user data).
 
 
-        .---------------. <-$00000
-      / !    BLOCK 0    !
-SLOT 0  !---------------! <-$10000
-      \ !    BLOCK 1    !
-        !---------------! <-$20000
-      / !    BLOCK 2    !
-SLOT 1  !---------------! <-$30000
-      \ !    BLOCK 3    !
-        !---------------! <-$40000
-      / !    BLOCK 4    !
-SLOT 2  !---------------! <-$50000
-      \ !    BLOCK 5    !
-        !---------------! <-$60000
-      / !    BLOCK 6    !
-SLOT 3  !---------------! <-$70000
-      \ !    BLOCK 7    !
-        !---------------!
-        ! etc etc etc   !
-
-
-Slot 0 is reserved for the OS /
-bootcode / user data. The other
-slots can each take a spartan II
-XS2S150 FPGA config .bin file
-(or user data).
-
-
-EEPROM TOOL Menu Options
+EEPROM Tool Menu Options
 -------------------------
 
-1. Reprogram a slot.
---------------------
+1: (Re)Program a slot.
+----------------------
 
-Simply follow the prompts to upload an
-FPGA config .bin file (as produced by
-the Xilinx Webpack software) These
-files are 130012 bytes in length and
-can be be downloaded with the serial
-link app from the PC or loaded from
-disk.Writing to the currently Active
-Slot is not recommended. Flashing
-should take less than 1 minute. Note:
-The ENTIRE 128KB slot is erased prior
-to flashing and the filename is tagged
-onto the end of the config file when
-written to the EEPROM.
+Simply follow the prompts to upload
+a raw FPGA config .bin file (as
+produced by the Xilinx Webpack 
+software) or a processed .v6c file
+(custom made for the V6Z80P -
+essentially these are the Xilinx
+config .bin files with extra data
+(label, PCB version requirement)
+appended.
+
+These files can be be downloaded
+with the serial link app from the PC
+or loaded from disk. Flashing should
+take less than 1 minute. Note: The
+entire 128KB slot is erased prior
+to flashing. If a .bin file used,
+its filename (up to the extension) 
+is tagged onto the end for later
+identification. If a .v6c file is
+used, it's native label data is used
+for identification and additionally,
+a PCB version check is performed
+before flashing. 
+
+Writing to the current power-up boot
+slot is not recommended. Instead it
+is safer to write to an inactive
+slot - this can be tested with option
+[2]  ("Reconfigure FPGA now"). If
+all is OK, the change can be made
+"permanent" later with Option [3]. 
 
 
-2. Reconfigure the FPGA now.
+2: Reconfigure the FPGA now.
 ----------------------------
 
 Temporarily (until power off) changes
@@ -82,28 +78,23 @@ the slot pointer and reprograms
 (restarts) the FPGA.
 
 
-3. Change active slot.
-----------------------
+3: Change power-on boot slot.
+-----------------------------
 
-The active slot is that which the FPGA
+This is the slot from which the FPGA
 configures from on power up. The
-value is held in the config PIC's flash
-memory and this option updates that
-value.
+setting is held in the config PIC's
+flash memory - use this option to
+change it.
 
-When writing a slot with option [1] it
-is recommended that an inactive slot is
-chosen, the config can then be tested
-with option [2] "Configure FPGA now".
-If all is OK, the change can be made
-"permanent" later with Option [3]. 
-
-Remember, if the Active Slot pointer
+Remember, if the power-up Slot pointer
 is changed to point to a config which
+does not work or a config which
 provides no means of changing the slot
-back this may be a problem. See
-"Emergency recovery" instructions at
-the end of this document.
+back, this will be a problem. See
+"Emergency recovery" instructions
+at the end of this document to
+resolve such issues.
 
 
 4. Erase slot
@@ -174,6 +165,48 @@ You will be prompted for a block
 number, address within the block
 where the save is to start and the
 save length.
+
+
+
+
+EEPROM Memory map
+-----------------
+
+
+        .---------------. <-$00000
+      / !    BLOCK 0    !
+SLOT 0  !---------------! <-$10000
+      \ !    BLOCK 1    !
+        !---------------! <-$20000
+      / !    BLOCK 2    !
+SLOT 1  !---------------! <-$30000
+      \ !    BLOCK 3    !
+        !---------------! <-$40000
+      / !    BLOCK 4    !
+SLOT 2  !---------------! <-$50000
+      \ !    BLOCK 5    !
+        !---------------! <-$60000
+      / !    BLOCK 6    !
+SLOT 3  !---------------! <-$70000
+      \ !    BLOCK 7    !
+        !---------------!
+        ! etc etc etc   !
+
+
+SLOT 0 (blocks 0+1) cannot contain
+an FPGA config file. Instead it is
+utilized as follows:
+
+
+Blk 0: $00000 : free for use by user
+     : $00800 : OS can be stored here
+     : $0F000 : Primary bootcode
+
+Blk 1: $10000 : free for use by user
+     : $1F000 : Backup bootcode
+
+All other /slots can contain FPGA
+config files
 
 
 
@@ -343,3 +376,4 @@ BAUD). (Again, OSCA 661 or above must
 be installed).
 
 ======================================
+
