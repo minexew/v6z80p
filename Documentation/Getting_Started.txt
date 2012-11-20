@@ -124,7 +124,6 @@ Avoid connecting or disconnecting anything to the V6Z80P whilst the power is swi
 FLOS cannot automatically recognize card swaps and any card inserted whilst the power is
 on (not recommended) needs to be initialized with the "MOUNT" command.
 
-If your PC doesn't have a (free) serial port, a USB->RS232 adapter should work.
-Occasionally, the first time the serial link util is used, the first file transfer
-fails with a "bad acknowledge" report. (I've yet to find out exactly why..)
+If your PC doesn't have a (free) serial port, a USB->RS232 adapter should work - make
+sure you use its latest drivers.
 
