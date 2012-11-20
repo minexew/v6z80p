@@ -1,25 +1,26 @@
-
-          Configuring the V6Z80P's Spartan 2 XC2S150 FPGA
-         -----------------------------------------------
+************************************************************
+* Configuring the V6Z80P's Spartan 2 XC2S150 FPGA via JTAG *
+************************************************************
 
 ------------------------------ WARNING!! ----------------------------------- 
 
-It is possible to damage the v6Z80P by configuring it with an incompatible
+It may be possible to damage the v6Z80P by configuring it with an incompatible
 design - upon compilation ensure the pin assignments match those in the
 original OSCA design (see the .ucf file) and that the data direction 
 of the pins is correct (check the Design Summary / Pad report). In general,
-if it doesn't start up once the yellow LED is steady-on, power down immediately!
+if it doesn't start up once the status LED is steady-on, power down immediately.
 
 ---------------------------------------------------------------------------
+
 
 JTAG CABLE CONFIG:
 ------------------
 
 With the power off put two jumpers on the JTAG CONFIG pin headers J1 and J2
-(shown in the diagram). Connect your JTAG cable. Load up Xilinx Webpack. Power
-up the V6Z80P and the yellow LED will flash quickly - this happens until the
-FPGA config data has been accepted. (During configuration, the FPGA pins are
-pulled high and the Z80 is held in the reset state.)
+Connect your JTAG cable. Load up Xilinx Webpack. Power up the V6Z80P and the
+status LED will flash quickly - this happens until the FPGA config data has
+been accepted. (During configuration, the FPGA pins are pulled high and the
+Z80 is held in the reset state.)
 
 The programming cable/interface is powered by the V6Z80P - the pin outs
 are the Xilinx standard IE:
@@ -40,11 +41,15 @@ preferences/options section. Impact should see the FPGA and request a config
 have been set" - ignore this, and right click on the green chip icon and select
 "Program". A progress bar appears for a short time (5 seconds?), when complete
 the FPGA should start up. (I have noticed on occasion the software thinks the
-download has been successful but the yellow LED continues to flash meaning the
+download has been successful but the status LED continues to flash meaning the
 FPGA did not raise its "DONE" line. If this happens, power down the V6Z80P,
 close Impact and redo).
 
 (For stability, disconnect the JTAG header when using normal EEPROM config)
+
+Note: If using PIC firmware 637, closing J2 after JTAG configuration will not
+reset/reconfigure the V6Z80P.
+
 
 
 ------------------- Quick Xilinx Webpack Guide ---------------------
@@ -65,8 +70,17 @@ close Impact and redo).
    are created in the project directory (where xxxx is the project name)
 
 
-Xilinx Webpack issues:
-----------------------
+Notes/Issues:
+-------------
+
+To create the .bin file required for EEPROM config, you need to right
+click the "generate programming file" option, go to properties and tick
+the revelent box under "general options"
+
+OSCA uses the "keep hierachy" switch ("soft") - right click
+"Synthesize - XST" to access this option. This setting is "off" by
+default when you make a new project so should be set manually
+if making an OSCA variant.  
 
 Sometimes Webpack fails to complile a valid design. If this happens
 it is necessary to make a fresh project and import all the files from
@@ -74,21 +88,3 @@ the previous one.. Be sure to check the pin configuration upon
 compilation - if you forget the .ucf constaints file (which contains
 the pins and ROM data) ISE will NOT tell you - it'll just choose pins
 at random!! (If making a new project, choose Spartan 2, XC2S150, PQ208, 5 ns)
-
-Note: The default design (OSCA) uses the "keep hierachy" switch (right click
-"Synthesize - XST") - this is off by default when you make a new project so
-should be enabled manually. Also, to create the .bin file required for EEPROM
-config, you need to right click the "generate programming file" option,
-go to properties and tick the revelent box under "general options"
-
-
------------------------------- WARNING!! ----------------------------------- 
-
-It is possible to damage the v6Z80P by configuring it with an incompatible
-design - upon compilation ensure the pin assignments match those in the
-original OSCA design (see the .ucf file) and that the data direction 
-of the pins is correct (check the Design Summary / Pad report). In general,
-if it doesn't start up once the yellow LED is steady-on, power down immediately!
-
----------------------------------------------------------------------------
-
