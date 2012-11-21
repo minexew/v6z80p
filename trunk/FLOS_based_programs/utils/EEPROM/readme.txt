@@ -161,29 +161,29 @@ All other /slots can contain FPGA config files
 Emergency Recovery: If the Active Slot points to an invalid / undesired config.
 ===============================================================================
 
----------------------------------------------------
-*** Recovery Instructions original V6Z80P Board ***
----------------------------------------------------
+-----------------------------------------------------------
+Recovery Instructions *** For the original V6Z80P Board ***
+-----------------------------------------------------------
 
-OPTION 1: With Config PIC firmware v616+ the Active Slot can be changed manually.
-Assuming there is a working config in Slot 1, 2 or 3 and the problem is just that
-the Active Slot selection is pointing at a bad config:
+OPTION 1: With Config PIC firmware v616+ the Active Slot can be changed manually. Assuming
+there is a working config in Slot 1, 2 or 3 and the problem is just that the Active Slot
+selection is pointing at a bad config:
 
-•Power off.
+* Power off.
 
-•Install jumper J2 only
+* Install jumper J2 only
 
-•Power on (yellow led flashes rapidly - JTAG mode).
+* Power on (yellow led flashes rapidly - JTAG mode).
 
-•Remove jumper J2 again
+* Remove jumper J2 again
 
-•The PIC will reset the active slot to 1 (indicated by 1 pulse of the red LED)
- The yellow led lights up for 4 seconds then Slot 2 is set (2 flashes of red LED),
- again there's a 4 second pause, finally slot 3 is set (3 flashes).
+* The PIC will reset the active slot to 1 (indicated by 1 pulse of the red LED)
+  The yellow led lights up for 4 seconds then Slot 2 is set (2 flashes of red LED),
+  again there's a 4 second pause, finally slot 3 is set (3 flashes).
 
-•Power off only when the yellow LED is lit following the desired slot setting.
+* Power off only when the yellow LED is lit following the desired slot setting.
 
-•When you power on the active slot will correctly point to slot 1, 2 or 3.
+* When you power on the active slot will correctly point to slot 1, 2 or 3.
 
 OPTION 2: Remove and reprogram the EEPROM or config PIC externally. (Note: It is the PIC
 chip that actually holds the slot selection - you will only need to reprogram the PIC if
@@ -194,19 +194,20 @@ this also contains the bootcode for SLOT 0.
 
 OPTION 3: JTAG config. If none of the first 3 slots contain OSCA:
 
-•Power off and connect a Xilinx JTAG cable to the V6Z80P.
+* Power off and connect a Xilinx JTAG cable to the V6Z80P.
 
-•Install jumpers J1 and J2.
+* Install jumpers J1 and J2.
 
-•Load the most recent OSCA project into Xilinx webpack ISE and send the OSCA config .bit
- file from the PC to the V6Z80P via JTAG.
+* Load the most recent OSCA project into Xilinx webpack ISE and send the OSCA config .bit
+  file from the PC to the V6Z80P via JTAG.
 
-•If the bootcode is intact in the EEPROM, the system will start as normal allowing you to load
- EEPROM.EXE via FLOS. If the bootcode checksum fails the screen will flash magenta, then grey.
- See "bootcode problems" below.
+* If the bootcode is intact in the EEPROM, the system will start as normal allowing you to load
+  EEPROM.EXE via FLOS. If the bootcode checksum fails the screen will flash magenta, then grey.
+  See "bootcode problems" below.
 
-•Remove jumpers J1 and J2 next time you power off so that the system automatically configures
- from the EEPROM.
+* Remove jumpers J1 and J2 next time you power off so that the system automatically configures
+  from the EEPROM.
+
 
 
 --------------------------------------------
@@ -217,38 +218,41 @@ OPTION 1: Assuming there is a working config in Slot 1 - 7 and the problem is ju
 the Active Slot selection is pointing at a bad config:
 
 
-•Power off.
+* Power off.
 
-•Install jumper J2 only
+* Install jumper J2 only (or hold down button if one is connected to J2)
 
-•Power on (yellow led flashes rapidly).
+* Power on (status led flashes rapidly).
 
-•Remove jumper J2 again
+* Remove jumper J2 again (or release button)
 
-•The yellow LED will flash once, pause about 5 seconds, then flash twice, pause 5 seconds,
- then flash three times and so on - the number of flashes represents the slot selection.
- During the pause following the slot selection you require, replace the jumper - the LED
- will then stay on permanently signifying that the slot has been set.
+* If the LED continues to flash rapidly, install and remove jumper (press and release button)
 
-•Power off and remove Jumper J2.
+* The status LED will now flash once, pause about 5 seconds, then flash twice, pause 5 seconds,
+  then flash three times and so on - the number of flashes represents the power-on slot selection.
+  During the pause following the slot selection you require, replace the jumper (or press the button)
+  the LED will then stay on permanently signifying that the slot has been set.
+
+* Power off and remove Jumper J2 (or release the button)
 
 
 
 OPTION 2: JTAG configuration. (If none of the first seven slots contain OSCA)
 
-•Power off and connect a Xilinx JTAG cable to the V6Z80P.
+* Power off and connect a Xilinx JTAG cable to the V6Z80P.
 
-•Install jumpers J1 and J2.
+* Install jumpers J1 and J2.
 
-•Load the most recent OSCA project into Xilinx webpack ISE and send the OSCA config .bit
- file from the PC to the V6Z80P via JTAG.
+* Load the most recent OSCA project into Xilinx webpack ISE and send the OSCA config .bit
+  file from the PC to the V6Z80P via JTAG.
 
-•If the bootcode is intact in the EEPROM, the system will start as normal allowing you to
- load EEPROM.EXE via FLOS. If the bootcode checksum fails the screen will flash magenta,
- then grey. See "bootcode problems" below.
+* If the bootcode is intact in the EEPROM, the system will start as normal allowing you to
+  load EEPROM.EXE via FLOS. If the bootcode checksum fails the screen will flash magenta,
+  then grey. See "bootcode problems" below.
 
-•Remove jumpers J1 and J2 next time you power off so that the system automatically
- configures from the EEPROM.
+* Remove jumpers J1 and J2 next time you power off so that the system automatically
+  configures from the EEPROM.
+
 
 
 
