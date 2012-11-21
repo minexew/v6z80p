@@ -307,23 +307,31 @@ is pointing at a bad config:
 
 * Power off.
 
-* Install jumper J2 only
+* Install jumper J2 only (or hold
+  button if connected to J2)
 
-* Power on (yellow led flashes rapidly).
+* Power on (LED flashes rapidly).
 
-* Remove jumper J2 again
+* Remove jumper J2 again (or release
+  J2 button)
 
-* The yellow LED will flash once, pause
+* If the LED continues to flash rapidly
+  install and remove the jumper (or
+  press and release J2 button)
+  
+* The LED will flash once, pause
   about 5 seconds, then flash twice,
   pause 5 seconds, then flash three
   times and so on - the number of flashes
   represents the slot selection. During
   the pause following the slot selection
-  you require, replace the jumper - the
-  LED will then stay on permanently
-  signifying that the slot has been set.
+  you require, replace the jumper (or
+  press J2 button) the LED will then stay
+  on permanently signifying that the slot
+  has been set.
 
-* Power off and remove Jumper J2.
+* Power off and remove Jumper J2 (release
+  J2 button).
 
 
 
