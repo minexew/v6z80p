@@ -10,20 +10,17 @@
 ; No animation on this test 
 ;-----------------------------------------------------------------------------------------
 
-;-----------------------------------------------------------------------------------------
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
-;-----------------------------------------------------------------------------------------
+;======================================================================================
+; Standard equates for OSCA and FLOS
+;======================================================================================
 
-	org OS_location+$10		
+include "\equates\kernal_jump_table.asm"
+include "\equates\osca_hardware_equates.asm"
+include "\equates\system_equates.asm"
 
-	jp start
+	org $5000
 
-;-----------------------------------------------------------------------------------------
-
-	org $4000			;keep code out the way of bank switched areas
-	
-;-----------------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------------
 
 ; Initialize video hardware
 
@@ -37,7 +34,7 @@ start	ld a,0
 	ld (vreg_window),a		; set x window size/position (320 pixels)
 	
 	ld a,%01000000
-	out (sys_mem_select),a	; page in video ram
+	out (sys_mem_select),a		; page in video ram
 	
 	ld e,0
 	ld a,e
@@ -65,7 +62,7 @@ flp	ld (hl),$00
 
 ;-----------------------------------------------------------------------------------------
 
-	ld hl,test_pal		; write palette
+	ld hl,test_pal			; write palette
 	ld de,palette
 	ld b,0
 pwloop	ld c,(hl)
@@ -96,7 +93,7 @@ pwloop	ld c,(hl)
 ;	jr nz,lp33
 	
 	
-	ld hl,test_gfx		;copy test image to top half of bitplane 0 with CPU
+	ld hl,test_gfx			;copy test image to top half of bitplane 0 with CPU
 	ld de,video_base
 	ld bc,40*100
 	ldir
@@ -104,14 +101,17 @@ pwloop	ld c,(hl)
 ;-----------------------------------------------------------------------------------------
 
 
-wvrtstart	ld a,(vreg_read)		;wait vrt
+wvrtstart	
+
+	ld a,(vreg_read)		;wait vrt
 	and 1
 	jr z,wvrtstart
+
 wvrtend	ld a,(vreg_read)
 	and 1
 	jr nz,wvrtend
 
-	ld hl,$444		;dark grey
+	ld hl,$444			;dark grey
 	ld (palette),hl
 
 	call do_stuff
@@ -119,8 +119,12 @@ wvrtend	ld a,(vreg_read)
 	ld hl,$00
 	ld (palette),hl
 
-	jp wvrtstart
-	
+	call kjt_get_key
+	cp $76
+	jp nz,wvrtstart
+	ld a,$ff
+	ret
+
 
 ;-----------------------------------------------------------------------------------------
 	
@@ -131,15 +135,16 @@ do_stuff
 	ld (video_base+8000-39),a	; wipe CPU written test bytes
 	ld (video_base+8000-40),a
 
-;	ld b,70
-;waitlp	call waitline
-;	djnz waitlp
-;	call waitline
+	ld b,70
+waitlp	call waitline
+	djnz waitlp
+		
+	call waitline
 			
 	ld hl,$c0			;green
 	ld (palette),hl
 
-	ld hl,0			;copy 75 lines with blitter
+	ld hl,0				;copy 75 lines with blitter
 	ld (blit_src_loc),hl
 	ld hl,4000
 	ld (blit_dst_loc),hl
@@ -157,7 +162,8 @@ do_stuff
 	ld hl,$0f			
 	ld (palette),hl
 
-waitblits	ld a,(vreg_read)		; wait for blit to start (blue)
+waitblits
+	ld a,(vreg_read)		; wait for blit to start (blue)
 	bit 4,a 
 	jr z,waitblits
 
@@ -166,7 +172,7 @@ waitblits	ld a,(vreg_read)		; wait for blit to start (blue)
 	call var_delay2
 	
 	
-	ld hl,$f0f		; (purple)
+	ld hl,$f0f			; (purple)
 	ld (palette),hl
 	
 
@@ -175,15 +181,17 @@ waitblits	ld a,(vreg_read)		; wait for blit to start (blue)
 	
 				
 	ld hl,$f00
-	ld (palette),hl		;(red)
+	ld (palette),hl			;(red)
 
 	
 	ld hl,video_base+(75*40)	;copy last 25 lines with CPU
 	ld de,video_base+4000+(75*40)
-	ld bc,24*40		;TEST: ONLY COPY 24 LINES!!!
+	ld bc,24*40			;TEST: ONLY COPY 24 LINES!!!
 	ldir		
 	
-waitblite	ld a,(vreg_read)		; ensure blit has ended
+waitblite	
+
+	ld a,(vreg_read)		; ensure blit has ended
 	bit 4,a 
 	jr nz,waitblite
 
@@ -191,7 +199,9 @@ waitblite	ld a,(vreg_read)		; ensure blit has ended
 
 
 
-waitline	ld de,vreg_read		;wait whilst raster in display window
+waitline	
+
+	ld de,vreg_read		;wait whilst raster in display window
 xwait1	ld a,(de)
 	and 2
 	jp nz,xwait1
@@ -236,12 +246,12 @@ lp5	djnz lp5
 
 temp		db 0
 counter       	db 0
-position		dw 4000
+position	dw 4000
 lines		db 100
 
 ;-------------------------------------------------------------------------------------------
 
-test_gfx	 	incbin "320x100bitplane.bin"
-test_pal 		incbin "320x100bitplane_12bit_palette.bin"
+test_gfx	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x100bitplane.bin"
+test_pal 	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x100bitplane_12bit_palette.bin"
 		
 ;-------------------------------------------------------------------------------------

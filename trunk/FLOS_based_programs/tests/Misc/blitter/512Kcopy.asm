@@ -3,22 +3,17 @@
 ;          Bitplane pointer 0 then scrolls through 512KB video ram
 ;-----------------------------------------------------------------------------------------
 
-;-----------------------------------------------------------------------------------------
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
-;-----------------------------------------------------------------------------------------
+;======================================================================================
+; Standard equates for OSCA and FLOS
+;======================================================================================
 
-	org OS_location+$10		
+include "\equates\kernal_jump_table.asm"
+include "\equates\osca_hardware_equates.asm"
+include "\equates\system_equates.asm"
 
-	jp start
+	org $5000
 
-;-----------------------------------------------------------------------------------------
-
-	org $4000			;keep code out the way of bank switched areas
-	
-;-----------------------------------------------------------------------------------------
-
-start	
+;--------------------------------------------------------------------------------------
 
 ; Initialize video hardware
 
@@ -32,7 +27,7 @@ start
 	ld (vreg_window),a		; set x window size/position (320 pixels)
 	
 	ld a,%01000000
-	out (sys_mem_select),a	; page in video ram
+	out (sys_mem_select),a		; page in video ram
 	
 	ld e,0
 	ld a,e
@@ -60,7 +55,7 @@ flp	ld (hl),$00
 
 ;-----------------------------------------------------------------------------------------
 
-	ld hl,test_pal		; write palette
+	ld hl,test_pal			; write palette
 	ld de,palette
 	ld b,0
 pwloop	ld c,(hl)
@@ -78,13 +73,13 @@ pwloop	ld c,(hl)
 
 	ld a,%00000000
 	ld (vreg_vidpage),a
-	ld hl,test_gfx		;copy test image to Video RAM address 0-7999 with CPU
+	ld hl,test_gfx			;copy test image to Video RAM address 0-7999 with CPU
 	ld de,video_base
 	ld bc,200*40
 	ldir
 	
 	ld de,8000
-	ld c,0			;copy VRAM 0-7999 to every 8000 byte boundary with blitter	
+	ld c,0				;copy VRAM 0-7999 to every 8000 byte boundary with blitter	
 	ld b,64
 nxtblit	push bc	
 	ld hl,0
@@ -104,9 +99,12 @@ ndadc	ex de,hl
 ;-----------------------------------------------------------------------------------------
 
 
-wvrtstart	ld a,(vreg_read)		;wait vrt
+wvrtstart
+
+	ld a,(vreg_read)		;wait vrt
 	and 1
 	jr z,wvrtstart
+
 wvrtend	ld a,(vreg_read)
 	and 1
 	jr nz,wvrtend
@@ -124,17 +122,18 @@ wvrtend	ld a,(vreg_read)
 	ld a,$00
 	ld (palette),a
 
-	in a,(sys_keyboard_data)
-	cp $29
-	jr nz,wvrtstart		; loop if SPACE key not pressed
+	call kjt_get_key
+	cp $76
+	jr nz,wvrtstart			; loop if ESC key not pressed
 
-	jp 0			; reboot
+	ld a,$ff
+	ret				; restart FLOS
 	
 
 ;-----------------------------------------------------------------------------------------
 	
 blit_copy	
-				;copy 40 bytes x 200 lines
+					;copy 40 bytes x 200 lines
 	ld (blit_src_loc),hl
 	ld a,b
 	ld (blit_src_msb),a
@@ -147,16 +146,18 @@ blit_copy
 	ld (blit_src_mod),a
 	ld a,$00
 	ld (blit_dst_mod),a
-	ld a,%01000000		;blitter in ascending mode, legacy msbs = 0
+	ld a,%01000000			;blitter in ascending mode, legacy msbs = 0
 	ld (blit_misc),a
 	ld a,199
 	ld (blit_height),a
 	ld a,39
 	ld (blit_width),a
-	nop			;ensures blit has begun
+	nop				;ensures blit has begun
 	nop
 	
-waitblit	ld a,(vreg_read)		;wait for blit to complete
+waitblit
+
+	ld a,(vreg_read)		;wait for blit to complete
 	bit 4,a 
 	jr nz,waitblit
 	ret
@@ -182,12 +183,12 @@ hwok	ret
 
 ;-------------------------------------------------------------------------------------------
 
-positionl		dw 0
-positionh		dw 0
+positionl	dw 0
+positionh	dw 0
 counter       	db 0
 save_sp		dw 0
 
-test_gfx	 	incbin "320x200bitplane.bin"
-test_pal 		incbin "320x200bitplane_12bit_palette.bin"
+test_gfx	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x200bitplane.bin"
+test_pal 	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x200bitplane_12bit_palette.bin"
 		
 ;-------------------------------------------------------------------------------------
