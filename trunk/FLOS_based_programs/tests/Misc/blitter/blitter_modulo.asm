@@ -5,20 +5,17 @@
 ; forcing pic right a byte each frame
 ;-----------------------------------------------------------------------------------------
 
-;-----------------------------------------------------------------------------------------
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
-;-----------------------------------------------------------------------------------------
+;======================================================================================
+; Standard equates for OSCA and FLOS
+;======================================================================================
 
-	org OS_location+$10		
+include "\equates\kernal_jump_table.asm"
+include "\equates\osca_hardware_equates.asm"
+include "\equates\system_equates.asm"
 
-	jp start
+	org $5000
 
-;-----------------------------------------------------------------------------------------
-
-	org $4000			;keep code out the way of bank switched areas
-	
-;-----------------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------------
 
 ; Initialize video hardware
 
@@ -32,9 +29,9 @@ start	ld a,0
 	ld (vreg_window),a		; set x window size/position (320 pixels)
 	
 	ld a,%01000000
-	out (sys_mem_select),a	; page in video ram
+	out (sys_mem_select),a		; page in video ram
 	
-	ld e,0			; clear all bitplanes (with CPU)
+	ld e,0				; clear all bitplanes (with CPU)
 	ld a,e
 clrabp	ld (vreg_vidpage),a
 	ld hl,video_base		
@@ -89,7 +86,9 @@ pwloop	ld c,(hl)
 ;-----------------------------------------------------------------------------------------
 
 
-wvrtstart	ld a,(vreg_read)
+wvrtstart	
+
+	ld a,(vreg_read)
 	and 1
 	jr z,wvrtstart
 wvrtend	ld a,(vreg_read)
@@ -113,9 +112,12 @@ wvrtend	ld a,(vreg_read)
 	jr nz,lineok
 	ld a,1
 lineok	ld (width),a
-	
-	jp wvrtstart
-	
+
+	call kjt_get_key
+	cp $76
+	jp nz,wvrtstart
+	ld a,$ff
+	ret
 
 ;-----------------------------------------------------------------------------------------
 	
@@ -127,7 +129,7 @@ do_stuff
 	
 	ld a,%00000001
 	ld (vreg_vidpage),a		;clear bitplane 0 by copying bitplane 1 to it
-	ld hl,8192		;copy 40 bytes x 200 lines 
+	ld hl,8192			;copy 40 bytes x 200 lines 
 	ld (blit_src_loc),hl
 	ld hl,0
 	ld (blit_dst_loc),hl
@@ -141,11 +143,14 @@ do_stuff
 	ld (blit_height),a
 	ld a,39
 	ld (blit_width),a
-	nop			;ensures blit has begun
+	nop				;ensures blit has begun
 	nop
 	nop	
 	nop
-waitblit1	ld a,(vreg_read)		;wait for blit to complete
+	
+waitblit1	
+
+	ld a,(vreg_read)		;wait for blit to complete
 	bit 4,a 
 	jr nz,waitblit1
 	
@@ -155,22 +160,22 @@ waitblit1	ld a,(vreg_read)		;wait for blit to complete
 	ld a,%01010000
 	ld (blit_misc),a		;blitter source msb is 1, dest 0
 
-	ld a,(width)		;copy various widths
+	ld a,(width)			;copy various widths
 	ld e,a
 	ld a,40
 	sub e
 	ld (blit_src_mod),a
 	ld (blit_dst_mod),a
 	
-	ld a,(width)		;push image right x bytes too
+	ld a,(width)			;push image right x bytes too
 	ld e,a
 	ld d,0
 	ld hl,40
 	xor a			
 	sbc hl,de
-	ld (blit_dst_loc),hl	;vary destination address
+	ld (blit_dst_loc),hl		;vary destination address
 	ld hl,0
-	ld (blit_src_loc),hl	;source address remains constant
+	ld (blit_src_loc),hl		;source address remains constant
 		
 	
 	ld a,200
@@ -178,11 +183,13 @@ waitblit1	ld a,(vreg_read)		;wait for blit to complete
 	ld a,(width)
 	sub 1
 	ld (blit_width),a		;width reg requires width - 1
-	nop			;ensures blit has begun
+	nop				;ensures blit has begun
 	nop
 	nop
 	nop
-waitblit	ld a,(vreg_read)		;wait for blit to complete
+waitblit	
+
+	ld a,(vreg_read)		;wait for blit to complete
 	bit 4,a 
 	jr nz,waitblit
 	ret
@@ -197,7 +204,7 @@ width		db 1
 
 ;-------------------------------------------------------------------------------------------
 
-test_gfx	 	incbin "320x100bitplane.bin"
-test_pal 		incbin "320x100bitplane_12bit_palette.bin"
+test_gfx	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x100bitplane.bin"
+test_pal 	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x100bitplane_12bit_palette.bin"
 		
 ;-------------------------------------------------------------------------------------
