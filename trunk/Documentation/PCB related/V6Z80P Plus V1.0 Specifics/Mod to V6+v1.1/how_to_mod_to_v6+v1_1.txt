@@ -2,6 +2,8 @@
 How to mod a V6+V1.0 PCB to V6+v1.1:
 ====================================
 
+Disclaimer! This procedure is currently untested.
+
 First, make sure you have a V6+1.1 config installed in
 one of the first seven slots. If you don't, the system
 cannot start after the mod (unless you have access
