@@ -1,7 +1,10 @@
 ; ***************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.24 *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.25 *
 ; ***************************************************
 ;
+; v1.25 - Backup/restores initial dir
+;         Layout of slot list updated
+; 
 ; v1.24 - Supports .v6c files to aid correct config installation.
 ;         Reports Bootcode and OS on-EEPROM status
 ;
@@ -34,7 +37,10 @@ data_bank  	    equ 1
 
 ;-----------------------------------------------------------------------------
 
-	  jp go_eeprom
+          call save_dir_vol
+          call go_eeprom
+          call restore_dir_vol
+          ret
 
 ;======== CODE / DATA that must be kept out of paged RAM =======================
 
@@ -1687,10 +1693,8 @@ leftside  call kjt_set_cursor_position
           ld (cursor_pos),bc
 
           ld a,(working_slot)                     
-          ld hl,slot_number_text
+          ld hl,slot_number_text+1
           call kjt_hex_byte_to_ascii
-          ld hl,slot_text
-          call kjt_print_string
           ld hl,slot_number_text
           call kjt_print_string
           
@@ -2102,13 +2106,15 @@ include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
 
 include "FLOS_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 
+include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
+
 ;----------------------------------------------------------------------------------------
 
 
 
 
 start_text1         db    "                                      ",11
-                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.24   ",11
+                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.25   ",11
                     db    "                                      ",11,0
                     
 start_text2         db 11
@@ -2252,8 +2258,7 @@ warn_active_slot_txt db 11,11,"ERROR! Writing data to a block within",11
 current_slots_text  db 11,"Current EEPROM slot contents..",11,11,0
 bootcode_text       db "BOOTCODE ETC",0
 
-slot_text           db " ",0
-slot_number_text    db "xx - ",0
+slot_number_text    db " xx:",0
 unknown_text        db "UNKNOWN",0
 
 slot_zero_text      db 11,11,"SLOT 0 cannot hold FPGA configs!"
