@@ -5,10 +5,10 @@ Cycle Perfect Spectrums Emulators:
 --------------------------------------
 
 
-THiS EMULATOR IS FOR V6Z80P+ v1.1 ONLY
+THiS EMULATOR IS FOR V6Z80P+ v1.1(b) ONLY
 
 
-1. Install the config .bin files from:
+1. Install the config .v6c files from:
    
   FPGA_CFG\Alessand\V6plusv1.1\Pentagon
 
