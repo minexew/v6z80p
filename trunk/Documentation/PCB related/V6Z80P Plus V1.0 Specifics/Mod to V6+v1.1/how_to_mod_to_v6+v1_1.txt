@@ -1,0 +1,50 @@
+
+To mod a V6+V1.0 PCB to a V6+v1.1 PCB:
+======================================
+
+First make sure you have a V6+1.1 config installed in
+one of the first seven slots. If you don't, the system
+cannot start after the mod (unless you have access
+to a JTAG cable). You can make this slot the active
+slot before powering off the unmodded board or use
+the emergency slot selection procedure to set the boot
+slot once the board is modded.
+
+The basic requirement of the V6+1.1 clocking system is:
+
+The output from the onboard 16MHz oscillator goes
+direct to FPGA pin 80 (GCLK0) (yellow in the diagrams)
+
+The output from a 14MHz oscillator goes direct to
+FPGA pin 77 (GCLK1) (brown in the diagrams)
+
+The output from FPGA pin 75 (cyan in the diagrams) goes to
+input [A] of a 74HCT08 AND gate. Input [B] can be connected
+to input [A] or pulled high (it is connected to 5v via a 1k
+resistor on a real V6+1.1). The output from the AND gate needs
+to go direct to the Z80's clock input (pin 1) - this is
+coloured red in the diagrams.
+
+(The AND gate's only function is to raise the 3.3v
+logic clock signal to the 5v CMOS level that the
+Z80 requires).
+
+
+There are many ways to make the modifications, two
+ways are shown in the .pngs:
+
+Method 1 is most like a real V6+v1.1 but requires
+a bit more work.
+
+Method 2 is simpler but the 16MHz oscillator is
+unecessarily driving 2 AND inputs (instead of 1)
+and the FPGA output clock is driving 3 AND inputs
+instead of 1. However, it is not anticipated that
+this will cause trouble.
+
+
+Power connections to the additional 14MHz oscillator are
+not shown as this depends what is available. The real
+v6+1.1 uses a 3.3v level oscillator. Note that your
+oscillator may require a decoupling capacitor across
+its supply pins for stability - see its datasheet.
