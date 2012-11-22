@@ -11,7 +11,7 @@ To install:
 -----------
 
 1. Install the emulator FPGA config
-   .bin file from the folder "FPGA_CFG"
+   .v6c file from the folder "FPGA_CFG"
    to the EEPROM using the FLOS command
    "EEPROM.EXE". Make sure you select
    the correct config file for your
