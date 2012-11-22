@@ -51,7 +51,11 @@ flp	ld (hl),$00
 	ld (vreg_vidctrl),a		;bitmap mode + normal border + video enabled
 	ld a,0
 	ld (vreg_xhws),a		;x scroll position = 0
+	ld (vreg_yhws_bplcount),a	;1 bitplane display
 
+	ld hl,0
+	ld (bitplane0a_loc),hl
+	ld (bitplane0a_loc+2),hl
 
 ;-----------------------------------------------------------------------------------------
 
@@ -116,8 +120,7 @@ lineok	ld (width),a
 	call kjt_get_key
 	cp $76
 	jp nz,wvrtstart
-	ld a,$ff
-	ret
+	rst 0
 
 ;-----------------------------------------------------------------------------------------
 	

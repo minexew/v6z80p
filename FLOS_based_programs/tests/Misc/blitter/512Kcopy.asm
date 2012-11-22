@@ -51,7 +51,7 @@ flp	ld (hl),$00
 	ld (vreg_vidctrl),a		;bitmap mode + normal border + video enabled
 	ld a,0
 	ld (vreg_xhws),a		;x scroll position = 0
-
+	ld (vreg_yhws_bplcount),a	;1 bitplane display
 
 ;-----------------------------------------------------------------------------------------
 
@@ -126,10 +126,8 @@ wvrtend	ld a,(vreg_read)
 	cp $76
 	jr nz,wvrtstart			; loop if ESC key not pressed
 
-	ld a,$ff
-	ret				; restart FLOS
+	rst 0
 	
-
 ;-----------------------------------------------------------------------------------------
 	
 blit_copy	
