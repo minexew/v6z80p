@@ -1,23 +1,20 @@
 ;-----------------------------------------------------------------------------------------
-; Tests blitter - ascending mode (blit occurs midframe)
+; Tests blitter - ascending mode (blit occurs out of live video frame)
 ; CPU copies test pic to top half of display
 ; Blitter copies to bottom half (1 line more per frame)
 ;-----------------------------------------------------------------------------------------
 
-;-----------------------------------------------------------------------------------------
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
-;-----------------------------------------------------------------------------------------
+;======================================================================================
+; Standard equates for OSCA and FLOS
+;======================================================================================
 
-	org OS_location+$10		
+include "\equates\kernal_jump_table.asm"
+include "\equates\osca_hardware_equates.asm"
+include "\equates\system_equates.asm"
 
-	jp start
+	org $5000
 
-;-----------------------------------------------------------------------------------------
-
-	org $4000			;keep code out the way of bank switched areas
-	
-;-----------------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------------
 
 ; Initialize video hardware
 
@@ -91,7 +88,9 @@ pwloop	ld (hl),a
 ;-----------------------------------------------------------------------------------------
 
 
-wvrtstart	ld a,(vreg_read)
+wvrtstart	
+
+	ld a,(vreg_read)
 	and 1
 	jr z,wvrtstart
 wvrtend	ld a,(vreg_read)
@@ -124,17 +123,18 @@ wvrtend	ld a,(vreg_read)
 lineok	ld (lines),a
 	
 
-	jp wvrtstart
+	call kjt_get_key
+	cp $76
+	jp nz,wvrtstart
+	ld a,$ff
+	ret
+	
 	
 
 ;-----------------------------------------------------------------------------------------
 	
 	
 do_stuff
-
-	ld b,70
-waitlp	call waitline
-	djnz waitlp
 
 	ld a,$4c
 	ld (palette),a
@@ -158,8 +158,8 @@ clrlp	push hl
 	ld a,$88
 	ld (palette),a
 	
-	ld hl,0			; copy image to bottom half of bitplane 0  
-	ld (blit_src_loc),hl	; (ie: vram locations 0-3999 to 4000-7999)
+	ld hl,0				; copy image to bottom half of bitplane 0  
+	ld (blit_src_loc),hl		; (ie: vram locations 0-3999 to 4000-7999)
 	ld hl,4000		
 	ld (blit_dst_loc),hl
 	ld a,$00
@@ -174,44 +174,29 @@ clrlp	push hl
 	ld a,39
 	ld (blit_width),a		; (reg requires width - 1)
 
-	nop			; ensures blit has begun
+	nop				; ensures blit has begun
 	nop
 	
-waitblit	ld a,(vreg_read)		; wait for blit to complete
+waitblit	
+
+	ld a,(vreg_read)		; wait for blit to complete
 	bit 4,a 
 	jr nz,waitblit
 	ret
 
 
-
-waitline	ld de,vreg_read		;wait whilst raster in display window
-xwait1	ld a,(de)
-	and 2
-	jp nz,xwait1
-	nop
-	nop
-	nop
-
-xwait2	ld a,(de)			;wait whilst raster in border
-	and 2
-	jp z,xwait2
-	nop
-	nop
-	nop
-	ret	
-
 ;-----------------------------------------------------------------------------------------
 
 counter       	db 0
 
-position		dw 4000
+position	dw 4000
 lines		db 1
 
 save_sp		dw 0
 
 ;-------------------------------------------------------------------------------------------
 
-test_gfx	 	incbin "320x100bitplane.bin"
-test_pal 		incbin "320x100bitplane_12bit_palette.bin"
+test_gfx	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x100bitplane.bin"
+test_pal 	 incbin "FLOS_based_programs\tests\Misc\blitter\data\320x100bitplane_12bit_palette.bin"
 		
 ;-------------------------------------------------------------------------------------
