@@ -90,8 +90,8 @@ readloop	call read_kb_byte
 kbtest_txt	db "Keyboard Test Menu",11,11
 		db "Press:",11,11
 		db "1. Reset keyboard",11
-		db "2. Turn on caps lock",11
-		db "3. Turn off caps lock",11
+		db "2. Turn on caps lock LED",11
+		db "3. Turn off caps lock LED",11
 		db "4. Send ECHO command",11
 		db "5. Report scancodes",11,11
 		db "ESC - Main test menu",11,11,0

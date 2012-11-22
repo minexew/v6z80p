@@ -154,7 +154,7 @@ albldone	call s_goodack
 		ld hl,ok_text
 		call kjt_print_string
 		call kjt_wait_key_press
-		jp mainloop
+		jp serial_tests
 		
 
 save_data	
