@@ -38,6 +38,8 @@ mouse_menu_text
 			
 initialize_mouse
 		
+		call kjt_clear_screen
+		
 		ld hl,ms_init_txt
 		call kjt_print_string
 		
@@ -48,6 +50,7 @@ nomouse		ld hl,no_mouse_txt
 		call kjt_print_string
 		call press_any_key
 		xor a
+		inc a
 		ret
 		
 minit_ok	call kjt_get_display_size		;get pointer boundaries
@@ -71,14 +74,16 @@ minit_ok	call kjt_get_display_size		;get pointer boundaries
 		ret
 
 show_mouse_data
+		
+		call kjt_clear_screen
 
-		ld bc,$0005
+		ld bc,$0000
 		call kjt_set_cursor_position
 		
 		ld hl,mouse_loc_test_txt
 		call kjt_print_string
 		
-mst_noesc	ld bc,$0007
+mst_noesc	ld bc,$0002
 		call kjt_set_cursor_position
 		
 		call kjt_get_mouse_position
@@ -122,7 +127,8 @@ askinit		ld hl,init_txt
 		ret
 
 okinit		call initialize_mouse
-		ret
+		ret nz	
+		jp show_mouse_data
 
 
 init_txt	db "Mouse driver not active.",11,11

@@ -15,13 +15,16 @@ not_vt_quit	ld a,b
 		jr z,test_palette
 		cp "2"
 		jp z,test_sprite_def
+		cp "3"
+		jp z,test_char_blit
 		jr wait_vt_menu
 		
 test_palette	call do_palette_test
 		jr video_tests
 test_sprite_def	call do_sprite_def_test
 		jr video_tests
-		
+test_char_blit	call do_char_blit_test
+		jr video_tests
 
 ;------------------------------------------------------------------------------------
 
@@ -31,7 +34,9 @@ video_test_menu1
 
 		db "Press:",11,11
 		db "1. RGB colour test",11
-		db "2. Sprite test",11,11
+		db "2. Sprite test",11
+		db "3. Plot char (blit) test",11,11
+		
 		db "ESC - quit to main menu",11,11,0
 		
 
@@ -387,15 +392,45 @@ sprite_page	db 0
 
 ;-------------------------------------------------------------------------------------
 
-
 test_sprite	ds 256,0
 
 blank_sprite	ds 256,0
 
 ;-------------------------------------------------------------------------------------
 
+do_char_blit_test
+		call kjt_clear_screen
+		ld hl,charblit_txt
+		call kjt_print_string
+		
+		ld d,0
 
+chbllp3		ld e,d
+		ld c,1
+chbllp2		ld b,0
+chbllp1		ld a,e
+		call kjt_plot_char
+		inc e
+		inc b
+		ld a,b
+		cp 40
+		jr nz,chbllp1
+		inc c
+		ld a,c
+		cp 25
+		jr nz,chbllp2
+		
+		inc d
+		
+		call kjt_get_key
+		cp $76
+		jr nz,chbllp3
+		xor a
+		ret
 
+charblit_txt	db "Plot char test.. Esc to quit.",0
+
+;-------------------------------------------------------------------------------------
 
 
 

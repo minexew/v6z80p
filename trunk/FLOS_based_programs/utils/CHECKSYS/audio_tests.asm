@@ -19,6 +19,8 @@ not_aud_quit	ld a,b
 
 test_panning	call kjt_clear_screen
 		call do_panning_test
+		xor a
+		out (sys_audio_enable),a
 		jr audio_tests
 		
 

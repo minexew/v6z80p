@@ -2,6 +2,9 @@
 ;
 ; Keep program < $8000, paged area used for samples, memtest etc
 ;
+; V1.03 - added plot char test
+;       - audio dma now disabled after audio test
+;
 ;---Standard header for OSCA and FLOS -----------------------------------------------------------------------
 
 include "equates\kernal_jump_table.asm"
@@ -63,7 +66,8 @@ show_sysinfo	call system_info
 		
 		
 		
-menu_txt	db "V6Z80P System Tester V1.02",11
+menu_txt	db "--------------------------",11
+		db "V6Z80P System Tester V1.03",11
 		db "--------------------------",11,11
 		db "Press:",11,11
 		db "1. For keyboard tests",11
