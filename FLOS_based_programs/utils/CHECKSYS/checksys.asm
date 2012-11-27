@@ -2,6 +2,11 @@
 ;
 ; Keep program < $8000, paged area used for samples, memtest etc
 ;
+; V1.04 - Added Blitter test
+;       - Added SD Card Tests
+;       - Simplified RGB test
+;       - Pass count shown in decimal
+;
 ; V1.03 - added plot char test
 ;       - audio dma now disabled after audio test
 ;
@@ -38,8 +43,10 @@ menu_loop	call kjt_wait_key_press
 		jr z,test_audio
 		cp "7"
 		jr z,test_memory
-		cp "8"
+		cp "i"
 		jr z,show_sysinfo
+		cp "8"
+		jr z,test_sdcard
 		jr menu_loop
 
 quit		ld a,1			
@@ -63,11 +70,13 @@ test_audio	call audio_tests
 		jr main_menu
 show_sysinfo	call system_info
 		jr main_menu
+test_sdcard	call sd_tests
+		jr main_menu
 		
 		
 		
 menu_txt	db "--------------------------",11
-		db "V6Z80P System Tester V1.03",11
+		db "V6Z80P System Tester V1.04",11
 		db "--------------------------",11,11
 		db "Press:",11,11
 		db "1. For keyboard tests",11
@@ -77,7 +86,10 @@ menu_txt	db "--------------------------",11
 		db "5. For video tests",11
 		db "6. For audio tests",11
 		db "7. For memory tests",11
-		db "8. For system info",11,11
+		db "8. For SD card tests",11,11
+		
+		db "I. For system info",11,11
+		
 		db "ESC - Quit",11,11,0
 
 ;--------------------------------------------------------------------------------------------------------
@@ -90,5 +102,6 @@ menu_txt	db "--------------------------",11
 	include "FLOS_based_programs\utils\checksys\video_tests.asm"
 	include "FLOS_based_programs\utils\checksys\audio_tests.asm"
 	include "FLOS_based_programs\utils\checksys\system_info.asm"
+	include "FLOS_based_programs\utils\checksys\sdcard_tests.asm"
 	
 ;--------------------------------------------------------------------------------------------------------

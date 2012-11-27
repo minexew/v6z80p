@@ -14,18 +14,25 @@ not_vt_quit	ld a,b
 		cp "1"
 		jr z,test_palette
 		cp "2"
-		jp z,test_sprite_def
+		jr z,test_sprite_def
 		cp "3"
-		jp z,test_char_blit
+		jr z,test_char_blit
+		cp "4"
+		jr z,test_blitter
 		jr wait_vt_menu
 		
 test_palette	call do_palette_test
 		jr video_tests
+		
 test_sprite_def	call do_sprite_def_test
 		jr video_tests
+
 test_char_blit	call do_char_blit_test
 		jr video_tests
 
+test_blitter	call do_blitter_test
+		jr video_tests
+		
 ;------------------------------------------------------------------------------------
 
 video_test_menu1
@@ -35,7 +42,8 @@ video_test_menu1
 		db "Press:",11,11
 		db "1. RGB colour test",11
 		db "2. Sprite test",11
-		db "3. Plot char (blit) test",11,11
+		db "3. Plot char test",11
+		db "4. Blitter test",11,11
 		
 		db "ESC - quit to main menu",11,11,0
 		
@@ -44,67 +52,44 @@ video_test_menu1
 
 do_palette_test
 		call kjt_clear_screen
-		
-		ld hl,pal_test_txt
-		call kjt_print_string
 
-		call kjt_wait_key_press
-		
-		call setup_256x200
-	
-		ld hl,colours1			; write palette
-		ld de,palette+$1e0
-		ld bc,32
+		ld hl,colours1
+		ld de,palette+(17*2)
+		ld bc,16
 		ldir
-
-		di
-		ld a,%00100001
-		out (sys_mem_select),a		; select direct vram write mode
-			
-		ld hl,0
-		ld c,200
-fvramlp2	ld a,h
-		rrca
-		rrca
-		rrca
-		rrca
-		and $f
-		add a,240
-		ld b,0
-fvramlp1	ld (hl),a
-		inc l
-		djnz fvramlp1
-		inc h
-		dec c
-		jr nz,fvramlp2
 		
-		ld a,%00000000
-		out (sys_mem_select),a		; deselect direct vram write mode
-		ei
-
-paltwx		call kjt_wait_key_press
-		cp $76
-		jr nz,paltwx
+		ld c,$10
+		ld hl,colour_txt
+rgblp		ld a,(hl)
+		or a
+		jr z,rgbdone
+		ld a,c
+		call kjt_set_pen
+		call kjt_print_string
+		ld a,c
+		add a,$10
+		ld c,a
+		jr rgblp
 		
+rgbdone		ld a,7
+		call kjt_set_pen
+		call press_any_key
 		call kjt_flos_display
 		xor a
 		ret
 
-colours1	dw $000,$00f,$0f0,$0ff,$f00,$f0f,$ff0,$fff
-		dw $000,$000,$000,$000,$000,$000,$000,$000
+colours1	dw $000,$00f,$f00,$f0f,$0f0,$0ff,$ff0,$fff
 
-pal_test_txt	db "The following colour bars should",11
-		db "appear:",11,11
-		db "BLACK",11
-		db "BLUE",11
-		db "GREEN",11
-		db "CYAN",11
-		db "RED",11
-		db "MAGENTA",11
-		db "YELLOW",11
-		db "WHITE",11,11
-		db "Press any key to start / ESC to exit",11,11,0
-
+colour_txt	db "   BLACK  ",11,0
+		db "   BLUE   ",11,0
+		db "    RED   ",11,0
+		db "  MAGENTA ",11,0
+		db "   GREEN  ",11,0
+		db "   CYAN   ",11,0
+		db "  YELLOW  ",11,0
+		db "   WHITE  ",11,11,0
+		db 0
+		
 ;-------------------------------------------------------------------------------------
 
 setup_256x200
@@ -432,7 +417,203 @@ charblit_txt	db "Plot char test.. Esc to quit.",0
 
 ;-------------------------------------------------------------------------------------
 
+do_blitter_test
+
+		call kjt_clear_screen
+		ld hl,blit_test_txt
+		call kjt_print_string
+			
+		ld a,$0
+		ld (vreg_vidpage),a		; put blit test obs at VRAM $0
+		call kjt_page_in_video
+		ld hl,object
+		ld de,$2000
+		ld bc,512
+		ldir
+		call kjt_page_out_video
+			
+		ld hl,0
+		ld (pass_count),hl
+			
+bltstlp		call pause_1_second
+		call pause_1_second
+		call kjt_get_key
+		cp $76
+		ret z
+		
+		call setup_256x200
+		
+		ld hl,colours2			; write palette
+		ld de,palette
+		ld bc,256*2
+		ldir
+
+		ld a,$20
+		ld (vreg_vidpage),a		;draw screen at vram $40000
+		ld ix,bitplane0a_loc		
+		ld hl,$0000			
+		ld c,4				
+		ld (ix),l
+		ld (ix+1),h
+		ld (ix+2),c
+		ld a,c
+		ld (dest_page),a
+		call make_blit_screen
+		
+		ld a,$30			;draw screen at vram $60000
+		ld (vreg_vidpage),a
+		ld hl,$0000			
+		ld c,6		
+		ld (ix),l
+		ld (ix+1),h
+		ld (ix+2),c
+		ld a,c
+		ld (dest_page),a
+		call make_blit_screen
+		
+		call kjt_flos_display
+		
+		ld b,8
+		ld c,0				;compare the two blitted screens
+blcomp2		ld a,c
+		add a,$20
+		ld (vreg_vidpage),a
+		push bc
+		call kjt_page_in_video
+		ld hl,$2000
+		ld de,$8000
+		ld bc,$2000
+		ldir
+		pop bc
+		ld a,c
+		add a,$30
+		ld (vreg_vidpage),a
+		ld hl,$2000
+		ld de,$8000
+blcomp		ld a,(de)
+		cp (hl)
+		jr nz,blerr
+		inc hl
+		inc de
+		bit 6,h
+		jr z,blcomp
+		inc c
+		djnz blcomp2
+		
+		call kjt_page_out_video
+		ld hl,(pass_count)
+		inc hl
+		ld (pass_count),hl
+		call show_passes
+		call kjt_get_key
+		cp $76
+		ret z
+		jp bltstlp
+		
+blerr		call kjt_page_out_video
+		ld hl,blit_error_txt
+		call kjt_print_string
+		call press_any_key
+		xor a
+		inc a
+		ret
+			
+
+blit_test_txt	db "Blitter Test",11,11
+		db "ESC to quit (when FLOS display shows)",11,11,0
+
+blit_error_txt	db 11,"BLITTING ERROR!",11,11
+		db "VRAM $40000-$4FFFF and $60000-$6FFFF",11
+		db "do not match.",11,11,0
 
 
 
+make_blit_screen
+
+		ld hl,(pass_count)
+		ld (seed),hl
+		
+		di
+		ld a,%00100000
+		out (sys_mem_select),a		; select direct vram write mode (64KB video page)
+		ld hl,0				; clear screen
+		xor a
+clrs1		ld (hl),a
+		inc l
+		jr nz,clrs1
+		inc h
+		jr nz,clrs1
+		xor a
+		out (sys_mem_select),a
+		ei
+					
+		ld bc,0				;draw 65536 randomly positioned bobs
+blrand		exx
+		call rand16
+		ld b,h
+		ld c,l
+		ld a,b
+		xor c
+		and 1				;choose randon image
+		call blit_trans_16x16
+		exx
+		inc bc
+		ld a,b
+		or c
+		jr nz,blrand
+		ret
+		
+
+;-------------------------------------------------------------------------------------------
+; Use blitter to put object on screen
+;-------------------------------------------------------------------------------------------
+
+display_width		equ 256
+obj_width 		equ 16
+obj_height		equ 16
+source_modulo 		equ 0
+destination_modulo	equ display_width-obj_width
+
+blit_trans_16x16
+		
+		ld h,a
+		ld l,0
+		ld a,$0				;source objects are at VRAM $0/$100
+		ld (blit_src_loc),hl		;set source address
+		ld (blit_src_msb),a		;set source address msb
+		
+		ld a,source_modulo 	
+		ld (blit_src_mod),a		;set source modulo
+
+		ld (blit_dst_loc),bc		;coords (on 256x256 display = bc)
+		ld a,(dest_page)		;destination page for blit is VRAM $40000 or $60000
+		ld (blit_dst_msb),a
+		
+		ld a,destination_modulo
+		ld (blit_dst_mod),a		;set destination modulo
+		
+		ld a,%11000000			;set blitter to ascending mode (modulo 
+		ld (blit_misc),a		;high bits set to zero, transparency: on)
+
+		ld a,obj_height-1
+		ld (blit_height),a		;set height of blit object (in lines)
+		ld a,obj_width-1
+		ld (blit_width),a		;set width of blit object (in bytes) and start blit
+		
+		nop				;waste a few cycles to ensure blit has begun
+		nop				;before testing busy flag
+waitblit5	in a,(sys_vreg_read)		
+		bit 4,a 			;busy wait for blit to complete
+		jr nz,waitblit5
+		ret
+
+dest_page	dw 0
+
+;-------------------------------------------------------------------------------------------
+
+object		incbin "FLOS_based_programs\utils\CHECKSYS\data\tiles.bin"
+
+colours2	incbin "FLOS_based_programs\utils\CHECKSYS\data\tiles_palette.bin"
+
+;-------------------------------------------------------------------------------------------
 
