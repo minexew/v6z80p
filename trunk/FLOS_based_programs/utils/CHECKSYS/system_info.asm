@@ -64,14 +64,14 @@ got_bdev	call kjt_print_string
 		
 		call show_video_mode
 		
-		ld hl,cr_txt
+		ld hl,crlf_txt
 		call kjt_print_string
 		
 		call press_any_key
 		ret
 		
 
-cr_txt		db 11,0
+crlf_txt	db 11,0
 
 ;----------------------------------------------------------------------------------------------------------------
 		

@@ -139,18 +139,54 @@ loop3		push bc
 
 
 		
-show_passes	ld a,(pass_count+1)
-		ld hl,pass_hex_txt
-		call kjt_hex_byte_to_ascii
-		ld a,(pass_count)
-		call kjt_hex_byte_to_ascii
-		
-		ld bc,$0008
+show_passes	ld bc,$0008
 		call kjt_set_cursor_position
 		ld hl,pass_txt
 		call kjt_print_string
+		ld hl,(pass_count)
+		call print_decimal
+		ld hl,cr_txt
+		call kjt_print_string
 		ret
+			
+
+;---------------------------------------------------------------------------------------------------
+
+print_decimal
 	
+;Number in hl to decimal ASCII (thanks to z80 Bits)
+;Modified to skip leading zeroes by Phil Ruston
+;inputs:	hl = number to ASCII
+;example: hl=300 outputs '300'
+;destroys: af, bc, hl, de used
+
+		ld d,4
+		ld e,0
+		ld bc,-10000
+		call Num1b
+		ld bc,-1000
+		call Num1b
+		ld bc,-100
+		call Num1b
+		ld c,-10
+		call Num1b
+		ld c,-1
+Num1b		ld a,'0'-1
+Num2b		inc a
+		add hl,bc
+		jr c,Num2b
+		sbc hl,bc
+		dec d
+		jr z,notzerob
+		cp "0"
+		jr nz,notzerob
+		bit 0,e
+		ret z
+notzerob	call print_char
+		ld e,1
+		ret
+
+ 	
 ;---------------------------------------------------------------------------------------------------
 	
 sysmem_fail		
@@ -496,7 +532,7 @@ testing_vmem_txt
 		db "(Garbage will appear on screen",11
 		db "during tests..) ESC to quit",11,0
 		
-sys_memtest_txt	db "Testing System RAM $08000-$7FFFF",11,11
+sys_memtest_txt	db "Testing System RAM $00000-$7FFFF",11,11
 		db "ESC to quit",11,11,0
 
 bank_select_txt	db "Bank selection test..",11,11,0
@@ -505,8 +541,8 @@ random_txt	db "OK",11,11,"Random byte write/verify test..",11,11,0
 
 pass_count	db 0,0
 
-pass_txt	db 11,11,"Pass:"
-pass_hex_txt	db "0000",10,0
+pass_txt	db 11,11,"Pass count:",0
+cr_txt		db 13,0
 
 dot_txt		db ".",0
 
