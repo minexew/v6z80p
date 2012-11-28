@@ -1,0 +1,8 @@
+
+MEMRND.EXE - Fills system RAM
+and video RAM with random bytes.
+
+Use: MEMRND (no args)
+
+Notes: Made by Daniel.
+

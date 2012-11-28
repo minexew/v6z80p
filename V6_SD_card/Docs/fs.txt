@@ -1,0 +1,10 @@
+
+FS.EXE - File explorer
+
+Use: FS (no args)
+
+Allows files to be browsed,
+launched etc
+
+Notes: Made in C by Valen.
+

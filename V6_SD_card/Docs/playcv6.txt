@@ -1,0 +1,9 @@
+
+PLAYCV6.EXE - Plays CV6 files
+
+Use: PLAYCV6 filename
+
+Notes:
+
+Made by Daniel.
+

@@ -5,14 +5,14 @@ a file in the current dir.
 
 Use: FIRMWARE file.bin [start_block]
 
-Note: "blocks" is 64KB in size,
+Note: "blocks" are 64KB in size,
 whereas "slots" are 128KB. Therefore
 to use this app to write to EEPROM
 slot 1, you would enter:
 
 FIRMWARE file.bin 2
 
-If "start_block" is not specified 
+If the "start_block" is not specified 
 it'll start writing from EEPROM block
 0.
 
@@ -27,3 +27,4 @@ this app should work on all older
 versions of FLOS and OSCA so it is
 provided as a backup method of
 updating the system.
+

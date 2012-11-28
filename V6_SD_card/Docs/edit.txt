@@ -39,4 +39,5 @@ Tech info:
 Stores text file in VRAM $20000-$7ffff
 for ease/speed of manipulation with
 blitter. Also uses VRAM $0-$1fff for
-buffer
+buffer.
+

@@ -1,0 +1,11 @@
+
+SQ.EXE - File compressor
+
+Use: SQ (no args)
+
+Notes:
+
+Use "USQ" to unpack
+
+Made in C by Stefano Bodrati
+

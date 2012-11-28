@@ -33,3 +33,4 @@ CHFNT mychars.fff 80
 
 will begin the write at ASCII
 character 128.
+

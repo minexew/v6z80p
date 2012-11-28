@@ -1,0 +1,7 @@
+
+HEXOR - File hex editor
+
+Use: HEXOR filename
+
+Notes: Made in C Enzo.
+

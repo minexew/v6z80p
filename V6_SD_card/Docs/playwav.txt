@@ -11,4 +11,5 @@ Filename can contain path
 Wav file must be 8 bit, mono,
 PCM with sample rate below 30KHz
 
-Wav file size in unlimited
+Wav file size in unlimited.
+

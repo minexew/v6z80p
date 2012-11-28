@@ -1,0 +1,7 @@
+
+CHECKSYS.EXE - System Tester
+
+Use: CHECKSYS (no args)
+
+Self explanatory.
+

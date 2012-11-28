@@ -11,4 +11,5 @@ The picture must be Windows format
 Width must be multiple of x pixels.
 Max dimensions 368x256.
 
-The filename can contain a path
+The filename can contain a path.
+

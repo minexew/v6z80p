@@ -1,9 +1,5 @@
 
 TYPE - Displays simple text files.
 
-Use: TYPE filename
-
-Notes:
-
-Filename can contain path
+Use: TYPE [path/]filename
 

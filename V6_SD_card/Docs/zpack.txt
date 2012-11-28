@@ -1,0 +1,9 @@
+
+ZPACK.EXE - File (un)packer
+
+Use: ZPACK source dest
+
+Notes:
+
+Made in C by Enzo.
+
