@@ -1,0 +1,12 @@
+
+FNTEDIT.EXE - Font editor
+
+Use: FNTEDIT
+
+Notes:
+
+Made in C by Enzo.
+
+See readme.txt file in
+FNTEDIT dir.
+

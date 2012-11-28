@@ -1,0 +1,8 @@
+
+MEMCLR.EXE - clears system RAM
+and video RAM.
+
+Use: MEMCLR (no args)
+
+Notes: Made by Daniel.
+

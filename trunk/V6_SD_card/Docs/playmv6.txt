@@ -1,0 +1,9 @@
+
+PLAYMV6.EXE - Plays MV6 files
+
+Use: PLAYMV6 filename
+
+Notes:
+
+Made by Daniel.
+

@@ -1,0 +1,10 @@
+
+PT3PLAY.EXE - Plays .pt3 format
+music files.
+
+Use: PT3PLAY filename
+
+Notes:
+
+Made by Daniel.
+

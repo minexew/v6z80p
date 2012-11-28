@@ -1,7 +1,7 @@
 
 MODPLAY - Plays Protracker format tunes.
 
-Use: MODPLAY [?] filename
+Use: MODPLAY [?] [path/]filename
 
 Notes:
 
@@ -9,4 +9,3 @@ Total samples in module must be < 448KB
 
 If ? is included, raster time is shown
 
-Filename can include path

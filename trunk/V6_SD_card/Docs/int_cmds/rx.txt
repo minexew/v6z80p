@@ -1,6 +1,6 @@
 
 RX - Receive data from serial comms
-port. places it in RAM and optionally
+port, places it in RAM and optionally
 executes it as code. 
 
 Usage: RX filename address [bank]   

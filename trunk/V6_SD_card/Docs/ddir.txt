@@ -1,0 +1,9 @@
+
+DDIR.EXE - Alternative DIR list
+
+Use: DDIR (no args)
+
+Notes:
+
+ Made in C by Stefano Bordrato
+

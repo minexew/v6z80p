@@ -1,0 +1,9 @@
+
+PCXSHOW.EXE - Shows PCX format pics.
+
+Use: PCXSHOW filename
+
+Notes:
+
+Made in C by Enzo.
+

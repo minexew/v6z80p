@@ -39,10 +39,3 @@ partition, Linux and other operating
 systems may well recognize the others
 too.
 
-Higher partitions may be slower when
-saving data. It seems some cards have
-optimization for the lower sectors
-perhaps because they're expected to
-receive a lot of traffic (FAT table
-updates etc)
-

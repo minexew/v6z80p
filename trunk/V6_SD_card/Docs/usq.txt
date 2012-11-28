@@ -1,0 +1,11 @@
+
+USQ.EXE - File packer
+
+Use: USQ (no args)
+
+Notes:
+
+Use "SQ" to unpack
+
+Made in C by Stefano Bodrati
+

@@ -11,5 +11,6 @@ Notes:
 If destination filename is not supplied
 the source filename is used.
 
-The directories in the paths must exist,
-(they will not be created).
+The directories in the paths must
+exist (they will not be created).
+
