@@ -1,6 +1,8 @@
 ; ***************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.25 *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.26 *
 ; ***************************************************
+;
+; v1.26 - moved list_eeprom_contents routine to external code library
 ;
 ; v1.25 - Backup/restores initial dir
 ;         Layout of slot list updated
@@ -228,8 +230,12 @@ respbad	  xor a
 	  ret
 
 
-	  
 ;------------------------------------------------------------------------------------------------------------------
+
+	 include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
+  
+;------------------------------------------------------------------------------------------------------------------
+
 
 cfg_id              db $ff,$ff,$ff,$ff,$aa,$99,$55,$66		;Xilinx ID string
 
@@ -267,11 +273,8 @@ backup_cursor_position        dw 0
 save_length_lo	    dw 0
 save_length_hi      dw 0
 
-eeprom_id_byte      db 0
 working_slot        db 0
-number_of_slots     db 4             ;including slot 0
 active_slot         db 0
-
 pic_fw_byte         db 0
 
 	
@@ -1671,60 +1674,7 @@ show_slot_ids
           ld hl,current_slots_text
           call kjt_print_string
 
-          call kjt_get_cursor_position
-          ld (cursor_pos),bc
-          
-          ld a,0
-id_loop   ld (working_slot),a
-          ld bc,(cursor_pos)
-          cp 16
-          jr nz,sameside
-          push af
-          ld a,c
-          sub 16
-          ld c,a
-          pop af
-
-sameside  jr c,leftside
-          ld b,20   
-
-leftside  call kjt_set_cursor_position
-          inc c
-          ld (cursor_pos),bc
-
-          ld a,(working_slot)                     
-          ld hl,slot_number_text+1
-          call kjt_hex_byte_to_ascii
-          ld hl,slot_number_text
-          call kjt_print_string
-          
-          ld a,(working_slot)                     ;read in EEPROM page that contains the ID string
-          or a
-          jr nz,notszero
-          ld hl,bootcode_text
-          jr id_ok  
-
-notszero  ld h,a
-          ld l,0
-          add hl,hl
-          ld de,$01fb
-          add hl,de
-          ex de,hl
-          call read_eeprom_page
-          
-          ld hl,page_buffer+$de                   ;location of ID (filename ASCII)
-          ld a,(hl)
-          or a
-          jr z,unk_id
-          bit 7,a
-          jr z,id_ok
-unk_id    ld hl,unknown_text
-id_ok     call kjt_print_string
-          ld hl,number_of_slots
-          ld a,(working_slot)
-          inc a
-          cp (hl)
-          jr nz,id_loop
+          call list_eeprom_contents
           
           call show_active_slot
           ret
@@ -1756,29 +1706,6 @@ endit     call kjt_print_string
           ret
           
 
-          
-read_pic_byte
-
-          ld (hl),0
-          ld c,8                                                   
-nxt_bit   sla (hl)
-          ld a,1<<pic_clock_input                 ; prompt PIC to present next bit by raising PIC clock line
-          out (sys_pic_comms),a
-          ld b,128                                ; wait a while so PIC can keep up..
-pause_lp1 djnz pause_lp1
-          xor a                                   ; drop clock line again
-          out (sys_pic_comms),a
-          in a,(sys_hw_flags)                     ; read the bit into shifter
-          bit 3,a
-          jr z,nobit
-          set 0,(hl)
-nobit     ld b,128
-pause_lp2 djnz pause_lp2
-          dec c
-          jr nz,nxt_bit
-          ret
-
-          
 ;--------------------------------------------------------------------------------------
 
 show_pic_firmware
@@ -1800,7 +1727,7 @@ show_pic_firmware
           
 got_fw    ld hl,pic_fw_figures+1
           call kjt_hex_byte_to_ascii
-          ld hl,pic_fw_figures                              ; show pic fw
+          ld hl,pic_fw_figures                    ; show pic fw
 fw_end    call kjt_print_string
           xor a
           ret
@@ -1809,56 +1736,23 @@ fw_end    call kjt_print_string
 
 show_eeprom_type
 
-          in a,(sys_eeprom_byte)                  ; clear shift reg count with a read
-
-          ld a,$88                                ; send PIC the command to prompt the EEPROM to
-          call send_byte_to_pic                   ; return its ID code byte
-          ld a,$53
-          call send_byte_to_pic
-                
-          ld d,32                                 ; D counts timer overflows
-          ld a,1<<pic_clock_input                 ; prompt PIC to send a byte by raising PIC clock line
-          out (sys_pic_comms),a
-wbc_byte2 in a,(sys_hw_flags)                     ; have 8 bits been received?            
-          bit 4,a
-          jr nz,gbcbyte2
-          in a,(sys_irq_ps2_flags)                ; check for timer overflow..
-          and 4
-          jr z,wbc_byte2      
-          out (sys_clear_irq_flags),a             ; clear timer overflow flag
-          dec d                                   ; dec count of overflows,
-          jr nz,wbc_byte2                                             
-          xor a                                   ; if waited too long give up (and drop PIC clock)
-          out (sys_pic_comms),a
-          jr no_id                                
-gbcbyte2  xor a                         
-          out (sys_pic_comms),a                   ; drop PIC clock line, PIC will then wait for next high 
-          in a,(sys_eeprom_byte)                  ; read byte received, clear bit count
-
-          push af
-          ld hl,eeprom_id_text
+	  call get_eeprom_size
+	  jr z,eid_ok
+	  ld hl,no_id_text
           call kjt_print_string
-          pop af
-
-          cp $bf                                  ; If SST25VF type EEPROM is present, we'll have received
-          jr nz,non_sst                           ; manufacturer's ID ($BF) not the capacity
-
-          ld hl,sst25vf_text
-          call kjt_print_string         
-          ld a,$88                                ; Use alternate "Get EEPROM ID" command to find ID 
-          call send_byte_to_pic                   
-          ld a,$6c
-          call send_byte_to_pic
-          ld hl,eeprom_id_byte                              
-          call read_pic_byte
-          ld a,(hl)
-          jr got_eid
+          ret
+          	  
+eid_ok    ld hl,eeprom_id_text
+          call kjt_print_string
           
-non_sst   push af
-          ld hl,at25x_text
-          call kjt_print_string
-          pop af
-got_eid   ld (eeprom_id_byte),a         
+	  ld hl,at25x_text
+	  ld a,(eeprom_type)
+	  or a                                   
+          jr z,non_sst                           
+          ld hl,sst25vf_text
+non_sst   call kjt_print_string
+
+	  ld a,(eeprom_id_byte)         
           sub $11   
           ld l,a
           ld h,0
@@ -1869,23 +1763,11 @@ got_eid   ld (eeprom_id_byte),a
           ld de,eeprom_id_list
           add hl,de
           call kjt_print_string
-
-          ld a,(eeprom_id_byte)
-          sub $10
-          ld b,a
-          ld a,1
-slotslp   sla a
-          djnz slotslp
-          ld (number_of_slots),a
           ret
 
-no_id     ld hl,no_id_text
-          call kjt_print_string
-          ret
-          
+
           
 ;--------------------------------------------------------------------------------------
-
 
 show_banner
 
@@ -2102,8 +1984,6 @@ oslabel_txt	ds 32,$ff					;label can be 32 chars max
 		
 ;----------------------------------------------------------------------------------------
 
-include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
-
 include "FLOS_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 
 include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
@@ -2111,10 +1991,8 @@ include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 ;----------------------------------------------------------------------------------------
 
 
-
-
 start_text1         db    "                                      ",11
-                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.25   ",11
+                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.26   ",11
                     db    "                                      ",11,0
                     
 start_text2         db 11
@@ -2256,10 +2134,6 @@ warn_active_slot_txt db 11,11,"ERROR! Writing data to a block within",11
                      db "the Active Slot is not allowed!",11,0
 
 current_slots_text  db 11,"Current EEPROM slot contents..",11,11,0
-bootcode_text       db "BOOTCODE ETC",0
-
-slot_number_text    db " xx:",0
-unknown_text        db "UNKNOWN",0
 
 slot_zero_text      db 11,11,"SLOT 0 cannot hold FPGA configs!"
                     db 11,11,"Press any key.",0             
@@ -2268,7 +2142,7 @@ current_slot_txt    db 11,11,"Current Active Slot: "
 active_slot_txt     db "xx",11,11,0
 
 
-eeprom_id_text      db 11,"Detected EEPROM type: ",0
+eeprom_id_text      db 11,"EEPROM: ",0
 at25x_text          db "25*",0
 sst25vf_text        db "SST25VF",0
 
