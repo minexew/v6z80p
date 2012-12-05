@@ -28,7 +28,7 @@ Visible differences between boards
 Installing an FPGA config onto the EEPROM
 -----------------------------------------
 
-1. [Optional: Copy the relevant FPGA config *.bin file to the SD card.]
+1. [Optional: Copy the relevant FPGA config *.v6c (or *.bin) file to the SD card.]
 
 2. Boot into FLOS.
 
@@ -38,7 +38,7 @@ Installing an FPGA config onto the EEPROM
 
 5. Choose an inactive slot.
 
-6. Locate the config .bin file on disk, or send it (from "Config File" folder)
+6. Locate the config .v6c (or .bin) file on disk, or send it (from "Config File" folder)
    with the Serial Link app, choosing the "RS232" option in the dialog box for
    serial download.
 
