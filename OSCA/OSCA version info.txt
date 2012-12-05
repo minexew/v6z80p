@@ -7,6 +7,16 @@ Both support VGA output.
 Updates to OSCA
 ---------------
 
+674 - The upper 4 bits of the OSCA version ID now contain a PCB version code (1=V6Z80P,
+      2=V6+V1.0, 3=V6+v1.1)
+
+    - PS/2 Interface modules changed to synchronous logic. 
+    - PS/2 interface write signal input changed to delayed CPU write (was using raw CPU write)
+
+
+Previous versions
+-----------------
+
 673 - Linecop programs can now be placed anywhere in system RAM (on even byte boundaries)
       so can be upto 212KB in length. Register $20f doubles as Linecop add bits 18:16 when
       written with bit 7 set.
