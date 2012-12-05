@@ -12,6 +12,7 @@
 ; Changes:
 ; --------
 ;
+; v0.11 - Updated EEPROM contents list code.
 ; v0.10 - Requester code 0.28
 ; v0.08 - More easily customizable, supports up to 10 machines
 ; v0.07 - Allows boot (to residos/esxdos) via arguments ("EMU M0" = machine0, "EMU M1" = machine1)
@@ -625,9 +626,7 @@ cr_txt	db 11,0
 ;---------------------------------------------------------------------------------------- 
           
 show_eeprom_slot_contents
-
-          call get_eeprom_type
-          
+	  
           call kjt_clear_screen
 
           call inverse_video
@@ -638,147 +637,8 @@ show_eeprom_slot_contents
           ld hl,eeprom_contents_txt
           call kjt_print_string
           
-          call kjt_get_cursor_position
-          ld (cursor_pos),bc
-          
-          ld a,0
-id_loop   ld (working_slot),a
-          ld bc,(cursor_pos)
-          cp 16
-          jr nz,sameside
-          push af
-          ld a,c
-          sub 16
-          ld c,a
-          pop af
-
-sameside  jr c,leftside
-          ld b,20   
-
-leftside  call kjt_set_cursor_position
-          inc c
-          ld (cursor_pos),bc
-
-          ld a,(working_slot)                     
-          ld hl,slot_number_text
-          call kjt_hex_byte_to_ascii
-          ld hl,slot_text
-          call kjt_print_string
-          ld hl,slot_number_text
-          call kjt_print_string
-          
-          ld a,(working_slot)                     ;read in EEPROM page that contains the ID string
-          or a
-          jr nz,notszero
-          ld hl,bootcode_text
-          jr id_ok  
-
-notszero  ld h,a
-          ld l,0
-          add hl,hl
-          ld de,$01fb
-          add hl,de
-          ex de,hl
-          call read_eeprom_page
-          
-          ld hl,page_buffer+$de                   ;location of ID (filename ASCII)
-          ld a,(hl)
-          or a
-          jr z,unk_id
-          bit 7,a
-          jr z,id_ok
-unk_id    ld hl,unknown_text
-id_ok     call kjt_print_string
-          ld hl,number_of_slots
-          ld a,(working_slot)
-          inc a
-          cp (hl)
-          jr nz,id_loop
-          
-          ret
-
-
-;--------------------------------------------------------------------------------------
-
-
-get_eeprom_type
-
-          in a,(sys_eeprom_byte)                  ; clear shift reg count with a read
-
-          ld a,$88                                ; send PIC the command to prompt the EEPROM to
-          call send_byte_to_pic                   ; return its ID code byte
-          ld a,$53
-          call send_byte_to_pic
-                
-          ld d,32                                 ; D counts timer overflows
-          ld a,1<<pic_clock_input                 ; prompt PIC to send a byte by raising PIC clock line
-          out (sys_pic_comms),a
-wbc_byte2 in a,(sys_hw_flags)                     ; have 8 bits been received?            
-          bit 4,a
-          jr nz,gbcbyte2
-          in a,(sys_irq_ps2_flags)                ; check for timer overflow..
-          and 4
-          jr z,wbc_byte2      
-          out (sys_clear_irq_flags),a             ; clear timer overflow flag
-          dec d                                   ; dec count of overflows,
-          jr nz,wbc_byte2                                             
-          xor a                                   ; if waited too long give up (and drop PIC clock)
-          out (sys_pic_comms),a
-          jr no_id                                
-gbcbyte2  xor a                         
-          out (sys_pic_comms),a                   ; drop PIC clock line, PIC will then wait for next high 
-          in a,(sys_eeprom_byte)                  ; read byte received, clear bit count
-
-          cp $bf                                  ; If SST25VF type EEPROM is present, we'll have received
-          jr nz,got_eid                           ; manufacturer's ID ($BF) not the capacity
-
-          ld b,0                                  ; wait a while to ensure PIC is ready for command
-deloop1   djnz deloop1
-          
-          ld a,$88                                ; Use alternate "Get EEPROM ID" command to find ID 
-          call send_byte_to_pic                   
-          ld a,$6c
-          call send_byte_to_pic
-          ld hl,eeprom_id_byte                              
-          call read_pic_byte
-          ld a,(hl)
-          
-got_eid   ld (eeprom_id_byte),a         
-          sub $10
-          ld b,a
-          ld a,1
-slotslp   sla a
-          djnz slotslp
-          ld (number_of_slots),a
-          ret
-
-no_id     xor a                                   ;error reading eeprom ID
-          inc a
-          ret
-          
-                              
-;----------------------------------------------------------------------------------------
-          
-read_pic_byte
-
-          ld (hl),0
-          ld c,8                                                   
-nxt_bit   sla (hl)
-          ld a,1<<pic_clock_input                 ; prompt PIC to present next bit by raising PIC clock line
-          out (sys_pic_comms),a
-          ld b,128                                ; wait a while so PIC can keep up..
-pause_lp1 djnz pause_lp1
-          xor a                                   ; drop clock line again
-          out (sys_pic_comms),a
-          in a,(sys_hw_flags)                     ; read the bit into shifter
-          bit 3,a
-          jr z,nobit
-          set 0,(hl)
-nobit     ld b,128
-pause_lp2 djnz pause_lp2
-          dec c
-          jr nz,nxt_bit
-          ret
+	  call list_eeprom_contents
+	  ret
 
 ;----------------------------------------------------------------------------------------
 
@@ -1757,7 +1617,7 @@ saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 bad_fn_txt          db 11,"Can't find that file.",11,11,0
 
 banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.10   ",11
+                    db "   Emulator Kickstart V0.11   ",11
                     db "                              ",11,0
           
 machine_txt         db 11,"Selected machine: ",11,11," ",0
@@ -1769,16 +1629,11 @@ boot_into_txt	    db " Boot into ",0
 eeprom_contents_txt db 11,"EEPROM contents:",11,11,0        
 
 slot_prompt_txt     db 11,11,"Please enter the slot which contains",11
-		    db "FPGA Config file for:" ,11,11,0
+		    db "the FPGA Config file for:" ,11,11,0
 
 slot_prompt2_txt    db 11,11,"SLOT? :",0
 	                  
 error_txt           db 11,11,"THERE HAS BEEN AN ERROR!",0
-
-slot_text           db " ",0
-slot_number_text    db "xx - ",0
-unknown_text        db "UNKNOWN",0
-bootcode_text       db "BOOTCODE ETC",0
 
 ;-------------------------------------------------------------------------------------------------
 
@@ -1792,8 +1647,6 @@ arg_string          dw 0
 pen_colour          db 0
 cursor_pos          dw 0
 
-eeprom_id_byte      db 0
-number_of_slots     db 4
 working_slot        db 0
 
 video_page          db 0
