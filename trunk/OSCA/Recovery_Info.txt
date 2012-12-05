@@ -2,7 +2,7 @@ Config Problems
 ---------------
 
 If the FPGA does not receive a valid configuration pattern from the
-EEPROM upon power on, the status LED (on the right below the PIC) will
+EEPROM upon power on, the status LED (on the right, below the PIC) will
 flash slowly (around 1 flash per second). There are various ways to
 fix this..
 
@@ -57,6 +57,7 @@ that the Active Slot selection is pointing at a bad config:
 * Install jumper J2 only
 * Power on (LED flashes rapidly).
 * Remove jumper J2
+* If the LED continues to flash rapidly, briefly install and remove the jumper again.
 * The LED will flash once, pause about 5 seconds, then flash twice,
   pause 5 seconds, then flash three times and so on - the number of flashes
   represents the slot selection. During the pause following the slot selection
