@@ -1,6 +1,6 @@
 
-Spectrum 128 / 48 Emulator for V6Z80P+ by Phil Ruston 2009-2011
---------------------------------------------------------------
+Spectrum 128 / 48 Emulator for V6Z80P/V6+ by Phil Ruston 2009-2012
+------------------------------------------------------------------
 
 This is an "approximate" ZX Spectrum emulator config - it makes
 no attempt to be cycle-perfect, but there are speed adjust keys
@@ -14,12 +14,14 @@ Changes
 
 v x014 - Updated SD card driver for SDHC compatibility
        - Directory listing is faster
+       - Start up file "bootcode.exe" renamed "menu.zxp"
 
 v x013 - Changed ROM code to better activate Spectrum 48 Snapshots
        - Modified "Read from $0067 = Real Spectrum" logic.
        - Added version ID to all configs
        - Bootcode standard across all versions.
        - Keyboard now initializes correctly.
+
 
 ---------------------------
 How to install the emulator
