@@ -35,7 +35,7 @@ To install:
 
     ZXSPEC48.ROM
     ZXSPE128.ROM
-    BOOTCODE.EXE
+    MENU.ZXP
 
    You should also add any snapshot
    files you want to run.
