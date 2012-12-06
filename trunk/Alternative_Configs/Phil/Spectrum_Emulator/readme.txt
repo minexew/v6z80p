@@ -12,6 +12,9 @@ loading only .sna image files.
 Changes
 -------
 
+v x014 - Updated SD card driver for SDHC compatibility
+       - Directory listing is faster
+
 v x013 - Changed ROM code to better activate Spectrum 48 Snapshots
        - Modified "Read from $0067 = Real Spectrum" logic.
        - Added version ID to all configs
@@ -26,7 +29,7 @@ How to install the emulator
    (can be same card used for FLOS etc) (Add more Snapshots to the
    "48snaps" and "128snaps" folders as desired).
 
-2. Install the FPGA config .bin file from the folder "FPGA_CFG"
+2. Install the FPGA config file (.v6c) from the folder "FPGA_CFG"
    to the EEPROM using FLOS command "EEPROM.EXE" (Make sure you select
    the correct file for your version of V6 board) PAL and NTSC versions of
    each board's config file are supplied: filenames ending in "p" are
@@ -67,15 +70,15 @@ Known issues:
 
 * Only the first 44 files/folders in each directory are shown.
 
-* The odd snapshot does not start correctly (EG: Cauldron 2)
+* The occasional snapshot does not start correctly (EG: Cauldron 2)
 
 
 ----
 Tech
 ----
 
-If you remove the bootcode.exe file, you can download one serially
+If you remove the "menu.zxp" file, you can download one serially
 when the error message flashes. This is useful for testing new
-bootcode programs. (Serial comms currenty Untested on v1013)
+bootcode programs. 
 
 
