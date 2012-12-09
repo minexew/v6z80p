@@ -2,7 +2,7 @@
 ;---------------------------------------------------------------------------------------------------
 ; "flat_mem_copy"
 ;
-; Copies data within system memory with flat, linear source/dest addresses using LDIRs were possible
+; Copies data within system memory with flat, linear source/dest addresses using LDIRs
 ;
 ; IMPORTANT:
 ; ----------
@@ -15,7 +15,7 @@
 ; Set C:DE = dest address
 ; Set A:IX = number of bytes to copy
 ;
-; Trashes all registers (but doesnt use: A' BC' DE' HL' or IY)
+; Trashes all registers except  A' BC' DE' HL' IY
 ;
 ;---------------------------------------------------------------------------------------------------
 
