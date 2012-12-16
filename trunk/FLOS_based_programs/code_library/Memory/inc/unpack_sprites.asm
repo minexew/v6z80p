@@ -1,5 +1,5 @@
 ;---------------------------------------------------------------------------------------
-; Unpacks V6Z80P RLE packed data to sprite RAM using flat address for sprite destination
+; Unpacks V6Z80P RLE format packed data to sprite RAM using flat address for sprite destination
 ; version: 0.02
 ;
 ; Notes:
