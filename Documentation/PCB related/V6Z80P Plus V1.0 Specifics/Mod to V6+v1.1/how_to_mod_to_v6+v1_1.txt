@@ -2,8 +2,6 @@
 How to mod a V6+V1.0 PCB to V6+v1.1:
 ====================================
 
-Disclaimer! This procedure is currently untested.
-
 First, make sure you have a V6+1.1 config installed in
 one of the first seven slots. If you don't, the system
 cannot start after the mod (unless you have access
@@ -33,16 +31,20 @@ the Z80 requires.)
 
 
 There are many ways to make the modifications, two
-ways are shown in the .pngs:
+ways are shown in the .pngs in the "method1" and
+"method2" folders.
 
 Method 1 is most like a real V6+v1.1 but requires
-a bit more work.
+a bit more work. This method has been successfully
+used by Martin Lukasec to convert his board.
+
 
 Method 2 is simpler but the 16MHz oscillator is
 unnecessarily driving 2 AND inputs (instead of 1)
 and the FPGA output clock is driving 3 AND inputs
 instead of 1. However, it is not anticipated that
-this will cause trouble.
+this will cause trouble. Disclaimer! This method
+is currently untested.
 
 
 Power connections to the additional 14MHz oscillator are
