@@ -4,7 +4,7 @@
 ; Limitations:
 ; ------------
 ;
-; * Can only write 65536 bytes
+; * Can only write up to 65536 bytes
 ; * Not fast at all! Does not use blitter or even optimal Z80 code.
 ; 
 ; Usage:
@@ -21,9 +21,8 @@
 
 clear_vram	ld l,0
 
-fill_vram	ld a,l
-		ld hl,fvr_fill_byte
-		ld (hl),a
+fill_vram	ld ix,fvr_fill_byte
+		ld (ix),l
 		
 		push de
 		sla d
@@ -38,6 +37,8 @@ fill_vram	ld a,l
 		ld (ix),a
 		
 		call kjt_page_in_video		
+		
+		ld hl,fvr_fill_byte
 		
 fvr_fvrb	ld a,d
 		and %00011111
