@@ -1,6 +1,6 @@
 
 ;-----------------------------------------------------------------------------------------------------
-; "load_flat" - Load file using flat memory address
+; "load_flat" - Load file to system RAM using flat memory address
 ;
 ; Set:
 ; A:HL = Dest address ($0-$7ffff)
@@ -19,7 +19,7 @@ load_flat	call convert_flat_to_banked
 
 
 ;------------------------------------------------------------------------------------------------------
-; "save_flat" - Save file using flat memory address
+; "save_flat" - Save file from system RAM using flat memory address
 ;
 ; Set:
 ; A:HL = Sysram source address ($0-$7ffff)
