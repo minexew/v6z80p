@@ -44,7 +44,9 @@
 ; "osca_play_tracker"       - Call each frame to process and play tune. (This calls "pt_play"
 ;                             and "osca_update_audio_hardware", skipping every 6th update if OSCA
 ;                             is in 60Hz mode. If this feature is not required, EG running on Timer IRQs
-;			      then "pt_play" then "osca_update_audio_hardware" can be called in sequence)
+;			      then "pt_play" then "osca_update_audio_hardware" can be called instead)
+;
+; "osca_silence"            - Call this when playback has stopped to silence the sound channels
 ;
 ;----------------------------------------------------------------------------------------
 
@@ -408,6 +410,18 @@ loop2     in a,(sys_vreg_read)
 
 ;------------------------------------------------------------------------------------------
 
+osca_silence
+          
+	  xor a
+          out (sys_audio_enable),a      		; silence channels
+          out (audchan0_vol),a
+	  out (audchan1_vol),a
+	  out (audchan2_vol),a
+	  out (audchan3_vol),a
+	  ret
+
+;------------------------------------------------------------------------------------------
+ 	
 pt_read_module_byte	
 
 ; set DE to offset from start of module for byte required
