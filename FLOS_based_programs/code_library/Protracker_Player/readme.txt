@@ -1,5 +1,5 @@
 
-Notes for latest version: Protracker_code_v515.asm  (Requires OSCA672+)
+Notes for latest version: "osca_modplayer_v515.asm"  (Requires OSCA672+)
 -----------------------------------------------------------------------
 
 (See source code for full info).
@@ -8,8 +8,8 @@ Module size limitations have been removed in this version. If the module is in
 banked memory (IE: outside the first 64KB of system RAM) the replay routine must be
 in unpaged memory.
  
-To use, include "osca_modplay_v515.asm" into the source of you app (this contains
-an include for the generic Z80 portion of the code).
+To use, include "osca_modplay_v515.asm" into the source of your program (this contains
+an include directive for the file "generic_Z80_modplayer.asm" which is also required).
 
 
 Labels required:
