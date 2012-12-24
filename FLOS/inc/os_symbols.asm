@@ -1,5 +1,5 @@
 ;----------------------------
-; OS SYMBOLS / EQUATES V5.03
+; OS SYMBOLS / EQUATES V5.04
 ;----------------------------
 
 ; Assemble this prior to os_code to create symbols included into that file
@@ -8,14 +8,10 @@
 ; VARIABLE BANK USED BY OS - 256 BYTES MAXIMUM  (located at OS_variables)
 ;------------------------------------------------------------------------
 
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
-
 OS_window_cols equ 40
 OS_window_rows equ 25
 
-
-	org OS_variables 
+	org $0b00		; Location of OS variable table (max 256 bytes)
 
 ;---------------------------------------------------------------------------------------------
 
