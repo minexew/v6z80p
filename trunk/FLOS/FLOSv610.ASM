@@ -2702,17 +2702,17 @@ os_get_display_size
 
 os_readmemflat
 
-	ld c,sys_mem_select		;put byte from memory location E:HL into A
-	ld a,h
-	rlca			;convert flat memory location to bank:addr
-	rl e
-	jr z,lopage1
-	set 7,h
-lopage1	in b,(c)			;get current bank
-	out (c),e			;set bank reqd for read
-	ld a,(hl)			;get byte at location in A
-	out (c),b			;restore original bank
-	ret	
+	ld c,sys_mem_select		;7 put byte from memory location E:HL into A
+	ld a,h				;4
+	rlca				;4 convert flat memory location to bank:addr
+	rl e				;8
+	jr z,lopage1			;13
+	set 7,h				;8
+lopage1	in b,(c)			;12 get current bank
+	out (c),e			;12 set bank reqd for read
+	ld a,(hl)			;7  get byte at location in A
+	out (c),b			;12 restore original bank
+	ret				;10
 
 
 os_writememflat
