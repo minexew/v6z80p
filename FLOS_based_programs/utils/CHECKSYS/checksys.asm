@@ -76,7 +76,7 @@ test_sdcard	call sd_tests
 		
 		
 menu_txt	db "--------------------------",11
-		db "V6Z80P System Tester V1.04",11
+		db "V6Z80P System Tester V1.05",11
 		db "--------------------------",11,11
 		db "Press:",11,11
 		db "1. For keyboard tests",11
@@ -96,7 +96,7 @@ menu_txt	db "--------------------------",11
 
 	include "FLOS_based_programs\utils\checksys\joystick_test.asm"
 	include "FLOS_based_programs\utils\checksys\keyboard_tests.asm"
-	include "FLOS_based_programs\utils\checksys\serial_tests.asm"
+	include "FLOS_based_programs\utils\checksys\serial_tests_675.asm"
 	include "FLOS_based_programs\utils\checksys\mouse_test.asm"
 	include "FLOS_based_programs\utils\checksys\memory_tests.asm"
 	include "FLOS_based_programs\utils\checksys\video_tests.asm"
