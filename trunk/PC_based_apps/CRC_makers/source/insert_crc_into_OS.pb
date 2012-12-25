@@ -6,7 +6,7 @@
 ; Get the OS file
 ;-------------------------------------------------------------------------------------
 
-    srcfile$ = OpenFileRequester("Select an OS file for CRC insertion","",".bin files (.bin)|*.bin|All Files(*.*)|*.*",0)
+    srcfile$ = OpenFileRequester("Select an OS file for CRC insertion","",".exe files (.exe)|*.exe|All Files(*.*)|*.*",0)
     
     If ReadFile(0,srcfile$) 
       sourcesize_bc = Lof(0)                                  ; get the length of opened file
@@ -79,6 +79,6 @@ EndIf
 End
 
 ; IDE Options = PureBasic 4.30 (Windows - x86)
-; CursorPosition = 40
+; CursorPosition = 8
 ; Folding = -
 ; Executable = ..\..\..\FLOS\apps\insert_crc_into_OS.exe
