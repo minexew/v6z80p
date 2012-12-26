@@ -12,6 +12,7 @@
 ; Changes:
 ; --------
 ;
+; v0.12 - Reassembled with EEPROM routines v1.03
 ; v0.11 - Updated EEPROM contents list code.
 ; v0.10 - Requester code 0.28
 ; v0.08 - More easily customizable, supports up to 10 machines
@@ -295,33 +296,15 @@ basic_reconfigure
 
           call copy_bank_switch_code_to_vram
                     
-go_cfg    ld a,$88                                ; send "set config base" command
-          call send_byte_to_pic
-          ld a,$b8
-          call send_byte_to_pic
-          ld a,$00                      
-          call send_byte_to_pic                   ; send address low
-          ld a,$00            
-          call send_byte_to_pic                   ; send address mid
-          
-          ld a,(machine_selection)
+go_cfg    ld a,(machine_selection)
           ld e,a
           ld d,0
           ld hl,machine_slot_list
           add hl,de
           ld a,(hl)
-          sla a
-          call send_byte_to_pic                   ; send address high
-
-          ld a,$88                                ; send reconfigure command
-          call send_byte_to_pic
-          ld a,$a1
-          call send_byte_to_pic
-
-
-stop_here jr stop_here
-          
-          
+	  jp eeprom_reconfig
+	  
+         
 ;------------------------------------------------------------------------------------------
 
 
@@ -637,7 +620,7 @@ show_eeprom_slot_contents
           ld hl,eeprom_contents_txt
           call kjt_print_string
           
-	  call list_eeprom_contents
+	  call eeprom_slot_list
 	  ret
 
 ;----------------------------------------------------------------------------------------
@@ -967,13 +950,17 @@ prior_vol	db 0
 
 ;-----------------------------------------------------------------------------------------------------
 
-include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
+	include "flos_based_programs\code_library\eeprom\inc\eeprom_subroutines.asm"
+	include "flos_based_programs\code_library\eeprom\inc\eeprom_read.asm"
+	include "flos_based_programs\code_library\eeprom\inc\eeprom_interogation.asm"
+	include "flos_based_programs\code_library\eeprom\inc\eeprom_slot_list.asm"
+	include "flos_based_programs\code_library\eeprom\inc\eeprom_config.asm"
+	
+	include "FLOS_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
 
-include "FLOS_based_programs\code_library\requesters\inc\file_requesters_with_rs232.asm"
+	include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
-include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
-
-include "flos_based_programs\code_library\string\inc\extract_path_and_filename.asm"
+	include "flos_based_programs\code_library\string\inc\extract_path_and_filename.asm"
 
 ;----------------------------------------------------------------------------------------
 
@@ -1617,7 +1604,7 @@ saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 bad_fn_txt          db 11,"Can't find that file.",11,11,0
 
 banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.11   ",11
+                    db "   Emulator Kickstart V0.12   ",11
                     db "                              ",11,0
           
 machine_txt         db 11,"Selected machine: ",11,11," ",0
@@ -1628,7 +1615,7 @@ boot_into_txt	    db " Boot into ",0
 
 eeprom_contents_txt db 11,"EEPROM contents:",11,11,0        
 
-slot_prompt_txt     db 11,11,"Please enter the slot which contains",11
+slot_prompt_txt     db 11,"Please enter the slot which contains",11
 		    db "the FPGA Config file for:" ,11,11,0
 
 slot_prompt2_txt    db 11,11,"SLOT? :",0
@@ -1645,9 +1632,6 @@ args_set            db 0
 arg_string          dw 0
 
 pen_colour          db 0
-cursor_pos          dw 0
-
-working_slot        db 0
 
 video_page          db 0
 page_address        dw 0
@@ -1667,8 +1651,6 @@ dir_cache           dw 0
 
 vram_load_addr_hi   db $0               ;bits 23:16 of the VRAM load address
 vram_load_addr_lo   dw $0000            ;bits 15:0 of the VRAM load address
-
-page_buffer         ds 256,0
 
 load_buffer         ds buffer_size,0
 
