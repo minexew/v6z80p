@@ -2,6 +2,27 @@
 Current FLOS version:
 ---------------------
 
+v6.11 - 24/12/2012
+
+
+	Fixed:	 Previously, loading very small external commands (<16 bytes) returned error "Read beyond EOF" 
+
+	Changed: Reformatted all source to Tab size 8
+
+	Changed: Updated FAT16 routines - consistancy (any time A returns an error code, ZF is not set)
+  		 
+	Changed: 'OS_symbols.symbols' file changed to 'OS_variables.symbol' (main equates now included
+		 into main FLOS source)
+	
+	Changed: FLOS now assembled from Programmer's Notepad like any other program (use the .bat file to
+ 		 rebuild "flos_variables.symbol" when necessary) and use app "INSERT_CRC_INTO_OS.EXE"
+         	 to make release version of FLOS.
+
+
+
+Previous changes:
+-----------------
+
 v6.10 - 15/11/2012
 
         Improvement: DE,HL,BC are now pushed and popped around "scroll up" - there was an inconsitancy
@@ -23,9 +44,6 @@ v6.10 - 15/11/2012
                      (which has been updated to suit). An offset word to an OS label is now placed at header $0E
 
 
-
-Previous changes:
------------------
 
 
 v6.09 - 31/10/2012  

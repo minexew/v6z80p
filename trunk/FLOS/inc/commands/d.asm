@@ -5,48 +5,48 @@
 
 os_cmd_d:
 
-	ld de,$ffff
-	ld (disend),de		; default end address
+		ld de,$ffff
+		ld (disend),de		; default end address
 		
-	call hexword_or_bust	; the call only returns here if the hex in DE is valid
-	jr z,startdis		; in no args, use last address (no address supplied)
+		call hexword_or_bust	; the call only returns here if the hex in DE is valid
+		jr z,startdis		; in no args, use last address (no address supplied)
 
 dvalidhex	ld (DISADD),de
 
-	call hexword_or_bust	; the call only returns here if the hex in DE is valid
-	jr z,startdis		; get end address if supplied
-	ld (disend),de		; use specifed end location
+		call hexword_or_bust	; the call only returns here if the hex in DE is valid
+		jr z,startdis		; get end address if supplied
+		ld (disend),de		; use specifed end location
 	
 startdis	xor a			; start disassembly listing
-	ld (os_linecount),a
+		ld (os_linecount),a
 
-disloop	ld hl,mdis_txt
-	call os_print_string	; show "> "
+disloop		ld hl,mdis_txt
+		call os_print_string	; show "> "
 	
-	ld de,(DISADD)
-	call z80dis_jk
-	ld (DISADD),de		; new location
+		ld de,(DISADD)
+		call z80dis_jk
+		ld (DISADD),de		; new location
 
-	call os_new_line
+		call os_new_line
 	
-	ld hl,(disend)
-	xor a
-	sbc hl,de
-	jr nc,d_cline
-	call os_new_line
-	xor a
-	ret
+		ld hl,(disend)
+		xor a
+		sbc hl,de
+		jr nc,d_cline
+		call os_new_line
+		xor a
+		ret
 	
-d_cline	call os_count_lines
-	ld a,"y"
-	cp b
-	jr z,disloop
+d_cline		call os_count_lines
+		ld a,"y"
+		cp b
+		jr z,disloop
 
 dcmddone	xor a
-	ret
+		ret
 
 mdis_txt
-	db "< ",0
+		db "< ",0
 	
 ; ======================================================================================
 ; DIS-Z80 by John Kerr, published in the SUBSET column of Personal Computer World 1987.

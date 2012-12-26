@@ -4,11 +4,11 @@
 
 os_cmd_remount
 
-	xor a			;quiet mode off			
-	call os_mount_with_ex0
-	call os_new_line
-	xor a
-	ret
+		xor a				;quiet mode off			
+		call os_mount_with_ex0
+		call os_new_line
+		xor a
+		ret
 
 ;-----------------------------------------------------------------------------------------------
 	
