@@ -1,4 +1,4 @@
-; boot.exe command - reconfigs the FPGA. v1.03
+; boot.exe command - reconfigs the FPGA. v1.04
 ;
 ; Changes: 1.02 - when run without args, the EEPROM contents are displayed
 
@@ -36,7 +36,7 @@ include 	"flos_based_programs\code_library\program_header\inc\test_flos_version.
 		call kjt_clear_screen			;if args = null, show slot contents etc	
 		ld hl,contents_txt
 		call kjt_print_string
-		call list_eeprom_contents	
+		call eeprom_slot_list	
 		ld hl,slot_prompt_txt
 		call kjt_print_string
 		ld a,2
@@ -69,25 +69,9 @@ op2wait		xor a
 		call kjt_timer_wait
 		djnz op2wait					
 
-		ld a,$88				; send "set config base" command
-		call send_byte_to_pic
-		ld a,$b8
-		call send_byte_to_pic
-		ld a,$00			
-		call send_byte_to_pic			; send address low
-		ld a,$00		
-		call send_byte_to_pic			; send address mid
 		ld a,(slot_number)
-		sla a
-		call send_byte_to_pic			; send address high
-
-		ld a,$88				; send reconfigure command
-		call send_byte_to_pic
-		ld a,$a1
-		call send_byte_to_pic
-infloop		jr infloop
-
-
+		jp eeprom_reconfig
+		
 ;--------------------------------------------------------------------------------------
 
 badslot		ld hl,badslot_txt
@@ -98,27 +82,26 @@ badslot		ld hl,badslot_txt
 
 ;--------------------------------------------------------------------------------------
 
-include "FLOS_based_programs\code_library\eeprom\inc\eeprom_routines.asm"
-
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_subroutines.asm"
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_read.asm"
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_interogation.asm"
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_slot_list.asm"
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_config.asm"
+		
 ;-------------------------------------------------------------------------------------------------
 
 slot_number	db 0
-
-cursor_pos	dw 0
-
-working_slot	db 0
 
 ;------------------------------------------------------------------------------------------
 
 contents_txt		db 11,"           EEPROM CONTENTS:",11
 			db "           ----------------",11,11,0
 
-page_buffer		ds 256,0
-
 ;------------------------------------------------------------------------------------------
 
 reconfig_txt		db 11,11,"Reconfiguring...",0
 badslot_txt		db 11,11,"Invalid slot selection.",11,0
-slot_prompt_txt		db 11,11,"Enter slot to configure from: ",0
+slot_prompt_txt		db 11,"Enter slot to configure from: ",0
 
 ;-------------------------------------------------------------------------------------------
+
