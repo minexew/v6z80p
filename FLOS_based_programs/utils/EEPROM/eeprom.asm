@@ -2,6 +2,8 @@
 ; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.26 *
 ; ***************************************************
 ;
+; v1.27 - bugfix: reported OS version on eeprom was mangled.
+;
 ; v1.26 - moved list_eeprom_contents routine to external code library
 ;
 ; v1.25 - Backup/restores initial dir
@@ -1894,7 +1896,6 @@ no_ebc_txt	db "None",0
 
 ;--------------------------------------------------------------------------------------------------------------------
 
-
 show_eeprom_os_status
 
 		ld hl,os_txt
@@ -1918,68 +1919,54 @@ cmposn		ld a,(de)
 		jr nz,gotoslab
 unkeos		ld hl,unkos_txt
 		call kjt_print_string
-		xor a
 		ret
 		
-gotoslab	ld hl,$0800				;move to page offset of label
+gotoslab	ld hl,$0800				;move to eeprom page where label resides
 		add hl,de
 		jr c,unkeos
 		ld e,h
 		ld d,0
-		push hl
 		call read_eeprom_page
-		pop hl
 		ld h,0
+		push hl
+		pop ix
 		ld bc,page_buffer
-		add hl,bc				;in-page label address
-		ld bc,oslabel_txt
-cpylab1		ld a,(bc)
+		add ix,bc				;in-page label address
+		ld iy,oslabel_txt
+		ld b,32
+cpyoslab	ld a,(ix)
+		ld (iy),a
 		or a
 		jr z,showoslab
-		ld a,(hl)
-		ld (bc),a
-		or a
-		jr z,showoslab
-		inc bc
+		inc ix
+		inc iy
 		inc l
-		jr nz,cpylab1
-		inc de					;in case label crosses page
-		push bc
-		call read_eeprom_page
-		pop bc
-		ld hl,page_buffer
-cpylab2		ld a,(bc)
-		or a
-		jr z,showoslab
-		ld a,(hl)
-		ld (bc),a
-		or a
-		jr z,showoslab
-		inc bc
-		inc l
-		jr nz,cpylab2
+		jr z,nextepage
+cpyoslab_cont	djnz cpyoslab
 		
 showoslab	ld hl,oslabel_txt
 		call kjt_print_string
-		xor a
 		ret
 		
-		
+nextepage	inc de					;in case label crosses page
+		call read_eeprom_page
+		ld ix,page_buffer
+		jr cpyoslab_cont
+				
 noeos		ld hl,noos_txt
 		call kjt_print_string
-		xor a
-		inc a
 		ret
 		
 
-os_txt		db 11,"OS currently on EEPROM: ",11,11,0
+os_txt		db 11,"OS on EEPROM: ",0
 z80_OS_txt	db "Z80P*OS*"
 
-noos_txt	db "No OS installed.",0
+noos_txt	db "None",0
 unkos_txt	db "Yes, but no label.",0
 
 oslabel_txt	ds 32,$ff					;label can be 32 chars max
 		db 0
+		
 		
 		
 ;----------------------------------------------------------------------------------------
@@ -1992,7 +1979,7 @@ include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
 
 start_text1         db    "                                      ",11
-                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.26   ",11
+                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.27   ",11
                     db    "                                      ",11,0
                     
 start_text2         db 11
