@@ -148,49 +148,38 @@ unkeos		ld hl,unkos_txt
 		call kjt_print_string
 		ret
 		
-gotoslab	ld hl,$0800				;move to page offset of label
+gotoslab	ld hl,$0800				;move to eeprom page where label resides
 		add hl,de
 		jr c,unkeos
 		ld e,h
 		ld d,0
-		push hl
 		call read_eeprom_page
-		pop hl
 		ld h,0
+		push hl
+		pop ix
 		ld bc,page_buffer
-		add hl,bc				;in-page label address
-		ld bc,oslabel_txt
-cpylab1		ld a,(bc)
+		add ix,bc				;in-page label address
+		ld iy,oslabel_txt
+		ld b,32
+cpyoslab	ld a,(ix)
+		ld (iy),a
 		or a
 		jr z,showoslab
-		ld a,(hl)
-		ld (bc),a
-		or a
-		jr z,showoslab
-		inc bc
+		inc ix
+		inc iy
 		inc l
-		jr nz,cpylab1
-		inc de					;in case label crosses page
-		push bc
-		call read_eeprom_page
-		pop bc
-		ld hl,page_buffer
-cpylab2		ld a,(bc)
-		or a
-		jr z,showoslab
-		ld a,(hl)
-		ld (bc),a
-		or a
-		jr z,showoslab
-		inc bc
-		inc l
-		jr nz,cpylab2
+		jr z,nextepage
+cpyoslab_cont	djnz cpyoslab
 		
 showoslab	ld hl,oslabel_txt
 		call kjt_print_string
 		ret
 		
-		
+nextepage	inc de					;in case label crosses page
+		call read_eeprom_page
+		ld ix,page_buffer
+		jr cpyoslab_cont
+				
 noeos		ld hl,noos_txt
 		call kjt_print_string
 		ret
@@ -204,7 +193,7 @@ unkos_txt	db "Yes, but no label.",0
 
 oslabel_txt	ds 32,$ff					;label can be 32 chars max
 		db 0
-		
+	
 ;--------------------------------------------------------------------------------------------------------------------
 		
 		
