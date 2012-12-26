@@ -265,23 +265,14 @@ verloop		dec b
 		srl b
 		ret
 
-;---------------------------------------------------------------------------------------------------------------
 
+;---------------------------------------------------------------------------------------------------------------
 
 show_active_slot
 
-		ld a,$88                                ; send PIC the command to prompt it to
-		call send_byte_to_pic                   ; return the slot pointer MSB
-		ld a,$76
-		call send_byte_to_pic
-	    
-		ld hl,active_slot                       ; read bits from PIC RB7 
-		call read_pic_byte
-		srl (hl)
-		ld a,(hl)                               ; if slot returns $00, the PIC code does not support the command
-		or a                                    ; so cannot show active slot text
-		jr nz,got_acts
-	
+		call get_active_slot              ; if ZF not set, the PIC code does not support the command
+		jr z,got_acts                     ; so cannot show active slot text
+
 		ld hl,old_pic_fw
 		jr endit
 	  
@@ -303,301 +294,71 @@ show_pic_firmware
 		ld hl,pic_fw_text
 		call kjt_print_string
 		  
-		ld a,$88                                ; send PIC the command to prompt it to
-		call send_byte_to_pic                   ; return its firmware byte
-		ld a,$4e
-		call send_byte_to_pic
-		ld hl,pic_fw_byte                       ; read bits from PIC RB7 
-		call read_pic_byte
-		ld a,(hl)                               
-		or a                                    
-		jr nz,got_fw
+		call get_pic_fw                         ; if fw byte > $00, the PIC firmware is v618+
+ 		jr z,got_fw
 		ld hl,pic_fw_unknown_text
 		jr fw_end
-		  
+ 		  
 got_fw  	ld hl,pic_fw_figures+1
 		call kjt_hex_byte_to_ascii
-		ld hl,pic_fw_figures                              ; show pic fw
+		ld hl,pic_fw_figures                    ; show pic fw
 fw_end		call kjt_print_string
 		xor a
 		ret
 
 
-;--------------------------------------------------------------------------------------
-
-        
-read_pic_byte	ld (hl),0
-		ld c,8                                                   
-nxt_bit		sla (hl)
-		ld a,1<<pic_clock_input                 ; prompt PIC to present next bit by raising PIC clock line
-		out (sys_pic_comms),a
-		ld b,128                                ; wait a while so PIC can keep up..
-pause_lp1	djnz pause_lp1
-		xor a                                   ; drop clock line again
-		out (sys_pic_comms),a
-		in a,(sys_hw_flags)                     ; read the bit into shifter
-		bit 3,a
-		jr z,nobit
-		set 0,(hl)
-nobit		ld b,128
-pause_lp2	djnz pause_lp2
-		dec c
-		jr nz,nxt_bit
-		ret
 
 ;--------------------------------------------------------------------------------------
 
 show_eeprom_type
-
-		in a,(sys_eeprom_byte)                  ; clear shift reg count with a read
-		ld a,$88                                ; send PIC the command to prompt the EEPROM to
-		call send_byte_to_pic                   ; return its ID code byte
-		ld a,$53
-		call send_byte_to_pic
-			
-		ld d,32                                 ; D counts timer overflows
-		ld a,1<<pic_clock_input                 ; prompt PIC to send a byte by raising PIC clock line
-		out (sys_pic_comms),a
-wbc_byte2	in a,(sys_hw_flags)                     ; have 8 bits been received?            
-		bit 4,a
-		jr nz,gbcbyte2
-		in a,(sys_irq_ps2_flags)                ; check for timer overflow..
-		and 4
-		jr z,wbc_byte2      
-		out (sys_clear_irq_flags),a             ; clear timer overflow flag
-		dec d                                   ; dec count of overflows,
-		jr nz,wbc_byte2                                             
-		xor a                                   ; if waited too long give up (and drop PIC clock)
-		out (sys_pic_comms),a
-		jr no_id                                
-gbcbyte2	xor a                         
-		out (sys_pic_comms),a                   ; drop PIC clock line, PIC will then wait for next high 
-		in a,(sys_eeprom_byte)                  ; read byte received, clear bit count
-
-		push af
+		
 		ld hl,eeprom_id_text
 		call kjt_print_string
-		pop af
-
-		cp $bf                                  ; If SST25VF type EEPROM is present, we'll have received
-		jr nz,non_sst                           ; manufacturer's ID ($BF) not the capacity
-
+		
+		call get_eeprom_size
+		jr nz,no_id
+		
 		ld hl,sst25vf_text
-		call kjt_print_string         
-		ld a,$88                                ; Use alternate "Get EEPROM ID" command to find ID 
-		call send_byte_to_pic                   
-		ld a,$6c
-		call send_byte_to_pic
-		ld hl,eeprom_id_byte                              
-		call read_pic_byte
-		ld a,(hl)
-		jr got_eid
-		  
-non_sst		push af
+		bit 0,e
+		jr nz,sst_type_epr
 		ld hl,at25x_text
+sst_type_epr	call kjt_print_string
+		
+		ld a,d
+		ld hl,epr_id_list
+		ld bc,end_id_list-epr_id_list
+		cpir
 		call kjt_print_string
-		pop af
-got_eid		ld (eeprom_id_byte),a         
-		sub $11   
-		ld l,a
-		ld h,0
-		add hl,hl
-		add hl,hl
-		add hl,hl
-		add hl,hl
-		ld de,eeprom_id_list
-		add hl,de
-		call kjt_print_string
-
-		ld a,(eeprom_id_byte)
-		sub $10
-		ld b,a
-		ld a,1
-slotslp		sla a
-		djnz slotslp
-		ld (number_of_slots),a
 		ret
-
+		
 no_id		ld hl,no_id_text
 		call kjt_print_string
 		ret
 
 
-;-------- EEPROM CONSTANTS -------------------------------------------------------------
-
-pic_data_input	 equ 0	; from FPGA to PIC (bit 0 of sys_pic_comms)
-pic_clock_input	 equ 1	; from FPGA to PIC (bit 1 of sys_pic_comms)
-pic_clock_output equ 3	; from PIC to FPGA (bit 3 of sys_hw_flags) 
-
-;----------------------------------------------------------------------------------------------------------	
-
-send_byte_to_pic
-
-; put byte to send in A
-; Bit rate ~ 50KHz (Transfer ~ 4.7KBytes/Second)
-
-		push bc
-		push de
-		ld c,a			
-		ld d,8
-bit_loop
-		xor a
-		rl c
-		jr nc,zero_bit
-		set pic_data_input,a
-zero_bit
-		out (sys_pic_comms),a		; present new data bit
-		set pic_clock_input,a
-		out (sys_pic_comms),a		; raise clock line
-		
-		ld b,12
-psbwlp1		djnz psbwlp1			; keep clock high for 10 microseconds
-			
-		res pic_clock_input,a
-		out (sys_pic_comms),a		; drop clock line
-		
-		ld b,12
-psbwlp2		djnz psbwlp2			; keep clock low for 10 microseconds
-		
-		dec d
-		jr nz,bit_loop
-
-		ld b,60				; short wait between bytes ~ 50 microseconds
-pdswlp		djnz pdswlp			; allows time for PIC to act on received byte
-		pop de				; (PIC will wait 300 microseconds for next clock high)
-		pop bc
-		ret			
-
-
-;-------------------------------------------------------------------------------------------
-
-
-wait_pic_busy	push de
-		ld de,0
-	
-wait_pic	in a,(sys_irq_ps2_flags)	; check for timer overflow..
-		and 4
-		jr z,test_pic	
-		out (sys_clear_irq_flags),a	; clear timer overflow flag
-		inc de				; inc count of overflows
-		ld a,d
-		cp 5
-		jr nz,test_pic			; every 256 DE increments = 1 second		
-		pop de
-		scf				; timed out error - carry flag set
-		ret
-	
-test_pic	in a,(sys_hw_flags)		; if PIC is holding its clock output high it is
-		bit pic_clock_output,a		; busy and cannot accept data bytes at this time
-		jr nz,wait_pic
-		pop de
-		scf
-		ccf				; carry flag zero if OK
-		ret
-
-;---------------------------------------------------------------------------------
-
-read_eeprom_page
-
-		push hl			;put page number to read to buffer in DE
-		push de
-		push bc
-		
-		ld a,d
-		ld (page_hi),a
-		ld a,e
-		ld (page_med),a
-		
-		in a,(sys_eeprom_byte)		;at outset, clear input byte shift count with a read
-		
-		ld a,$88			;send "set databurst location" command
-		call send_byte_to_pic
-		ld a,$d4
-		call send_byte_to_pic
-		ld a,$00			
-		call send_byte_to_pic		;send address low
-		ld a,(page_med)	
-		call send_byte_to_pic		;send address mid
-		ld a,(page_hi)
-		call send_byte_to_pic		;send address high
-		
-		ld a,$88			;send "set databurst location" command
-		call send_byte_to_pic
-		ld a,$e2
-		call send_byte_to_pic
-		ld a,$00			
-		call send_byte_to_pic		;send length low
-		ld a,$01	
-		call send_byte_to_pic		;send length mid
-		ld a,$00
-		call send_byte_to_pic		;send length high
-		
-		ld a,$88			;send "start databurst" command
-		call send_byte_to_pic
-		ld a,$c9
-		call send_byte_to_pic
-
-		ld hl,page_buffer		; download loop.. 
-		ld bc,$100			; page = 256 bytes                 
-nxt_byte
-		ld d,0				; D counts timer overflows
-		ld a,1<<pic_clock_input		; raise clock to prompt PIC to send a byte
-		out (sys_pic_comms),a
-wbc_byte
-		in a,(sys_hw_flags)		; have 8 bits been received?		
-		bit 4,a
-		jr nz,gbcbyte
-		in a,(sys_irq_ps2_flags)	; check for timer overflow..
-		and 4
-		jr z,wbc_byte	
-		out (sys_clear_irq_flags),a	; clear timer overflow flag
-		inc d				; inc count of overflows,
-		jr nz,wbc_byte			
-		ld a,1				; timed out error
-		pop bc
-		pop de
-		pop hl
-		ret
-					
-gbcbyte		xor a				; drop pic clock
-		out (sys_pic_comms),a	
-		in a,(sys_eeprom_byte)		; read byte received (clears bit count)
-		ld (hl),a			; copy to dest, loop back to wait for next byte
-		inc hl
-		dec bc
-		ld a,b
-		or c
-		jr nz,nxt_byte
-		pop bc
-		pop de
-		pop hl
-		xor a
-		ret
-		
+;----------------------------------------------------------------------------------------------------------------
+ 
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_subroutines.asm"
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_read.asm"
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_interogation.asm"
+		include "flos_based_programs\code_library\eeprom\inc\eeprom_slot_list.asm"
 
 ;----------------------------------------------------------------------------------------------------------------
  		  
 eeprom_id_text      db "EEPROM type: ",0
-at25x_text          db "25*",0
+at25x_text          db "25x",0
 sst25vf_text        db "SST25VF",0
 
-eeprom_id_list      db "20 (256KB)",11,0,0,0,0,0  ;id = $11
-                    db "40 (512KB)",11,0,0,0,0,0  ;id = $12
-                    db "80 (1MB)  ",11,0,0,0,0,0  ;id = $13
-                    db "16 (2MB)  ",11,0,0,0,0,0  ;id = $14
-                    db "32 (4MB)  ",11,0,0,0,0,0  ;id = $15
-                    db "64 (8MB)  ",11,0,0,0,0,0  ;id = $16
+epr_id_list	    db $11,"20 (256KB)",11,0
+                    db $12,"40 (512KB)",11,0
+                    db $13,"80 (1MB)",11,0
+                    db $14,"16 (2MB)",11,0
+                    db $15,"32 (4MB)",11,0
+                    db $16,"64 (8MB)",11,0
+end_id_list	    db 0
 
+no_id_text          db "EEPROM type: Unknown, 25x40?",0
 
-no_id_text          db "EEPROM type: Unknown, probably 25x40",0
-
-eeprom_id_byte      db 0
-working_slot        db 0
-
-number_of_slots     db 4                          ;including slot 0
-
-
-active_slot         db 0
 act_slot_text       db "FPGA power-on boot slot: ",0
 act_slot_figures    db "xx",0         	
 
@@ -605,16 +366,7 @@ old_pic_fw	    db "FPGA boot slot: Unknown (Old PIC FW)",11,0
 
 pic_fw_text         db 11,"Config PIC firmware: ",0
 pic_fw_figures      db "6xx",11,0
-pic_fw_unknown_text db "Unknown (Old version)",11,0
-pic_fw_byte         db 0
-
-		    org ($+$ff)&$ff00
-		    
-page_buffer	    ds 256,0
-
-page_lo	 	    db 0
-page_med	    db 0
-page_hi		    db 0
+pic_fw_unknown_text db "Unknown (Old?)",11,0
 
 ;==============================================================================================================
  	
