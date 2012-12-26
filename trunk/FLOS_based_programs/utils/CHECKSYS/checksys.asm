@@ -76,7 +76,7 @@ test_sdcard	call sd_tests
 		
 		
 menu_txt	db "--------------------------",11
-		db "V6Z80P System Tester V1.05",11
+		db "V6Z80P System Tester V1.06",11
 		db "--------------------------",11,11
 		db "Press:",11,11
 		db "1. For keyboard tests",11
