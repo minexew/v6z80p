@@ -257,7 +257,6 @@ end_pcb_types	    db "Unknown PCB",0
 
 newline_txt         db 11,0
 	  
-page_buffer         ds 256,0
 verify_buffer       ds 256,0
 
 page_count          dw 0
@@ -659,25 +658,8 @@ op2wait   in a,(sys_irq_ps2_flags)
           dec d                                   
           jr nz,op2wait                                               
 
-
-          ld a,$88                      ; send "set config base" command
-          call send_byte_to_pic
-          ld a,$b8
-          call send_byte_to_pic
-          ld a,$00                      
-          call send_byte_to_pic         ; send address low
-          ld a,$00            
-          call send_byte_to_pic         ; send address mid
-          ld a,(slot_number)
-          sla a
-          call send_byte_to_pic         ; send address high
-
-          ld a,$88                      ; send reconfigure command
-          call send_byte_to_pic
-          ld a,$a1
-          call send_byte_to_pic
-
-          jp begin
+	  ld a,(slot_number)
+          jp eeprom_reconfig
 
                     
 ;------------------------------------------------------------------------        
@@ -719,40 +701,16 @@ change_active_slot
           call yn_response
 	  jp nz,begin
 
-is_zero   ld a,$88                      ; send "set config base" command
-          call send_byte_to_pic
-          ld a,$b8
-          call send_byte_to_pic
-          ld a,$00                      
-          call send_byte_to_pic         ; send address low
-          ld a,$00            
-          call send_byte_to_pic         ; send address mid
-          ld a,(slot_number)
-          sla a
-          call send_byte_to_pic         ; send address high
-          
-          call enter_programming_mode
-          
-          ld a,$88                      ; send "fix config base in PIC" command
-          call send_byte_to_pic
-          ld a,$37
-          call send_byte_to_pic
-          ld a,$d8
-          call send_byte_to_pic
-          ld a,$06
-          call send_byte_to_pic
-          
-          call wait_pic_busy            ; wait for PIC to complete update
-          jr c,toer1
-          call exit_programming_mode
-
+is_zero   ld a,(slot_number)
+	  call set_power_on_boot_slot
+	  jr c,toer1
+	  
           ld hl,ok_text                 ; show "completed" text
 endop3    call kjt_print_string
           call kjt_wait_key_press
           jp begin
 
-toer1     call exit_programming_mode
-          ld hl,time_out_text
+toer1     ld hl,time_out_text
           jr endop3
 
 no_change
@@ -1673,119 +1631,101 @@ showpr    call kjt_print_string
 
 show_slot_ids
 
-          ld hl,current_slots_text
-          call kjt_print_string
+		ld hl,current_slots_text
+		call kjt_print_string
 
-          call list_eeprom_contents
-          
-          call show_active_slot
-          ret
+		call eeprom_slot_list
+		  
+		call show_active_slot
+		ret
 
 ;--------------------------------------------------------------------------------------
 
 show_active_slot
 
-          ld a,$88                                ; send PIC the command to prompt it to
-          call send_byte_to_pic                   ; return the slot pointer MSB
-          ld a,$76
-          call send_byte_to_pic
-    
-          ld hl,active_slot                       ; read bits from PIC RB7 
-          call read_pic_byte
-          srl (hl)
-          ld a,(hl)                               ; if slot returns $00, the PIC code does not support the command
-          or a                                    ; so cannot show active slot text
-          ret z
-          
-          ld hl,act_slot_figures
-          call kjt_hex_byte_to_ascii
-          
-          ld hl,act_slot_text                     ; show the active slot
-          call kjt_print_string
-          ld hl,act_slot_figures
-endit     call kjt_print_string
-          xor a
-          ret
+		call get_active_slot             	 ; if ZF not set, the PIC code does not support the command
+		jr z,got_acts                    	 ; so cannot show active slot text
+				
+		ld hl,old_pic_fw
+		jr endit
+	  
+got_acts	ld (active_slot),a
+		
+		ld hl,act_slot_figures
+		call kjt_hex_byte_to_ascii
+		  
+		ld hl,act_slot_text                     ; show the active slot
+		call kjt_print_string
+		ld hl,act_slot_figures
+endit		call kjt_print_string
+		xor a
+		ret
           
 
 ;--------------------------------------------------------------------------------------
 
 show_pic_firmware
 
-          ld hl,pic_fw_text
-          call kjt_print_string
-          
-          ld a,$88                                ; send PIC the command to prompt it to
-          call send_byte_to_pic                   ; return its firmware byte
-          ld a,$4e
-          call send_byte_to_pic
-          ld hl,pic_fw_byte                       ; read bits from PIC RB7 
-          call read_pic_byte
-          ld a,(hl)                               ; if fw > $00, the PIC firmware is v618+
-          or a                                    ; so cannot show active slot text
-          jr nz,got_fw
-          ld hl,pic_fw_unknown_text
-          jr fw_end
-          
-got_fw    ld hl,pic_fw_figures+1
-          call kjt_hex_byte_to_ascii
-          ld hl,pic_fw_figures                    ; show pic fw
-fw_end    call kjt_print_string
-          xor a
-          ret
+		ld hl,pic_fw_text
+		call kjt_print_string
+		  
+		call get_pic_fw                         ; if fw byte > $00, the PIC firmware is v618+
+ 		jr z,got_fw
+		ld hl,pic_fw_unknown_text
+		jr fw_end
+ 		  
+got_fw  	ld hl,pic_fw_figures+1
+		call kjt_hex_byte_to_ascii
+		ld hl,pic_fw_figures                    ; show pic fw
+fw_end		call kjt_print_string
+		xor a
+		ret
+
 
 ;--------------------------------------------------------------------------------------
 
 show_eeprom_type
-
-	  call get_eeprom_size
-	  jr z,eid_ok
-	  ld hl,no_id_text
-          call kjt_print_string
-          ret
-          	  
-eid_ok    ld hl,eeprom_id_text
-          call kjt_print_string
-          
-	  ld hl,at25x_text
-	  ld a,(eeprom_type)
-	  or a                                   
-          jr z,non_sst                           
-          ld hl,sst25vf_text
-non_sst   call kjt_print_string
-
-	  ld a,(eeprom_id_byte)         
-          sub $11   
-          ld l,a
-          ld h,0
-          add hl,hl
-          add hl,hl
-          add hl,hl
-          add hl,hl
-          ld de,eeprom_id_list
-          add hl,de
-          call kjt_print_string
-          ret
-
-
+		
+		ld hl,eeprom_id_text
+		call kjt_print_string
+		
+		call get_eeprom_size
+		jr nz,no_id
+		
+		ld hl,sst25vf_text
+		bit 0,e
+		jr nz,sst_type_epr
+		ld hl,at25x_text
+sst_type_epr	call kjt_print_string
+		
+		ld a,d
+		ld hl,epr_id_list
+		ld bc,end_id_list-epr_id_list
+		cpir
+		call kjt_print_string
+		ret
+		
+no_id		ld hl,no_id_text
+		call kjt_print_string
+		ret
           
 ;--------------------------------------------------------------------------------------
 
 show_banner
 
-          call kjt_clear_screen
-          call kjt_get_pen
-          push af
-          rrca
-          rrca
-          rrca
-          rrca
-          call kjt_set_pen
-          ld hl,start_text1
-          call kjt_print_string
-          pop af
-          call kjt_set_pen
-          ret
+		call kjt_clear_screen
+		call kjt_get_pen
+		push af
+		rrca
+		rrca
+		rrca
+		rrca
+		call kjt_set_pen
+		ld hl,start_text1
+		call kjt_print_string
+		pop af
+		call kjt_set_pen
+		ret
 
 ;----------------------------------------------------------------------------------------
 
@@ -2125,42 +2065,50 @@ current_slots_text  db 11,"Current EEPROM slot contents..",11,11,0
 slot_zero_text      db 11,11,"SLOT 0 cannot hold FPGA configs!"
                     db 11,11,"Press any key.",0             
 
-current_slot_txt    db 11,11,"Current Active Slot: "
-active_slot_txt     db "xx",11,11,0
 
 
-eeprom_id_text      db 11,"EEPROM: ",0
-at25x_text          db "25*",0
+
+
+
+eeprom_id_text      db "EEPROM type: ",0
+at25x_text          db "25x",0
 sst25vf_text        db "SST25VF",0
 
-eeprom_id_list      db "20 (256KB)",11,0,0,0,0,0  ;id = $11
-                    db "40 (512KB)",11,0,0,0,0,0  ;id = $12
-                    db "80 (1MB)  ",11,0,0,0,0,0  ;id = $13
-                    db "16 (2MB)  ",11,0,0,0,0,0  ;id = $14
-                    db "32 (4MB)  ",11,0,0,0,0,0  ;id = $15
-                    db "64 (8MB)  ",11,0,0,0,0,0  ;id = $16
+epr_id_list	    db $11,"20 (256KB)",11,0
+                    db $12,"40 (512KB)",11,0
+                    db $13,"80 (1MB)",11,0
+                    db $14,"16 (2MB)",11,0
+                    db $15,"32 (4MB)",11,0
+                    db $16,"64 (8MB)",11,0
+end_id_list	    db 0
+
+no_id_text          db "EEPROM type: Unknown, 25x40?",0
+
+act_slot_text       db "Power-on boot slot: ",0
+act_slot_figures    db "xx",0         	
+
+old_pic_fw	    db "FPGA boot slot: Unknown (Old PIC FW)",11,0 
+
+pic_fw_text         db 11,"Config PIC firmware: ",0
+pic_fw_figures      db "6xx",11,0
+pic_fw_unknown_text db "Unknown (Old?)",11,0
 
 
-no_id_text          db 11,"EEPROM: Unknown - Assuming 25x40 (512KB)",0
 
-act_slot_text       db 11,11,"Current active slot:",0
-act_slot_figures    db "xx",0
+
+
 
 no_change_text      db 11,11,"Active slot unchanged.."
                     db 11,11,"Press any key",0
 
 total_blocks_text   db 11,"Max EEPROM block: "
-total_blocks_figs   db "xx",0
+total_blocks_figs   db "xx",11,11,0
 
 op7_block_text      db " (Blocks "
 op7_fig_text1       db "xx/"
 op7_fig_text2       db "xx)",11,0
           
 restart_text        db 11,11,"Reconfiguring...",0
-
-pic_fw_text         db 11,"Config PIC firmware: ",0
-pic_fw_figures      db "6xx",11,0
-pic_fw_unknown_text db "Unknown",11,0
 
 retry_txt           db 11,"Do you want to re-write the data (y/n)? ",0
 
