@@ -1,3 +1,19 @@
+;-----------------------------------------------------------------------------------------------------------------
+; EEPROM / PIC programming related routines
+;-----------------------------------------------------------------------------------------------------------------
+;
+; Routine List
+; ------------
+;
+; program_eeprom_page - writes data from "HL" to EEPROM page number in "DE" (each page is 256 bytes) - Page must be erased first 
+;
+; erase_eeprom_sector - sets all bytes in EEPROM sector "A" to $ff (each sector is 64KB in size)
+;
+; set_power_on_boot_slot - sets the default power on config slot to "A" (use with care!)
+; 
+;------------------------------------------------------------------------------------------------------------------
+
+
 
 program_eeprom_page
 

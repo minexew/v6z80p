@@ -5,9 +5,10 @@
 ;
 ; Subroutine list:
 ; ----------------
-; send_byte_to_pic
-; wait_pic_busy
-; read_pic_byte
+; send_pic_command - Set HL to command string (first byte = number of bytes in string)
+; send_byte_to_pic - Send byte in A to PIC
+; wait_pic_busy    - Read a byte from the PIC into A
+; read_pic_byte    - Wait until PIC/EEPROM is not busy (Carry flag set on return if timed out) Note: Uses sys_timer
 ;
 ;-------- EEPROM CONSTANTS -------------------------------------------------------------
 
@@ -118,12 +119,14 @@ pic_dloop	djnz pic_dloop
 
 
 wait_pic_busy
-
+		
+		xor a
+		out (sys_timer),a		; set timer irq interval
+		
 		push de
 		ld de,0
 	
-wait_pic
-		in a,(sys_irq_ps2_flags)	; check for timer overflow..
+wait_pic	in a,(sys_irq_ps2_flags)	; check for timer overflow..
 		and 4
 		jr z,test_pic	
 		out (sys_clear_irq_flags),a	; clear timer overflow flag
@@ -135,8 +138,7 @@ wait_pic
 		scf				; timed out error - carry flag set
 		ret
 	
-test_pic
-		in a,(sys_hw_flags)		; if PIC is holding its clock output high it is
+test_pic	in a,(sys_hw_flags)		; if PIC is holding its clock output high it is
 		bit pic_clock_output,a		; busy and cannot accept data bytes at this time
 		jr nz,wait_pic
 		pop de
