@@ -1,4 +1,18 @@
 
+;-----------------------------------------------------------------------------------------------------------------
+; EEPROM config related routines
+;-----------------------------------------------------------------------------------------------------------------
+;
+; Routine List
+; ------------
+;
+; eeprom_reconfig - restart from the config slot selected by the routine below
+;
+; set_cofig_slot - set the config slot from A (does not change the power on slot)
+;
+;------------------------------------------------------------------------------------------------------------------
+
+
 ; Set A to slot to reconfigure from
 
 

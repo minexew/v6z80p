@@ -2,22 +2,11 @@
 ; V6Z80P EEPROM ROUTINES V1.03
 ; ----------------------------
 ;
-; Main routine list:
-; -------------------
-; program_eeprom_page  (burns new data to eeprom - all 256 bytes of page must be $ff prior to write)
-; read_eeprom_page     (reads 256 bytes to address label "page_buffer")
-; erase_eeprom_sector  (erases a 64KB sector to all $ff)
-; get_eeprom_size      (returns number of slots)
-; get_pic_fw           (returns pic fw version byte)
-; list_eeprom_contents (shows a list of all slot contents)
-;
-; ZF is set on return if operation was successful.
-;
-;  
 ; Changes:
 ; --------
 ;
-; v1.03 - Optimized/split up source, added "get_pic_fw" etc, some routines renamed.
+; v1.03 - Optimized/split up source, added "get_pic_fw" etc, disabled IRQs around main
+; routines, some routines renamed.
 ; 
 ;---------------------------------------------------------------------------------------
 

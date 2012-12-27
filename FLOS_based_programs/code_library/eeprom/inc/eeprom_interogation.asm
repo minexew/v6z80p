@@ -1,5 +1,22 @@
 
-;----------------------------------------------------------------------------------------
+;-----------------------------------------------------------------------------------------------------------------
+; EEPROM / PIC interogation related routines
+;-----------------------------------------------------------------------------------------------------------------
+;
+; Routine List
+; ------------
+;
+; get_eeprom_size - returns number of slots in A (and eeprom type in E, eeprom ID in D) 
+;
+; read_eeprom_id - returns eeprom type (0=25x, 1=SST25VF) in E, eeprom ID in D ($10-$16) 
+;
+; get_pic_fw - returns lower 2 digits of config PIC firmware in A *
+;
+; get_active_slot - returns the power on boot slot in A *
+;
+; * Old firmware may not support this feature and will fail with ZF not set on return.
+;
+;------------------------------------------------------------------------------------------------------------------
 
 get_eeprom_size
 
