@@ -1,6 +1,6 @@
 
 ;------------------------------------------------------------------------------------------
-; EEPROM SUBROUTINES - DISABLE INTERRUPTS AROUND THIS CALLS
+; EEPROM SUBROUTINES - DISABLE INTERRUPTS AROUND THEsE CALLS
 ;----------------------------------------------------------------------------------------
 ;
 ; Subroutine list:
