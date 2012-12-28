@@ -136,3 +136,37 @@ index_buffer	ds 16,0
 
 
 ;--------------------------------------------------------------------------------------------------
+; Two routines that can be called around a bulk_file load to ensure the directory and volume that
+; a program loaded from is selected for loading bulkfile data. This is important if a program is
+; loaded using an assigned path.
+;--------------------------------------------------------------------------------------------------
+
+bfl_change_to_programs_dirvol
+
+; set A to volume, DE to cluster
+
+	push de
+	push af
+	call kjt_get_volume_info
+	ld (bfl_orig_vol),a
+	pop af
+	call kjt_change_volume
+	call kjt_get_dir_cluster
+	ld (bfl_orig_dir),de
+	pop de
+	call kjt_set_dir_cluster
+	ret
+		
+bfl_restore_original_dirvol
+
+	ld de,(bfl_orig_dir)
+	call kjt_set_dir_cluster
+	ld a,(bfl_orig_vol)
+	call kjt_change_volume
+	ret
+	
+bfl_orig_dir	dw 0
+bfl_orig_vol	db 0
+
+
+;----------------------------------------------------------------------------------------------------
