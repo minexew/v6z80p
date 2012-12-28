@@ -29,7 +29,7 @@ window_height       equ 224
 		call video_mode_prompt		;in case video mode is not PAL 50Hz
 		ret nz
 		
-		call backup_flos_video		;put FLOS display data at $70000
+		call backup_flos_bitmap		;put FLOS display data at $60000
 
 ;-------- Initialize --------------------------------------------------------------------
 
@@ -51,8 +51,8 @@ window_height       equ 224
           ld a,$ac
           ld (vreg_window),a            ; set 288 pixels wide window
 
-          ld a,%10000000
-          ld (vreg_vidctrl),a           ; Set bitmap mode (bit 0 = 0) + chunky pixel mode (bit 7 = 1)
+          ld a,%00000100
+          ld (vreg_vidctrl),a           ; Disable video until set up
 
           
           call kjt_page_in_video
@@ -110,7 +110,9 @@ clrbplp   ld (hl),0
           ld bc,32
           ldir
 
-          
+          ld a,%10000000
+          ld (vreg_vidctrl),a           ; Set bitmap mode (bit 0 = 0) + chunky pixel mode (bit 7 = 1)
+
 ;--------- Main Loop ---------------------------------------------------------------------------------
 
 
@@ -130,12 +132,18 @@ wvrtend   ld a,(vreg_read)
 ;-------------------------------------------------------------------------------------------------
          
 		xor a
-		out (sys_audio_enable),a      ; silence channels
+		out (sys_audio_enable),a      		; silence channels
           
-		call restore_flos_video
+		call restore_flos_bitmap
+		
 		call kjt_flos_display
-	  
-		xor a				; and quit to FLOS
+	        
+		call restore_original_video_mode	; in case VGA50 was selected at start prompt
+
+		ld a,%10000001
+		out (sys_irq_enable),a        		; re-enable kb irq source
+		ei
+		xor a					; and quit to FLOS
 		ret
 
 ;-------------------------------------------------------------------------------------------------
@@ -1304,7 +1312,7 @@ suploadlp ld a,%00000000
 
  	include "flos_based_programs\code_library\video\inc\video_mode_prompt.asm"
 
-	include "flos_based_programs\code_library\video\inc\backup_restore_flos_video.asm"
+	include "flos_based_programs\code_library\video\inc\backup_restore_flos_bitmap.asm"
          
 ;=============================================================================================================
 
