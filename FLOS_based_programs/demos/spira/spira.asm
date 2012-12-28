@@ -1,15 +1,18 @@
 
 ;---Standard header for OSCA and OS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
+
 
           org $5000
 
 ;---------------------------------------------------------------------------------------
 ; Spira "Quad-sine" line-draw demo with pattern editor.
-; By Phil Ruston 08 - www.retroleum.co.uk V1.00
+; By Phil Ruston 08 - www.retroleum.co.uk V1.01
+;
+; Added video mode check and friendly-flos return Dec 2012
 ;---------------------------------------------------------------------------------------
 
 req_hw_version      equ $263
@@ -19,26 +22,14 @@ window_width        equ 256
 window_height       equ 256
 number_of_lines     equ 256
 
-;-----------------------------------------------------------------------------------------------------------
-; Check V5Z80P hardware revision is appropriate for code
-;-----------------------------------------------------------------------------------------------------------
 
-          call kjt_get_version
-          ld hl,req_hw_version-1
-          xor a
-          sbc hl,de
-          jr c,hw_vers_ok
-          
-          ld hl,bad_hw_vers
-          call kjt_print_string
-          xor a
-          ret
-          
-bad_hw_vers
+;--------------------------------------------------------------------------------------
 
-          db 11,"Program requires hardware version v263+",11,11,0
-          
-hw_vers_ok
+		call video_mode_prompt		;in case video mode is not PAL 50Hz
+		ret nz
+		
+		call backup_flos_bitmap		;put FLOS display data at $70000
+
 
 ;-------- Initialize --------------------------------------------------------------------
 
@@ -104,10 +95,21 @@ wvrtend   ld a,(vreg_read)
           ld a,(key_press)
           cp $76
           jr nz,wvrtstart               ;loop if ESC key not pressed
-          xor a
-          ld a,$ff                      ;quit (restart OS)
-          ret
 
+
+;-------------------------------------------------------------------------------------------------
+
+		xor a
+		out (sys_audio_enable),a      ; silence channels
+          
+		call restore_flos_bitmap
+		
+		call restore_original_video_mode
+		
+		call kjt_flos_display
+	        
+		xor a				; and quit to FLOS
+		ret
 
 ;-------------------------------------------------------------------------------------------------
 
@@ -1490,45 +1492,52 @@ colours             dw $f0f,$f0f,$e0f,$e0f,$d0f,$c0f,$b0f,$a0f,$90f,$80f,$70f,$6
                     dw $ff0,$fe0,$fe0,$fd0,$fd0,$fc0,$fb0,$fa0,$f90,$f80,$f70,$f60,$f50,$f40,$f30,$f30,$f20,$f20,$f10,$f10,$f00
                     dw $f00,$f00,$f01,$f01,$f02,$f02,$f03,$f04,$f05,$f06,$f07,$f08,$f09,$f0a,$f0b,$f0c,$f0d,$f0d,$f0d,$f0e,$f0e,$f0f,$f0f
                     
-stars_cols          incbin "stars_palette.bin"
+stars_cols          incbin "flos_based_programs\demos\spira\data\stars_palette.bin"
 
-logo_cols           incbin "logo_palette.bin"
+logo_cols           incbin "flos_based_programs\demos\spira\data\logo_palette.bin"
 
-sine_table          incbin "sin_table.bin"
+sine_table          incbin "flos_based_programs\demos\spira\data\sin_table.bin"
 
-patterns            incbin "patterns.bin"
+patterns            incbin "flos_based_programs\demos\spira\data\patterns.bin"
           
 ;---------------------------------------------------------------------------------------------------
 
-hexfont_gfx         incbin "hexfont_sprites_packed.bin"
+hexfont_gfx         incbin "flos_based_programs\demos\spira\data\hexfont_sprites_packed.bin"
 end_hexfont_gfx     db 0
 
-settings_gfx        incbin "settings_sprites_packed.bin"
+settings_gfx        incbin "flos_based_programs\demos\spira\data\settings_sprites_packed.bin"
 end_settings_gfx    db 0
 
-highlight_gfx       incbin "highlight_sprites_packed.bin"
+highlight_gfx       incbin "flos_based_programs\demos\spira\data\highlight_sprites_packed.bin"
 end_highlight_gfx   db 0
 
-star_gfx            incbin "stars_sprites_packed.bin"
+star_gfx            incbin "flos_based_programs\demos\spira\data\stars_sprites_packed.bin"
 end_star_gfx        db 0
 
-logo_gfx            incbin "logo_sprites_packed.bin"
+logo_gfx            incbin "flos_based_programs\demos\spira\data\logo_sprites_packed.bin"
 end_logo_gfx        db 0
 
-instruction_gfx     incbin "instructions_sprites_packed.bin"
+instruction_gfx     incbin "flos_based_programs\demos\spira\data\instructions_sprites_packed.bin"
 end_instruction_gfx db 0
 
-;---------------------------------------------------------------------------------------------------
+;=============================================================================================================
 
-                    include "Z80_Protracker_Player_v504.asm"
-                    include "Amiga_audio_to_V5Z80P_v502.asm"
+ 	include "flos_based_programs\code_library\video\inc\video_mode_prompt.asm"
+
+	include "flos_based_programs\code_library\video\inc\backup_restore_flos_bitmap.asm"
+         
+;=============================================================================================================
+
+
+                    include "flos_based_programs\demos\spira\inc\Z80_Protracker_Player_v504.asm"
+                    include "flos_based_programs\demos\spira\inc\Amiga_audio_to_V5Z80P_v502.asm"
 
           
                     org (($+2)/2)*2               ; word align
 
-music_module        incbin "tune.pat"
+music_module        incbin "flos_based_programs\demos\spira\data\tune.pat"
 
-music_samples       incbin "tune.sam"
+music_samples       incbin "flos_based_programs\demos\spira\data\tune.sam"
 end_of_samples      db 0
 
 ;---------------------------------------------------------------------------------------------------
