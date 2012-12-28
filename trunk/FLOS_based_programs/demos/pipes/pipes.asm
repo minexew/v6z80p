@@ -77,6 +77,9 @@ wvrtend   ld a,(vreg_read)
           cp $76
           jr nz,wvrtstart                         ; quit if ESC key pressed
           
+	  xor a
+	  out (sys_audio_enable),a
+	  
 	  call kjt_flos_display
 	  xor a
           ret
