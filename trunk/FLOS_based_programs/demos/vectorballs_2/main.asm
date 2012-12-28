@@ -1,6 +1,11 @@
+; -----------------------------------------
 ; Vectorballs2 Demo for OSCA/FLOS on V6Z80P
+; -----------------------------------------
 ;
-; V1.01 - Added Video mode check and nice FLOS return Dec 2012
+; A 2008 demo, originally for the V5Z80P.
+;
+; Updated dodgy protracker player, added Video mode check, bulkfile loader
+; and nice FLOS return Dec 2012 Better late than never! :)
 
 ;---Standard header for OSCA and OS ----------------------------------------
 
@@ -11,12 +16,47 @@ include "equates\system_equates.asm"
           org $5000
 
 ;--------------------------------------------------------------------------------------
+; Program location / truncation header
+;--------------------------------------------------------------------------------------
 
+proglength equ last_byte-my_location
 
-		call video_mode_prompt		;in case video mode is not PAL 50Hz
-		ret nz
+my_location equ $5000         		; desired load address        
+my_bank     equ $00           		; desired bank (used if location is $8000 to $FFFF)
+
+          org my_location  		; desired load address
+
+load_loc  db $ed,$00                    ; header ID (Invalid but safe Z80 instruction)
+          jr exec_addr                 	; jump over remaining header data 
+          dw load_loc                   ; location file should load to 
+          db my_bank                    ; upper 32KB bank that file should load into
+          db 01                         ; control byte: 1=truncate using next 3 bytes
+          dw proglength			; Load length 15:0 (if truncate feature required)
+          db 0                          ; Load length 23:16 (""                "")
+
+exec_addr
+
+;--------------------------------------------------------------------------------------
+
+;index_start_lo	equ 0				; only whilst testing
+
+index_start_lo	equ proglength			; low word of offset to bulkfile
+index_start_hi	equ 0				; hi word of offset to bulkfile
+
+	call bfl_change_to_programs_dirvol
+	
+	call video_mode_prompt			; in case video mode is not PAL 50Hz
+	ret nz
 		
-		call backup_flos_video		;put FLOS display data at $70000
+	call backup_flos_bitmap			; copy FLOS display data at $60000
+
+	ld hl,music_data_fn			; load music/player data
+	ld b,3					; bank 3 (audio ram base)
+	ld de,$8000				; address to load to 
+	call load_from_bulk_file
+	ret nz
+	
+	call bfl_restore_original_dirvol
 
 
 ;--------- Initialize --------------------------------------------------------------------
@@ -26,13 +66,13 @@ number_of_objects equ 5
 
           call clear_vram
           
-          ld a,0                        ;unpack sprites
+          ld a,0                      	  	;unpack sprites
           ld hl,rgby_ballsprite
           ld de,sprite_base
           ld bc,endofrgbybs-rgby_ballsprite
           call unpack_sprites
 
-          ld a,0                        ;unpack font
+          ld a,0                        	;unpack font
           ld (vreg_vidpage),a
           ld a,%01100000
           out (sys_mem_select),a        
@@ -44,7 +84,7 @@ number_of_objects equ 5
           ld a,%00100000
           out (sys_mem_select),a        
 
-          ld hl,$400                    ;put empty blocks (>$07) in Playfield B
+          ld hl,$400                    	;put empty blocks (>$07) in Playfield B
           ld b,0
 clpf2     ld (hl),$80
           inc hl
@@ -54,36 +94,35 @@ clpf2     ld (hl),$80
           ld a,%00000000
           out (sys_mem_select),a
 
-          ld hl,sin_table               ; upload sine table to math unit
+          ld hl,sin_table              	 	; upload sine table to math unit
           ld de,mult_table
           ld bc,$200
           ldir      
 
-          ld hl,font_colours            ;upload font colours
+          ld hl,font_colours           		 ;upload font colours
           ld de,palette+(224*2)
           ld bc,64
           ldir
           
-          call relocate_music
           call make_patterns
           call setup_stars
           call make_fade_table
           call init_music
           
           ld a,1
-          ld (vreg_sprctrl),a           ; enable sprites
+          ld (vreg_sprctrl),a           	; enable sprites
           ld a,0
           ld (vreg_rasthi),a            
-          ld a,$2e                      ;         
-          ld (vreg_window),a            ; 256 line display
-          ld a,%00000100                ; Switch to x window pos reg
+          ld a,$2e                      	;         
+          ld (vreg_window),a            	; 256 line display
+          ld a,%00000100                	; Switch to x window pos reg
           ld (vreg_rasthi),a            
           ld a,$6e                      
-          ld (vreg_window),a            ; Window Width = 368 pixels (+16 masked by wideborder)
+          ld (vreg_window),a            	; Window Width = 368 pixels (+16 masked by wideborder)
           ld a,%10000011
-          ld (vreg_vidctrl),a           ; DualPF, tilemap mode, show tile map a, using blockset 0,wideborder
+          ld (vreg_vidctrl),a           	; DualPF, tilemap mode, show tile map a, using blockset 0,wideborder
 
-          ld a,$00                      ; clear vertical scroll registers
+          ld a,$00                      	; clear vertical scroll registers
           ld (vreg_yhws_bplcount),a
           ld a,$80
           ld (vreg_yhws_bplcount),a
@@ -92,14 +131,14 @@ clpf2     ld (hl),$80
 ;--------- Main Loop -----------------------------------------------------------------------------------------------
 
 
-wvrtstart ld a,(vreg_read)              ;wait for VRT
+wvrtstart ld a,(vreg_read)             	 	; wait for VRT
           and 1
           jr z,wvrtstart
 wvrtend   ld a,(vreg_read)
           and 1
           jr nz,wvrtend
 
-          ld a,(scroll_fine)            ;update hardware scroll - Playfield B
+          ld a,(scroll_fine)            	; update hardware scroll - Playfield B
           rrca
           rrca
           rrca
@@ -109,7 +148,7 @@ wvrtend   ld a,(vreg_read)
 ;         ld hl,$00f
 ;         ld (palette),hl
           
-          call update_sprites           ;do first, so off screen
+          call update_sprites           	;do first, so off screen
           
 ;         ld hl,$0ff
 ;         ld (palette),hl
@@ -120,7 +159,7 @@ wvrtend   ld a,(vreg_read)
           call upload_palette
           call play_music
           
-          call scrolling_message        ;do high up, as it is not double buffered
+          call scrolling_message        	;do high up, as it is not double buffered
                     
 ;         ld hl,$f00
 ;         ld (palette),hl
@@ -149,14 +188,17 @@ wvrtend   ld a,(vreg_read)
           
           in a,(sys_keyboard_data)
           cp $76
-          jr nz,wvrtstart               ;loop if ESC key not pressed
+          jr nz,wvrtstart               	;loop if ESC key not pressed
           
 ;------------------------------------------------------------------------------------------------------
 
 		xor a
 		out (sys_audio_enable),a      ; silence channels
             
-		call restore_flos_video
+		call restore_flos_bitmap
+		
+		call restore_original_video_mode
+		
 		call kjt_flos_display
 	    
 		xor a				; and quit to FLOS
@@ -1178,41 +1220,6 @@ hbz3      sla c
           
 ;------------------------------------------------------------------------------------------
 
-relocate_music
-
-          ld hl,music_file              ;shift music code and data to sample ram 
-          ld de,$8000                   ;(via horribly inefficient upper bank switching)
-          ld b,%00000001                ;source bank
-          ld c,%00000100                ;dest bank
-          exx
-          ld bc,$9d00                   ;length of file to relocate
-movelp    exx
-          ld a,b
-          out (sys_mem_select),a
-          ld a,(hl)
-          push af
-          ld a,c
-          out (sys_mem_select),a
-          pop af
-          ld (de),a
-          inc hl
-          inc de
-          bit 7,h
-          jr nz,sbankok
-          ld h,$80
-          inc b
-sbankok   bit 7,d
-          jr nz,dbankok
-          ld d,$80
-          inc c
-dbankok   exx
-          dec bc
-          ld a,b
-          or c
-          jp nz,movelp
-          ld a,0
-          out (sys_mem_select),a
-          ret
 
 init_music
 
@@ -1236,12 +1243,20 @@ play_music
  
 ;------------------------------------------------------------------------------------------
 
-	include "flos_based_programs\code_library\video\inc\video_mode_prompt.asm"
+		include "flos_based_programs\code_library\video\inc\video_mode_prompt.asm"
 
-	include "flos_based_programs\code_library\interrupts\inc\set_restore_vector.asm"
+		include "flos_based_programs\code_library\interrupts\inc\set_restore_vector.asm"
 	
-	include "flos_based_programs\code_library\video\inc\backup_restore_flos_video.asm"
-                   
+		include "flos_based_programs\code_library\video\inc\backup_restore_flos_bitmap.asm"
+	
+		include "flos_based_programs\code_library\loading\inc\bulk_file_loader.asm"
+ 
+music_data_fn	db "vb2music.exe",0
+
+bulkfile_fn	db "VBALLS2.EXE",0		; if this is same as main program, adjust index_start
+
+;bulkfile_fn	db "bulkfile.bin",0		; only whilst testing
+             
 ;------------------------------------------------------------------------------------------
 
 timer               db 0
@@ -1489,7 +1504,7 @@ scroll_text         db "                                   "
                     DB " DEJA VU?        WELCOME TO VECTORBALLS II - THE REDUX!"
                     DB "       THIS IS A QUICK UPDATE OF THE VECTORBALLS"
                     DB " DEMO WHICH WAS ORIGINALLY MADE FOR MY V4 Z80 PROJECT."
-                    DB " THIS VERSION USES SOME OF THE NEW FEATURES OF THE V5Z80P"
+                    DB " THIS VERSION USES SOME OF THE NEW FEATURES OF THE V6Z80P"
                     DB " SUCH AS THE 16 BIT MATHS HARDWARE AND 127 SPRITE REGISTERS...       "
                     DB " GREETINGS TO: JIM B, PETER MCQ, ERIK L, BRANDER, PETER G, GREY, HUW W, STEVE G, RICHARD D,"
                     DB " JIM F.A, DANIEL T, ALAN G, GEOFF O, JOSEPH C,"
@@ -1497,7 +1512,8 @@ scroll_text         db "                                   "
                     DB "             CODED BY PHIL RUSTON WWW.RETROLEUM.CO.UK IN 2008.  TUNE BY ALEX CRAXTON 1993.       BE SEEING YOU!"
                     db "                           ",0
 
-;------------------------------------------------------------------------------------------------
+;=========================================================================================================    
 
-music_file
+last_byte	
 
+;=========================================================================================================
