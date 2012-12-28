@@ -4,14 +4,15 @@
 ;
 ; Note: Code is a bit flaky :)
 ;
+; V1.03 - Returns to FLOS nicely
 ; V1.02 - Quick update to use single file loading system
 ; V1.01 - 60Hz mode auto detect (uses same values for VGA too)
 ;
 ;---Standard header for OSCA and OS --------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
 ; Program location / truncation header
@@ -32,9 +33,11 @@ load_loc  db $ed,$00                    ; header ID (Invalid but safe Z80 instru
 
 exec_addr
 
-          
-;--------- Test OSCA version ---------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------
 
+          call bfl_change_to_programs_dirvol
+
+;--------- Test OSCA version ---------------------------------------------------------------------
           
           call kjt_get_version                    ; check running under FLOS v541+ 
           ex de,hl
@@ -53,7 +56,12 @@ old_osca_txt
           
 osca_ok   
 
+;---------------------------------------------------------------------------------------------
+
+		call backup_flos_bitmap		;put FLOS display data at $60000
+
 ;--------- Get video mode --------------------------------------------------------------------
+
 
           ld b,0                                            
           in a,(sys_hw_flags)                     ;VGA jumper on?
@@ -190,9 +198,23 @@ wvrtend   ld a,(vreg_read)
           in a,(sys_keyboard_data)
           cp $76
           jr nz,wvrtstart               ; quit if ESC key pressed
-          xor a
-          ld a,$ff
-          ret
+         
+;-------------------------------------------------------------------------------------------
+
+		xor a
+		out (sys_audio_enable),a      		; silence channels
+          
+		call restore_flos_bitmap	;restore FLOS display from data at $60000
+		
+		call bfl_restore_original_dirvol
+		
+		call kjt_flos_display
+		ld hl,cr_txt
+		call kjt_print_string
+		xor a
+		ret
+		
+cr_txt		db 11,0
 
 ;------------------------------------------------------------------------------------------
           
@@ -1415,14 +1437,18 @@ endscr    ex de,hl
 
 ;---------------------------------------------------------------------------------------------------------
 
-bulkfile_fn         db "parity.exe",0             ;same as main program, adjusted index_start:
+;bulkfile_fn		db "bulkfile.bin",0		;only whilst testing
+;index_start_lo		equ 0      			;only whilst testing
 
-index_start_lo      equ prog_end-my_location      ;low word of offset to bulkfile
+bulkfile_fn		db "parity.exe",0             	;same as main program, adjusted index_start:
+index_start_lo		equ prog_end-my_location      	;low word of offset to bulkfile
 
-index_start_hi      equ 0                         ;hi word of offset to bulkfile
+index_start_hi		equ 0                         	;hi word of offset to bulkfile
 
 
-          include "bulk_file_loader.asm"
+          include "flos_based_programs\code_library\loading\inc\bulk_file_loader.asm"
+  	  
+	  include "flos_based_programs\code_library\video\inc\backup_restore_flos_bitmap.asm"
 
 ;---------------------------------------------------------------------------------------------------------
 
@@ -1585,7 +1611,7 @@ coord_list          ds 128,0
 
 ;-----------------------------------------------------------------------------------------------------
 
-sin_table           incbin "sin_table.bin"
+sin_table           incbin "flos_based_programs\demos\parity\source\data\sin_table.bin"
 
 scale_factors       dw 32768 / $02
                     dw 32768 / $04
@@ -1732,17 +1758,17 @@ scale_factors       dw 32768 / $02
 
 ;------------------------------------------------------------------------------------------
 
-bgnd_colours        incbin "background_palette.bin"
+bgnd_colours        incbin "flos_based_programs\demos\parity\source\data\background_palette.bin"
 
-font_colours        incbin "font_palette.bin"
+font_colours        incbin "flos_based_programs\demos\parity\source\data\font_palette.bin"
 
 ;------------------------------------------------------------------------------------------
 
-include             "50Hz_60Hz_Protracker_code_v513.asm"
+	include "flos_based_programs\demos\parity\source\inc\50Hz_60Hz_Protracker_code_v513.asm"
 
                     org (($+2)/2)*2               ;WORD align song module in RAM
 
-music_module        incbin "tune.pat"
+music_module        incbin "flos_based_programs\demos\parity\source\data\tune.pat"
                     
 ;------------------------------------------------------------------------------------------
 
