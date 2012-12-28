@@ -1,18 +1,5 @@
 
-With this demo, I removed the need for the demo to load in external
-files when it runs - all the data is in one file which FLOS loads
-into subsequent upper system RAM banks..
+Join bulkfile.bin to the end of main.exe and rename the resulting file vballs2.exe
 
-IE: The FLOS data load address goes..
-
-    $5000 - FFFF bank 0
-    $8000 - FFFF bank 1
-    $8000 - FFFF bank 2
- 
-    etc..
-
-However, as Pasmo cannot assemble beyond 64KB, the final executable binary
-has to be made manually by joining three files (democode+music_player+samples)
-to each other (use join.bat)
-
-(The demo relocates the music data and samples to audio RAM on boot)
+(Bulkfile.bin holds a file called vb2music.exe - vb2music.exe is "vectorballs_music.exe"
+with "tune.sam" appended to the end.)
