@@ -2,13 +2,14 @@
 ; Pipes Demo (Line Sync'd Blits) - Phil Ruston 2009
 ; -------------------------------------------------
 ;
+;V1.02 - Friendly FLOS return
 ;V1.01 - Automatic NTSC / VGA adjustments
 ;
 ;---Standard header for OSCA and FLOS  -----------------------------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
           org $5000
 
@@ -75,8 +76,9 @@ wvrtend   ld a,(vreg_read)
           in a,(sys_keyboard_data)
           cp $76
           jr nz,wvrtstart                         ; quit if ESC key pressed
-          xor a
-          ld a,$ff
+          
+	  call kjt_flos_display
+	  xor a
           ret
                     
 ;---------------------------------------------------------------------------------------------
@@ -834,11 +836,11 @@ end_of_bar          dw $300,$410,$520,$630,$741,$852,$963,$a74
 
 counter             db 0
 
-large_pipe_image    incbin "blu_mag_bar.bin"
+large_pipe_image    incbin "flos_based_programs\demos\pipes\data\blu_mag_bar.bin"
 
-large_pipe_colours  incbin "blu_mag_bar_palette.bin"
+large_pipe_colours  incbin "flos_based_programs\demos\pipes\data\blu_mag_bar_palette.bin"
 
-sin_table           incbin "sin_table.bin"
+sin_table           incbin "flos_based_programs\demos\pipes\data\sin_table.bin"
           
 x_start_offset1     db 0
 x_start_offset2     db 0
@@ -850,11 +852,11 @@ x_start_offset2     db 0
 
 scroll_sprite_def0  ds 128,0
 
-scroll_sprite_def1  incbin "8x8crystal_sprite.bin"
+scroll_sprite_def1  incbin "flos_based_programs\demos\pipes\data\8x8crystal_sprite.bin"
 
-scroll_colours      incbin "8x8crystal_palette.bin"
+scroll_colours      incbin "flos_based_programs\demos\pipes\data\8x8crystal_palette.bin"
 
-font                incbin "rotated_fontb.bin"
+font                incbin "flos_based_programs\demos\pipes\data\rotated_fontb.bin"
 
 scroll_text         db "  WELCOME TO ANOTHER V6Z80P INTRO.. THIS TIME ITS A TEST "
                     db "OF LINE SYNCD BLITS... HELLO TO: "
@@ -878,21 +880,21 @@ buffer              db 0
 ;------- Data and vars for logo -------------------------------------------------------------------------
 
 
-logo_gfx            incbin "v6logo_sprites_packed.bin"
+logo_gfx            incbin "flos_based_programs\demos\pipes\data\v6logo_sprites_packed.bin"
 end_logo_gfx        db 0
 
-logo_colours        incbin "v6logo_palette.bin"
+logo_colours        incbin "flos_based_programs\demos\pipes\data\v6logo_palette.bin"
 
 
 ;---------------------------------------------------------------------------------------------------------
 
-include             "50Hz_60Hz_Protracker_code_v513.asm"
+	include "flos_based_programs\demos\pipes\inc\50Hz_60Hz_Protracker_code_v513.asm"
 
                     org (($+2)/2)*2               ;WORD align song module in RAM
 
-music_module        incbin "tune.pat"
+music_module        incbin "flos_based_programs\demos\pipes\data\tune.pat"
 
-samples             incbin "tune.sam"
+samples             incbin "flos_based_programs\demos\pipes\data\tune.sam"
                     
 ;------------------------------------------------------------------------------------------
           
