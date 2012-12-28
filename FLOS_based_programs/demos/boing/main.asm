@@ -1,12 +1,13 @@
-;---Standard header for OSCA and OS ----------------------------------------
+;---Standard header for OSCA and FLOS --------------------------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------
-; Boing demo v1.07 - For 50Hz PAL                 
+; Boing demo v1.08 - For 50Hz PAL                 
 ; 30-08-2012: Uses bulk file loader.
+; 27-12-2012: Added video option header + quit to FLOS nicely.
 ;--------------------------------------------------------------------------------------
 
 sprite_data         equ $8000
@@ -16,13 +17,13 @@ tile_data           equ $8000
 ; Program location / truncation header
 ;--------------------------------------------------------------------------------------
 
-my_location equ $5000         ; desired load address        
-my_bank     equ $00           ; desired bank (used if location is $8000 to $FFFF)
+my_location equ $5000         		; desired load address        
+my_bank     equ $00           		; desired bank (used if location is $8000 to $FFFF)
 
-          org my_location  ; desired load address
+          org my_location  		; desired load address
 
 load_loc  db $ed,$00                    ; header ID (Invalid but safe Z80 instruction)
-          jr exec_addr                  ; jump over remaining header data 
+          jr exec_addr                 	; jump over remaining header data 
           dw load_loc                   ; location file should load to 
           db my_bank                    ; upper 32KB bank that file should load into
           db 01                         ; control byte: 1=truncate using next 3 bytes
@@ -31,8 +32,18 @@ load_loc  db $ed,$00                    ; header ID (Invalid but safe Z80 instru
 
 exec_addr
 
-;-------- Set up system for demo ------------------------------------------------------
+;--------------------------------------------------------------------------------------
 
+		call bfl_change_to_programs_dirvol
+
+		call video_mode_prompt		;in case video mode is not PAL 50Hz
+		ret nz
+		
+		call backup_flos_video		;put FLOS display data at $70000
+
+
+;-------- Set up system for demo ------------------------------------------------------
+	
           di                            ; disable interrupts at CPU
           xor a
           out (sys_irq_enable),a        ; disable all irq sources
@@ -274,8 +285,9 @@ smacdone  ld (hl),$8e                   ; loop char
           ld (vreg_sprctrl),a           ; Enable sprites  / set priority mode (masked by colours 128-255)     
           
           ld hl,irq_handler             
-          ld (irq_vector),hl
-          ld a, %10000000
+          call set_irq_vector
+	  
+	  ld a, %10000000
           out (sys_irq_enable),a        ;master irq enable
           ei
           
@@ -343,10 +355,29 @@ routines  ld a,(counter)
           cp $76
           jr nz,wvrtstart               ; loop if ESC key not pressed
           
-          xor a
-          out (sys_audio_enable),a      ; silence channels
-          ld a,$ff                      ; and quit (restart OS)
-          ret
+;------------------------------------------------------------------------------------------------------
+
+		xor a
+		out (sys_audio_enable),a      		; silence channels
+          
+		di
+	  
+		call restore_flos_video
+		call kjt_flos_display
+	  
+		ld a,%10000001
+		out (sys_irq_enable),a			; re-enable keyboard IRQ
+		xor a
+		ld (vreg_rasthi),a			; disable video IRQ
+		call restore_irq_vector
+		ei
+		
+		call bfl_restore_original_dirvol
+		
+		call restore_original_video_mode	; in case VGA50 was selected at start prompt
+		
+		xor a					; and quit to FLOS
+		ret	
 
 ;------------------------------------------------------------------------------------------------------
 
@@ -1055,26 +1086,35 @@ init_pb   ld a,%00000000                ; go to y window pos register
 ;---------------------------------------------------------------------------------------------------------    
 
 bulkfile_fn         db "boing.exe",0              ;if this is same as main program, adust index_start
-
 index_start_lo      equ prog_end-my_location      ;low word of offset to bulkfile
 
-index_start_hi      equ 0                         ;hi word of offset to bulkfile
+;bulkfile_fn	db "bulkfile.bin",0		;only whilst testing
+;index_start_lo	equ 0				;only whilst testing
 
 
-          include "bulk_file_loader.asm"
+index_start_hi	equ 0                         ;hi word of offset to bulkfile
+
+
+        include "flos_based_programs\code_library\loading\inc\bulk_file_loader.asm"
+
+	include "flos_based_programs\code_library\video\inc\video_mode_prompt.asm"
+
+	include "flos_based_programs\code_library\interrupts\inc\set_restore_vector.asm"
+	
+	include "flos_based_programs\code_library\video\inc\backup_restore_flos_video.asm"
 
 ;---------------------------------------------------------------------------------------------------------    
 
 
 temp_bank           db 0
 
-                    include "50Hz_60Hz_Protracker_Code_v513.asm"
+                    include "flos_based_programs\demos\boing\inc\50Hz_60Hz_Protracker_Code_v513.asm"
 
 samp_filename       db "TUNE03.SAM",0
 
                     org (($+2)/2)*2               ;WORD align song module in RAM
 
-music_module        incbin "tune03.pat"
+music_module        incbin "flos_based_programs\demos\boing\data\tune03.pat"
 
 ;----------------------------------------------------------------------------------------------------------
 
@@ -1094,18 +1134,18 @@ tiles_fn3           db "LFTILES.BIN",0
 
 load_err_msg        db "LOAD ERROR!",11,0
 
-colours             incbin "palette.bin"
+colours             incbin "flos_based_programs\demos\boing\data\palette.bin"
 
 ;---------------------------------------------------------------------------------------------------------    
 
 
                     org (($+256)/256)*256
 
-arc_table_l         incbin "arc_table_l.bin"
+arc_table_l         incbin "flos_based_programs\demos\boing\data\arc_table_l.bin"
 
-arc_table_m         incbin "arc_table_m.bin"
+arc_table_m         incbin "flos_based_programs\demos\boing\data\arc_table_m.bin"
 
-arc_table_s         incbin "arc_table_s.bin"
+arc_table_s         incbin "flos_based_programs\demos\boing\data\arc_table_s.bin"
 
 ascii_translate     db $2f,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
                     db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
