@@ -1,5 +1,4 @@
 
-Copy all the files from "external_files" to the same
-single folder as the Bounder.exe program.
+Append bulkfile.bin to end of main.exe to make bounder.exe
 
-Bounder was developed for the 50Hz PAL TV system.
+Hiscores are saved in [ROOT] GAMES/HISCORES/

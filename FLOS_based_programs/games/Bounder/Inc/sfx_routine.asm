@@ -429,12 +429,8 @@ fx_set_hw_loclen
           push bc
           pop ix
           
-          ld hl,vreg_read                         ; wait for display window part of scan line (sound dma done)
-fxwait1   bit 1,(hl)
-          jr nz,fxwait1
-fxwait2   bit 1,(hl)                                        
-          jr z,fxwait2
-          
+	  call wait_dma
+	           
           ld a,(HW_enabled_channels)              ; Play (same) FX on channel 1+3
           and %00000101                           ; Include other channel bits from tracker player
           out (sys_audio_enable),a                ; Disable channel during loc/len update
@@ -459,16 +455,12 @@ fxwait2   bit 1,(hl)
           out (c),a                               ; write WORD length to HW reg            
 
 
-          ld hl,vreg_read                          ; wait one scan line (sound dma done)
-fxwait1b  bit 1,(hl)
-          jr nz,fxwait1b
-fxwait2b  bit 1,(hl)                                        
-          jr z,fxwait2b
-
-          
+	  call wait_dma
+         
           ld a,(HW_enabled_channels)              ; Include other channel bits from tracker player
           or %00001010
           out (sys_audio_enable),a                ; Restart audio DMA
+
 
           ld c,audchan1_loc
           ld a,(ix+6)                             ; lsb of WORD loop location
@@ -523,8 +515,19 @@ fx_vnm    srl a                                   ;scale volume to HW range
 fx_fhwv   out (audchan1_vol),a
           out (audchan3_vol),a
           ret
-                    
-          
+
+
+;-----------------------------------------------------------------------------------------------------
+                   
+wait_dma  in a,(sys_vreg_read)                    ;wait for LSB for scanline count to change
+          and $40
+          ld b,a
+loop2     in a,(sys_vreg_read)
+          and $40
+          cp b
+          jr z,loop2
+          ret         
+
 ;-----------------------------------------------------------------------------------------------------
 
 fx_change           db 0
