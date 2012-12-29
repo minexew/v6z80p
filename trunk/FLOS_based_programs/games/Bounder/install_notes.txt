@@ -1,4 +1,0 @@
-
-Append bulkfile.bin to end of main.exe to make bounder.exe
-
-Hiscores are saved in [ROOT] GAMES/HISCORES/
