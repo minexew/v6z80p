@@ -19,17 +19,13 @@ update_sound_hardware
 skpch1a   ld c,audchan2_per                       
           ld iy,channel_data+(vars_per_channel*2)
           call update_pervol
-;         ld c,audchan3_per             
+;         ld c,audchan3_per             		;modded for bounder's sound fx
 ;         ld iy,channel_data+(vars_per_channel*3)
 ;         call update_pervol
           
-
-          ld hl,vreg_read                         ; wait for display window part of scan line (sound dma done)
-xwait1    bit 1,(hl)
-          jr nz,xwait1
-xwait2    bit 1,(hl)                                        
-          jr z,xwait2
-          
+	  
+	  call wait_dma
+	  
           
           ld e,%00000001                          ; now set the 4 channels' sample location
           ld c,audchan0_loc                       ; and length registers, * if triggered *
@@ -53,14 +49,10 @@ skpch1b   ld e,%00000100
 ;         ld c,audchan3_loc                        
 ;         ld iy,channel_data+(vars_per_channel*3)
 ;         bit 0,(iy+control_bits)
-;         call nz,update_start_loclen
+;         call nz,update_start_loclen			;modded for bounder's sound fx
 
           
-          ld hl,vreg_read                          ; wait one scan line (sound dma done)
-xwait1b   bit 1,(hl)
-          jr nz,xwait1b
-xwait2b   bit 1,(hl)                                        
-          jr z,xwait2b
+	  call wait_dma
 
           
           ld e,%00000001                          ; finally set the 4 channels' loop around values
@@ -80,7 +72,7 @@ skpch1c   ld e,%00000100
           call update_loop_loclen
 ;         ld e,%00001000                           
 ;         ld c,audchan3_loc                        
-;         ld iy,channel_data+(vars_per_channel*3)
+;         ld iy,channel_data+(vars_per_channel*3)	;modded for bounder's sound fx
 ;         call update_loop_loclen
           ret
 
