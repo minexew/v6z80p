@@ -1,21 +1,27 @@
 
 ; A header for programs to test that required OSCA version (or above) is running.
-
+;
+; Include this as in-line code at start of program, DO NOT call it as routine!
+;
+; set "required_osca" label 
 
 ;--------- Test OSCA version -----------------------------------------------------------
 
 
-; set "required_osca" label 
-
-
+		push af
+		push bc
+		push de
 		push hl
+		push ix
+		push iy
+		
 		call kjt_get_version	
 		ex de,hl
 		ld de,required_osca 	
 		xor a
 		sbc hl,de
-		pop hl
 		jr nc,osca_ok
+		
 		ld hl,old_osca_txt
 		call kjt_print_string
 		ld hl,hwhex_txt
@@ -27,7 +33,14 @@
 		pop hl
 		inc hl
 		call kjt_print_string
-		xor a
+		
+		pop iy
+		pop ix
+		pop hl
+		pop de
+		pop bc
+		pop af
+		cp a
 		ret
 
 old_osca_txt
@@ -36,6 +49,13 @@ old_osca_txt
 hwhex_txt	db "----+",11,11,0
 
 
-osca_ok	
+osca_ok		pop iy
+		pop ix
+		pop hl
+		pop de
+		pop bc
+		pop af
 
+;--------------------------------------------------------------------------------------
+; user code continues here...
 ;--------------------------------------------------------------------------------------
