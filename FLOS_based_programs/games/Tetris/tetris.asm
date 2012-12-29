@@ -1,8 +1,11 @@
-; ****************************************************
-; * Tetris v1.01 for V6Z80P by Phil @ Retroleum 2010 *
-; ****************************************************
-
-; Changes in 1.01 - Cosmetic: Added bas-relief fix-up below entry $67 = $77
+; *********************************************************
+; * Tetris v1.02 for V6Z80P by Phil @ Retroleum 2010-2012 *
+; *********************************************************
+;
+; Changes:
+;
+;v1.02 - Nicer quit to FLOS, saves hiscores in GAMES/HISCORES/
+;v1.01 - Cosmetic: Added bas-relief fix-up below entry $67 = $77
 
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
@@ -12,7 +15,31 @@ include "equates\OSCA_hardware_equates.asm"
 include "equates\system_equates.asm"
 
           org $5000 
-
+	  
+	  call save_dir_vol
+	  
+	  call backup_flos_bitmap
+	  
+	  ld hl,(irq_vector)
+	  ld (orig_irq_vector),hl
+	  
+	  call kjt_get_dir_cluster	; load hi-score from games/hiscores if exists
+	  push de
+	  call goto_hiscores_dir
+	  jr nz,no_hspd
+	  ld hl,hs_filename             
+          call kjt_find_file
+          jr nz,no_hspd
+          ld ix,0
+          ld iy,6
+          call kjt_set_load_length      ; ensure load size is 6 bytes
+          ld hl,hiscore
+          ld b,0
+          call kjt_read_from_file
+no_hspd	  pop de
+	  call kjt_set_dir_cluster
+	
+	
 ;-------- Initialize  ---------------------------------------------------------
 
           ld hl,hs_filename             ; load hi-score if exists
@@ -106,10 +133,20 @@ waitng    ld a,(esc_keytime)
 
 quit_tetris
 
-          xor a
-          out (sys_audio_enable),a      ; silence channels
+	  call back_to_flos
+	  call save_hi_score
+	  call restore_dir_vol
+	  ret
+	  
 
-          ld hl,hs_filename             ; erase existing hiscore file (if it exists)
+save_hi_score
+	  
+	  ld a,(new_hs)
+	  or a
+	  ret z
+	  call goto_hiscores_dir
+	  jr nz,nohsdir
+          ld hl,hs_filename             	; erase existing hiscore file (if it exists)
           call kjt_erase_file
           ld ix,hiscore
           ld b,0
@@ -117,9 +154,38 @@ quit_tetris
           ld c,0
           ld de,6
           call kjt_save_file
-          
-          ld a,$ff                      ; and quit (restart OS)
-          ret
+	  ld hl,hss_txt
+	  call kjt_print_string
+	  ret
+
+nohsdir	  xor a					; if no hiscore dir, quit silently
+	  ret
+     
+
+back_to_flos
+
+	  di						
+	  xor a
+          out (sys_audio_enable),a      	; silence channels
+
+	  call restore_flos_bitmap
+	  call kjt_flos_display	        
+	 
+	  ld hl,(orig_irq_vector)
+	  ld (irq_vector),hl
+	  xor a
+	  ld (vreg_rasthi),a			; disable video IRQ
+	  ld a,%10000001
+	  out (sys_irq_enable),a        	; re-enable kb irq source	
+	  ei
+	  ret
+
+
+orig_irq_vector
+
+	  dw 0
+
+hss_txt	  db "New hiscore saved.",11,0
 
 ;------------------------------------------------------------------------------
 
@@ -2171,6 +2237,8 @@ higher    ld hl,score
           ld de,hiscore                 
           ld bc,5
           ldir
+	  ld a,1
+	  ld (new_hs),a
                     
 update_hiscore
 
@@ -2993,6 +3061,36 @@ tswait    call kjt_wait_vrt
                               
 ;--------------------------------------------------------------------------------------------------
 
+goto_hiscores_dir
+
+	  call kjt_root_dir
+	  ld hl,games_dir
+	  call kjt_change_dir
+	  ret nz
+	  ld hl,hiscores_dir
+	  call kjt_change_dir
+	  ret
+
+games_dir
+
+	db "GAMES",0
+
+hiscores_dir
+
+	db "HISCORES",0
+
+hs_filename
+
+	db "TETRIS.HSC",0
+	
+;--------------------------------------------------------------------------------------------------
+
+	include "flos_based_programs\code_library\video\inc\backup_restore_flos_bitmap.asm"	
+	
+	include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
+
+;--------------------------------------------------------------------------------------------------
+
 tl_sin_base         db 43
 tl_cos_base         db 233
 tl_rad              dw $cc
@@ -3051,8 +3149,7 @@ ready_for_new_piece db 0
 
 score               db 0,0,0,0,0,0                ;lowest digit first
 hiscore             db 0,0,0,0,0,0
-hs_filename         db "TET-HISC.BIN",0
-
+new_hs		    db 0
 add_one             db 1,0,0,0,0,0
 
 line_bonus_1        db 0,0,1,0,0,0,0,0            ; for a single line
