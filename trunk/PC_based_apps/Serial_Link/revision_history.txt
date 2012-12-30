@@ -1,3 +1,7 @@
+v3.3
+----
+Combo box for new BAUD selection (14400,28800,57600, 115200)
+
 v3.2
 ----
 
