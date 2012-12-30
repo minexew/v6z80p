@@ -27,7 +27,7 @@ Enumeration
   #StatusBar_0
 EndEnumeration
 
-  If OpenWindow(#Window_0, 314, 107, 330, 210,  "xZ80P Serial Link V3.2", #PB_Window_SystemMenu | #PB_Window_TitleBar)
+  If OpenWindow(#Window_0, 314, 107, 330, 210,  "xZ80P Serial Link V3.3", #PB_Window_SystemMenu | #PB_Window_TitleBar)
         ButtonGadget(#Button_0, 10, 10, 90, 40, "Send")
         ButtonGadget(#Button_1, 120, 10, 80, 40, "Receive")
         ProgressBarGadget(#ProgressBar_0, 10, 180, 309, 20, 0, 100)
@@ -600,7 +600,6 @@ wait_ack:
 Return
 ;------------------------------------------------------------------------------------------
 ; IDE Options = PureBasic 4.30 (Windows - x86)
-; CursorPosition = 101
-; FirstLine = 546
+; CursorPosition = 29
 ; Folding = -
 ; Executable = ..\Serial_link_v3_0.exe
