@@ -67,6 +67,6 @@ rainbow_colours	dw $f0f,$f0f,$e0f,$e0f,$d0f,$c0f,$b0f,$a0f,$90f,$80f,$70f,$60f,$
 
 ;---------------------------------------------------------------------------------------------------------
 
-		org $6000			;line cop programs must start on even address
+		org $5800			;line cop programs must start on even address
 		
 linecop_prog	db 0
