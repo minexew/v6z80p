@@ -3,9 +3,9 @@
 
 ;---Standard header for OSCA and FLOS  -----------------------------------------------------------------------
 
-include "kernal_jump_table.asm"
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\kernal_jump_table.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 	org $5000
 
@@ -14,53 +14,41 @@ linecop_code	equ $0			; $0000 to $FFFE = $70000 to $7FFFE in sys RAM (must be ev
 
 ;--------------------------------------------------------------------------------------------------------------
 
-	ld a,13				;Bank 13 = $70000 in sys RAM (flat address)
-	ld de,linecop_code			
-	bit 7,d				;if > $7FFF use bank 14 ($78000 in sys RAM)
-	jr z,lowerbank
-	inc a
-lowerbank	call kjt_forcebank
-	set 7,d				; will always be in upper page of Z80 address space
-
-	push de				;build rainbow colour bar list
-	pop ix
-	ld (ix+0),$10			;first wait line
-	ld (ix+1),$c0
-	inc ix
-	inc ix
-	ld b,0
-	ld hl,rainbow_colours
-mcblp	ld (ix+0),$00			;set reg 0
-	ld (ix+1),$80
-	ld a,(hl)
-	ld (ix+2),a			;write colour lo, inc reg
-	ld (ix+3),$40
-	inc hl
-	ld a,(hl)
-	ld (ix+4),a			;write colour hi, inc line
-	ld (ix+5),$20
-	inc hl
-	ld de,6
-	add ix,de
-	djnz mcblp
-	ld (ix+0),$ff			;wait for $1ff - end of line cop list
-	ld (ix+1),$c1		
-
-	ld de,linecop_code
-	set 0,e				; enable line cop (bit 0 of vreg_linecop_lo)
-	ld (vreg_linecop_lo),de		; set h/w location of line cop list
+		ld de,linecop_prog
+		push de			;build rainbow colour bar linecop program from list
+		pop ix
+		ld (ix+0),$10			;first wait line
+		ld (ix+1),$c0
+		inc ix
+		inc ix
 		
-	xor a				; and quit
-	ret
+		ld b,0				;make a load of set reg, writelo+inc_reg, writehi instructions
+		ld hl,rainbow_colours
+mcblp		ld (ix+0),$00			;set reg 0
+		ld (ix+1),$80
+		ld a,(hl)
+		ld (ix+2),a			;write colour lo, inc reg
+		ld (ix+3),$40
+		inc hl
+		ld a,(hl)
+		ld (ix+4),a			;write colour hi, inc line
+		ld (ix+5),$20
+		inc hl
+		ld de,6
+		add ix,de
+		djnz mcblp
+		ld (ix+0),$ff			;at end of list, wait for $1ff 
+		ld (ix+1),$c1		
 
+		ld de,linecop_prog
+		set 0,e				; enable line cop (bit 0 of vreg_linecop_lo)
+		ld (vreg_linecop_lo),de		; set h/w location of line cop list
+		
+		xor a				; and quit
+		ret
 
-;--------------------------------------------------------------------------------------------------------
-
-do_stuff	ret
 
 ;------------------------------------------------------------------------------------------------------
-
-counter		db 0
 
 rainbow_colours	dw $f0f,$f0f,$e0f,$e0f,$d0f,$c0f,$b0f,$a0f,$90f,$80f,$70f,$60f,$50f,$40f,$30f,$30f,$20f,$20f,$10f,$10f,$00f
 		dw $00f,$00f,$01f,$01f,$02f,$02f,$03f,$04f,$05f,$06f,$07f,$08f,$09f,$0af,$0bf,$0cf,$0df,$0df,$0ef,$0ef,$0ff
@@ -76,3 +64,5 @@ rainbow_colours	dw $f0f,$f0f,$e0f,$e0f,$d0f,$c0f,$b0f,$a0f,$90f,$80f,$70f,$60f,$
 		dw $f00,$f00,$f01,$f01,$f02,$f02,$f03,$f04,$f05,$f06,$f07,$f08,$f09,$f0a,$f0b,$f0c,$f0d,$f0d,$f0d,$f0e,$f0e,$f0f,$f0f
 
 ;---------------------------------------------------------------------------------------------------------
+
+linecop_prog	db 0
