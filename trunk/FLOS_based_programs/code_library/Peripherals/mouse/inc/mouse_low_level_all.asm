@@ -6,7 +6,7 @@
 ;
 ;-------------------------------------------------------------------------------------------
 
-include "flos_based_programs\code_library\peripherals\keyboard\inc\mouse_low_level_main.asm"
+include "flos_based_programs\code_library\peripherals\mouse\inc\mouse_low_level_main.asm"
 
 include "FLOS_based_programs\code_library\Timer\inc\timer_set_test.asm"
 
