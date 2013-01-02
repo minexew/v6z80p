@@ -1,6 +1,5 @@
 ; Ultra simple audio example - play a sample once (ie: loops to silent sample data)
 ; Note: Requires OSCA v672+
-; (Source tab width=8)
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------
 
@@ -46,19 +45,19 @@ include "equates\system_equates.asm"
 
 ;-----------------------------------------------------------------------------------------
 
-	org ($+1) & $fffe		;word align the samples
+	org ($+1) & $fffe		;always word align the samples
 
-my_sound     incbin "flos_based_programs\simple_examples\sound\data\pop.bin"		;pop sample data (8 bit, signed - no header)
+my_sound     incbin "flos_based_programs\simple_examples\sound\data\pop.bin"	;"pop" sample data (8 bit, signed - no header)
 end_sound			
 
 silent_samp db 0,0			;silent sample data
 
 ;----------------------------------------------------------------------------------------
 
-sample_addr	db 0,0,0			;all little-endian
-sample_length	db 0,0,0
-sample_period	dw 0
-sample_volume	db 0
+sample_addr		db 0,0,0	;all little-endian
+sample_length		db 0,0,0
+sample_period		dw 0
+sample_volume		db 0
 
 sample_loop_addr	db 0,0,0
 sample_loop_length	db 0,0,0

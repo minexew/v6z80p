@@ -1,6 +1,5 @@
 ; Ultra simple audio example - play a continuous tone
 ; Note: Requires OSCA v672+
-; (Source tab width=8)
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------
 
@@ -18,7 +17,7 @@ include "equates\system_equates.asm"
 	ld (sample_addr),hl
 	ld (sample_addr+2),a
 	
-	ld hl,end_sound-my_sound		;set up byte length of sample,  0-$1fffe
+	ld hl,end_sound-my_sound	;set up byte length of sample,  0-$1fffe
 	ld (sample_length),hl
 	ld a,0
 	ld (sample_length+2),a
@@ -67,30 +66,30 @@ play_sound
 
 	ld a,(sample_addr+2)
 	ld hl,(sample_addr)
-	srl a 				;divide location by 2 for WORD location
+	srl a 					;divide location by 2 for WORD location
 	rr h
 	rr l
 	ld b,h			
 	ld c,audchan0_loc	
 	out (c),l				;write sample WORD address [15:0] to audio port	
-	out (audchan0_loc_hi),a		;write sample WORD address [16:17] to audio port
+	out (audchan0_loc_hi),a			;write sample WORD address [16:17] to audio port
 	
 	ld a,(sample_length+2)
 	ld hl,(sample_length)
 	srl a
 	rr h
-	rr l				;divide length by 2 for length in WORDS
+	rr l					;divide length by 2 for length in WORDS
 	ld b,h
 	ld c,audchan0_len
 	out (c),l				;write sample WORD length to port
 	
-	ld hl,(sample_period)		;period = clock ticks between sample bytes
+	ld hl,(sample_period)			;period = clock ticks between sample bytes
 	ld b,h
 	ld c,audchan0_per
 	out (c),l				;write sample frequency to period port 
 	
 	ld a,(sample_volume)
-	out (audchan0_vol),a		;write sample volume to port (64 = full volume)
+	out (audchan0_vol),a			;write sample volume to port (64 = full volume)
 
 	call dma_wait
 
