@@ -67,6 +67,7 @@ video_registers     equ $200
 vreg_xhws           equ $200            ; video control registers
 vreg_vidctrl        equ $201
 vreg_window         equ $202
+vreg_window_size    equ $202		; new name for above
 vreg_yhws_bplcount  equ $203
 vreg_rasthi         equ $204
 vreg_rastlo         equ $205
