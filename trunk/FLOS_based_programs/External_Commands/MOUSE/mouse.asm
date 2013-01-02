@@ -60,11 +60,11 @@ minit_ok	call kjt_get_display_size		;get pointer boundaries
 
 mouse_enabled_txt
 
-	db 11,"Mouse detected and enabled",11,11,0
+	db 11,"Mouse detected and enabled.",11,11,0
 	
 no_mouse_txt
 	
-	db 11,"No mouse detected",11,11,0
+	db 11,"No mouse detected.",11,11,0
 
 ;-----------------------------------------------------------------------------------------------
 	
