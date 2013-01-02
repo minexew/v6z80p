@@ -50,12 +50,12 @@ lc_wl	     equ $c000		; Wait Line
 		
 my_linecop_list	
 	
-		dw lc_wl+$050		; Wait for line $50
+		dw lc_wl+$080		; Wait for line $80
 		dw lc_sr+$000		; Select video register $000 (background colour)
 		dw lc_wrir+$ff		; Write $ff to colour LSB, increment video register
 		dw lc_wril+$ff		; Write $ff to colour MSB, increment wait line (and wait)
 		dw lc_sr+$000		; Select video register $000 (background colour)
-		dw lc_wril+$00		; Write $00 to colour LSB, increment video register
+		dw lc_wrir+$00		; Write $00 to colour LSB, increment video register
 		dw lc_wr+$00		; Write $00 to colour MSB
 		dw lc_wl+$1ff		; Wait for Line $1FF (End of LineCop program)
 		
