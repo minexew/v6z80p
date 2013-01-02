@@ -1,8 +1,6 @@
 
-; LineCop example: Changes a single scanline (border) colour to white
-;
-; (The FLOS command "LCD 0" can be used to disassemble the linecop program once this program has run)
-; (Source tab width=8)
+; Simple LineCop Example: Changes a single scanline (border) colour to white
+; Requires OSCA v673 or above
 
 ;---Standard header for OSCA and FLOS  -----------------------------------------------------------------------
 
@@ -15,46 +13,50 @@ include "equates\system_equates.asm"
 
 ;--------------------------------------------------------------------------------------------------------------
 
-		ld b,end_my_linecop_list-my_linecop_list	; copy LineCop instructions to $70000+
-		ld hl,0						; IE: Locations accessible by LineCop system
-		ld e,7					
-		ld ix,my_linecop_list
-copyloop	ld a,(ix)
-		push hl
-		push bc
-		push de
-		call kjt_write_sysram_flat		; put A @ (E:HL)
-		pop de
-		pop bc
-		pop hl
-		inc ix
-		inc hl
-		djnz copyloop
 	
-	
-		ld hl,$0001
-		ld (vreg_linecop_lo),hl			; set linecop program location and start
+		ld c,$0 
+		ld de,my_linecop_list		; c:de = linecop address in system memory
 		
-		call kjt_wait_key_press			; wait for any key
+		ld ix,linecop_addr0
+		set 7,c 			; bit 7 of MSB must be set for linecop hi
+		set 0,e 			; Bit 0 of LSB must be set to enable the linecop system
+		ld (ix+2),c			; write linecop addr 23:16
+		ld (ix+1),d			; write linecop addr 15:8
+		ld (ix+0),e			; write linecop addr 7:0 (and enable)
 		
-		ld a,0
-		ld (vreg_linecop_lo),a			; disable linecop
+		call kjt_wait_key_press		; wait for any key
+		
+		xor a
+		ld (vreg_linecop_lo),a		; disable linecop
 	
-		xor a					; back to FLOS
+		xor a				; back to flos
 		ret
 
 
-;--------------------------------------------------------------------------------------------------------
+;---------------------------------------------------------------------------------------------------------------
+; Linecop mnemonics and their opcodes..
+;---------------------------------------------------------------------------------------------------------------
 
-my_linecop_list	dw $c050		; Wait for line $50
-		dw $8000		; Select video register $000 (background colour)
-		dw $40ff		; Write $ff to colour LSB, increment video register
-		dw $20ff		; Write $ff to colour MSB, increment wait line (and wait)
-		dw $8000		; Select video register $000 (background colour)
-		dw $4000		; Write $00 to colour LSB, increment video register
-		dw $0000		; Write $00 to colour MSB
-		dw $C1FF		; Wait for Line $1FF (End of LineCop program)
+lc_wr        equ $0000		; Write Register
+lc_wril      equ $2000		; Write Register & Inc Line (then wait)
+lc_wrir      equ $4000		; Write Register & Inc Reg
+lc_wrilir    equ $6000		; Write Register & Inc Reg & Inc Line (then wait)
+lc_sr        equ $8000		; Select Register
+lc_wl	     equ $c000		; Wait Line
+
+;------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		org ($+1) & $fffe	; line cop lists must be aligned on even address
 		
-end_my_linecop_list	db 0
-
+my_linecop_list	
+	
+		dw lc_wl+$050		; Wait for line $50
+		dw lc_sr+$000		; Select video register $000 (background colour)
+		dw lc_wrir+$ff		; Write $ff to colour LSB, increment video register
+		dw lc_wril+$ff		; Write $ff to colour MSB, increment wait line (and wait)
+		dw lc_sr+$000		; Select video register $000 (background colour)
+		dw lc_wril+$00		; Write $00 to colour LSB, increment video register
+		dw lc_wr+$00		; Write $00 to colour MSB
+		dw lc_wl+$1ff		; Wait for Line $1FF (End of LineCop program)
+		
 ;---------------------------------------------------------------------------------------------------------
