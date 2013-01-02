@@ -22,6 +22,7 @@ notquitmt	ld a,b
 		jr mouse_tlp
 
 mouse_init	call initialize_mouse
+		call pause_1_second
 		jr mouse_test
 
 mouse_move	call show_mouse_data
@@ -47,7 +48,7 @@ initialize_mouse
 		jr nc,minit_ok
 nomouse		ld hl,no_mouse_txt
 		call kjt_print_string
-		call press_any_key
+		scf 
 		ret
 		
 minit_ok	call kjt_get_display_size		;get pointer boundaries
@@ -66,6 +67,7 @@ minit_ok	call kjt_get_display_size		;get pointer boundaries
 		
 		ld hl,mouse_enabled_txt
 		call kjt_print_string
+		xor a
 		ret
 
 
@@ -123,9 +125,11 @@ askinit		ld hl,init_txt
 		ret
 
 okinit		call initialize_mouse
-		ret nz	
-		jp show_mouse_data
-
+		push af
+		call pause_1_second
+		pop af
+		jp nc,show_mouse_data
+		ret
 
 init_txt	db "Mouse driver not active.",11,11
 		db "Init mouse? (y/n)",11,11,0
@@ -134,7 +138,7 @@ mouse_loc_test_txt
 
 		db "Testing mouse motion - ESC to QUIT",0
 ms_init_txt
-		db "Initializing mouse..",11,0
+		db "Initializing mouse..",11,11,0
 		
 ;-----------------------------------------------------------------------------------------------		
 		
@@ -290,7 +294,7 @@ update_ms_sprite
 		
 ;----------------------------------------------------------------------------------------------------------
 
-include "flos_based_programs/code_library/peripherals/inc/mouse_low_level.asm"
+include "flos_based_programs/code_library/peripherals/mouse/inc/mouse_low_level_main.asm"
 
 ;-----------------------------------------------------------------------------------------------------------
 
