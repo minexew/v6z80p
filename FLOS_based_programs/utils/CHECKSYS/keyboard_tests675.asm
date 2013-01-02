@@ -25,7 +25,10 @@ notquit		ld a,b
 		jr wait_key
 		
 kb_reset	call do_reset
-kbt_ret		ei
+kbt_ret		push af
+		call pause_1_second
+		pop af
+		ei
 		jp nc,keyboard_tests
 		call kjt_print_string
 		jp keyboard_tests
@@ -40,6 +43,7 @@ kb_capsoff	call do_capsoff
 		jr kbt_ret
 
 kb_rd_test	call do_kb_rd_test
+		ei
 		jp keyboard_tests
 		
 kbtest_txt	db "Keyboard Test Menu",11,11
@@ -57,16 +61,14 @@ kb_read_test_txt
 			
 ;-----------------------------------------------------------------------------------------
 
-do_echo		call pause_1_second
-		di
+do_echo		di
 		ld a,$ee			;echo command				
 		call show_send
 		ret c
 		call show_response
 		ret 
 		
-do_reset	call pause_1_second
-		di
+do_reset	di
 		ld a,$ff			;reset command
 		call show_send
 		ret c
@@ -76,8 +78,7 @@ do_reset	call pause_1_second
 		ret
 
 
-do_capson	call pause_1_second
-		di
+do_capson	di
 		ld a,$ed			;set status leds command
 		call show_send
 		ret c
@@ -91,8 +92,7 @@ do_capson	call pause_1_second
 		ret	
 
 
-do_capsoff	call pause_1_second
-		di
+do_capsoff	di
 		ld a,$ed			;set status leds command				
 		call show_send
 		ret c
@@ -107,11 +107,10 @@ do_capsoff	call pause_1_second
 
 
 
-do_kb_rd_test	call pause_1_second
-		di					; show scancodes
-		ld hl,kb_read_test_txt
+do_kb_rd_test	ld hl,kb_read_test_txt
 		call kjt_print_string
 		
+		di					; show scancodes
 readloop	in a,(sys_irq_ps2_flags)		; wait for keyboard IRQ flag to be set
 		bit 0,a
 		jr z,readloop
@@ -124,7 +123,7 @@ readloop	in a,(sys_irq_ps2_flags)		; wait for keyboard IRQ flag to be set
 		ret z
 		call show_rec_byte
 		jr readloop
-			
+	
 
 
 ;----------------------------------------------------------------------------------------------
@@ -173,27 +172,7 @@ pause_lp	call test_timer
 		pop af
 		ret
 
-set_timer
-
-; put timer reload value in A before calling, remember - timer counts upwards!
-
-		out (sys_timer),a			;load and restart timer
-		ld a,%00000100
-		jr clr_tirq				;clear timer overflow flag
-
-
-;------------------------------------------------------------------------------------------
-		
-test_timer
-
-; zero flag is set on return if timer has not overflowed
-
-		in a,(sys_irq_ps2_flags)		;check for timer overflow..
-		and 4
-		ret z	
-clr_tirq	out (sys_clear_irq_flags),a		;clear timer overflow flag
-		ret
-		
+	
 ;---------------------------------------------------------------------------------------------------------
 		
 show_send_byte	push af
@@ -229,6 +208,6 @@ hex_txt		db "$xx",11,0
 
 ;-----------------------------------------------------------------------------------------------------------
 
-include "flos_based_programs/code_library/peripherals/inc/keyboard_low_level.asm"
+include "flos_based_programs/code_library/peripherals/keyboard/inc/keyboard_low_level_main.asm"
 
 ;-----------------------------------------------------------------------------------------------------------

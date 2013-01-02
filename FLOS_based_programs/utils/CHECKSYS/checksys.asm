@@ -1,6 +1,10 @@
 ; CHECKSYS - V6Z80P/OSCA/FLOS test program
+; ----------------------------------------
 ;
 ; Keep program < $8000, paged area used for samples, memtest etc
+;
+; v1.07 - Low level mouse and Keybocde code updated for OSCA v675 (now uses standard code library routines)
+;       - Serial Port tests allow 14400 and 28800 BAUD
 ;
 ; V1.04 - Added Blitter test
 ;       - Added SD Card Tests
@@ -17,6 +21,11 @@ include "equates\OSCA_hardware_equates.asm"
 include "equates\system_equates.asm"
 
 	org $5000	
+
+;----------------------------------------------------------------------------------------------
+
+required_osca       equ $675
+include             "flos_based_programs\code_library\program_header\inc\test_osca_version.asm"
 
 ;------------------------------------------------------------------------------------------------------------
 
@@ -76,7 +85,7 @@ test_sdcard	call sd_tests
 		
 		
 menu_txt	db "--------------------------",11
-		db "V6Z80P System Tester V1.06",11
+		db "V6Z80P System Tester V1.07",11
 		db "--------------------------",11,11
 		db "Press:",11,11
 		db "1. For keyboard tests",11
@@ -95,13 +104,15 @@ menu_txt	db "--------------------------",11
 ;--------------------------------------------------------------------------------------------------------
 
 	include "FLOS_based_programs\utils\checksys\joystick_test.asm"
-	include "FLOS_based_programs\utils\checksys\keyboard_tests.asm"
-	include "FLOS_based_programs\utils\checksys\serial_tests_675.asm"
-	include "FLOS_based_programs\utils\checksys\mouse_test.asm"
+	include "FLOS_based_programs\utils\checksys\keyboard_tests675.asm"
+	include "FLOS_based_programs\utils\checksys\serial_tests675.asm"
+	include "FLOS_based_programs\utils\checksys\mouse_test675.asm"
 	include "FLOS_based_programs\utils\checksys\memory_tests.asm"
 	include "FLOS_based_programs\utils\checksys\video_tests.asm"
 	include "FLOS_based_programs\utils\checksys\audio_tests.asm"
 	include "FLOS_based_programs\utils\checksys\system_info.asm"
 	include "FLOS_based_programs\utils\checksys\sdcard_tests.asm"
 	
+;--------------------------------------------------------------------------------------------------------
+	include "flos_based_programs/code_library/timer/inc/timer_set_test.asm"
 ;--------------------------------------------------------------------------------------------------------
