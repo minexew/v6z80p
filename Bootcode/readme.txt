@@ -35,12 +35,23 @@ he backup copy.
   of the V6Z80P. You can then update fully using EEPROM.EXE.
 
 
+
 *************
 * Revisions *
 *************
 
 Current version:
 ----------------
+
+6.18 (2-1-2012)
+
+* Uses standard keyboard init code from code library (required for OSCA v675 but compatible
+  with previous versions). Will not hang on Keyboard init in any circumstances.
+
+
+
+Previous versions:
+------------------
 
 6.17 (15-11-2012)
 
@@ -54,9 +65,6 @@ Current version:
 * Boot device and available device codes changed (not previously used) and passed to OS
   in BC (A = 1 to signify valid, previously A=0)
 
-
-Previous versions:
-------------------
 
 6.16 (18-10-2012)
 
