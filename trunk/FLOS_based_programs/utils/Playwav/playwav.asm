@@ -120,7 +120,7 @@ short_samp
           call kjt_set_file_pointer
           ld hl,$8000
           ld b,3                        ; load sample data (continuing from header) 
-          call kjt_force_load           ; at start of audio accessible system RAM
+          call kjt_force_load           ; to $20000
           
           ld a,3
           call kjt_forcebank            ; convert to signed samples
@@ -184,7 +184,7 @@ long_samp
           call kjt_set_load_length
  
           ld hl,$8000
-          ld b,3                        ; load sample data at start of audio accessible system RAM
+          ld b,3                        ; load sample data to $20000 in system RAM
           call kjt_force_load           ; both buffers will be filled as sample is > 128KB          
 
           ld a,3
