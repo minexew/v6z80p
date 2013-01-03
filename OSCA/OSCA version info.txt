@@ -7,15 +7,25 @@ Both support VGA output.
 Updates to OSCA
 ---------------
 
-674 - The upper 4 bits of the OSCA version ID now contain a PCB version code (1=V6Z80P,
-      2=V6+V1.0, 3=V6+v1.1)
+*** THIS VERSION OF OSCA REQUIRES BOOTCODE v618 TO BE INSTALLED FIRST ****
 
-    - PS/2 Interface modules changed to synchronous logic. 
-    - PS/2 interface write signal input changed to delayed CPU write (was using raw CPU write)
+675 - 28800 and 14400 BAUD support and IRQ feature added to serial port
+    - PS/2 Interfaces updated: Now hold clock lines low when "byte_received_flag" is set
+    - Video Interrupt can be enabled via normal "sys_irq_enable"  port
+    - Audio interrupt move to bit 4 of IRQ enable
+
+*** THIS VERSION OF OSCA REQUIRES BOOTCODE v618 TO BE INSTALLED FIRST ****
+
 
 
 Previous versions
 -----------------
+
+674 - The upper 4 bits of the OSCA version ID now contain a PCB version code (1=V6Z80P,
+      2=V6+V1.0, 3=V6+v1.1)
+    - PS/2 Interface modules changed to synchronous logic. 
+    - PS/2 interface write signal input changed to delayed CPU write (was using raw CPU write)
+
 
 673 - Linecop programs can now be placed anywhere in system RAM (on even byte boundaries)
       so can be upto 212KB in length. Register $20f doubles as Linecop add bits 18:16 when
@@ -23,8 +33,6 @@ Previous versions
 
 672 - Audio system can now see all 512KB of System RAM (new location_hi register ports $24-$27)
       Simplified flood filler to XOR (as proposed by Daniel)
-
-
 
 671 - Exp Pin B has weak pull-up
 
