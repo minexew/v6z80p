@@ -72,6 +72,7 @@ kjt_draw_cursor               equ os_start + $bb
 kjt_get_pen                   equ os_start + $be
 kjt_scroll_up                 equ os_start + $c1
 kjt_flos_display              equ os_start + $c4
+kjt_flos_settings	      equ os_start + $c4   ; new name for above
 kjt_get_dir_name              equ os_start + $c7
 kjt_get_key_mod_flags         equ os_start + $ca
 kjt_get_display_size          equ os_start + $cd   ; added in v559
