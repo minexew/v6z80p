@@ -14,7 +14,7 @@ save_dir_vol
 		push ix
 		push iy
 		call kjt_get_volume_info
-		ld (original_vol),a
+		ld (srdv_orig_vol),a
 
 		ld hl,orig_cluster_list
 		xor a
@@ -65,7 +65,7 @@ skprestdir	pop af
 		cp 10
 		jr nz,rodv_lp
 		
-restore_orgvol	ld a,(original_vol)
+restore_orgvol	ld a,(srdv_orig_vol)
 		call kjt_change_volume
 		pop iy
 		pop ix
@@ -80,6 +80,6 @@ orig_cluster_list
 
 		ds 20,0
 
-original_vol	db 0
+srdv_orig_vol	db 0
 
 ;-----------------------------------------------------------------------------------------------------
