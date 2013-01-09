@@ -1,7 +1,8 @@
 ;********************************************************
-;* Sound FX Editor for FLOS V0.25 - By Phil Ruston 2010 *
+;* Sound FX Editor for FLOS V0.26 - By Phil Ruston 2010 *
 ;********************************************************
 
+; v0.25 - standard dir/vol restore
 ; V0.25 - uses newer window code (FLOS 6.02+ required)
 
 ;---Standard header for OSCA and FLOS ---------------------------------------------------------
@@ -28,7 +29,16 @@ include             "flos_based_programs\code_library\program_header\inc\test_fl
 
 ;---------------------------------------------------------------------------------------
 
-          jp start_fxedit     ;skip data that needs to be in unpaged RAM
+max_path_length equ 40
+
+          call save_dir_vol
+          call fxeditor
+          call restore_dir_vol
+          ret
+
+;---------------------------------------------------------------------------------------
+                
+fxeditor  jp start_fxedit     ;skip data that needs to be in unpaged RAM
           
 ;---------------------------------------------------------------------------------------
 
@@ -4257,6 +4267,8 @@ y_win_offset
 
           include "FLOS_based_programs\code_library\requesters\inc\file_requesters.asm"
 
+	  include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
+
 ;---------------------------------------------------------------------------------------
 
 
@@ -4708,7 +4720,7 @@ ascii_entry_mode              db 0
 
 ;------------------------------------------------------------------------------
 
-sfxed_txt db "SOUND FX EDITOR 0.25 - TOP LEVEL        ",0
+sfxed_txt db "SOUND FX EDITOR 0.26 - TOP LEVEL        ",0
                     
 byte_txt  db "xx",0
 
@@ -4728,7 +4740,7 @@ snu_txt   db "--",0
 
 ;--------------------------------------------------------------------------------
 
-waved_txt db "SOUND FX EDITOR 0.25 - WAVE SELECTOR    ",0
+waved_txt db "SOUND FX EDITOR 0.26 - WAVE SELECTOR    ",0
                     
 wav_txt   db 11,"Clip: ",0
 prev_txt  db "   Preview? : ",0
@@ -4757,7 +4769,7 @@ undefined_txt       db "UNDEFINED    ",0
 
 sample_load_txt
 
-          db "SOUND FX EDITOR 0.25 - SAMPLE LOADER    ",0
+          db "SOUND FX EDITOR 0.26 - SAMPLE LOADER    ",0
 
 sample_bank_txt
 
@@ -4801,7 +4813,7 @@ wav_header          ds 64,0
 
 project_loadsave_txt
 
-          db "SOUND FX EDITOR 0.25 - DATA LOAD/SAVE   ",0
+          db "SOUND FX EDITOR 0.26 - DATA LOAD/SAVE   ",0
 
 loadsavepage_txt
 
@@ -4837,7 +4849,7 @@ dot_txt             db ".",0
 
 script_ed_txt
 
-          db "SOUND FX EDITOR 0.25 - SCRIPT EDITOR    ",0
+          db "SOUND FX EDITOR 0.26 - SCRIPT EDITOR    ",0
           
 script_no_txt
 

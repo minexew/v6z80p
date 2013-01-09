@@ -1,10 +1,12 @@
 ;****************************************************
-; FLOS File Manager by Phil @ Retroleum.co.uk - V0.04
+; FLOS File Manager by Phil @ Retroleum.co.uk - V0.05
 ;****************************************************
 
 ;Updates:
 ;--------
-
+;
+;v0.05 - Standard store/restore dir vol routines
+;
 ;V0.04 - Uses new window draw code (FLOS 6.02+)
 ;
 ;v0.03 - Added "RX" button to receive files via Serial Link, requires Serial Link 2.8
@@ -51,17 +53,20 @@ file_buffer_bank              equ 0
 window_cols                   equ 40
 window_rows                   equ 25
 
+max_path_length equ 40
+
+;--------------------------------------------------------------------------------------------
+
+          call save_dir_vol
+          call filemgr
+          call restore_dir_vol
+          ret
 
 ;--------------------------------------------------------------------------------------------
           
-          call w_backup_display
+filemgr   call w_backup_display
           call kjt_get_cursor_position
           ld (orig_cursor),bc
-          
-          call kjt_get_volume_info
-          ld (original_volume),a
-          call kjt_get_dir_cluster
-          ld (original_cluster),de
           
           
 ;--------- Initialize ------------------------------------------------------------------------
@@ -1737,12 +1742,7 @@ note_dst_cluster
 ;----------------------------------------------------------------------------------------------
 
 req0_esc_pressed
-          
-          ld a,(original_volume)
-          call kjt_get_volume_info
-          ld de,(original_cluster)
-          call kjt_set_dir_cluster
-          
+                    
           call w_restore_display
           ld bc,(orig_cursor)
           call kjt_set_cursor_position
@@ -2615,6 +2615,8 @@ text_buffer ds max_chars+8,0
 
 include "FLOS_based_programs\code_library\window_routines\inc\window_draw_routines.asm"
 include "FLOS_based_programs\code_library\window_routines\inc\Window_Support_Routines.asm"
+
+include   "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
 ;---------------------------------------------------------------------------------------------
 
