@@ -1,5 +1,5 @@
 
-; Help [command] - shows help text files By Phil '12
+; Help [command] - shows help text files By Phil '13
 
 ;======================================================================================
 ; Standard equates for OSCA and FLOS
@@ -28,9 +28,17 @@ include 	"flos_based_programs\code_library\program_header\inc\test_flos_version.
 window_rows equ 25
 window_cols equ 40
 
-		call kjt_store_dir_position
+max_path_length equ 40
 
-		ld a,(hl)			; examine argument text, if 0 show use
+		call save_dir_vol
+		call help
+		call restore_dir_vol
+		ret
+
+;------------------------------------------------------------------------------------------------
+			
+
+help		ld a,(hl)			; examine argument text, if 0 show use
 		or a			
 		jr nz,fn_ok
 
@@ -138,7 +146,6 @@ gotdocf		call div_line
 		ld a,(original_pen)
 		call kjt_set_pen
 
-		call kjt_restore_dir_position
 		xor a
 		ret
 
@@ -152,7 +159,6 @@ doc_dir_nf
 
 		ld hl,no_doc_dir_txt
 print_end	call kjt_print_string
-		call kjt_restore_dir_position
 		xor a
 		ret
 
@@ -164,7 +170,6 @@ got_nonalpha_cmd
 		call div_line
 		call kjt_print_string
 		call div_line
-		call kjt_restore_dir_position
 		xor a
 		ret
 
@@ -319,7 +324,7 @@ more_prompt
 
 ;-------------------------------------------------------------------------------------------
 
-	div_line
+div_line
 		push hl
 		ld hl,div_line_txt
 		call kjt_print_string
@@ -327,6 +332,10 @@ more_prompt
 		ret
 	
 ;-------------------------------------------------------------------------------------------
+
+include 	"flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
+
+;----------------------------------------------------------------------------------------------
 
 docs_txt		db "docs",0
 

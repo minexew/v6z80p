@@ -9,6 +9,7 @@
 ;-------------------------------------------------------------------------------------
 ; Changes
 ;
+; 1.05 - Fixed: Path was being reset for volumes. 
 ; 1.04 - Changed "/../" (truncated path) to "/--/"
 ; 1.03 - Allow Envar data to be ascii string (4 chars in quotes)
 ;        "+" and "-" parameters to inc or dec value
@@ -41,9 +42,95 @@ required_flos	equ $594
 include 	"flos_based_programs\code_library\program_header\inc\test_flos_version.asm"
 
 ;---------------------------------------------------------------------------------------
-	
 
-		ld (args_pointer),hl
+		call save_all_voldirs
+		call do_set
+		call restore_all_voldirs
+		ret
+
+;---------------------------------------------------------------------------------------
+
+
+save_all_voldirs
+
+		push af				; these book-end routines assume the volumes and
+		push bc				; dirs remain unchanged (ie: not deleted) during the
+		push de				; operation between them
+		push hl
+		push ix
+		push iy
+		call kjt_get_volume_info
+		ld (original_vol),a
+
+		ld hl,orig_cluster_list
+		xor a
+sadv_lp1	push af
+		push hl
+		call kjt_change_volume
+		call kjt_get_dir_cluster
+		pop hl
+		ld (hl),e
+		inc hl
+		ld (hl),d
+		inc hl
+stodv_novol	pop af
+		inc a
+		cp 10
+		jr nz,sadv_lp1
+		jr restore_orgvol			;start program in the volume original active
+
+
+
+
+restore_all_voldirs
+
+		push af				; these book-end routines assume the volumes and
+		push bc				; dirs remain unchanged (ie: not deleted) during the
+		push de				; operation between them
+		push hl
+		push ix
+		push iy
+		
+		ld hl,orig_cluster_list
+		xor a
+rodv_lp		push af
+		push hl
+		call kjt_change_volume
+		pop hl
+		jr z,rodv_volok
+		inc hl
+		inc hl
+		jr skprestdir
+rodv_volok	ld e,(hl)
+		inc hl
+		ld d,(hl)
+		inc hl
+		call kjt_set_dir_cluster
+skprestdir	pop af	
+		inc a
+		cp 10
+		jr nz,rodv_lp
+		
+restore_orgvol	ld a,(original_vol)
+		call kjt_change_volume
+		pop iy
+		pop ix
+		pop hl
+		pop de
+		pop bc
+		pop af
+		ret
+
+
+orig_cluster_list
+
+		ds 20,0
+
+original_vol	db 0
+
+;---------------------------------------------------------------------------------------
+			
+do_set		ld (args_pointer),hl
 
 		ld a,(hl)			; examine argument text, if none show envars
 		or a			
@@ -275,26 +362,19 @@ skp_ev		ld de,8
 		ret
 		
 
-show_assign
+;------------------------------------------------------------------------------------------------------------
+		
 
-		ld hl,equals_txt
+show_assign	ld hl,equals_txt
 		call kjt_print_string
 		
-		call kjt_get_dir_cluster	;show the en_var as a path
-		ld (orig_cluster),de
-		call kjt_get_volume_info
-		ld (orig_volume),a
-
 		ld a,(var_data+2)
 		call kjt_change_volume
 		ld de,(var_data)
 		call kjt_set_dir_cluster
+		
 		call show_path
-		ld a,(orig_volume)	
-		call kjt_change_volume
-		ld de,(orig_cluster)
-		call kjt_set_dir_cluster
-
+		
 		ld hl,new_line_txt
 		call kjt_print_string
 		jr show_next_envar
@@ -318,7 +398,7 @@ show_path
 
 		max_chars equ 32		;max allowable window width for path (min 28)
 			
-		ld c,max_chars-9		;Paths always have "VOL0:" and may also have "/../"
+		ld c,max_chars-9		;Paths always have "VOLx:" and may also have "/../"
 		ld b,0				;untruncated dir count
 		ld de,text_buffer
 		ld a,$2f
@@ -449,10 +529,6 @@ defined_vars_txt	db 11,"Environment variables:",11
 		db "----------------------",11,11,0
 
 badname_txt	db "Illegal variable name.",11,11,0
-
-orig_cluster	dw 0
-
-orig_volume  	db 0
 
 new_line_txt	db 11,0
 

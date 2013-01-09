@@ -121,7 +121,7 @@ orig_volume  	db 0
 
 missing_args_txt
 
-		db 11,"ASSIGN.EXE (v1.00)",11,11
+		db 11,"ASSIGN.EXE (v1.01)",11,11
 		db "Usage: ASSIGN PROXY [PATH]",11,11
 		db "PROXY is a 3 character (maximum)",11
 		db "environment variable to be used as",11

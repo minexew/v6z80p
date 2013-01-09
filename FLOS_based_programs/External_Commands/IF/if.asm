@@ -350,7 +350,7 @@ var_name	ds 5,0
 
 var_name2	ds 5,0
 
-var_data	 s 5,0
+var_data	ds 5,0
 
 goto_txt	db "GOTO",0
 
