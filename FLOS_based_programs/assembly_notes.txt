@@ -1,8 +1,0 @@
-
-To assemble the source code with Pasmo, make sure the Pasmo parameter
-string includes the base address of the V6Z80P project folder:
-
-EG: 
-
--I C:\V6Z80P\
-
