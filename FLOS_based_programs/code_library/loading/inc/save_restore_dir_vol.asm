@@ -1,8 +1,8 @@
 ;---------------------------------------------------------------------------------------
 ; Book-end routines to store all directory positions for all the volumes.
-; This is achieved by reading the current cluster position and it is
-; assumed the volumes and dirs remain unchanged (ie: not deleted) during the
-; operation between them
+; This is achieved by reading the current cluster position. (The kernal's
+; "restore cluster" routine attempts to check that dirs are still valid
+; but deleting directories between the routines is best avoided).
 ;---------------------------------------------------------------------------------------
 
 save_dir_vol
@@ -59,7 +59,9 @@ rodv_volok	ld e,(hl)
 		inc hl
 		ld d,(hl)
 		inc hl
+		push hl
 		call kjt_set_dir_cluster
+		pop hl
 skprestdir	pop af	
 		inc a
 		cp 10
