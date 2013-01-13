@@ -1,4 +1,4 @@
 
-Append bulkfile.bin to end of main.exe to make bounder.exe
+Append bulkfile.bin to end of main.exe to make bounder.flx
 
 Hiscores are saved in [ROOT] GAMES/HISCORES/
