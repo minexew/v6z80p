@@ -156,6 +156,7 @@ call_rx
 		ld (store_registers),a		; switching to external code, so store registers by default
 		call os_allow_nmi_freeze
 		
+		call backwards_compatibility
 		call get_pre_launch_regs	; set default args position in HL, DE = current DIR block, A = current VOL
 
 		ld ix,(serial_address)

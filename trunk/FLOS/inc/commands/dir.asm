@@ -2,9 +2,8 @@
 ; "dir" - show directory command. v6.09
 ;-----------------------------------------------------------------------
 
-os_cmd_dir
 
-		call kjt_check_volume_format	
+os_cmd_dir	call kjt_check_volume_format	
 		ret nz
 		
 		ld a,(hl)
@@ -14,15 +13,11 @@ os_cmd_dir
 		call cd_parse_path			;if DIR has args, interpret as path
 		ret nz
 		call dir_no_args
-		push af
-		call cd_restore_vol_dir
-		pop af
-		ret
+		jp cd_restore_vol_dir			;no point calling as routine
 	
 	
-dir_no_args
-	
-		call div_line
+
+dir_no_args	call div_line
 		call os_get_current_dir_name		;show dir name
 		ret nz
 		call os_print_string

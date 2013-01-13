@@ -2,6 +2,74 @@
 Current FLOS version:
 ---------------------
 
+v6.12  - 12/01/2013
+
+
+NEW:
+----
+
+* In the UI, the END key positions cursor at last non-space char on a line
+
+* Executables can now have a ".FLX" file extension (as well as ".EXE") this helps
+  differentiate between PC apps and FLOS apps.
+
+* When VOLx: is entered and the volume is not at [ROOT] the current dir path is shown.
+
+* Commands can be run with a path prefix. If a path is specified and the command is
+  not found there then the executable paths (%EX0-%EX9) are not checked.
+
+* Script lines starting with a semicolon are skipped.
+
+
+
+CHANGED: 
+--------
+
+* Path parsing massively redone - Now behaves essentially the same as DOS. One effect
+  of this is that paths with a volume at start require the "/" to specify the root.
+  Otherwise the directory part is taken as relative to the current dir position of
+  that volume.
+
+* CD command now does not select the volume. Use "VOLx:" to switch volumes.
+
+* Backwards compatibility mods now made only when running an external command.
+
+* "kjt_flos_display" renamed to "kjt_flos_settings" as it now clears the keyboard buffer,
+   sets FLOS IRQ settings etc.
+                 
+* Optimized: FAT16 code v1.26 used ("fs_check_dir_cluster" tests for dir cluster = 0)
+
+* KJT_SET_DIR_CLUSTER:  The routine now attempts to validate the dir by looking for the
+  directory name, if this fails, the dir is set to ROOT and error code $23 is returned
+  (DIR not found).
+
+* Restructured source - split into multiple include files Optimized dictionary routine / data.
+
+
+FIXED:
+------
+
+* When a program runs from an assigned %EXn: path, the current directory in all volumes
+  is retained.
+
+* Commands that need to access a directory of a different volume, now corrrectly restore
+  the originally seleced directory of the destination volume.
+
+
+NOTES
+-----
+
+* Changes made have slowed execution of scripts quite a lot. Will attempt to improve
+  this later.
+
+
+
+
+
+Previous changes:
+-----------------
+
+
 v6.11 - 24/12/2012
 
 
@@ -19,9 +87,6 @@ v6.11 - 24/12/2012
          	 to make release version of FLOS.
 
 
-
-Previous changes:
------------------
 
 v6.10 - 15/11/2012
 

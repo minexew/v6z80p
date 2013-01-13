@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"R" - show CPU register values saved on return from command. V6.03
+;"R" - show CPU register values saved on return from command. V6.04
 ;-----------------------------------------------------------------------
 
 
@@ -14,7 +14,7 @@ os_cmd_r	ld ix,af_store1			;show register values
 		ld c," "			;prefix char = space
 		call show_rr_cr
 		
-		call show_reg_run
+		call show_reg_run		;show IX IY SP IR
 		call os_print_string		;show PC
 	
 		ld a,(mem_select_store)
@@ -28,7 +28,7 @@ fbnkok		call os_show_hex_byte		;show BANK
 		ld a,(mem_select_store)
 		call os_show_hex_byte		;show port 0
 		
-		ld hl,flag_txt			; show the CPU flags
+		ld hl,flag_txt			;show the CPU flags
 		call os_copy_to_output_line
 		ld hl,output_line+5
 		ld bc,5
@@ -51,7 +51,7 @@ sfzero		add hl,bc
 pfzero		add hl,bc
 		inc hl
 		
-		ld a,(iff2_store)			;IFF flag
+		ld a,(iff2_store)		;IFF flag
 		bit 0,a
 		jr z,iffzero
 		ld (hl),'1'
@@ -69,6 +69,10 @@ show_reg_run	push bc
 		call os_print_char
 		
 		call os_print_string
+		
+		ld a,"="
+		call os_print_char
+		
 		ld e,(ix)
 		ld d,(ix+1)
 		inc ix

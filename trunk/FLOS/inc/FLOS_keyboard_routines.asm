@@ -84,11 +84,13 @@ os_get_key_press
 
 ;--------------------------------------------------------------------------------
 
+
 get_kb_buffer_indexes
 
 
-		ld hl,key_buf_wr_idx		; buffer write index			
-		ld a,(key_buf_rd_idx)		; buffer read index
+		ld hl,key_buf_rd_idx					
+		ld a,(hl)			; a = buffer read index
+		dec hl				; hl = location of buffer write index
 		ret
 
 
@@ -101,4 +103,34 @@ get_buffer_loc
 kbblncar	ld l,a
 		ret
 		
+
 ;--------------------------------------------------------------------------------
+
+
+os_get_key_mod_flags
+
+		ld a,(key_mod_flags)
+		ret
+
+
+;--------------------------------------------------------------------------------
+
+
+clear_keyboard_buffer
+
+; keyboad IRQs must be off when this is called
+
+		ld hl,0					; reset FLOS external key buffer
+		ld (key_buf_wr_idx),hl
+		ld b,50					; clear keyboard's internal buffer
+clrkbbf_lp	call kjt_wait_vrt			; (throw away upto 16 scancodes)
+		in a,(sys_irq_ps2_flags)		; wait 1 second max for scancodes to be transmitted
+		and 1					; expect each each scancode within 1 frame 
+		ret z
+		out (sys_clear_irq_flags),a
+		djnz clrkbbf_lp
+		ret
+		
+
+;--------------------------------------------------------------------------------
+		

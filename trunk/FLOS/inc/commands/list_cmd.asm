@@ -1,5 +1,5 @@
 ;-----------------------------------------------------------------------
-;"?" - List commands. V6.04
+;"?" - List commands. V6.05
 ;-----------------------------------------------------------------------
 
 os_cmd_list
@@ -8,7 +8,7 @@ os_cmd_list
 cmdlstlp	call os_show_packed_text
 		inc hl
 		ld a,(hl)
-		cp $ff
+		or a
 		jr nz,cmdlstlp
 		xor a
 		ret

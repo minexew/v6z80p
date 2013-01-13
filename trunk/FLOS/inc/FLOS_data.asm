@@ -6,29 +6,25 @@
 ; Non-packed Text Strings
 ;-------------------------------------------------------------------------------------------
 
-welcome_message		db "FLOS by Phil Ruston 2012"
-null_txt		db 0
+flos_version_txt	db "FLOS v"
+			db $30+((flos_version>>8)&$f)
+			db $30+((flos_version>>4)&$f)
+			db $30+(flos_version&$f)
+			db 0
 
+osca_version_txt	db " / OSCA v",0
+
+author_txt		db "By Phil Ruston 2008-2013"
+crlfx2_txt		db 11,11,0
+		
 storage_txt		db "Drives:",11,0
 
 commands_txt		db "COMMANDS",0
 
 boot_script_fn		db " BOOT_RUN.SCR ",0		 ; note: surrounding spaces are required for path split routine
 
-os_hex_prefix_txt	db "$",0
-
-flos_version_txt	db "FLOS V:$0"
-			db $30+((flos_version>>8)&$f)
-			db $30+((flos_version>>4)&$f)
-			db $30+(flos_version&$f)
-			db 0
-
-osca_version_txt	db " / OSCA V:$",0
-crlfx2_txt		db 11,11,0
-
-loading_txt		db "Loading..",11,0
-
-saving_txt		db "Saving..",11,0
+os_hex_prefix_txt	db "$"
+null_txt		db 0
 
 os_more_txt		db 11,"More?",11,11,0
 
@@ -48,17 +44,17 @@ xb_spare_txt		db "xB Free",11,0
 
 nmi_freeze_txt		db 11,"** NMI **",11,11,0
 
-register_txt		db "AF=",0
-			db "BC=",0
-			db "DE=",0
-			db "HL=",0,0
+register_txt		db "AF",0
+			db "BC",0
+			db "DE",0
+			db "HL",0,0
 		
-			db "IX=",0
-			db "IY=",0
-			db "SP=",0
-			db "IR=",0,0
+			db "IX",0
+			db "IY",0
+			db "SP",0
+			db "IR",0,0
 		
-			db "PC=",0,0
+			db "PC",0,0
 		
 			db " BANK=",0
 			db " PORT0=",0
@@ -70,155 +66,162 @@ banknum_txt		db "xx selected ("
 sysram1_txt		db "xx000-"
 sysram2_txt		db "xxFFF @ 8000)",11,0
 
-dot_exe_txt		db ".EXE",0
+fat16_txt		db "FAT16",0
+
+exe_txt			db ".EXE",0
+flx_txt			db ".FLX",0
 
 ;------------------------------------------------------------------------------------------------
 ; Packed text section
 ;------------------------------------------------------------------------------------------------
 
-dictionary	db 0,"DEBUG:"		;01	
-		db 0," "		;02 (space)
-		db 0,"IO:"		;03
-		db 0,11,11		;04 (new line * 2)
-		db 0,"MISC:"		;05
-		db 0,"Value"		;06 
-		db 0,"Filename"		;07
-		db 0,"MBR"		;08
-		db 0,"Envar"		;09
-		db 0,"Address"		;0a
-		db 0,"Driver"		;0b
-		db 0,"Bank"		;0c
-		db 0,"None"		;0d
-		db 0,"Continue"		;0e
-		db 0,"To"		;0f
-		
-yes_txt		db 0,"YES" 		;10
-		db 0,"Script"		;11
-		db 0,"Enter"		;12
-		db 0," Bytes"		;13
-		db 0,".."		;14
-		db 0,11			;15 (new line)
-		db 0,"Sending"		;16
-		db 0,"Receiving"	;17
-		db 0,"Awaiting"		;18
-		db 0,"?"		;19
-		db 0,"Device"		;1a
-		db 0,"Append"		;1b
-		db 0,"End"		;1c
-		db 0,"Dir"		;1d
-		db 0,"Empty"		;1e
-		db 0,"Is"		;1f
-		
-		db 0,"A"		;20
-		db 0,"File"		;21
-		db 0,"Protected"	;22
-		db 0,"VOLx:"		;23
-		db 0,"OS"		;24
-		db 0,"OK"		;25
-		db 0,"Start"		;26
-		db 0,"Warning!"		;27
-		db 0,"All"		;28
-		db 0,"Missing"		;29
-		db 0,"Invalid"		;2a
-		db 0,"Destination"	;2b
-		db 0,"Receive"		;2c
-		db 0,"Save"		;2d
-		db 0,"Long"		;2e
-		db 0,"Load"		;2f
-		
-		db 0,"Too"		;30
-		db 0,"Out"		;31
-		db 0,"Time"		;32				
-		db $80,":"		;33
-		db $81,">"		;34
-		db $82,"B"		;35
-		db 0,"Volumes"		;36
-		db $83,"C"		;37
-		db $84,"CD"		;38
-		db $85,"CLS"		;39
-		db $86,"COLOUR"		;3a
-		db $87,"D"		;3b
-		db $88,"DEL"		;3c
-		db $89,"DIR"		;3d
-		db $8a,"H"		;3e
-		db $8b,"F"		;3f
-		
-		db 0,"Serial"		;40 
-		db $8c,"FORMAT"		;41
-		db 0,"G"		;42
-		db $8d,"LB"		;43
-		db $8e,"M"		;44
-		db $8f,"MOUNT"		;45
-		db 0,"Be"		;46
-		db $90,"R"		;47
-		db $91,"RD"		;48
-		db $92,"RN"		;49
-		db $93,"RX"		;4a
-		db $94,"SB"		;4b
-		db $95,"T"		;4c
-		db $96,"TX"		;4d
-		db 0,"Lost"		;4e	
-		db 0,"$"
-hex_byte_txt	db "xx"			;4f (for hex-to-ascii)
-		
-		db 0,"Mem"		;50
-		db 0,"Arguments"	;51
-		db 0,"Will"		;52
-		db 0,"Error"		;53
-		db 0,"Comms"		;54
-		db 0,"Loaded"		;55
-		db $97,"MD"		;56
-		db 0,"Checksum"		;57
-		db 0,"Present"		;58
-		db 0,"Aborted"		;59
-		db 0,"No"		;5a
-		db 0,"Hex"		;5b
-		db $98,"?"		;5c
-		db 0,"Bad"		;5d
-		db 0,"Command"		;5e
-		db 0,"-"		;5f
-		
-		db 0,"Volume"		;60
-		db 0,"Full"		;61
-		db 0,"Not"		;62
-		db 0,"Found"		;63
-		db 0,"Length"		;64
-		db 0,"Zero"		;65
-		db 0,"Out"		;66
-		db 0,"Of"		;67
-		db 0,"Range"		;68
-		db 0,"Already"		;69
-		db 0,"Exists"		;6a
-		db 0,"At"		;6b
-		db 0,"Root"		;6c
-		db 0,"Mismatch"		;6d
-		db 0,"Request"		;6e
-		db 0,"Data"		;6f
+; The first byte/char of each entry has bit 7 set. If this byte is $80-$9f, it signifies that this entry
+; is also an internal command name (in which case, the actual ASCII begins on the next byte).
+; $FF is a special case and is translated to 11 (ie: a FLOS CR+LF char)
 
-		db 0,"EOF"		;70
-		db 0,"After"		;71
-		db 0,"Unknown"		;72
-		db 0
-fat16_txt	db "FAT16"		;73
-		db $99,"EXEC"		;74	
-		db $9a,"<"		;75		
-		db 0,"On"		;76
+
+dictionary	db "D"+$80,"EBUG:"		;01	
+		db " "+$80			;02 (space)
+		db "I"+$80,"O:"			;03
+		db $7f+$80,11			;04 (new line * 2) ($FF = Special case, translated to 11 = <CR,LF>)
+		db "M"+$80,"ISC:"		;05
+		db "V"+$80,"alue"		;06 
+		db "F"+$80,"ilename"		;07
+		db "M"+$80,"BR"			;08
+		db "E"+$80,"nvar"		;09
+		db "A"+$80,"ddress"		;0a
+		db "D"+$80,"river"		;0b
+		db "B"+$80,"ank"		;0c
+		db "N"+$80,"one"		;0d
+		db "C"+$80,"ontinue"		;0e
+		db "T"+$80,"o"			;0f
+		
+		db "Y"+$80,"ES" 		;10
+		db "S"+$80,"cript"		;11
+		db "E"+$80,"nter"		;12
+		db " "+$80,"Bytes"		;13
+		db "."+$80,"."			;14
+		db $7f+$80			;15 (new line) ($FF = Special case, translated to 11 = <CR,LF>)
+		db "S"+$80,"ending"		;16
+		db "R"+$80,"eceiving"		;17
+		db "A"+$80,"waiting"		;18
+		db "?"+$80			;19
+		db "D"+$80,"evice"		;1a
+		db "A"+$80,"ppend"		;1b
+		db "E"+$80,"nd"			;1c
+		db "D"+$80,"ir"			;1d
+		db "E"+$80,"mpty"		;1e
+		db "I"+$80,"s"			;1f
+		
+		db "A"+$80			;20
+		db "F"+$80,"ile"		;21
+		db "P"+$80,"rotected"		;22
+		db "V"+$80,"OLx:"		;23
+		db "O"+$80,"S"			;24
+		db "O"+$80,"K"			;25
+		db "S"+$80,"tart"		;26
+		db "W"+$80,"arning!"		;27
+		db "A"+$80,"ll"			;28
+		db "M"+$80,"issing"		;29
+		db "I"+$80,"nvalid"		;2a
+		db "D"+$80,"estination"		;2b
+		db "R"+$80,"eceive"		;2c
+		db "S"+$80,"ave"		;2d
+		db "L"+$80,"ong"		;2e
+		db "L"+$80,"oad"		;2f
+		
+		db "T"+$80,"oo"			;30
+		db "O"+$80,"ut"			;31
+		db "T"+$80,"ime"		;32				
+		db $80,":"			;33
+		db $81,">"			;34
+		db $82,"B"			;35
+		db "V"+$80,"olumes"		;36
+		db $83,"C"			;37
+		db $84,"CD"			;38
+		db $85,"CLS"			;39
+		db $86,"COLOUR"			;3a
+		db $87,"D"			;3b
+		db $88,"DEL"			;3c
+		db $89,"DIR"			;3d
+		db $8a,"H"			;3e
+		db $8b,"F"			;3f
+		
+		db "S"+$80,"erial"		;40 
+		db $8c,"FORMAT"			;41
+		db "G"+$80			;42
+		db $8d,"LB"			;43
+		db $8e,"M"			;44
+		db $8f,"MOUNT"			;45
+		db "B"+$80,"e"			;46
+		db $90,"R"			;47
+		db $91,"RD"			;48
+		db $92,"RN"			;49
+		db $93,"RX"			;4a
+		db $94,"SB"			;4b
+		db $95,"T"			;4c
+		db $96,"TX"			;4d
+		db "L"+$80,"ost"		;4e	
+		db "$"+$80
+hex_byte_txt	db "xx"				;4f (for hex-to-ascii)
+		
+		db "M"+$80,"em"			;50
+		db "A"+$80,"rguments"		;51
+		db "W"+$80,"ill"		;52
+		db "E"+$80,"rror"		;53
+		db "C"+$80,"omms"		;54
+		db "L"+$80,"oaded"		;55
+		db $97,"MD"			;56
+		db "C"+$80,"hecksum"		;57
+		db "P"+$80,"resent"		;58
+		db "A"+$80,"borted"		;59
+		db "N"+$80,"o"			;5a
+		db "H"+$80,"ex"			;5b
+		db $98,"?"			;5c
+		db "B"+$80,"ad"			;5d
+		db "C"+$80,"ommand"		;5e
+		db "-"+$80			;5f
+			
+		db "V"+$80,"olume"		;60
+		db "F"+$80,"ull"		;61
+		db "N"+$80,"ot"			;62
+		db "F"+$80,"ound"		;63
+		db "L"+$80,"ength"		;64
+		db "Z"+$80,"ero"		;65
+		db "O"+$80,"ut"			;66
+		db "O"+$80,"f"			;67
+		db "R"+$80,"ange"		;68
+		db "A"+$80,"lready"		;69
+		db "E"+$80,"xists"		;6a
+		db "A"+$80,"t"			;6b
+		db "R"+$80,"oot"		;6c
+		db "M"+$80,"ismatch"		;6d
+		db "R"+$80,"equest"		;6e
+		db "D"+$80,"ata"		;6f
+
+		db "E"+$80,"OF"			;70
+		db "A"+$80,"fter"		;71
+		db "U"+$80,"nknown"		;72
+		db "F"+$80,"AT16"		;73
+		db $99,"EXEC"			;74	
+		db $9a,"<"			;75		
+		db "O"+$80,"n"			;76
 				
-		db 0,1			;END MARKER
+		db "*"+$80,0			;END MARKER ($7e is max dictionaty word number)
 
 
 
 
-save_append_msg		db $07,$69,$6a,$5f,$1b,$6f,$19,$15,0		;"Filename Already Exists - Append data?"
-ser_rec_msg		db $18,$21,$14,$15,0				;"Awaiting File..",11,0
-ser_rec2_msg		db $17,$6f,$14,$15,0				;"Receiving Data..",11,0
-ser_send_msg		db $16,$6f,$14,$15,0				;"Sending Data..",11,0
-hw_err_msg		db $0b,$53,$4f,$15,0				;"Driver Error:$xx",11,0
-disk_err_msg		db $60,$53,0					;"Disk Error",0
-script_aborted_msg	db $11,$59,$15,$15,0				;"Script Aborted",11.0
-script_error_msg	db $11,$53,$15,$15,0				;"Script Error",11,0
-form_dev_warn1		db $27,$28,$36,$76,$15,$15,0			;"Warning! all volumes on"
-form_dev_warn2		db $52,$46,$4e,$14,$12,$10,$0f,$0e,$15,0	;"will be lost. Enter YES to Continue"
+save_append_msg		db $07,$69,$6a,$5f,$1b,$6f,$19,$15+$80		;"Filename Already Exists - Append data?"
+ser_rec_msg		db $18,$21,$14,$15+$80				;"Awaiting File..",11,0
+ser_rec2_msg		db $17,$6f,$14,$15+$80				;"Receiving Data..",11,0
+ser_send_msg		db $16,$6f,$14,$15+$80				;"Sending Data..",11,0
+hw_err_msg		db $0b,$53,$4f,$15+$80				;"Driver Error:$xx",11,0
+disk_err_msg		db $60,$53+$80					;"Disk Error",0
+script_aborted_msg	db $11,$59,$15,$15+$80				;"Script Aborted",11.0
+script_error_msg	db $11,$53,$15,$15+$80				;"Script Error",11,0
+form_dev_warn1		db $27,$28,$36,$76,$15,$15+$80			;"Warning! all volumes on"
+form_dev_warn2		db $52,$46,$4e,$14,$12,$10,$0f,$0e,$15+$80	;"will be lost. Enter YES to Continue"
 
 
 
@@ -256,77 +259,77 @@ os_cmd_locs	dw os_cmd_colon		;command 0
 
 
 
-packed_cmd_list	db $15,0						;DEBUG
-		db $01,$04,0
-		db $02,$33,$34,$75,$35,$37,$3b,$3f,$42,$3e,$44,$47,$4c,0
-		db $04,0
+packed_cmd_list	db $15+$80						;DEBUG
+		db $01,$04+$80
+		db $02,$33,$34,$75,$35,$37,$3b,$3f,$42,$3e,$44,$47,$4c+$80
+		db $04+$80
 
-		db $03,$04,0						; IO
-		db $02,$38,$3c,$3d,$41,$43,$56,$45,$48,$49,$15,0
-		db $02,$4a,$4b,$4d,$23,0
-		db $04,0
+		db $03,$04+$80						; IO
+		db $02,$38,$3c,$3d,$41,$43,$56,$45,$48,$49,$15+$80
+		db $02,$4a,$4b,$4d,$23+$80
+		db $04+$80
 	
-		db $05,$04,0						; MISC
-		db $02,$39,$3a,$74,$5c,0
-		db $04,0
-		db $ff							;end marker	
+		db $05,$04+$80						; MISC
+		db $02,$39,$3a,$74,$5c+$80
+		db $04+$80
+		db 0
 
 
 
 
-packed_msg_list		db 0				;First message marker
+packed_msg_list		db $80				;First message marker
 		
-			db $60,$61,0			;$01 Volume Full
-			db $21,$62,$63,0		;$02 File Not Found
-			db $1d,$61,0			;$03 Dir Full
-			db $62,$20,$1d,0		;$04 Not A Dir 
-			db $1d,$1f,$62,$1e,0		;$05 Dir Is Not Empty
-			db $62,$20,$21,0		;$06 Not A File
-			db $21,$64,$1f,$65,0		;$07 File Length Is Zero
+			db $60,$61+$80			;$01 Volume Full
+			db $21,$62,$63+$80		;$02 File Not Found
+			db $1d,$61+$80			;$03 Dir Full
+			db $62,$20,$1d+$80		;$04 Not A Dir 
+			db $1d,$1f,$62,$1e+$80		;$05 Dir Is Not Empty
+			db $62,$20,$21+$80		;$06 Not A File
+			db $21,$64,$1f,$65+$80		;$07 File Length Is Zero
 			
-			db $0a,$66,$67,$68,0		;$08 Address out of Range
-			db $07,$69,$6a,0		;$09 Filename Already Exists
-			db $69,$6b,$6c,0		;$0a Already at root
-			db $72,$5e,0			;$0b Unknown command
-			db $2a,$5b,0			;$0c Invalid Hex
-			db $5a,$07,0			;$0d No filename
-			db $2a,$60,0			;$0e Invalid Volume
-			db $57,$5d,0			;$0f Checksum bad
+			db $0a,$66,$67,$68+$80		;$08 Address out of Range
+			db $07,$69,$6a+$80		;$09 Filename Already Exists
+			db $69,$6b,$6c+$80		;$0a Already at root
+			db $72,$5e+$80			;$0b Unknown command
+			db $2a,$5b+$80			;$0c Invalid Hex
+			db $5a,$07+$80			;$0d No filename
+			db $2a,$60+$80			;$0e Invalid Volume
+			db $57,$5d+$80			;$0f Checksum bad
 
-bytes_loaded_msg	db $13,$55,0			;$10 [Space] Bytes Loaded
-			db $54,$53,0			;$11 Comms error
-			db $5d,$51,0			;$12 Bad arguments
-format_err_msg		db $62,$73,0			;$13 not FAT16
-			db $40,$32,$31,0		;$14 serial time out
-			db $07,$30,$2e,0		;$15 filename too long 
-			db $5a,$26,$0a,0		;$16 no start address
-			db $5a,$21,$64,0		;$17 no file length
+bytes_loaded_msg	db $13,$55+$80			;$10 [Space] Bytes Loaded
+			db $54,$53+$80			;$11 Comms error
+			db $5d,$51+$80			;$12 Bad arguments
+format_err_msg		db $62,$73+$80			;$13 not FAT16
+			db $40,$32,$31+$80		;$14 serial time out
+			db $07,$30,$2e+$80		;$15 filename too long 
+			db $5a,$26,$0a+$80		;$16 no start address
+			db $5a,$21,$64+$80		;$17 no file length
 
-			db $2d,$59,0			;$18 save aborted
-			db $2d,$53,$6b,$2b,0		;$19 save error at destination
-			db $06,$66,$67,$68,0		;$1a Value Out of Range
-			db $6f,$71,$70,$6e,0		;$1b Data after EOF request
-			db $5a,$1c,$0a,0		;$1c no end address
-			db $5a,$2b,$0a,0		;$1d no destination address
-			db $2a,$68,0			;$1e Invalid range
-			db $29,$51,0			;$1f missing arguments
+			db $2d,$59+$80			;$18 save aborted
+			db $2d,$53,$6b,$2b+$80		;$19 save error at destination
+			db $06,$66,$67,$68+$80		;$1a Value Out of Range
+			db $6f,$71,$70,$6e+$80		;$1b Data after EOF request
+			db $5a,$1c,$0a+$80		;$1c no end address
+			db $5a,$2b,$0a+$80		;$1d no destination address
+			db $2a,$68+$80			;$1e Invalid range
+			db $29,$51+$80			;$1f missing arguments
 
-ok_msg			db $25,0			;$20 OK
-			db $2a,$0c,0			;$21 invalid bank
-			db $1a,$62,$58,0		;$22 Device not present
-			db $1d,$62,$63,0		;$23 Dir not found
-			db $1c,$67,$1d,0		;$24 End of Dir
-			db $07,$6d,0			;$25 Filename mismatch
-			db $24,$50,$22,0		;$26 OS RAM protected
-			db $5c,0			;$27 "?" 
+ok_msg			db $25+$80			;$20 OK
+			db $2a,$0c+$80			;$21 invalid bank
+			db $1a,$62,$58+$80		;$22 Device not present
+			db $1d,$62,$63+$80		;$23 Dir not found
+			db $1c,$67,$1d+$80		;$24 End of Dir
+			db $07,$6d+$80			;$25 Filename mismatch
+			db $24,$50,$22+$80		;$26 OS RAM protected
+			db $5c+$80			;$27 "?" 
 
-no_vols_msg		db $5a,$36,$0			;$28 No Volumes
-none_found_msg		db $15,$0d,$63,$0		;$29 None Found
-			db $2c,$59,0			;$2a Receive Aborted - Serial receive abort
-			db $09,$62,$63,0		;$2b Envar not found
-			db $09,$21,$61,0		;$2c Envar file full
-			db $59,0			;$2d Aborted
-			db $5a,$08,0			;$2e No MBR
+no_vols_msg		db $5a,$36+$80			;$28 No Volumes
+none_found_msg		db $15,$0d,$63+$80		;$29 None Found
+			db $2c,$59+$80			;$2a Receive Aborted - Serial receive abort
+			db $09,$62,$63+$80		;$2b Envar not found
+			db $09,$21,$61+$80		;$2c Envar file full
+			db $59+$80			;$2d Aborted
+			db $5a,$08+$80			;$2e No MBR
 				
 			db $ff				;END MARKER
 		
@@ -493,8 +496,14 @@ os_quiet_mode		db 0
 
 ;----------------------------------------------------------------------------------
 
-os_dir_block_cache  	dw 0
-os_vol_cache		db 0
+pre_script_dir		dw 0
+pre_script_vol		db 0
+
+;-----------------------------------------------------------------------------------
+
+cmd_filename_addr	dw 0
+
+path_flag		db 0
 
 envar_data		db 0,0,0,0
 
@@ -506,7 +515,7 @@ fs_drive_sel_cache	db 0		; used in format command
 filesize_cache_lsw	dw 0		; used by LB command
 filesize_cache_msw	dw 0		; "" 
 
-dir_pos_cache		dw 0		; for KJT routines store/restore dir position
+stored_cluster		dw 0		;legacy - only for compatibility with old programs
 
 ;----------------------------------------------------------------------------------------
 

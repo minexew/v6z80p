@@ -1,14 +1,11 @@
 ;-------------------------------------------------------------------------------------------
-;"rn" - Rename command. V6.03
+;"rn" - Rename command. V6.04
 ;-------------------------------------------------------------------------------------------
 
-os_cmd_rn
-	
-		call fileop_preamble			; handle path parsing etc
+os_cmd_rn	call fileop_preamble			; handle path parsing etc
 		ret nz	
 		call do_rn_cmd
-		call cd_restore_vol_dir
-		ret
+		jp cd_restore_vol_dir
 
 do_rn_cmd	push hl
 		pop de

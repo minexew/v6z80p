@@ -1,12 +1,12 @@
 ;-----------------------------------------------------------------------
-;"cd" - Change Dir command. V6.13
+;"cd" - Change Dir command. V6.15
 ;-----------------------------------------------------------------------
 
 os_cmd_cd	
 
 		ld a,(hl)				; if no args, just show dir path		
 		or a				
-		jr nz,cd_parse_path		
+		jr nz,pc_like_cd		
 
 ;--------------------------------------------------------------------------------------------------
 
@@ -35,12 +35,12 @@ shdir_lp	pop de
 		call kjt_set_dir_cluster
 		call kjt_get_dir_name
 		call kjt_print_string
-		pop de				;dont show "/" if root dir (VOLx)
+		pop de					;dont show "/" if root dir (VOLx:/) already has a slash
 		ld a,d
 		or e
 		pop bc
 		jr z,no_dirsl
-		ld a,c				;dont show "/" if last dir of list
+		ld a,c					;dont show "/" if last dir of list
 		dec a
 		jr z,no_dirsl
 		ld a,$2f				;2f = "/"
@@ -55,65 +55,73 @@ no_dirsl	dec c
 
 ;--------------------------------------------------------------------------------------------------
 
+pc_like_cd	ld a,(current_volume)
+		ld e,a
+		push de
+		call cd_parse_path
+		pop de
+		push af
+		ld a,e
+		call os_change_volume
+		pop af
+		ret
+
+;--------------------------------------------------------------------------------------------------
 
 cd_parse_path
-		
-		call kjt_check_volume_format	
-		ret nz
-		
 		call cd_store_vol_dir
 		
+		call kjt_check_volume_format	
+		ret nz		
+		
 		ld a,(hl)				
-		cp $5c				; if "\" = go root
-		jr z,cd_goroot
-		cp $2f			
-		jr nz,cd_nogor			; if "/" = go root
+		call compare_slashes			; is first char "/" or "\" ?
+		jr nz,cd_nogor
+		
 cd_goroot	push hl
 		call kjt_root_dir	
 		pop hl
 		ret nz
 		inc hl
-		jr cd_margs			; more args follow?
+		jr cd_margs				; more args follow?
 		
 		
-cd_nogor	cp "%"				; "%" char = go assigned dir
+cd_nogor	cp "%"					; "%" char = go to assigned dir
 		jr nz,cd_no_assign
 		push hl
-		call os_set_dirvol_from_envar
+		call get_dirvol_from_envar		; DE = dir cluster, A = volume
 		pop hl
+		call cd_volmove
 		ret nz
-		ld de,5
-		add hl,de
-		jr cd_nchvol
+		jr cd_notvolsl
 			
-cd_no_assign
-
-		push hl
-		pop ix
-		ld a,(ix+4)
-		cp ":"				; wish to change volume?
-		jr nz,cd_nchvol
-		ld de,vol_txt+1
-		ld b,3
-		call os_compare_strings
+cd_no_assign	call test_vol_string			; VOLx: ??
 		jr nc,cd_nchvol
-		ld de,5
-		add hl,de
-		ld (os_args_start_lo),hl		; update args position
-		ld a,(ix+3)			; volume digit char
-		sub $30
-		call os_change_volume
-		ret nz				; error if new volume is invalid
-		call kjt_root_dir			; go to new drive's root block as drive has changed
-
+		ld de,0					; put root block in DE, A = volume  		
+		call cd_volmove
+		ret nz
+		ld a,(hl)				; if volx: and no further path, only change the volume - and use its existing dir
+		or a
+		ret z
+		cp " "
+		ret z
+		call compare_slashes			; if slash immediately follows "volx:" skip it (dont want it seen as a dir name)
+		jr nz,cd_margs				; but still reset volume to root. If not, dont reset volume to root, just assume		
+		inc hl					; current dir of this volume
+		ld (os_args_start_lo),hl
+		
+cd_notvolsl	push de
+		call fs_get_dir_block
+		ld (original_dir_cd_cmd),de		; update the cluster that needs to be replaced upon completion (if want to restore)
+		pop de
+		call os_update_dir_cluster_safe
+				
 		ld hl,(os_args_start_lo)
 cd_margs	ld a,(hl)
 		cp " "
-		jr nz,cd_mollp			; look for additional paths in args
-cd_done		xor a
-		ret
+		ret z
 
-cd_nchvol	ld a,(hl)
+cd_nchvol	ld a,(hl)				; look for additional paths in args
 		cp "."
 		jr nz,cd_mollp
 		inc hl
@@ -127,8 +135,8 @@ cd_nchvol	ld a,(hl)
 		inc hl
 		jr cd_mol
 
-cd_mollp	ld a,(hl)
-		or a
+cd_mollp	ld a,(hl)			
+		or a					; null terminator = last char of string?
 		ret z
 		cp " "
 		jr nz,cd_gdn
@@ -137,23 +145,16 @@ cd_mollp	ld a,(hl)
 		
 cd_gdn		push hl
 		call kjt_change_dir			;step through args changing dirs as apt
-		pop hl
-		jr nz,cd_dcherr
+		pop hl					
+		jr nz,cd_restore_vol_dir		;if a dir is not found go back to original dir and drive 
 cd_mol		ld a,(hl)				;move to next dir name in args (after "/" or "\") if no more found, quit
 		inc hl
 		or a
 		ret z
-		cp $2f				;"/"?
-		jr z,cd_nchvol
-		cp $5c				;"\"?
+		call compare_slashes			;"/" or "\" ?
 		jr z,cd_nchvol
 		jr cd_mol
 			
-cd_dcherr	
-
-		call cd_restore_vol_dir		;if a dir is not found go back to original dir and drive 
-		or a
-		ret
 
 
 ;--------------------------------------------------------------------------------------------------
@@ -165,21 +166,46 @@ cd_store_vol_dir
 		ld (original_dir_cd_cmd),de
 		ret
 		
+
+;--------------------------------------------------------------------------------------------------
+
+		
+cd_dcherr	ld a,$23					;dir not found error
+		or a
 		
 cd_restore_vol_dir
-		
+
 		push af
-		ld a,(original_vol_cd_cmd)
 		ld de,(original_dir_cd_cmd)
-		call os_set_dir_vol
-		jr z,cd_rvdok
-		inc sp
-		inc sp
-		ret
-cd_rvdok	pop af
+		ld a,(original_vol_cd_cmd)
+		call restore_vol_dir				;puts DE in volume's cluster and changes vol to A
+		pop af
 		ret
 
-			
+;--------------------------------------------------------------------------------------------------
+
+
+cd_volmove	ld bc,5
+		add hl,bc
+		ld (os_args_start_lo),hl
+		
+		push de
+		push hl
+		call os_change_volume		
+		call fs_get_dir_block
+		ld (original_dir_cd_cmd),de			;when changing volume, note the initial dir of the new volume		
+		pop hl
+		pop de
+		ret 
+
+
+;--------------------------------------------------------------------------------------------------
+
+compare_slashes	cp $2f
+		ret z
+		cp $5c
+		ret
+
 ;--------------------------------------------------------------------------------------------------
 
 original_dir_cd_cmd	dw 0			; dont use scratch pad for these 
