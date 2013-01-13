@@ -405,7 +405,7 @@ samprate_txt        db "Wav file sample rate is too high",11,0
 
 loop_txt            db "Loop",11,0
 
-use_txt             db 11,"USE: Playwav.exe filename",11,11
+use_txt             db 11,"USE: PLAYWAV filename",11,11
                     db "Wav file must be 8 bit, mono, PCM",11
                     db "with sample rate below 30KHz",11,0 
           

@@ -420,7 +420,7 @@ too_big_txt         db "Dimensions too big",11,0
 
 test_fn             db "pic.bmp",0
 
-usage_txt           db "Use: Showbmp filename.bmp (v1.00)",11,11
+usage_txt           db "Use: SHOWBMP filename.bmp",11,11
                     db "BMP file must be 256 colours",11
                     db "uncompressed, 368x256 or smaller",11
                     db "with width a multiple of 8 pixels",11,11,0
