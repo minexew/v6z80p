@@ -1,2 +1,2 @@
-assign ex1 utils
-assign key VOL0:KEYMAPS
+assign ex1 VOL0:/UTILS
+assign key VOL0:/KEYMAPS
