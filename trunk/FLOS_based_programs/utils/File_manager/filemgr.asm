@@ -5,7 +5,7 @@
 ;Updates:
 ;--------
 ;
-;v0.05 - Standard store/restore dir vol routines
+;v0.05 - Does not store/restore dir+vol
 ;
 ;V0.04 - Uses new window draw code (FLOS 6.02+)
 ;
@@ -57,9 +57,9 @@ max_path_length equ 40
 
 ;--------------------------------------------------------------------------------------------
 
-          call save_dir_vol
-          call filemgr
-          call restore_dir_vol
+;         call save_dir_vol			; do not save/restore dirs this way, dirs may be deleted by the program!
+          call filemgr				
+;         call restore_dir_vol
           ret
 
 ;--------------------------------------------------------------------------------------------
