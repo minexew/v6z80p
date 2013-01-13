@@ -5061,7 +5061,7 @@ include "FLOS_based_programs\games\Bounder\inc\object_list.asm"
 
 ;---------------------------------------------------------------------------------------------------------
 
-bulkfile_fn	db "bounder.exe",0
+bulkfile_fn	db "bounder.flx",0
 
 include "flos_based_programs\code_library\loading\inc\bulk_file_loader.asm"
 
