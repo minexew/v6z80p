@@ -593,7 +593,7 @@ skpen		push de
 		ret
 		
 		
-pic_path_txt	db "VOL0:PICTURES/",0
+pic_path_txt	db "VOL0:/PICTURES/",0
 		ds 40,0
 		
 pics_available	db 0

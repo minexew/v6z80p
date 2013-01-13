@@ -195,9 +195,13 @@ wvrtend   ld a,(vreg_read)
 
           call per_frame_routines
 
-          in a,(sys_keyboard_data)
-          cp $76
-          jr nz,wvrtstart               ; quit if ESC key pressed
+	  in a,(sys_irq_ps2_flags)     ; loop if ESC key not pressed
+          and 1
+          jr z,wvrtstart 
+          out (sys_clear_irq_flags),a
+	  in a,(sys_keyboard_data)
+	  cp $76
+          jr nz,wvrtstart               
          
 ;-------------------------------------------------------------------------------------------
 
@@ -1440,7 +1444,7 @@ endscr    ex de,hl
 ;bulkfile_fn		db "bulkfile.bin",0		;only whilst testing
 ;index_start_lo		equ 0      			;only whilst testing
 
-bulkfile_fn		db "parity.exe",0             	;same as main program, adjusted index_start:
+bulkfile_fn		db "parity.flx",0             	;same as main program, adjusted index_start:
 index_start_lo		equ prog_end-my_location      	;low word of offset to bulkfile
 
 index_start_hi		equ 0                         	;hi word of offset to bulkfile

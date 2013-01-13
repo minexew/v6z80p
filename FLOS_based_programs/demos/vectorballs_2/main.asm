@@ -186,7 +186,7 @@ wvrtend   ld a,(vreg_read)
 ;         ld hl,$000
 ;         ld (palette),hl
           
-          in a,(sys_keyboard_data)
+          call kjt_get_key
           cp $76
           jr nz,wvrtstart               	;loop if ESC key not pressed
           
@@ -1253,7 +1253,7 @@ play_music
  
 music_data_fn	db "vb2music.exe",0
 
-bulkfile_fn	db "VBALLS2.EXE",0		; if this is same as main program, adjust index_start
+bulkfile_fn	db "VBALLS2.FLX",0		; if this is same as main program, adjust index_start
 
 ;bulkfile_fn	db "bulkfile.bin",0		; only whilst testing
              

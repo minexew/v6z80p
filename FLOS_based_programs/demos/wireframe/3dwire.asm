@@ -125,9 +125,13 @@ wvrtend   ld a,(vreg_read)
           
           call vrt_routines
           
-          in a,(sys_keyboard_data)
-          cp $76
-          jr nz,wvrtstart               ;loop if ESC key not pressed
+	  in a,(sys_irq_ps2_flags)     ; loop if ESC key not pressed
+          and 1
+          jr z,wvrtstart 
+          out (sys_clear_irq_flags),a
+	  in a,(sys_keyboard_data)
+	  cp $76
+          jr nz,wvrtstart               
 
 ;-------------------------------------------------------------------------------------------------
          

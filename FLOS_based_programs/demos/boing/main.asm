@@ -351,9 +351,13 @@ routines  ld a,(counter)
 ;         ld hl,0
 ;         ld (palette),hl
           
-          in a,(sys_keyboard_data)
-          cp $76
-          jr nz,wvrtstart               ; loop if ESC key not pressed
+	  in a,(sys_irq_ps2_flags)     ; loop if ESC key not pressed
+          and 1
+          jr z,wvrtstart 
+          out (sys_clear_irq_flags),a
+	  in a,(sys_keyboard_data)
+	  cp $76
+          jr nz,wvrtstart               
           
 ;------------------------------------------------------------------------------------------------------
 
@@ -1085,7 +1089,7 @@ init_pb   ld a,%00000000                ; go to y window pos register
           
 ;---------------------------------------------------------------------------------------------------------    
 
-bulkfile_fn         db "boing.exe",0              ;if this is same as main program, adust index_start
+bulkfile_fn         db "boing.flx",0              ;if this is same as main program, adust index_start
 index_start_lo      equ prog_end-my_location      ;low word of offset to bulkfile
 
 ;bulkfile_fn	db "bulkfile.bin",0		;only whilst testing
