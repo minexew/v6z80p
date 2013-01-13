@@ -93,8 +93,8 @@ script_fn		ds 13,0
 
 scancode_buffer		ds 32,0
 
-key_buf_wr_idx		db 0
-key_buf_rd_idx		db 0
+key_buf_wr_idx		db 0		; Do not change order of these two variables
+key_buf_rd_idx		db 0		; Do not change order of these two variables
 key_release_mode	db 0		
 not_currently_used	db 0
 key_mod_flags		db 0

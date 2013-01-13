@@ -1,25 +1,24 @@
 ;-----------------------------------------------------------------------
-;"exec" - execute script V6.05
+;"exec" - execute script V6.06
 ;
 ;Changes:
 ;
+;6.06 - Fixed dir restore when swapping volumes
 ;6.05 - Allowed path for script file
 ;6.04 - Made load script line a subroutine so it can be used by programmable F-keys
 ;6.03 - Set load length = 24bit (optimized)
 ;6.02 - Support for loop (via GOTO envar and [xxxx] labels)
 ;6.01 - abort with CRTL + C
 ;
-;Notes: Changing drives within a script not supported yet.
-;       Scripts cannot launch scripts
+;Notes:  Scripts cannot launch scripts
 ;-----------------------------------------------------------------------
 
-os_cmd_exec
 
-		ld a,(in_script_flag)			;test if already in a script
+os_cmd_exec	ld a,(in_script_flag)			;test if already in a script
 		or a
 		jp nz,scr_error
 
-		call fileop_preamble			;try to move to dir containing script		
+		call fileop_preamble			;try to move to dir containing script file	
 		ret nz
 		
 		ld de,script_fn				;copy the script filename (scripts cannot launch
@@ -30,7 +29,7 @@ os_cmd_exec
 		
 		call scr_clear_goto
 
-		call os_get_dir_vol			;store dir/vol that contains script
+		call os_get_dir_vol			;make a note of vol/dir that contains the script
 		ld (script_dir),de
 		ld (script_vol),a
 		
@@ -39,6 +38,7 @@ os_cmd_exec
 		ld a,1
 		ld (in_script_flag),a			;set the in-script flag
 
+
 ;----------------------------------------------------------------------------------------------------------
 	
 scr_begin	ld hl,0
@@ -46,9 +46,8 @@ scr_begin	ld hl,0
 
 ;----------------------------------------------------------------------------------------------------------
 
-scrp_loop
-	
-		ld a,(key_mod_flags)
+
+scrp_loop	ld a,(key_mod_flags)
 		and 2
 		jr z,noskip_script
 		call os_get_key_press
@@ -56,15 +55,16 @@ scrp_loop
 		cp $21
 		jp z,scr_err2
 	
-noskip_script
 
-		call os_get_dir_vol			;store current dir
-		push de
-		push af
+noskip_script	call os_get_dir_vol			;store current volume
+		ld (pre_script_vol),a
 		
-		ld a,(script_vol)
-		ld de,(script_dir)			;return to dir that contains the script
-		call os_set_dir_vol
+		ld a,(script_vol)			;swap to volume that contains the script
+		call kjt_change_volume
+		call fs_get_dir_block
+		ld (pre_script_dir),de			;note what dir cluster was originally set for this volume
+		ld de,(script_dir)			
+		call os_update_dir_cluster_safe		;move to dir in volume that contains the script
 		
 		ld hl,script_fn				;locate the script file - this needs to be done every
 		call os_find_file			;script line as external commands will have opened files
@@ -74,12 +74,13 @@ noskip_script
 		ld (script_file_offset),iy
 		ld (script_buffer_offset),hl
 		
-		pop af					;go back to dir we were at before script file load
-		pop de
-		call os_set_dir_vol			
+		call back_to_prescript_dir		;restore dir and go to volume we were in before loading the script file			
 		
-		ld a,(commandstring)			;Is this line a label?
-		cp "["
+
+		ld a,(commandstring)			;Analyze the script line just loaded
+		cp ";"					;if line is commented out with ";" at start, skip it
+		jr z,scr_skpl
+		cp "["					;Is this line a label?
 		jr nz,scr_norm
 		call scr_test_goto			;Yes, is goto mode (envar) set?
 		jr nz,scr_skpl			
@@ -131,10 +132,15 @@ scrp_gnc	ld (script_file_offset),iy		;update file offset and loop
 
 ;-----------------------------------------------------------------------------------------------
 
-scr_ferr	pop af
-		pop de
-		call os_set_dir_vol			;return to dir selected prior to script
-		ld a,$02
+back_to_prescript_dir
+
+		ld de,(pre_script_dir)			;restore dir and go to volume we were in before loading the script file
+		ld a,(pre_script_vol)
+		call restore_vol_dir			
+		ret
+		
+scr_ferr	call back_to_prescript_dir		; return to dir selected prior to script
+		ld a,$02				; error
 		or a
 		ret
 		
@@ -211,4 +217,4 @@ scrp_eol	xor a
 		ret
 
 ;------------------------------------------------------------------------------------------------
-			
+

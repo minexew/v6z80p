@@ -1,13 +1,11 @@
 ;-----------------------------------------------------------------------
-;"SB" - Save binary file command. V6.05
+;"SB" - Save binary file command. V6.06
 ;-----------------------------------------------------------------------
 
-os_cmd_sb
-		call fileop_preamble			; handle path parsing etc
+os_cmd_sb	call fileop_preamble			; handle path parsing etc
 		ret nz
 		call do_sb_cmd
-		call cd_restore_vol_dir
-		ret
+		jp cd_restore_vol_dir
 	
 
 do_sb_cmd	ld (sb_save_name_addr),hl

@@ -215,12 +215,12 @@ no_mouse
 		ret
 		
 ;-----------------------------------------------------------------------------------------
-; NMI code v6.01
+; NMI code v6.02
 ;-----------------------------------------------------------------------------------------
 
 os_allow_nmi_freeze
 
-		ld hl,os_nmi_freeze		; allow NMI freezer
+		ld hl,os_nmi_freeze			; allow NMI freezer
 		ld (nmi_vector),hl	 
 		ret
 			
@@ -230,30 +230,29 @@ os_nmi_freeze
 
 	
 		call os_store_CPU_regs
-		pop hl				; gets the NMI return address
-		ld (pc_store),hl		; stores it for recorded PC
-		ld hl,continue			; change return address for continue
-		push hl			; to get out of NMI mode
-		retn				; jump to continue
+		pop hl					; gets the NMI return address
+		ld (pc_store),hl			; stores it for recorded PC
+		ld hl,continue				; change return address for continue
+		push hl				; to get out of NMI mode
+		retn					; jump to continue
 	
-continue	ld sp,stack			; Fix stack pointer to default - so wiping out
-		di				; program's subroutines/maskable IRQ status
-		im 1				; CPU IRQ: mode 1
-		xor a
-		out (sys_mem_select),a		; make sure VRAM etc is not paged in
+continue	ld sp,stack				; Fix stack pointer to default - so wiping out
+		di					; program's subroutines/maskable IRQ status
+		im 1					; CPU IRQ: mode 1
+		xor a	
+		out (sys_mem_select),a			; make sure VRAM etc is not paged in
 		out (sys_alt_write_page),a
 
-		call nmi_freeze_os_init		; set up OS front end (disk system not reset)
-		call restore_bank_no_script	; restore original FLOS bank
-		call restore_dir_vol		; restore original FLOS dir
-		
-		ld hl,nmi_freeze_txt		; show NMI break text
+		call nmi_freeze_os_init			; set up OS front end (disk system not reset)
+		call restore_bank_no_script		; restore original FLOS bank
+				
+		ld hl,nmi_freeze_txt			; show NMI break text
 		call os_print_string	
 			
-		call os_cmd_r			; show registers
+		call os_cmd_r				; show registers
 		
-		ei				; enable mskable IRQs
-		jp os_main_loop			; continue os/monitor operations
+		ei					; enable mskable IRQs
+		jp os_main_loop				; continue os/monitor operations
 
 ;---------------------------------------------------------------------------------------
 

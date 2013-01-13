@@ -6,8 +6,7 @@ os_cmd_lb
 		call fileop_preamble			; handle path parsing etc
 		ret nz
 		call do_lb_cmd
-		call cd_restore_vol_dir
-		ret
+		jp cd_restore_vol_dir			; no point calling this as routine, just jump and use its RET.
 
 	
 do_lb_cmd	call os_getbank				;default load bank is current bank

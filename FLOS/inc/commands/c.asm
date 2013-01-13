@@ -69,42 +69,18 @@ set_copy_regs
 ; BC = run length on return
 ; HL = start address
 
-	ld hl,(cmdop_end_address)	
-	ld bc,(cmdop_start_address)
-	push bc
-	ld de,(copy_dest_address)
-	xor a
-	sbc hl,bc
-	ld b,h
-	ld c,l
-	inc bc
-	pop hl
-	ret
+		ld hl,(cmdop_end_address)	
+		ld bc,(cmdop_start_address)
+		push bc
+		ld de,(copy_dest_address)
+		xor a
+		sbc hl,bc
+		ld b,h
+		ld c,l
+		inc bc
+		pop hl
+		ret
 	
 ;------------------------------------------------------------------------
 
-get_start_and_end
-
-	call ascii_to_hexword			;get start address
-	ld (cmdop_start_address),de
-	inc hl
-	jr z,st_addrok
-	pop hl					;this pop is remove originating call addr from the stack
-	cp $1f					;bad hex error code
-	jr nz,c_badhex
-	ld a,$16				;no start address error code
-c_badhex	or a
-	ret
-	
-st_addrok	call ascii_to_hexword		;get end address
-	ld (cmdop_end_address),de
-	inc hl
-	ret z
-	pop hl					;this pop is remove originating call addr from the stack
-	cp $1f					;bad hex error code
-	jr nz,c_badhex
-	ld a,$1c				;no end address error code
-	ret
-	
-;------------------------------------------------------------------------
 
