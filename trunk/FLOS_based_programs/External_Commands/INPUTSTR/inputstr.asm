@@ -84,7 +84,7 @@ var_name	ds 5,0
 var_data  	ds 5,0
 
 usage_txt	db "-----------------------------------",11
-		db "INPUTSTR.EXE - V1.00 By Phil Ruston",11
+		db "INPUTSTR.FLX - V1.00 By Phil Ruston",11
 		db "Gets a 4 char max string for Envar",11
 		db "Usage:",11
 		db "INPUTSTR envar",11

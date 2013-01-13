@@ -124,9 +124,9 @@ include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
 ;----------------------------------------------------------------------------------------------
 
-args_loc		dw 0
+args_loc	dw 0
 
-keymap_dir_txt	db "VOL0:KEYMAPS/",0
+keymap_dir_txt	db "VOL0:/KEYMAPS/",0
 		
 km_set_txt	db "Keymap set",11,0
 

@@ -1,6 +1,7 @@
 
 ; Type [filename] command - shows text files By Phil 2009-2012
 ;
+; v1.05 - improved path preserving header
 ; v1.04 - allowed path in filename
 ; v1.03 - tab positioning added
 
@@ -249,7 +250,7 @@ include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
 ;---------------------------------------------------------------------------------------
 
-usage_txt	db "TYPE v1.04 - shows ASCII text",11,"Usage: TYPE filename",11,0
+usage_txt	db "TYPE v1.05 - shows ASCII text",11,"Usage: TYPE filename",11,0
 
 more_txt	db " More? (y/n) ",13,0
 more_gone_txt	db "             ",0

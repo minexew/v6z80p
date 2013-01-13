@@ -442,7 +442,7 @@ include "FLOS_based_programs\code_library\string\inc\find_next_argument.asm"
 
 args_loc	dw 0
 
-usage_txt	db 11,"FCMP.EXE (V1.02) - Compare files",11,11
+usage_txt	db 11,"FCMP.FLX (V1.02) - Compare files",11,11
 		db "Usage: FCMP [#] FILE1 FILE2",11,11,0
 
 fdiff_len_txt	db 11,"** Files are not the same length!  **",11

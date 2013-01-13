@@ -63,7 +63,7 @@ label_name	ds 5,0
 goto_txt	db "GOTO",0
 
 usage_txt	db "-------------------------------",11
-		db "GOTO.EXE - V1.00 By Phil Ruston",11
+		db "GOTO.FLX - V1.00 By Phil Ruston",11
 		db "Usage:",11
 		db "GOTO script_label",11
 		db "-------------------------------",11,0
