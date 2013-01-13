@@ -2,16 +2,5 @@
 FILERX.EXE - Copies a file sent
 serially to the current dir
 
-[Recently renamed to: FRX.EXE]
-
-Use: FILERX (path)
-
-Notes:
-
-Files are saved to the dir specified
-by "path" (or the current dir if a
-path is not supplied)
-
-If a file exists at dest, a prompt
-to overwrite it is displayed.
+[Renamed to: FRX.FLX]
 

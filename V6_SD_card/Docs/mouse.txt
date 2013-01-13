@@ -1,5 +1,5 @@
 
-MOUSE.EXE - Activate the mouse driver
+MOUSE.FLX - Activate the mouse driver
 
 Use: MOUSE (no parameters)
 

@@ -1,5 +1,5 @@
 
-CMP.EXE - Compares two areas of memory
+CMP.FLX - Compares two areas of memory
 
 Use: CMP [#] Start End Target [Bank]
 

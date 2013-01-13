@@ -1,5 +1,5 @@
 
-MONO.EXE - Sets the audio mixer to
+MONO.FLX - Sets the audio mixer to
 mono mode: all 4 channels sent to
 both left and right.
 

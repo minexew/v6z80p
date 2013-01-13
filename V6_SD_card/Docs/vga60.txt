@@ -1,6 +1,6 @@
 
 VGA60.EXE - OBSOLETE COMMAND
 
-Replaced by VGA.EXE
+Replaced by VGA.FLX
 
 

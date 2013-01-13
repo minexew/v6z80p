@@ -1,5 +1,5 @@
 
-BAUD.EXE - Sets the RS232 BAUD rate
+BAUD.FLX - Sets the RS232 BAUD rate
 
 Use: BAUD speed
 

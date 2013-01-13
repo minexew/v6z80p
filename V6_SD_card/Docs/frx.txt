@@ -1,5 +1,5 @@
 
-FRX.EXE - Copies a file sent
+FRX.FLX - Copies a file sent
 serially to the current dir
 
 Use: FRX (path)

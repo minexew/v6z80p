@@ -1,5 +1,5 @@
 
-SAVEVRAM.EXE - Saves data from Video RAM
+SAVEVRAM.FLX - Saves data from Video RAM
 
 Use: SAVEVRAM filename address length
 

@@ -1,5 +1,5 @@
 
-SHOWSPR.EXE - Browse sprite memory.
+SHOWSPR.FLX - Browse sprite memory.
 
 Use: SHOWSPR [address]
 

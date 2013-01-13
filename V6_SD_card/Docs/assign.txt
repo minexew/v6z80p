@@ -1,6 +1,6 @@
 
-ASSIGN.EXE  - Assigns a directory to
-an environment variable
+ASSIGN.FLX  - Assigns a volume and
+directory to an environment variable
 
 Use: ASSIGN xyz [path]
 

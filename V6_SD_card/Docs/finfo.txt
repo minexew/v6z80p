@@ -1,5 +1,5 @@
 
-FINFO.EXE - Retuns file length /
+FINFO.FLX - Retuns file length /
 load address, sets the Envar "FSIZ"
 
 Use: FINFO (#) filename

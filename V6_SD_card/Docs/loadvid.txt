@@ -3,5 +3,4 @@ LOADVID.EXE - Loads data to VRAM
 
 This command has been renamed to:
 
-LOADVRAM.EXE
-
+LOADVRAM.FLX

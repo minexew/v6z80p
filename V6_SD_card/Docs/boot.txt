@@ -1,5 +1,5 @@
 
-BOOT.EXE - Reconfigure the FPGA
+BOOT.FLX - Reconfigure the FPGA
 
 Use: BOOT [slot]
 

@@ -1,5 +1,5 @@
 
-LOADVRAM.EXE - Loads data to Video RAM
+LOADVRAM.FLX - Loads data to Video RAM
 
 Use: LOADVRAM filename addr
 

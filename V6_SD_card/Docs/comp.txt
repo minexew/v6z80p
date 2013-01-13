@@ -1,5 +1,5 @@
 
 COMP.EXE - Compares two files
 
-Now Obsolete, Use FILECMP instead.
+Now Obsolete, Use FCMP instead.
 

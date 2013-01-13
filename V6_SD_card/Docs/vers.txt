@@ -1,5 +1,5 @@
 
-VERS.EXE - Shows FLOS / OSCA version
+VERS.FLX - Shows FLOS / OSCA version
 
 Use: VERS (#)
 

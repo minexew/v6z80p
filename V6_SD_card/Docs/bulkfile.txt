@@ -1,5 +1,5 @@
 
-BULKFILE.EXE - Collates all files in dir
+BULKFILE.FLX - Collates all files in dir
 
 Use: BULKFILE filename
 

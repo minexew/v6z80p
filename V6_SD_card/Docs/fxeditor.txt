@@ -1,5 +1,5 @@
 
-FXEDITOR.EXE - A sound effect editor
+FXEDITOR.FLX - A sound effect editor
 
 Use: FXEDITOR (no args)
 

@@ -1,5 +1,5 @@
 
-FTX.EXE - Sends a file to external
+FTX.FLX - Sends a file to external
 system via Serial Link protocol.
 
 Use: FTX filename

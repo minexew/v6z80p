@@ -1,5 +1,5 @@
 
-LCD.EXE - LineCop Disassemble
+LCD.FLX - LineCop Disassemble
 
 Use: LCD address
 
