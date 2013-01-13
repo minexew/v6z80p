@@ -1,5 +1,5 @@
 
-TYPE - Displays simple text files.
+TYPE.FLX - Displays simple text files.
 
 Use: TYPE [path/]filename
 

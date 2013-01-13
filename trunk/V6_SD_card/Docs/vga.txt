@@ -1,5 +1,5 @@
 
-VGA.EXE - Sets the VGA refresh rate
+VGA.FLX - Sets the VGA refresh rate
 
 Use: VGA hz
 

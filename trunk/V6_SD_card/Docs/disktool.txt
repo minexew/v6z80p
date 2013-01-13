@@ -1,5 +1,5 @@
 
-DISKTOOL.EXE - Partitions/formats SD
+DISKTOOL.FLX - Partitions/formats SD
 cards.
 
 Use: DISKTOOL (no arguments)

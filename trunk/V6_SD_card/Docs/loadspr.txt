@@ -1,5 +1,5 @@
 
-LOADSPR.EXE - Loads data to sprite RAM
+LOADSPR.FLX - Loads data to sprite RAM
 
 Use: LOADSPR filename addr
 

@@ -1,5 +1,5 @@
 
-FCMP.EXE - Compares two files
+FCMP.FLX - Compares two files
 
 Use: FCMP [#] file1 file2
 

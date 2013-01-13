@@ -1,5 +1,5 @@
 
-SHOWSND.EXE - Browse memory for
+SHOWSND.FLX - Browse memory for
 sound sample data.
 
 Use: SHOWSND [address length period]

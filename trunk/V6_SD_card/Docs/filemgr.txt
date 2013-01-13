@@ -1,5 +1,5 @@
 
-FILEMGR.EXE - A GUI filemanager
+FILEMGR.FLX - A GUI filemanager
 
 Use: FILEMGR (no args)
 

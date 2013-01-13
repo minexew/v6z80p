@@ -1,5 +1,5 @@
 
-CHECKSYS.EXE - System Tester
+CHECKSYS.FLX - System Tester
 
 Use: CHECKSYS (no args)
 

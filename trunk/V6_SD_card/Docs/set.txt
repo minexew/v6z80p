@@ -1,5 +1,5 @@
 
-SET.EXE - Sets / deletes / adjusts
+SET.FLX - Sets / deletes / adjusts
 environment variables
 
 Use: SET abcd (=) value

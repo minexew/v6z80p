@@ -1,5 +1,5 @@
 
-EMU.EXE - Emulator Launcher
+EMU.FLX - Emulator Launcher
 
 Used to start Alessandro's cycle
 perfect Spectrum emulators.

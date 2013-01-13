@@ -1,5 +1,5 @@
 
-SHOWBMP.EXE - Displays .bmp format
+SHOWBMP.FLX - Displays .bmp format
 image files.
 
 Use: SHOWBMP filename

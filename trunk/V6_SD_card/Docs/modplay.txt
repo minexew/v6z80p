@@ -1,5 +1,5 @@
 
-MODPLAY - Plays Protracker format tunes.
+MODPLAY.FLX - Plays Protracker format tunes.
 
 Use: MODPLAY [?] [path/]filename
 

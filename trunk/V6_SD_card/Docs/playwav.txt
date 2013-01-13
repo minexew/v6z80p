@@ -1,5 +1,5 @@
 
-PLAYWAV.EXE - Plays .wav format
+PLAYWAV.FLX - Plays .wav format
 sound files.
 
 Use: PLAYWAV filename

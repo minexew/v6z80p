@@ -1,5 +1,5 @@
 
-STEREO.EXE - Sets the audio mixer to
+STEREO.FLX - Sets the audio mixer to
 the default split mode: 2 channels
 left, 2 channels right.
 

@@ -1,5 +1,5 @@
 
-EDIT.EXE - Simple text editor
+EDIT.FLX - Simple text editor
 
 Use: EDIT [filename] [-G hex_number]
 

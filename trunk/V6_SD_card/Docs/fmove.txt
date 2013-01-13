@@ -1,5 +1,5 @@
 
-FMOVE.EXE - Move a file from one dir
+FMOVE.FLX - Move a file from one dir
 to another.
                                    
 Use: FMOVE src dst

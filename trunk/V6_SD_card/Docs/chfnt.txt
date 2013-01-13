@@ -1,11 +1,11 @@
 
-CHFNT.EXE - Changes the OS font
+CHFNT.FLX - Changes the OS font
 
 Use: CHFNT filename [xx]
 
 Filename can include a path. If
 no path is supplied, the current
-dir and VOL0:FONTS/ are checked
+dir and VOL0:/FONTS/ are checked
 for the font file.
 
 FLOS FONT FILE DESCRIPTION:

@@ -1,5 +1,5 @@
 
-GOTO.EXE - Causes a jump within
+GOTO.FLX - Causes a jump within
 scripts (IE: sets the GOTO envar)
 
 Use: GOTO label

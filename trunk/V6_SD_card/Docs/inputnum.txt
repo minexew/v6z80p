@@ -1,5 +1,5 @@
 
-INPUTNUM.EXE - Get user input (hex
+INPUTNUM.FLX - Get user input (hex
 number) and apply to an environment
 variable.
 	
