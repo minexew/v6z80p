@@ -355,7 +355,7 @@ var_data	ds 5,0
 goto_txt	db "GOTO",0
 
 usage_txt	db "-----------------------------",11
-		db "IF.EXE - V1.00 By Phil Ruston",11
+		db "IF.FLX - V1.00 By Phil Ruston",11
 		db "(Script control command)",11
 		db "Usage:",11
 		db "IF xxxx cond yyyy GOTO zzzz",11

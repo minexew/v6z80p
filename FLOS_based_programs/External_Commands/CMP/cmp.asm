@@ -260,7 +260,7 @@ cond_print_string
 		
 ;-----------------------------------------------------------------------------------------------------
 
-usage_txt	db 11,"CMP.EXE (V1.01) - Compares memory.",11,11
+usage_txt	db 11,"CMP.FLX (V1.01) - Compares memory.",11,11
 
 		db "Syntax:"
 		db "CMP [#] Start End Target [bank]",11,11

@@ -156,7 +156,7 @@ old_font	push ix				;make sure font size = 768
 		ld b,my_bank
 		ld hl,fnt_data
 		call kjt_read_from_file
-			ret nz
+		ret nz
 		
 		ld ix,fnt_data				;for 96 planar  font
 		ld c,32
@@ -271,7 +271,7 @@ include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
 font_dir_txt
 
-	db "VOL0:FONTS/",0
+	db "VOL0:/FONTS/",0
 		
 font_set_txt
 
@@ -279,7 +279,7 @@ font_set_txt
 
 no_param_txt
 
-	db 11,"CHFNT.EXE V1.05",11
+	db 11,"CHFNT.FLX V1.05",11
 	db "USE: CHFNT filename [xx]",11
 	db "xx = start char (.fff files only)",11,0
 

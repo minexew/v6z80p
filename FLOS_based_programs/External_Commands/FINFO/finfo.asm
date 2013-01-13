@@ -182,7 +182,7 @@ include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 ;---------------------------------------------------------------------------------------
 
 usage_txt	db "--------------------------------",11
-		db "FINFO.EXE - V1.01 By Phil Ruston",11
+		db "FINFO.FLX - V1.01 By Phil Ruston",11
 		db "Shows information about a file",11
 		db "Usage:",11
 		db "FINFO.EXE # filename",11

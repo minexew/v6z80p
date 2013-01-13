@@ -104,7 +104,7 @@ malformed_txt	db "ERROR: Malformed expression",11,0
 
 too_long_txt	db "ERROR: Expression too long",11,0
 		
-show_use_txt	db 11,"CALC.EXE v1.00 - 16bit calculator",11
+show_use_txt	db 11,"CALC.FLX v1.00 - 16bit calculator",11
 		db 11,"USAGE: CALC expression",11,11
 		db "Prefixes: # = Dec, $ = Hex, % = bin",11
 		db "(None: number interpreted as hex)",11,0

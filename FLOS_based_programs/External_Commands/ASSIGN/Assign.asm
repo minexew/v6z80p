@@ -3,7 +3,7 @@
 ; Usage: Assign "proxy_name" "path" (proxy name 3 chars max. If no path is
 ; supplied, the current dir is assigned)
 ;
-; V1.01 - use kernal for path parsing
+; V1.02 - use kernal for path parsing
 
 ;======================================================================================
 ; Standard equates for OSCA and FLOS
@@ -121,7 +121,7 @@ orig_volume  	db 0
 
 missing_args_txt
 
-		db 11,"ASSIGN.EXE (v1.01)",11,11
+		db 11,"ASSIGN.FLX (v1.02)",11,11
 		db "Usage: ASSIGN PROXY [PATH]",11,11
 		db "PROXY is a 3 character (maximum)",11
 		db "environment variable to be used as",11

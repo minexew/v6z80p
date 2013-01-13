@@ -385,7 +385,7 @@ show_use	ld hl,no_args_txt
 
 ;----------------------------------------------------------------------------------------------
 		
-no_args_txt	db 11,"FMOVE.EXE (FILE MOVE) V0.02",11
+no_args_txt	db 11,"FMOVE.FLX (FILE MOVE) V0.02",11
 		db "USE: FMOVE src dest",11,11,0
 
 same_file_txt	db 11,"ERROR: The source and destination",11

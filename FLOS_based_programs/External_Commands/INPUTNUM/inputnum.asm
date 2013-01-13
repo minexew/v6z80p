@@ -118,7 +118,7 @@ var_name	ds 5,0
 var_data  	ds 5,0
 
 usage_txt	db "-----------------------------------",11
-		db "INPUTNUM.EXE - V1.00 By Phil Ruston",11
+		db "INPUTNUM.FLX - V1.00 By Phil Ruston",11
 		db "Gets a hex number (32bit) for Envar",11
 		db "Usage:",11
 		db "INPUTNUM envar",11

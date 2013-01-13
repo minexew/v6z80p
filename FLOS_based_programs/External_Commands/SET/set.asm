@@ -43,90 +43,10 @@ include 	"flos_based_programs\code_library\program_header\inc\test_flos_version.
 
 ;---------------------------------------------------------------------------------------
 
-		call save_all_voldirs
+		call save_dir_vol
 		call do_set
-		call restore_all_voldirs
+		call restore_dir_vol
 		ret
-
-;---------------------------------------------------------------------------------------
-
-
-save_all_voldirs
-
-		push af				; these book-end routines assume the volumes and
-		push bc				; dirs remain unchanged (ie: not deleted) during the
-		push de				; operation between them
-		push hl
-		push ix
-		push iy
-		call kjt_get_volume_info
-		ld (original_vol),a
-
-		ld hl,orig_cluster_list
-		xor a
-sadv_lp1	push af
-		push hl
-		call kjt_change_volume
-		call kjt_get_dir_cluster
-		pop hl
-		ld (hl),e
-		inc hl
-		ld (hl),d
-		inc hl
-stodv_novol	pop af
-		inc a
-		cp 10
-		jr nz,sadv_lp1
-		jr restore_orgvol			;start program in the volume original active
-
-
-
-
-restore_all_voldirs
-
-		push af				; these book-end routines assume the volumes and
-		push bc				; dirs remain unchanged (ie: not deleted) during the
-		push de				; operation between them
-		push hl
-		push ix
-		push iy
-		
-		ld hl,orig_cluster_list
-		xor a
-rodv_lp		push af
-		push hl
-		call kjt_change_volume
-		pop hl
-		jr z,rodv_volok
-		inc hl
-		inc hl
-		jr skprestdir
-rodv_volok	ld e,(hl)
-		inc hl
-		ld d,(hl)
-		inc hl
-		call kjt_set_dir_cluster
-skprestdir	pop af	
-		inc a
-		cp 10
-		jr nz,rodv_lp
-		
-restore_orgvol	ld a,(original_vol)
-		call kjt_change_volume
-		pop iy
-		pop ix
-		pop hl
-		pop de
-		pop bc
-		pop af
-		ret
-
-
-orig_cluster_list
-
-		ds 20,0
-
-original_vol	db 0
 
 ;---------------------------------------------------------------------------------------
 			
@@ -510,6 +430,10 @@ nxtarg2		inc hl
 		ret z
 		jr nxtarg2
 	
+;-------------------------------------------------------------------------------------------
+
+include "flos_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
+
 ;-------------------------------------------------------------------------------------------
 
 args_pointer	dw 0
