@@ -1,5 +1,5 @@
 
-Join bulkfile.bin to the end of main.exe and rename the resulting file vballs2.exe
+Join bulkfile.bin to the end of main.flx and rename the resulting file vballs2.flx
 
 (Bulkfile.bin holds a file called vb2music.exe - vb2music.exe is "vectorballs_music.exe"
 with "tune.sam" appended to the end.)

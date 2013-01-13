@@ -73,8 +73,8 @@ wvrtend   ld a,(vreg_read)
 
           call per_frame_routines
 
-          in a,(sys_keyboard_data)
-          cp $76
+          call kjt_get_key
+	  cp $76
           jr nz,wvrtstart                         ; quit if ESC key pressed
           
 	  xor a
