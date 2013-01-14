@@ -1,17 +1,19 @@
 
-The ROM code is included in the actual FPGA configuration file as a 512 byte BLOCK RAM located
-at address $0. (Convert the binary file to text using the app provided and paste into the
-OSCA development .ucf file in the appropriate location). 
+The ROM is part of the actual FPGA configuration file (implemented as a 512
+byte BLOCK RAM located at address $0). The ROM code can be converted from
+binary code to text suitable for pasting into the Xilinx project's .ucf file
+by using the Windows app provided (ROM_bin_to_OSCA_constraints.exe)
 
-The ROM initializes the hardware and downloads the boot code from the onboard EEPROM.
-The bootcode is loaded to $200. 3520 bytes are requested from EEPROM location $0f000,
-if that fails (timeout or CRC check), bootcode backup location $1f000 is tried. If both
-locations fail the bootcode can be loaded serially (115200 baud). Serial load is forced
-immediately if UP+RIGHT+FIRE are selected by joystick in port A. 
+The ROM initializes various OSCA registers and downloads the boot code from
+the onboard EEPROM. The bootcode is loaded to $200. 3520 bytes are requested
+from EEPROM location $0f000, if that fails (timeout or CRC check), bootcode
+backup location $1f000 is tried. If both locations fail the bootcode can be
+loaded serially (115200 baud). Serial load is forced immediately if
+UP+RIGHT+FIRE are selected by joystick in port A. 
+
 
 ROM code Revisions:
 -------------------
-
 
 v6.16 (26/03/2011):
 
