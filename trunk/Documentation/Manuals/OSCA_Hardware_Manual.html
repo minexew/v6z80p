@@ -14,7 +14,7 @@ A:hover {color: #00ffff}
 <body>
 <h1 style="text-decoration: underline;">OSCA - An FPGA
 Config For The V6Z80P</h1>
-<pre style="font-style: italic;">By Phil Ruston 2008-2013 - Last updated 1-1-2013 (OSCA v675)</pre>
+<pre style="font-style: italic;">By Phil Ruston 2008-2013 - Last updated 14-01-2013 (OSCA v675)</pre>
 <pre><br>OSCA (Old School Computer Architecture) provides a home-computer era hardware platform for<br>the V6Z80P. As well as basic memory and peripheral control, its features include bitmap and<br>character mapped displays, sprites, a raster line synchronized co-pro ("LineCop"), blitter,<br>hardware line draw and four channels of 8 bit digital sound.<br> <br><span style="font-weight: bold;">Quick Links:</span></pre>
 <ul>
 <li><a href="#Port_List:">Port Index</a></li>
@@ -132,7 +132,7 @@ Ports:</span></h3>
 <hr style="width: 100%; height: 2px;">
 <pre><br><br>Port $0C - Read: No function</pre>
 <pre><br><a name="Port_0C_-_Write"></a>Port $0C - Write: "<span style="font-weight: bold;">sys_baud_rate</span>"</pre>
-<pre>Bit: 0 - Set serial port RS232 comms speed: <br><br>  $00 = 57600 BAUD<br>  $01 = 115200 BAUD<br>  $02 = 14400 BAUD<br>  $03 = 28800 BAUD</pre>
+<pre>Bits: [0:1] = Set serial port RS232 comms speed: <br><br>  %00 (0) = 57600 BAUD<br>  %01 (1) = 115200 BAUD<br>  %10 (2) = 14400 BAUD<br>  %11 (3) = 28800 BAUD</pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
 <pre><a name="Port_0D_-_Read"></a>Port&nbsp; $0D - Read: "<span style="font-weight: bold;">sys_eeprom_byte</span>"</pre>
