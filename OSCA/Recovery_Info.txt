@@ -86,7 +86,8 @@ Bootcode Problems
 
 If the OSCA ROM cannot load a valid bootcode file from the EEPROM, the display will flash
 magenta (bad CRC) or green (time out). If OSCA version 661 or above is running it is
-possible to send the bootcode file manually via the serial link when the display turns grey.
+possible to send the bootcode file manually via the serial link application when the
+display turns grey.
 
 It is also possible to force serial transfer of the bootcode on power-up by holding
 UP+RIGHT+FIRE on a joystick in port A. (Note: The transfer must be at 115200 BAUD).
