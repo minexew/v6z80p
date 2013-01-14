@@ -276,7 +276,7 @@ Window:</h3>
 <pre><br><span style="text-decoration: underline;"><a name="Horizontal_Positions"></a>Horizontal Positions - X_START and X_STOP</span><span style="text-decoration: underline;"></span><br><br>When writing to the <a href="OSCA_Hardware_Manual.html#202">vreg_window_size</a> register to set the horizontal positioning, the byte should<br>be composed as follows:</pre>
 <pre>Bits: [7:4] X_START value<br> &nbsp;    [3:0] X_STOP value</pre>
 <pre>(Make sure <a href="OSCA_Hardware_Manual.html#204">vreg_rasthi</a> was previously written with a value that has bit 2 set.)</pre>
-<pre>The table below shows all the possible combinations of X_START (green: columns) and X_STOP<br>(blue: rows). Where a column and row intersect, the value is the width of the display in<br>pixels. Note: X_Start values 0-4 (in red) are positioned well off the left hand side of the<br>display so should not be used. A good, centralized 320 pixel wide display choice would be<br>the value $8C. </pre>
+<pre>The table below shows all the possible combinations of X_START (the green rows) and X_STOP<br>(blue columns). Where a column and row intersect, the value is the width of the display in<br>pixels. Note: X_Start values 0-4 (in red) are positioned well off the left hand side of the<br>display so should not be used. A good, centralized 320 pixel wide display choice would be<br>the value $8C. </pre>
 <br>
 <table style="text-align: left; width: 50%;" border="1" cellpadding="2" cellspacing="2">
 <tbody>
@@ -612,7 +612,7 @@ Window:</h3>
 <pre><span style="text-decoration: underline;"><a name="Vertical_Positions:"></a>Vertical Positions:</span></pre>
 <pre><span style="text-decoration: underline;"></span>When writing to the <a href="OSCA_Hardware_Manual2.html#202">vreg_window_size</a> register, the byte should be composed as follows:</pre>
 <pre>Bits: [7:4] Y_START value<br>     &nbsp;[3:0] Y_STOP value<br><br>(Make sure <a href="OSCA_Hardware_Manual.html#204">vreg_rasthi</a> was previously written with a value that has bit 2 clear.)</pre>
-<pre>The table below shows all the possible combinations of Y_START (green: columns) and Y_STOP<br>(blue: rows). Where a column and row intersect, the value is the height of the display in<br>scanlines. Note: Y_Start values 0-1 (in red) are above the top of the display so should<br>not be used. A good, centralized 200 line wide display choice would be the value $5A.</pre>
+<pre>The table below shows all the possible combinations of Y_START (the green rows) and Y_STOP<br>(blue columns). Where a column and row intersect, the value is the height of the display in<br>scanlines. Note: Y_Start values 0-1 (in red) are above the top of the display so should<br>not be used. A good, centralized 200 line wide display choice would be the value $5A.</pre>
 <br>
 <table style="text-align: left; width: 50%;" border="1" cellpadding="2" cellspacing="2">
 <tbody>
