@@ -12,7 +12,7 @@ Updates to OSCA
 675 - 28800 and 14400 BAUD support and IRQ feature added to serial port
     - PS/2 Interfaces updated: Now hold clock lines low when "byte_received_flag" is set
     - Video Interrupt can be enabled via normal "sys_irq_enable"  port
-    - Audio interrupt move to bit 4 of IRQ enable
+    - Audio interrupt moved to bit 4 of IRQ enable
 
 *** THIS VERSION OF OSCA REQUIRES BOOTCODE v618 TO BE INSTALLED FIRST ****
 
