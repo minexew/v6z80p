@@ -8,7 +8,7 @@ Serial Link app.
 
 Bootcode is 3518 bytes max of code/data (+ CRC word*). It is downloaded from the FPGA
 config EEPROM (or serially if no bootcode exists) into RAM at $0200-$0FBF by the ROM
-code in the FPGA then executed (if the CRC word in the last two bytes matches the 
+code in the FPGA, then executed (if the CRC word in the last two bytes matches the 
 contents of the file). $0FC0-$0FFF is reserved for the stack. Address range $200-$7FF
 is system RAM when the ROM passes control to  this routine.
 
