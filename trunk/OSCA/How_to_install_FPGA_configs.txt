@@ -2,8 +2,10 @@
 IMPORTANT!
 ----------
 
-Please make sure you use files from the correct folder as the FPGA config
-files are not compatible between different versions of the V6Z80P.
+Please make sure you use config files from the correct folder for your
+PCB version as they are not compatible acrosss the different versions of
+the V6Z80P. (If you use a .v6c config file and OSCA is already reasonably
+up to date, EEPROM.EXE will prevent the wrong version from being installed.)
 
 
 Visible differences between boards
