@@ -47,7 +47,7 @@ close Impact and redo).
 
 (For stability, disconnect the JTAG header when using normal EEPROM config)
 
-Note: If using PIC firmware 637, closing J2 after JTAG configuration will not
+Note: If using PIC firmware 637+, closing J2 after JTAG configuration will not
 reset/reconfigure the V6Z80P.
 
 
