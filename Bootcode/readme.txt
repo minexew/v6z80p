@@ -26,7 +26,7 @@ the data into page 0, address $f000 (and page 1, address $f000 as a back up).
 
 Simply choose the "Update Bootcode" option. Send the file "bootcode.epr" Update
 both the primary version of the bootcode first, reboot and if all OK then update 
-he backup copy.
+the backup copy.
 
   If you have a really old versions of OSCA/FLOS, the latest version of "EEPROM.EXE"
   may not run. If this is the case you should use the command "FIRMWARE.EXE default.bin"
