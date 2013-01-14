@@ -1,5 +1,5 @@
 
-This programs makes a .v6c (v6z80 FPGA config file, as used by EEPROM.EXE)
+This programs makes a .v6c (V6z80P FPGA config file, as used by EEPROM.EXE)
 from a standard Xilinx .bin file
 
 .v6c files have the following extra data appended to the end:
