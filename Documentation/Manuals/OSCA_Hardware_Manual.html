@@ -131,8 +131,8 @@ Ports:</span></h3>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><br><br>Port $0C - Read: No function</pre>
-<pre><br><a name="Port_0C_-_Write"></a>Port $0C - Write: "<span style="font-weight: bold;">sys_baud_rate</span>"</pre>
-<pre>Bits: [0:1] = Set serial port RS232 comms speed: <br><br>  %00 (0) = 57600 BAUD<br>  %01 (1) = 115200 BAUD<br>  %10 (2) = 14400 BAUD<br>  %11 (3) = 28800 BAUD</pre>
+<pre><br><br><a name="Port_0C_-_Write"></a>Port $0C - Write: "<span style="font-weight: bold;">sys_baud_rate</span>"</pre>
+<pre>Bits: [0:1] = Set serial port RS232 comms speed: <br><br><span style="text-decoration: underline;">Bits: 1 0  (Decimal)  BAUD RATE</span><br><br>      0 0  =  (0)  =  57600<br>      0 1  =  (1)  =  115200<br>      1 0  =  (2)  =  14400<br>     &nbsp;1 1  =  (3)  =  28800 </pre>
 <pre><br></pre>
 <hr style="width: 100%; height: 2px;"><br>
 <pre><a name="Port_0D_-_Read"></a>Port&nbsp; $0D - Read: "<span style="font-weight: bold;">sys_eeprom_byte</span>"</pre>
@@ -206,7 +206,7 @@ should have bit 3 set<span style="font-weight: bold;">. </span>To clear the vide
 <span style="text-decoration: underline;">Serial Interrupt</span>
 <br>When a byte has been received in the internal shift buffer, a "byte received" flag becomes<br>set (see bit 6 of <a href="#Port_05_-_Read">sys_joy_com_flags</a> To allow this flag to cause an interrupt, the byte<br>written to <a href="#Port_01_-_Write">sys_irq_enable</a> should have bit 6 set. Reading from sys_serial_port clears the<br>byte received IRQ flag.OSCA only has a single byte serial buffer and no hardware flow<br>control, however (unlike the keyboard and mouse) the value in the shifter is latched into<br>a stable register until it is overwritten when the next complete byte received.<br><br>
 <span style="text-decoration: underline; font-weight: bold;">Non-Maskable Interrupts:</span><span style="font-weight: bold;"></span>
-<br>The default OSCA ROM has the instruction JP $0A03 at $0066 (the NMI Vector). The only<br>NMI source used in OSCA is the "NMI pin" of the expansion header block. When this signal is<br>pulled low (and the hardware NMI inhbit feature is not enabled) the Z80 /NMI line is <br>activated, causing a jump to $66.  The "NMI pin" can be used as a generic input (readable<br>in <a href="#Port_0E">sys_io_pins</a>) by setting bit 0 of <a href="#Port_09_-_Write">sys_hw_settings</a>.<span style="font-weight: bold;">
+<br>The default OSCA ROM has the instruction JP $0A03 at $0066 (the NMI Vector). The only<br>NMI source used in OSCA is the "NMI pin" of the expansion header block. When this signal is<br>pulled low (and the hardware NMI inhbit feature is not enabled) the Z80 /NMI line is <br>activated, causing a jump to $66.  The "NMI pin" is readable in bit 7 of <a href="OSCA_Hardware_Manual.html#Port_0E">sys_io_pins</a> and<br>its NMI feature can be disabled by setting bit 0 of <a href="#Port_09_-_Write">sys_hw_settings</a>.<span style="font-weight: bold;">
 </span>
 </pre>
 
