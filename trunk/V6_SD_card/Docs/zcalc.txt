@@ -1,0 +1,274 @@
+----------------------------------------
+     Z-CALC : SCIENTIFIC CALCULATOR     
+              Copyleft 2013             
+   based on sigmacalc.sourceforge.net   
+ FLOS version by Calogiuri Enzo Antonio 
+----------------------------------------
+
+Z-Calc is a parsing calculator that is
+simple yet powerful. It can handle up
+to 32 different variables and 19 math
+functions.
+
+1. Start the calculator
+Just type zcalc on flos to start the
+program. The "#>" simbol is the user's
+prompt.
+
+2. General commands.
+Z-Calc has only 3 generic commands:
+
+    1) QUIT: Exit to FLOS.
+    2) HELP: Show on screen a simple
+       list od commands.
+    3) VCLEAR: Set all variables to 0.
+
+3. Variables
+Use variables is very simple. Variable
+names must be one letter long from
+'A' to 'Z'. Here are some examples:
+
+    1) X = 12
+    2) Y = 23.34
+    3) A = SIN(Y)
+    4) B = (X + Y) / A
+    
+As you can see, you can assign both
+constants and calculated values from
+functions.
+
+4. Math function
+Here are the mathematical functions
+supported.
+
+4.1. Sin(x)
+Returns the sine of an angle of x
+radians.
+
+Example:
+    sin(30)
+    
+return value -0.9880316241
+
+4.2. Cos(x)
+Returns the cosine of an angle of
+x radians.
+
+Example:
+    cos(20)
+    
+return value 0.4080820618
+
+4.3. Tan(x)
+Returns the tangent of an angle of
+x radians.
+
+Example:
+    tan(12)
+    
+return value -0.6358599287
+
+4.4. Sinh(x)
+Returns the hyperbolic sine of x.
+
+Example:
+    sinh(12.34)
+    
+return value 114330.9760262966
+
+4.5. Cosh(x)
+Returns the hyperbolic cosine of x.
+
+Example:
+    cosh(2.4)
+    
+return value 5.5569471670
+
+4.6. Tanh(x)
+Returns the hyperbolic tangent of x.
+
+Example:
+    tanh(3.4)
+    
+return value 0.9977749279
+
+4.7. Asin(x)
+Returns the principal value of the arc
+sine of x, expressed in radians.
+
+Example:
+    asin(7.1)
+    
+return value 2.8617433124
+
+4.8. Acos(x)
+Returns the principal value of the arc
+cosine of x, expressed in radians.
+
+Example:
+    acos(20)
+    
+return value -1.4708795354
+
+4.9. Atan(x)
+Returns the principal value of the arc
+tangent of x, expressed in radians.
+
+Example:
+    atan(2.2122)
+    
+return value 1.1462483147
+
+4.10. Exp(x)
+Returns the base-e exponential function
+of x, which is the e number raised to
+the power x.
+
+Example:
+    exp(5)
+    
+return value 148.4131591024
+
+4.11. Log(x)
+Returns the natural logarithm of x.
+
+Example:
+    log(5.5)
+    
+return value 1.7047480922
+
+4.12. Log10(x)
+Returns the common (base-10) logarithm
+of x.
+
+Example:
+    log10(1000)
+    
+return value 3.0000000000
+
+4.13. Sqrt(x)
+Returns the square root of x.
+
+Example:
+    sqrt(1024)
+    
+return value 32
+
+4.14. Ceil(x)
+Returns the smallest integral value
+that is not less than x.
+
+Example:
+    ceil(3.8)
+    
+return value 4
+
+4.15. Floor(x)
+Returns the largest integral value
+that is not greater than x.
+
+Example:
+    floor(3.8)
+    
+return value 3
+
+4.16. Abs(x)
+Returns the absolute value of
+parameter x.
+
+Example:
+    abs(-11)
+    
+return value 11
+
+4.17. Pi()
+Return value of Pi.
+
+Example:
+    pi()
+    
+return value 3.1415926536
+
+4.18. Deg(x)
+Convert radians in degrees.
+
+Example:
+    deg(pi())
+    
+return value 180
+
+4.19. Rad(x)
+Convert degrees in radians.
+
+Example:
+    rad(180)
+    
+return value 3.1415926536
+
+5. Logical operators
+Z-CALC can perform logical tests on
+constants or function values and
+return value as True (1) or False (0).
+The logical operators supported are:
+
+    1) >= (greater than or equal)
+    2) <= (less than or equal)
+    3) > (greater than)
+    4) < (less than)
+    5) != or <> (different)
+    6) == (equal)
+    7) && (logical and)
+    8) || (logical or)
+    
+ Examples:
+    1 == 2
+    return 0 (false, because 1 is not
+              equal to 2)
+    
+    3 >= 2
+    return 1 (true, because 3 is
+              greater than or equal 2)
+              
+    1 && 3
+    return 1 (true, because 1 and 3
+              are not 0)
+              
+6. Shift operator
+Z-CALC can perform left and right shift
+operations on integer values or
+costants.
+
+Examples:
+    16 >> 2
+    return 4
+    
+    32 << 4
+    return 512
+    
+7. Mathematical operators.
+Z-CALC has an extended set of
+mathematical operations.
+The mathematical operators supported
+are:
+
+    1) + (summ)
+    2) - (minus)
+    3) * (multiplication)
+    4) / (division)
+    5) = (assignment)
+    6) & (and)
+    7) | (or)
+    8) ^ (xor)
+    9) % (modulo)
+   10) \\ (integer division)
+   
+Examples:
+    12+23
+    return 35
+    
+    456*578
+    return 263568
+    
+    21^2
+    return 440.9999999976
+
