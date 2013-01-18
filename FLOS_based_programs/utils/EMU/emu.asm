@@ -12,6 +12,7 @@
 ; Changes:
 ; --------
 ;
+; v0.13 - corrected paths (vol:0/) for FLOS 6.12
 ; v0.12 - Reassembled with EEPROM routines v1.03
 ; v0.11 - Updated EEPROM contents list code.
 ; v0.10 - Requester code 0.28
@@ -1488,9 +1489,9 @@ machine7_name		db " ",0
 machine8_name		db " ",0
 machine9_name		db " ",0
 
-machine0_romfn		db "vol0:spectrum/zxspec48.rom ",0
-machine1_romfn		db "vol0:spectrum/zxspe128.rom ",0
-machine2_romfn		db "vol0:spectrum/zxspe128.rom ",0
+machine0_romfn		db "vol0:/spectrum/zxspec48.rom ",0
+machine1_romfn		db "vol0:/spectrum/zxspe128.rom ",0
+machine2_romfn		db "vol0:/spectrum/zxspe128.rom ",0
 machine3_romfn		db " ",0
 machine4_romfn		db " ",0
 machine5_romfn		db " ",0
@@ -1510,10 +1511,10 @@ machine7_bits		db 0
 machine8_bits		db 0
 machine9_bits		db 0
 
-nvr_type0_fn		db "vol0:spectrum/resi48k.nvr ",0
-nvr_type1_fn		db "vol0:spectrum/esxdos.nvr ",0	
-nvr_type2_fn		db "vol0:spectrum/resi128k.nvr ",0	
-nvr_type3_fn		db "vol0:spectrum/esxdos.nvr ",0	
+nvr_type0_fn		db "vol0:/spectrum/resi48k.nvr ",0
+nvr_type1_fn		db "vol0:/spectrum/esxdos.nvr ",0	
+nvr_type2_fn		db "vol0:/spectrum/resi128k.nvr ",0	
+nvr_type3_fn		db "vol0:/spectrum/esxdos.nvr ",0	
 nvr_type4_fn		db " ",0
 nvr_type5_fn		db " ",0	
 nvr_type6_fn		db " ",0
@@ -1582,7 +1583,7 @@ machine_name_addrs	dw machine0_name
 
 ;----------------------------------------------------------------------------------------
 
-settings_dir        	db "vol0:settings",0
+settings_dir        	db "vol0:/settings",0
 settings_txt		db "settings",0
 cfg_fn              	db "EMU.CFG",0
 
@@ -1604,7 +1605,7 @@ saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 bad_fn_txt          db 11,"Can't find that file.",11,11,0
 
 banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.12   ",11
+                    db "   Emulator Kickstart V0.13   ",11
                     db "                              ",11,0
           
 machine_txt         db 11,"Selected machine: ",11,11," ",0
@@ -1643,7 +1644,7 @@ read_bytes          dw 0
 
 filename            ds 16,0
 
-spectrum_dir        db "vol0:spectrum",0
+spectrum_dir        db "vol0:/spectrum",0
 
 restore_fn_addr     dw 0
 
