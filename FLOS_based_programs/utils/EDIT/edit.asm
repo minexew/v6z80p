@@ -1,6 +1,7 @@
-; EDIT.EXE v0.04 for FLOS by Phil Ruston 2011 (to replace TEXTEDIT.EXE)
+; EDIT.EXE v0.05 for FLOS by Phil Ruston 2011 (to replace TEXTEDIT.EXE)
 ; ---------------------------------------------------------------------
 
+; v0.05 - CTRL + Q to quit
 ; v0.04 - Requester code V0.28
 ; V0.03 - Allow path in filename
 ; V0.02 - New requester code for FLOS 6.02
@@ -13,6 +14,7 @@
 ; 
 ; Keys:
 ; ----
+; CTRL + Q   = QUIT
 ; CTRL + ESC = QUIT
 ; CTRL + L   = LOAD
 ; CTRL + S   = SAVE
@@ -194,8 +196,10 @@ key_loop  call kjt_wait_vrt             ;flash cursor whilst waiting for key pre
           cp $31
           jp z,ctrl_n_pressed
           cp $76
-          jp z,esc_pressed
-
+          jp z,esc_pressed					;quit with CTRL+ESC
+	  cp $15
+	  jp z,esc_pressed					;quit with CTRL+Q
+	  
                     
 ctrl_not_held       
           
