@@ -14,6 +14,7 @@ Filename can contain path string.
 Keys:
 ----
 
+CTRL + Q   = QUIT
 CTRL + ESC = QUIT
 CTRL + L   = LOAD
 CTRL + S   = SAVE
