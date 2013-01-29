@@ -5,7 +5,7 @@ IMPORTANT!
 Please make sure you use config files from the correct folder for your
 PCB version as they are not compatible acrosss the different versions of
 the V6Z80P. (If you use a .v6c config file and OSCA is already reasonably
-up to date, EEPROM.EXE will prevent the wrong version from being installed.)
+up to date, EEPROM.FLX will prevent the wrong version from being installed.)
 
 
 Visible differences between boards
@@ -30,11 +30,12 @@ Visible differences between boards
 Installing an FPGA config onto the EEPROM
 -----------------------------------------
 
+
 1. [Optional: Copy the relevant FPGA config *.v6c (or *.bin) file to the SD card.]
 
 2. Boot into FLOS.
 
-3. Load the EEPROM tool (eeprom.exe)
+3. Load the EEPROM tool (eeprom.flx)
 
 4. Choose Option 1 "Write config to slot".
 
@@ -46,16 +47,20 @@ Installing an FPGA config onto the EEPROM
 
 7. Wait for file to load, write to EEPROM and complete verification.
 
-8. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
+8. If updating OSCA, check if the bootcode needs updating for the new config. If
+   so, use the "Update Bootcode" option and update the primary bootcode.
 
-9. When prompted, choose to reconfigure from whichever slot you
-   used in step 5
+9. Choose Option 2 - "Reconfigure from a slot now" (Non-permanent)
 
-10. The FPGA restarts with the new FPGA firmware. This selection
+10. When prompted, choose to reconfigure from whichever slot you
+    used in step 5
+
+11. The FPGA restarts with the new FPGA firmware. This selection
     persists until power off (or changed again with this util)
 
-11. If everything is OK, you can reload the EEPROM tool and choose option 3
-    to make the new slot active.
+12. If everything is OK, you can reload the EEPROM tool and choose option 3
+    to make the new slot active. At this point you can update the backup bootcode
+    to, if required.
 
    ( If you want, you can just rewrite the active slot in the first place, but       )
    ( the method above allows you to test the new config before making it the         )
