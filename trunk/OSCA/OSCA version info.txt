@@ -7,19 +7,28 @@ Both support VGA output.
 Updates to OSCA
 ---------------
 
-*** THIS VERSION OF OSCA REQUIRES BOOTCODE v618 TO BE INSTALLED FIRST ****
+v676:
 
-675 - 28800 and 14400 BAUD support and IRQ feature added to serial port
-    - PS/2 Interfaces updated: Now hold clock lines low when "byte_received_flag" is set
-    - Video Interrupt can be enabled via normal "sys_irq_enable"  port
-    - Audio interrupt moved to bit 4 of IRQ enable
+*** THIS VERSION OF OSCA REQUIRES BOOTCODE v618, UPDATE BOOTCODE FIRST IF NECESSARY  ****
 
-*** THIS VERSION OF OSCA REQUIRES BOOTCODE v618 TO BE INSTALLED FIRST ****
+    - mult_write, mult_read and mult_index are now also accessible through Z80 IO ports
+      mult_read/mult_write = port $28 (sys_mult_read, sys_mult_write)
+      mult_index = port $2a (sys_mult_index)
 
 
 
 Previous versions
 -----------------
+
+v675:
+
+*** THIS VERSION OF OSCA REQUIRES BOOTCODE v618 TO BE INSTALLED FIRST ****
+
+    - 28800 and 14400 BAUD support and IRQ feature added to serial port
+    - PS/2 Interfaces updated: Now hold clock lines low when "byte_received_flag" is set
+    - Video Interrupt can be enabled via normal "sys_irq_enable"  port
+    - Audio interrupt moved to bit 4 of IRQ enable
+
 
 674 - The upper 4 bits of the OSCA version ID now contain a PCB version code (1=V6Z80P,
       2=V6+V1.0, 3=V6+v1.1)
