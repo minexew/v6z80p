@@ -30,6 +30,14 @@ sys_low_page        equ $20
 sys_vram_location   equ $21
 sys_audio_panning   equ $22
 
+sys_mult_read		equ $28
+sys_mult_read_lo	equ $28
+sys_mult_read_hi	equ $29
+sys_mult_write		equ $28
+sys_mult_write_lo	equ $28
+sys_mult_write_hi	equ $29
+sys_mult_index		equ $2a
+
 ;---- Sound system ports ---------------------------------------------------
 
 audchan0_loc        equ $10
