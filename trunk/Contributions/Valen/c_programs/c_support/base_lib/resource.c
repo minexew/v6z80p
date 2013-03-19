@@ -61,9 +61,10 @@ BOOL Resource_LoadFileToBuffer(const char *pFilename, dword file_offset, byte* b
     WORD  index_size;
     DWORD file_offset_in_bulk_file;
 
-//    printf("LoadFile: %s \n", pFilename);
-//    printf("ofs: %lu, buf: %x, len: %lu \n", file_offset, buf, len);
-//    printf("bool: %i", resource.useFilesystem);
+#ifdef DEBUG_LIB_BASELIB
+    DEBUGPRINT("LoadFile: %s is_fs: i\n", pFilename, resource.useFilesystem);
+    DEBUGPRINT("ofs: %lu, buf: %x, len: %lu \n", file_offset, buf, len);
+#endif
 
 
     if(resource.useFilesystem) {
@@ -90,8 +91,9 @@ BOOL Resource_LoadFileToBuffer(const char *pFilename, dword file_offset, byte* b
         file_offset_in_bulk_file = (DWORD)index_size +  resource.entry_total_files_size + file_offset;
 
 //        _itoa(, bufff, 10); //ShowDiskErrorAndStopProgramExecution("---: ", bufff);
-//        printf("bulk_offs: %lu \n", file_offset_in_bulk_file);
-
+#ifdef DEBUG_LIB_BASELIB        
+        DEBUGPRINT("bulk_offs: %lu \n", file_offset_in_bulk_file);
+#endif
         r = FLOS_FindFile(&myFile, resource.pDataFilename);
         if(!r) {  return FALSE; }
 
@@ -143,7 +145,7 @@ DatafileEntry* Resource_FindEntryByFilename(const char* pFilename)
         if(strcmp(entry->file_name, pFilename) == 0)
             return entry;
         resource.entry_total_files_size += Resource_GetEntryFileSize(entry);    // accumulate size (of all prev files)
-//        printf("entry f.s.: %lu %s\n", Resource_GetEntryFileSize(entry), entry->file_name);
+//        DEBUGPRINT("entry f.s.: %lu %s\n", Resource_GetEntryFileSize(entry), entry->file_name);
     }
 
     return NULL;
@@ -152,7 +154,7 @@ DatafileEntry* Resource_FindEntryByFilename(const char* pFilename)
 
 DWORD Resource_GetEntryFileSize(DatafileEntry* entry)
 {
-//    printf("entry file size: %x %x %x \n", entry->length_of_file[0], entry->length_of_file[1], entry->length_of_file[2]);
+//    DEBUGPRINT("entry file size: %x %x %x \n", entry->length_of_file[0], entry->length_of_file[1], entry->length_of_file[2]);
     return (DWORD) entry->length_of_file[0] +
            (DWORD) entry->length_of_file[1] * 0x100UL +
            (DWORD) entry->length_of_file[2] * 0x10000UL;
