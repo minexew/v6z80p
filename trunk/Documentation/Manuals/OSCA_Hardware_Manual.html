@@ -17,18 +17,34 @@ Config For The V6Z80P</h1>
 <pre style="font-style: italic;">By Phil Ruston 2008-2013 - Last updated 11-04-2013 (OSCA v676)</pre>
 <pre><br>OSCA (Old School Computer Architecture) provides a home-computer era hardware platform for<br>the V6Z80P. As well as basic memory and peripheral control, its features include bitmap and<br>character mapped displays, sprites, a raster line synchronized co-pro ("LineCop"), blitter,<br>hardware line draw and four channels of 8 bit digital sound.<br> <br><span style="font-weight: bold;">Quick Links:</span></pre>
 <ul>
-<li><a href="#Port_List:">Port Index</a></li>
-<li><a href="#Video_Register_List:">Video Register
-Index</a></li>
-<li><a href="#The_Video_System:">Video System</a></li>
-<li><a href="#Display_Window:">Display Window</a></li>
-<li><a href="#Sprites:">Sprite System</a></li>
-<li><a href="#Sound_System_Detail:">Audio System</a></li>
-<li><a href="#Blitter:">Blitter</a></li><li><a href="#Line_Draw:">Line Draw</a></li>
+
+<li><a href="#Video_Register_List:"><b>Video Register Index</b></a></li>
+
+<li><a href="#The_Video_System">Video System</a></li>
+
+<li><a href="#Display_Window">Display Window</a></li>
+
+<li><a href="#Sprites">Sprite System</a></li>
+
+<li><a href="#Blitter">Blitter</a></li><li><a href="#Line_Draw:">Line Draw</a></li>
+
 <li><a href="#LineCop">LineCop</a></li>
-<li><a href="#Maths_Assist">Maths Assist</a></li>
-<li><a href="#OSCAs_ROM">OSCA ROM</a></li><li><a href="#Interrupts:">Interrupts</a></li>
 </ul>
+<ul>
+
+<li><a href="#Port_List"><b>Port Index</b></a></li>
+
+<li><a href="#Sound_System_Detail">Audio System</a></li>
+
+<li><a href="#Maths_Assist">Maths Assist</a></li>
+
+<li><a href="#Timer">Timer</a></li>
+
+<li><a href="#Interrupts">Interrupts</a></li>
+
+<li><a href="#OSCAs_ROM">OSCA ROM</a></li>
+</ul>
+
 <pre style="text-decoration: underline;"><br>Hardware Control:</pre>
 <pre>In OSCA, memory and peripheral controls are accessed via the Z80's In/Out Ports. Video<br>settings such as the palette, display controls, sprite registers etc are accessed via<br>locations in Z80 address space (these can be paged in and out as desired). Sections of<br>Z80 address space are also assigned to video RAM etc.<br></pre>
 <pre style="text-decoration: underline;"><br>Z80 Address Space Overview:</pre>
@@ -191,7 +207,7 @@ System&nbsp;Detail:</h3>
 <pre>The default set-up is for channels 0 and 2 to go to the left side, whilst channels 1 and 3<br>go to the right side,&nbsp; but by writing to port $22 "<a href="#Port_22">sys_audio_panning</a>" all 4 channels can be<br>individually directed to the left, right or both sides.</pre>
 
 
-<pre></pre><hr style="width: 100%; height: 2px;"><h2><a name="Interrupts:"></a>Interrupts:</h2>
+<pre></pre><hr style="width: 100%; height: 2px;"><h2><a name="Timer"></a>Timer</h2><pre>OSCA has a single 8 bit internal counter which continually counts upwards, once every 256<br>ticks of the master 16MHz clock (ie: it runs at 62.5 KHz). It is not possible to directly<br>read the value of the counter, instead the system sets a flag every time it overflows.<br>This flag can be used as an interrupt source.<br><br>When the counter overflows, it starts counting at whatever value was previously<br>written to it.<span style="font-weight: bold;"></span> Writing to the port immediately sets the <br>count to the written value and clears the internal prescaler count.<br><br>Relevant port bits:<br><br>Port: <a href="#Port:_07_-_Write">sys_timer</a>           - [7:0] -  Period (IE: 256-ticks until overflow)<br>Port: <a href="#Port:_01_-_Read">sys_irq_ps2_flags</a>&nbsp;  - bit 2 - (timer has overflowed)<br>Port: <a href="#Port_01_-_Write">sys_irq_enable</a>      - bit 2 - (allow timer IRQ)<br>Port: <a href="#Port:_02_-_Write">sys_clear_irq_flags</a> - bit 2 - (clear timer IRQ)<br><br></pre><hr style="width: 100%; height: 2px;"><h2><a name="Interrupts:"></a>Interrupts:</h2>
 <pre><br>OSCA uses interrupt mode 1, therefore all the interrupt sources when enabled cause a<br>jump to $0038. The default OSCA ROM has the instruction <span style="font-weight: bold;">JP $0A00</span> at this location.<br>The following devices can cause interrupts:<br><br>Keyboard - Byte received<br>Mouse - Byte received<br>Video - Scanline Match<br>Timer - Overflowed<br>Audio - Channel Looped<br>Serial Port - Byte received<br><br>Before enabling a new interrupt source, ensure your IRQ handling routine will clear its<br>IRQ flag, otherwise the system will get stuck in an IRQ service-loop.<br><br><br><span style="text-decoration: underline;">Keyboard and Mouse interrupts:</span>
 <br>When a full byte has been received by the internal serial-to-parallel shifter, the<br>keyboard (or mouse) sets its "byte received" flag (see bits 0 and 1 of <a href="#Port:_01_-_Read">sys_irq_ps2_flags</a>).<br>This flag in turn pulls the PS/2 Clock line low, meaning that the keyboard (or mouse) is<br>blocked from sending any more data (it has to buffer it internally). If these flags<br>are selected as an interrupt sources (see bits 0/1 of <a href="#Port_01_-_Write">sys_irq_enable</a>) then an IRQ will occur.<br>To clear the flag, write to <a href="#Port:_02_-_Write">sys_clear_irq_flags</a> with bit 0 (keyboard) or 1 (mouse) set<br><span style="text-decoration: underline;">after</span> reading port (sys_keyboad_data / sys_mouse_data).<span style="font-weight: bold;">
 <br><br></span><span style="text-decoration: underline;"><br>Video Interrupt</span>
