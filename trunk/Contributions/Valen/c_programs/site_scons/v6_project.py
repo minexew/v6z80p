@@ -283,10 +283,15 @@ class V6_Project_Dependencies():
         
     def Make_stdio_Lib(self):
         #return
-        env_lib = self.v6_project.env
+        env_lib = self.v6_project.env.Clone()
         
         obj = env_lib.Object(  'stdio_v6z80p.c', 
                 CCFLAGS     = env_lib['CCFLAGS'] + ['--std-sdcc99', '--opt-code-speed' ]  )                
+        # check, if debug mode (for this lib) was requeted by user via scons arg (DEBUG_LIB_STDIO=1)
+        debug = ARGUMENTS.get('DEBUG_LIB_STDIO', 0)
+        if int(debug):
+			env_lib.Append(CPPDEFINES = 'DEBUG_LIB_STDIO')        
+        
         obj[0].my_progress_message = '------------- stdio Lib: Compile C to object files ---------'
         
             
@@ -347,6 +352,7 @@ class V6_Project_SystemChecker():
                              stdout = subprocess.PIPE)                                                             
         if pipe.wait() != 0: 
             print 'Error: ' + str + ' not found! '
+            print 'Hint: On Linux, you will need to install the package called "srecord" (which include srec_cat program)'
             return False
         return True
 
