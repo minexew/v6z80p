@@ -18,6 +18,12 @@
 
 */
 
+
+#ifdef DEBUG_LIB_STDIO
+#include <base_lib/debug_print.h>
+#include <stdio.h>
+#endif
+
 #include <stdio_v6z80p.h>
 
 
@@ -322,7 +328,10 @@ static int open_file(FILE *stream, const char *filename, const char *mode)
 
   stream->filePosition = 0;
 
-//  sprintf(myTestString, "stream->fileSize: %x ", stream->fileSize);  FLOS_PrintStringLFCR(myTestString);
+
+#ifdef DEBUG_LIB_STDIO
+    DEBUGPRINT("stream->fileSize: %x ", stream->fileSize);
+#endif
 
   stream->flag = streamflag;
   stream->cnt = 0;
@@ -450,6 +459,11 @@ static FILE* allocateMemoryForFILE(void)
 FILE *fopen(const char *filename, const char *mode)
 {
   FILE *stream;
+
+#ifdef DEBUG_LIB_STDIO
+    DEBUGPRINT("fopen: %s", filename);
+    //DEBUGPRINT("stream->fileSize: %x ", stream->fileSize);
+#endif
 
   // allocate memory for stream
   stream = allocateMemoryForFILE();         //&stdio_v6z80p.arrFILE[0];
