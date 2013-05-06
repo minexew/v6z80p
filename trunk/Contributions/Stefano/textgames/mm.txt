@@ -1,0 +1,26 @@
+
+   Mastermind game, written by:	Stephen A. Ward,
+				January, 1980
+
+   Modified for BDS C by:	Leor Zolman,
+				February, 1980
+
+   Modified for OSCA by:	Stefano Bodrato,
+				April, 2013
+
+
+   Usage:  mm [ -B ] [ -K ] [ -C# ] [ -P# ]
+ 
+   where:  -B  tells # of possible solutions before each guess
+	   -C# sets number of different characters (e.g., "-c4" means A-D)
+		(defaults to 6)
+	   -P# sets number of positions in solution string
+		(defaults to 4)
+	   -K  disables kibitzing (enabled by default.). 
+		
+    Thus, for example, the invokation
+	   mm -C10 -P3
+    would simulate the game of "Bagels", where the layout is ten different
+    characters in three positions. I don't think "Bagels" allows repetitions,
+    though, so it isn't QUITE the same...
+
