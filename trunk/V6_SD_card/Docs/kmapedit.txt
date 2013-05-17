@@ -1,0 +1,43 @@
+
+KMAPEDIT - A keymap editor for FLOS
+------------------------------------
+
+A simple tool for creating and editing
+FLOS keymap files.
+
+USEGE:
+
+KMAPEDIT [no args]
+
+FLOS supports unqualified, shifted and
+ALTed keys. It uses a scancode-to-ASCII
+translation table, by default it is that
+of the U.K. but the KEYMAP command can
+be used to load a keymap for a different
+locale.
+ 
+FLOS keymaps are 294 bytes long (can
+also be 196 bytes if ALTed keys are
+not required). The format is:
+
+$00-$61 : ASCII codes for unshifted
+keys - scancodes $00-61
+$62-$c3 : ASCII Codes for shifted
+keys - scancodes $00-61
+$c4-$125: ASCII Codes for ALTed
+keys - scancodes $00-$61
+
+Once the util is loaded you can make
+a new keymap from scratch or load 
+(CTRL+ F11) and edit an existing
+keymap from the KEYMAPS folder.
+
+Press a key to select data entry for
+that scancode. Once it is highlighted,
+press F1 and F2 to adjust the ASCII
+code that the key is to generate.
+
+When complete, save the edited keymap
+with CTRL+F12.
+
+CTRL+ESC to quit.
