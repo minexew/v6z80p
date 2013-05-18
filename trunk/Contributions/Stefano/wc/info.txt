@@ -25,13 +25,4 @@ wc foo bar
 
 The first column is the count of newlines, meaning that the text file foo has 40 newlines while bar has 2294 newlines- resulting in a total of 2334 newlines. The second column indicates the number of words in each text file showing that there are 149 words in foo and 16638 words in bar- giving a total of 16787 words. The last column indicates the number of characters in each text file, meaning that the file foo has 947 characters while bar has 97724 characters- 98671 characters all in all.
 
-Newer versions of wc can differentiate between byte and character count. This difference arises with Unicode which includes multi-byte characters. The desired behaviour is selected with the -c or -m switch.
 
-GNU wc used to be part of the GNU textutils package; it is now part of GNU coreutils.
-Usage
-
-    wc -l <filename> print the line count
-    wc -c <filename> print the byte count
-    wc -m <filename> print the character count
-    wc -L <filename> print the length of longest line
-    wc -w <filename> print the word count

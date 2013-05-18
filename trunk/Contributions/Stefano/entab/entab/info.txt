@@ -1,3 +1,7 @@
 
 ENTAB replaces spaces in text files with tabs
 DETAB removes tabs
+
+Notes:
+
+Very slow due to method used for multiple file handling

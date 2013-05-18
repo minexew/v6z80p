@@ -4,7 +4,7 @@
 <body>
 <h3><span style="text-decoration: underline; font-weight: bold;">FLOS
 v612 Kernal Manual</span><span style="text-decoration: underline; font-weight: bold;"> -
-Last updated 11-01-2013</span></h3>
+Last updated 18-05-2013</span></h3>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span><br>The following FLOS kernal routines can be executed simply by using a "CALL name"<br>instruction, with registers pre-set to the routines requirements (Remember to<br>INCLUDE the labels definitions from the equates folder.)<br><br>EG:- <br><br>---------------------------------------------------------------------------------<br><br>         LD HL,  my_text<br>         CALL    kjt_print_string<br><br>         [rest of program..]<br>	<br>my_text  DB "HELLO WORLD!",0<br><br>----------------------------------------------------------------------------------<br><br><br><span style="text-decoration: underline;">Notes:</span><br><br>Kernal calls should not be made when the Video RAM is paged in. The only routine<br>that is guaranteed to work in that situation is "kjt_page_out_video"</pre>
 <pre><span style="text-decoration: underline; font-weight: bold;"></span>It should be assumed that Kernal calls trash all registers, unless a routine's<br>documentation says otherwise.</pre>
 <span style="text-decoration: underline; font-weight: bold;"><br>
@@ -639,7 +639,7 @@ Kernal Call Index:</span><br>
 <pre> ASCII Char $0a = Line Feed<br> ASCII Char $0d = Carriage Return<br> ASCII Char $0b = Line Feed and Carriage return</pre>
 <pre> HL returns pointing to the zero byte at end of the string</pre>
 <pre>All other registers are preserved by this routine.</pre>
-<pre><br></pre>
+<pre>This routine moves the current cursor position.<br><br></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;"><a name="kjt_clear_screen"></a>kjt_clear_screen</span></pre>
 <pre><br>Action: clears OS screen and set cursor position to top left (0,0)</pre>
@@ -714,7 +714,7 @@ Kernal Call Index:</span><br>
 
 <pre> HL = $0000 : No data, IE: Delete the cursor<br> HL = $085f&nbsp;: Underscore cursor ($800-$8ff = top line of&nbsp; ASCII chars 0-255)<br> HL=&nbsp; $1800 :&nbsp;Solid block cursor</pre>
 
-<pre><br>Output Registers : None</pre>
+<pre><br>Output Registers : None<br><br>Notes:<br><br>Remember, kjt_print_string moves the cursor position so the cursor image<br>should be deleted before that routine is called.</pre>
 <pre><br><a name="kjt_get_input_string"></a></pre>
 <hr style="width: 100%; height: 2px;">
 <pre><span style="font-weight: bold;">kjt_get_input_string</span></pre>
