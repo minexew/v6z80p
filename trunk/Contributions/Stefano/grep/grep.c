@@ -14,28 +14,40 @@
  * included and reference made to  the  fact  that  reproduction
  * privileges were granted by DECUS.
  *
- * Compile command: cc grep -fop
+ * Original authors:
+ *    David Conroy, Martin Minow.
+ * 
  */
+ 
+ /*
+  * Build with file redirection:
+  * zcc +osca -lflosxdos -DFLOS -DREDIR -O3 -ogrep.exe grep.c
+  *
+  * Otherwise (output to stdout only):
+  * zcc +osca -lflosdos -DFLOS -O3 -ogrep.exe grep.c
+  * 
+  * */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#ifdef FLOS
+#include <flos.h>
+int x;
+#endif
 
 /*
- * grep.
- *
- * Runs on the Decus compiler or on vms.
- *
- * On vms, define as:
- *
- *      grep :== "$disk:[account]grep"      (native)
- *      grep :== "$disk:[account]grep grep" (Decus)
- *
- * See below for more information.
+ * Wildcards are allowed on FLOS
  */
 
 char    *documentation[] = {
 "grep searches a file for a given pattern",
 "Execute by:",
+#ifdef REDIR
+"  grep [flg] reg_expr file_list [>ofile]",
+#else
 "  grep [flags] regular_expr file_list",
+#endif
 "",
 "Flags are single chars preceeded by '-':",
 " -c  Print count of matching lines",
@@ -85,6 +97,44 @@ char *pp, lbuf[LMAX], pbuf[PMAX];
 extern char *cclass(), *pmatch();
 
 
+#ifdef FLOS
+
+// Found in the BDS C sources, (wildexp..),written by Leor Zolman.
+// contributed by: W. Earnest, Dave Hardy, Gary P. Novosielski, Bob Mathias and others
+
+int wildmatch(char *wildnam, char *filnam)
+{
+   char c;
+   
+   while (c = *wildnam++)
+	if (c == '?')
+		if ((c = *filnam++) && c != '.')
+			continue;
+		else
+			return 0;
+	else if (c == '*')
+	{
+		while (c = *wildnam)
+		{ 	wildnam++;
+			if (c == '.') break;
+		}
+		while (c = *filnam)
+		{	filnam++;
+			if (c == '.') break;
+		}
+	}
+	else if (c == *filnam++)
+	 	continue;
+	else return 0;
+
+   if (!*filnam)
+	return 1;
+   else
+	return 0;
+}
+
+#endif
+
 /*** Main program - parse arguments & grep *************/
 main(argc, argv)
 int argc;
@@ -107,6 +157,32 @@ char *argv[];
    gotpattern = 0;
    for (i=1; i < argc; ++i) {
       p = argv[i];
+#ifdef	REDIR
+		/*
+		 * Hand-knit I/O redirection for vms
+		 */
+		if (*p == '<') {
+			freopen(&p[1], "r", stdin);
+			argv[i] = NULL;
+			continue;
+		}
+		if (*p == '>') {
+			if (p[1] == '>')
+				if (p[2]==0) {
+					fprintf(stderr, "Invalid output file\n");
+					exit (0);
+				} else
+					freopen(&p[2], "a", stdout);
+			else
+				if (p[1]==0) {
+					fprintf(stderr, "Invalid output file\n");
+					exit (0);
+				} else
+					freopen(&p[1], "w", stdout);
+			argv[i] = NULL;
+			continue;
+		}
+#endif
       if (*p == '-') {
          ++p;
          while (c = *p++) {
@@ -163,14 +239,29 @@ char *argv[];
 	} else {
       fflag = fflag ^ (nfile > 0);
       for (i=1; i < argc; ++i) {
-         if (p = argv[i]) {
-            if ((f=fopen(p, "r")) == NULL)
-               cant(p);
-            else {
-               grep(f, p);
-               fclose(f);
-            }
-         }
+		 if (p = argv[i]) {
+#ifdef FLOS
+			 if ((x=dir_move_first())!=0) return(0);
+
+			 while (x == 0) {
+				if (wildmatch(p,dir_get_entry_name())) {
+					if (!dir_get_entry_type()) {
+						f = fopen(dir_get_entry_name(), "r");
+						grep(f, dir_get_entry_name());
+						fclose(f);
+					}
+				}
+				x = dir_move_next();
+			 }
+#else
+			if ((f=fopen(p, "r")) == NULL)
+			   cant(p);
+			else {
+			   grep(f, p);
+			   fclose(f);
+			}
+#endif
+		 }
       }
    }
 }
