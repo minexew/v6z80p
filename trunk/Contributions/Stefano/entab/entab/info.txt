@@ -1,0 +1,3 @@
+
+ENTAB replaces spaces in text files with tabs
+DETAB removes tabs
