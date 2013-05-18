@@ -1,5 +1,7 @@
-; KEYMAP EDITOR - v1.00 by Phil Ruston 2013
+; KEYMAP EDITOR - v1.01 by Phil Ruston 2013
 ; ------------------------------------------
+;
+; v1.01 - added sprite offset for FLOS in 60Hz mode
 ;
 ;---Standard header for OSCA and FLOS -----------------------------------------------------------------------
 
@@ -20,7 +22,12 @@ max_path_length equ 40
           
 ;-----------------------------------------------------------------------------------------------
 
-kmapedit_go	call remove_cursor
+kmapedit_go	call get_video_mode
+		and 1
+		jr z,paltv
+		ld a,$4c
+		ld (sprite_pos),a
+paltv		call remove_cursor
                 call kjt_clear_screen
                  
 		xor a
@@ -53,7 +60,8 @@ spreglp		ld (ix+0),l                             ;set x coord low
 		or $50					; height of sprite
 		or c
 		ld (ix+1),a                             ;set msbs
-		ld (ix+2),$5c                           ;set y coord low
+		ld a,(sprite_pos)
+		ld (ix+2),a                             ;set y coord low
           
 		ld a,l                                  ;next x coord
 		add a,16
@@ -432,6 +440,8 @@ io_preamble     call remove_cursor
                 include "flos_based_programs/code_library/loading/inc/save_restore_dir_vol.asm"
 		
                 include "flos_based_programs/code_library/requesters/inc/file_requesters_with_rs232.asm"
+		
+		include "flos_based_programs/code_library/video/inc/get_video_mode.asm"
 
 ;------------------------------------------------------------------------------------
 
@@ -453,6 +463,7 @@ key_index	db 0
 		
 qual_offset	dw 0
 
+sprite_pos	db $5c
 
 ;------------------------------------------------------------------------------------
 
@@ -462,7 +473,7 @@ spr_end		db 0
 
 colours		incbin "FLOS_based_programs\utils\keymaped\data\colours.bin"	
 
-util_text	db "       FLOS KEYMAP EDITOR V1.00",11
+util_text	db "       FLOS KEYMAP EDITOR V1.01",11
 		db "       ------------------------",11
                 db 11,"PRESS A KEY...",11,11,11,11,11,11,11,11,11,11,11,11,11,11,"KEYS:-",11,11
                 db "F1/F2    : ASCII CODE -/+",11
