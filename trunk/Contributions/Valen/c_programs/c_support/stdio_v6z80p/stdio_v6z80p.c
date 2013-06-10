@@ -460,9 +460,11 @@ FILE *fopen(const char *filename, const char *mode)
 {
   FILE *stream;
 
+    DEBUGPRINT("fopen11111 \n");
 #ifdef DEBUG_LIB_STDIO
-    DEBUGPRINT("fopen: %s", filename);
-    //DEBUGPRINT("stream->fileSize: %x ", stream->fileSize);
+    DEBUGPRINT("fopen here \n");
+//    DEBUGPRINT("fopen: %s", filename);
+//    DEBUGPRINT("stream->fileSize: %x ", stream->fileSize);
 #endif
 
   // allocate memory for stream
