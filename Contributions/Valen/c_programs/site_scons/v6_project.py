@@ -5,6 +5,7 @@ import subprocess
 import pprint
 import time
 import datetime
+import serial
 import ConfigParser             # to read ini file
 from SCons.Script import *
 
@@ -207,7 +208,12 @@ class V6_Project(object):
         # but (on the side of fast PC), the sendv6 exits immidiatly  and will re-run again, and thus will fail to connect to v6,
         # because on v6 board, FILERX is still in disk write mode (not in listening mode).
         
-        upload_command = 'cd ${SOURCE.dir} && $SENDV6_UTIL $SENDV6_PORT ${SOURCE.file}  &&  $SLEEP_UTIL 2'    
+        port = self.options_handler.config.get('SendV6', 'port')
+        if self.misc_tools.Is_SerialPort_CanBeOpened(port):
+            upload_command = 'cd ${SOURCE.dir} && $SENDV6_UTIL $SENDV6_PORT ${SOURCE.file}  &&  $SLEEP_UTIL 2'   
+        else:
+            upload_command = '@@echo WARNING The serial port $SENDV6_PORT is BUSY ! Cant upload the file. '
+            #upload_command = 'echo zzzzzz';
         #upload_command = 'sendv6 S0 $SOURCE'       # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
         
         upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
@@ -386,6 +392,9 @@ class V6_Project_SystemChecker():
             return False
         return True
         
+
+			
+        
 # this class know how to handle specific ini file options
 class V6_Project_OptionsHandler():
     
@@ -433,7 +442,25 @@ class V6_Project_MiscTools():
         node =  Command(target, source, command)  
         node[0].my_progress_message = '---- binary file to C source file ------'
         return node
-         
+
+        
+    def Is_SerialPort_CanBeOpened(self, port):
+        try:    
+            ser = serial.Serial()
+            ser.port = "/dev/tty"  + port 
+            ser.baudrate = 115200 
+            ser.open()
+            ser.close()
+            return True
+        except serial.SerialException:
+            return False
+            
+        #if ser.isOpen():
+            #ser.write("hello")
+            #response = ser.read(ser.inWaiting())
+            #ser.close()
+    
+            
                         
 #screen = open('/dev/tty', 'w')
 def progress_function(node):
