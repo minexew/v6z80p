@@ -12,7 +12,6 @@
 ; Changes:
 ; --------
 ;
-; v0.14 - Removed Residos NVR type
 ; v0.13 - corrected paths (vol:0/) for FLOS 6.12
 ; v0.12 - Reassembled with EEPROM routines v1.03
 ; v0.11 - Updated EEPROM contents list code.
@@ -103,10 +102,7 @@ last_arg  ld a,(args_set)
           or a
           ret
 
-args_ok   call kjt_clear_screen
- 	  call show_custom_menu
-	  ld b,"1"
-	  jp not_quit                             ;assume option 1
+args_ok   jp boot_nvr                             ;boot to residos/esxdos
           
 notlarg   cp "M"
           jr z,config_arg
@@ -1504,9 +1500,9 @@ machine7_romfn		db " ",0
 machine8_romfn		db " ",0
 machine9_romfn		db " ",0
 
-machine0_bits		db $80		; bit7=Sense EXP_B for NVR select offset (0 or 1), bits 2:0=NVR type
-machine1_bits		db $80
-machine2_bits		db $80
+machine0_bits		db $80	; bit7=Sense EXP_B for NVR select offset (0 or 1), bits 2:0=NVR type
+machine1_bits		db $82
+machine2_bits		db $82
 machine3_bits		db 0
 machine4_bits		db 0
 machine5_bits		db 0
@@ -1515,30 +1511,30 @@ machine7_bits		db 0
 machine8_bits		db 0
 machine9_bits		db 0
 
-nvr_type0_fn		db " ",0
-nvr_type1_fn		db "vol0:/spectrum/esxdos.nvr",0
-nvr_type2_fn		db " ",0	
-nvr_type3_fn		db " ",0	
+nvr_type0_fn		db "vol0:/spectrum/resi48k.nvr ",0
+nvr_type1_fn		db "vol0:/spectrum/esxdos.nvr ",0	
+nvr_type2_fn		db "vol0:/spectrum/resi128k.nvr ",0	
+nvr_type3_fn		db "vol0:/spectrum/esxdos.nvr ",0	
 nvr_type4_fn		db " ",0
 nvr_type5_fn		db " ",0	
 nvr_type6_fn		db " ",0
 nvr_type7_fn		db " ",0
 
-nvr_type0_name	        db " ",0
+nvr_type0_name	        db "RESIDOS (48K)",0
 nvr_type1_name		db "ESXDOS",0
-nvr_type2_name	        db " ",0
-nvr_type3_name		db " ",0
+nvr_type2_name	        db "RESIDOS (128K)",0
+nvr_type3_name		db "ESXDOS",0
 nvr_type4_name		db " ",0
 nvr_type5_name		db " ",0
 nvr_type6_name		db " ",0
 nvr_type7_name		db " ",0
 
-nvr_type0_opt_mask	db %1111011
+nvr_type0_opt_mask	db %1111111
 nvr_type1_opt_mask	db %1111100
 nvr_type2_opt_mask	db %1111111
-nvr_type3_opt_mask	db %1111111
+nvr_type3_opt_mask	db %1111100
 nvr_type4_opt_mask	db %1111111
-nvr_type5_opt_mask	db %1111111
+nvr_type5_opt_mask	db %1111100
 nvr_type6_opt_mask	db %1111111
 nvr_type7_opt_mask	db %1111111
 
@@ -1609,7 +1605,7 @@ saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 bad_fn_txt          db 11,"Can't find that file.",11,11,0
 
 banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.14   ",11
+                    db "   Emulator Kickstart V0.13   ",11
                     db "                              ",11,0
           
 machine_txt         db 11,"Selected machine: ",11,11," ",0
