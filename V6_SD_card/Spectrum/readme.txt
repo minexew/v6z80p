@@ -45,10 +45,10 @@ for the V6Z80P:
   FPGA_CFG\Alessand\v6plus1.1\Pentagon
 
   These emulators offer powerful
-  features such as support for ResiDOS
-  and esxDOS, ULA+ and Timex graphics
-  modes etc. They can even load
-  Spectrum software from tape.
+  features such as support for esxDOS,
+  ULA+ and Timex graphics modes etc.
+  They can even load Spectrum software
+  from tape.
 
   Once installed on the EEPROM these
   emulators are launched with the FLOS
