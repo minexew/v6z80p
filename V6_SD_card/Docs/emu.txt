@@ -1,5 +1,6 @@
 
-EMU.FLX - Emulator Launcher
+EMU.EXE - Emulator Launcher v0.14
+---------------------------------
 
 Used to start Alessandro's cycle
 perfect Spectrum emulators.
@@ -12,9 +13,8 @@ If supplied, Options can be:
 "M1" (IE: Machine 1 Spectrum 128)
 "M2" (IE: Machine 2 Pentagon 128)
 
-(When arguments are supplied, you
-can only boot into an alterate OS
-from an .nvr file.)
+(When a machine selection argument
+is supplied, menu option 1 is used)
 
 Notes:
 
@@ -31,18 +31,22 @@ necessary).
 
 Emulators can use the status of
 the expansion pin EXT_B to determine
-hardware configuration (EG: The
-Spectrum 48/128/Pentagon emulators
-select virtual hardware expansion
-devices (zxMMC, divIDE etc) depending
-on this pin. EMU also reads the pin
-status to load an OS appropriate for
-the hardware:
+hardware configuration options of
+the emulated machine (EG: The
+Spectrum 48/128 emulators enable
+virtual hardware expansion devices
+(such divIDE etc) if EXT_B has a
+jumper on it. 
 
-If the pin is low (IE: pulled down
-by a jumper) the system restores
-to ESXDOS - If the pin is high (no
-jumper) RESIDOS is used.
+For the Spectrum 48/128 emulators:
+
+If this pin is low (pulled down by a
+fitted jumper) the only startup
+option is: Boot into ESXDOS. If
+the pin is high (no jumper) the
+you can start in BASIC with the
+standard ROM (optionally loading
+a .TAP file into memory beforehand) 
 
 For this automatic feature to work
 
@@ -51,4 +55,3 @@ a) OSCA v671+ must be installed and
 b) the Spectrum emulator configs must
 be versions 048K2715.bin/128K2715.bin
 or above.
-
