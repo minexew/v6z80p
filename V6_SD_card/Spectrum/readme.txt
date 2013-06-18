@@ -25,6 +25,11 @@ for the V6Z80P:
   is the slot number where the config
   file was installed)
 
+  This emulator requires the file
+  menu.zxp in the [ROOT:]SPECTRUM dir
+  of the SD card (it is the front end
+  /file selector code).
+
   For more info see the sub folder:
 
   FPGA_CFG\Phil\
