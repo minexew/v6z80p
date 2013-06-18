@@ -1,0 +1,78 @@
+1. V6Z80P Speccy core COPYRIGHT
+===============================
+
+* V6Z80P Speccy core (released under Modified BSD license)
+* Copyright (c) 2013, Alessandro Dorigatti
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * Neither the name of Alessandro Dorigatti nor the
+*       names of its contributors may be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY ALESSANDRO DORIGATTI "AS IS" AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL ALESSANDRO DORIGATTI BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+----------------------------------------------------------------------
+2. ZX SPECTRUM ROM
+==================
+
+This core uses the original ZX Spectrum 48/128K ROM, distributed with the
+binary package.
+
+Amstrad, the current owners of the Sinclair ZX Spectrum, allow free
+distribution of the ZX Spectrum 48K/128K ROMs; see
+
+http://www.worldofspectrum.org/permits/amstrad-roms.txt
+
+for further details.
+
+Amstrad have kindly given their permission for the redistribution of
+their copyrighted material but retain that copyright. Thank you Amstrad.
+-----------------------------------------------------------------------
+
+3. ESXDOS
+=========
+
+esxDOS core is (c) Papaya Dezign
+esxDOS additional commands are (c) their respective authors
+NMI.SYS is (c) ub880d
+
+For more information about ESXDOS, please visit the following URL:
+
+http://esxdos.org/
+
+5. YM-2149 block
+================
+
+This core makes use of the YM-2149 VHDL code developed by Mike Johnson.
+That is a simulation model of YM2149 (AY-3-8910 with bells on)
+Copyright (c) MikeJ - Jan 2005 - All rights reserved.
+
+Many thanks to Mike Johnson for this work!
+
+6. MANIC MINER
+==============
+
+Included as a test .tap file. According to World Of Spectrum, Matthew Smith
+(the author) has given permission for his Spectrum games to be distributed.
+
+http://www.worldofspectrum.org/infoseekpub.cgi?regexp=matthew+smith
+
+Thanks Matthew for that, and for the truly classic game.
+
+-----------------------------------------------------------------------
