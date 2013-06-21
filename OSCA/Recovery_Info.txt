@@ -90,5 +90,5 @@ possible to send the bootcode file manually via the serial link application when
 display turns grey.
 
 It is also possible to force serial transfer of the bootcode on power-up by holding
-UP+RIGHT+FIRE on a joystick in port A. (Note: The transfer must be at 115200 BAUD).
+UP+RIGHT+FIRE on a joystick in port 1. (Note: The transfer must be at 115200 BAUD).
 
