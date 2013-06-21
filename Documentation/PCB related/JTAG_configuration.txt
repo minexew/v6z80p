@@ -59,7 +59,7 @@ reset/reconfigure the V6Z80P.
 
 2. Click open project.
 
-3. Browse to v6xx.ise (whatever is the latest design version)
+3. Browse to an .ise file (whatever is the latest design version)
    and open it.
 
 4. In the processes box, click "Generate programming file".
