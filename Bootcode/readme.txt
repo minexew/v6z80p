@@ -46,7 +46,7 @@ Current version:
 6.18 (2-1-2012)
 
 * Uses standard keyboard init code from code library (required for OSCA v675 but compatible
-  with previous versions). Will not hang on Keyboard init in any circumstances.
+  with previous versions). Should not hang on Keyboard init in any circumstances.
 
 
 
