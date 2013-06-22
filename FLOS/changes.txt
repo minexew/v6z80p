@@ -2,6 +2,20 @@
 Current FLOS version:
 ---------------------
 
+v6.13 - 22/06/2012
+
+
+IMPROVED:
+---------
+
+* Filesystem now returns 'file not found' error as soon as the first dir entry
+  with $00 as the first byte is encountered (instead of scanning to end of cluster).
+  This means "Unknown command" error appears much sooner and scripts run a lot faster.
+
+
+
+
+
 v6.12  - 12/01/2013
 
 
