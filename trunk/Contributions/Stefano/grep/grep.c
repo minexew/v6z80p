@@ -20,29 +20,41 @@
  */
  
  /*
-  * Build with file redirection:
-  * zcc +osca -lflosxdos -DFLOS -DREDIR -O3 -ogrep.exe grep.c
+  * Build with hand-knit file redirection
+  * (add the following line: #pragma output noredir=1)
+  * zcc +osca -lflosxdos -O3 -DWILDCARD -DREDIR -ogrep.exe grep.c
+  * zcc +cpm -O3 -DWILDCARD ogrep.com grep.c
   *
-  * Otherwise (output to stdout only):
+  * Build with Internal z88dk file redirection
+  * zcc +osca -lflosxdos -O3 -DWILDCARD -ogrep.exe grep.c
+  * zcc +cpm -DWILDCARD -O3 -ogrep.com grep.c
+  * 
+  * No file redirection at all (faster and smaller):
+  * (add the following line: #pragma output noredir=1)
   * zcc +osca -lflosdos -DFLOS -O3 -ogrep.exe grep.c
+  * 
+  * The CP/M library can be rebuilt to support devices by rebuilding cpm_clib.lib
+  * Enter in z88dk/libsrc/fcntl and 'make clean'
+  * Edit cpm.h to congifure the DEVICES mode, rebuild the lib and copy it in 'clibs'
   * 
   * */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef FLOS
-#include <flos.h>
+#include <unistd.h>
+
+/*
+ * Wildcards are supported by z88dk on FLOS and CP/M
+ */
+#ifdef WILDCARD
 int x;
 #endif
 
-/*
- * Wildcards are allowed on FLOS
- */
-
 char    *documentation[] = {
-"grep searches a file for a given pattern",
-"Execute by:",
+//"grep searches a file for a given pattern",
+//"Execute by:",
+"",
 #ifdef REDIR
 "  grep [flg] reg_expr file_list [>ofile]",
 #else
@@ -97,43 +109,6 @@ char *pp, lbuf[LMAX], pbuf[PMAX];
 extern char *cclass(), *pmatch();
 
 
-#ifdef FLOS
-
-// Found in the BDS C sources, (wildexp..),written by Leor Zolman.
-// contributed by: W. Earnest, Dave Hardy, Gary P. Novosielski, Bob Mathias and others
-
-int wildmatch(char *wildnam, char *filnam)
-{
-   char c;
-   
-   while (c = *wildnam++)
-	if (c == '?')
-		if ((c = *filnam++) && c != '.')
-			continue;
-		else
-			return 0;
-	else if (c == '*')
-	{
-		while (c = *wildnam)
-		{ 	wildnam++;
-			if (c == '.') break;
-		}
-		while (c = *filnam)
-		{	filnam++;
-			if (c == '.') break;
-		}
-	}
-	else if (c == *filnam++)
-	 	continue;
-	else return 0;
-
-   if (!*filnam)
-	return 1;
-   else
-	return 0;
-}
-
-#endif
 
 /*** Main program - parse arguments & grep *************/
 main(argc, argv)
@@ -162,7 +137,11 @@ char *argv[];
 		 * Hand-knit I/O redirection for vms
 		 */
 		if (*p == '<') {
-			freopen(&p[1], "r", stdin);
+			if (p[1]==0) {
+				fprintf(stderr, "Invalid input file\n");
+				exit (0);
+			} else
+				freopen(&p[1], "r", stdin);
 			argv[i] = NULL;
 			continue;
 		}
@@ -171,14 +150,16 @@ char *argv[];
 				if (p[2]==0) {
 					fprintf(stderr, "Invalid output file\n");
 					exit (0);
-				} else
+				} else {
 					freopen(&p[2], "a", stdout);
+				}
 			else
 				if (p[1]==0) {
 					fprintf(stderr, "Invalid output file\n");
 					exit (0);
-				} else
+				} else {
 					freopen(&p[1], "w", stdout);
+				}
 			argv[i] = NULL;
 			continue;
 		}
@@ -233,18 +214,20 @@ char *argv[];
    if (!gotpattern)
       usage("No pattern");
    if (nfile == 0) {
-		usage("No arguments");
-       //grep(stdin, 0);
-		return(0);
+      if (isatty(stdin))
+		usage("No input file given");
+      else
+		grep(stdin, 0);
+      return(0);
 	} else {
       fflag = fflag ^ (nfile > 0);
       for (i=1; i < argc; ++i) {
 		 if (p = argv[i]) {
-#ifdef FLOS
-			 if ((x=dir_move_first())!=0) return(0);
+#ifdef WILDCARD
+			if ((x=dir_move_first())!=0) return(0);
 
-			 while (x == 0) {
-				if (wildmatch(p,dir_get_entry_name())) {
+			while (x == 0) {
+				if (wcmatch(p,dir_get_entry_name())) {
 					if (!dir_get_entry_type()) {
 						f = fopen(dir_get_entry_name(), "r");
 						grep(f, dir_get_entry_name());
@@ -252,7 +235,7 @@ char *argv[];
 					}
 				}
 				x = dir_move_next();
-			 }
+			}
 #else
 			if ((f=fopen(p, "r")) == NULL)
 			   cant(p);
@@ -270,7 +253,7 @@ char *argv[];
 file(s)
 char *s;
 {
-   printf("File %s:\n", s);
+   fprintf(stdout,"File %s:\n", s);
 }
 
 /*** Report unopenable file ****************************/
@@ -287,7 +270,7 @@ char **hp;
    register char   **dp;
 
    for (dp = hp; *dp; ++dp)
-      printf("%s\n", *dp);
+      fprintf(stderr,"%s\n", *dp);
 }
 
 /*** Display usage summary *****************************/
@@ -297,7 +280,7 @@ char    *s;
    fprintf(stderr, "Error:  %s\n", s);
    fprintf(stderr,
       "Usage: grep [-cfnv] pattern [file ...].  grep ? for help\n");
-   exit(1);
+   exit(0);
 }
 
 /*** Compile the pattern into global pbuf[] ************/
@@ -498,15 +481,16 @@ char       *fn;       /* File name (for -f option)  */
                fn = 0;
             }
             if (nflag)
-               printf("%d\t", lno);
-            printf("%s\n", lbuf);
+               fprintf(stdout,"%d\t", lno);
+            //fprintf(stdout,"%s\n", lbuf);
+            fprintf(stdout,"%s", lbuf);
          }
       }
    }
    if (cflag) {
       if (fflag && fn)
          file(fn);
-      printf("%d\n", count);
+      fprintf(stdout,"%d\n", count);
    }
 }
 
@@ -633,7 +617,7 @@ char               *pattern;  /* (partial) pattern to match   */
          return(0);              /* Nothing else worked */
 
       default:
-         printf("Bad op code %d\n", op);
+         fprintf(stderr,"Bad op code %d\n", op);
          error("Cannot happen -- match\n");
       }
    }
@@ -645,5 +629,5 @@ error(s)
 char *s;
 {
    fprintf(stderr, "%s", s);
-   exit(1);
+   exit(0);
 }
