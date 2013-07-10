@@ -460,7 +460,6 @@ FILE *fopen(const char *filename, const char *mode)
 {
   FILE *stream;
 
-    DEBUGPRINT("fopen11111 \n");
 #ifdef DEBUG_LIB_STDIO
     DEBUGPRINT("fopen here \n");
 //    DEBUGPRINT("fopen: %s", filename);
