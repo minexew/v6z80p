@@ -57,8 +57,11 @@ char myTestString[128];
     #define NO_REBOOT 0
 
 
-    char *myFilename =      "/home/valen/_1/v6z80p_SVN/Contributions/Valen/c_programs/build/v6/c_programs/test3/test3.exe";
-    char *myFilenameW =     "/home/valen/_1/test3.txt";
+    char *dir;
+    char myFilename[512];
+    char *path_for_exe  =     "/Contributions/Valen/c_programs/build/v6/c_programs/test3/test3.exe";
+    char myFilenameW[512];
+    char *path_for_txt  =     "/Contributions/Valen/c_programs/build/v6/c_programs/test3/test3.txt";
 
 
 #endif
@@ -75,6 +78,19 @@ BOOL test3(void);
 
 
 int main(void) {
+#ifndef SDCC
+    dir = getenv("v6z80pdir");
+    //printf("%s \n", dir); 
+    strcat (myFilename, dir);
+    strcat (myFilename, path_for_exe);
+
+    strcat (myFilenameW, dir);
+    strcat (myFilenameW, path_for_txt);
+
+    //printf("%s \n", myFilenameW); 
+    //exit(0);
+#endif
+
     test0(); test1(); test2(); test3();
     return NO_REBOOT;
 }
