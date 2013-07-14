@@ -1,5 +1,5 @@
 
-EMU.EXE - Emulator Launcher v0.14
+EMU.FLX - Emulator Launcher v0.14
 ---------------------------------
 
 Used to start Alessandro's cycle
