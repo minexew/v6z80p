@@ -1,6 +1,9 @@
 ; ***************************************************
-; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.26 *
+; * ONBOARD EEPROM MANAGEMENT TOOL FOR V6Z80P V1.28 *
 ; ***************************************************
+;
+; v1.28 - bugfix: If .v6c file was sent serially, the filename would be used as Slot ID
+;         lable, not the ASCII from the file.
 ;
 ; v1.27 - bugfix: reported OS version on eeprom was mangled.
 ;
@@ -278,7 +281,8 @@ working_slot        db 0
 active_slot         db 0
 pic_fw_byte         db 0
 
-	
+file_is_v6c	    db 0
+
 ;======== END OF CODE/DATA THAT MUST BE KEPT IN UNPAGED RAM =====================================================
 
 
@@ -396,35 +400,15 @@ hw_err1   call hw_error_requester
           jr retrylr
           
 ldreq_ok1 call copy_filename
-          call test_v6c_extension
-	  jr nz,notv6c
-	  push ix			;check file length for .v6c file
+         
+	  push ix			;does file length suggest .v6c file?
 	  pop bc
 	  push iy
-	  pop de
-	  ld hl,$fbf0
-	  xor a
-	  sbc hl,de
-	  jr nz,flenerr
-	  ld hl,1
-	  xor a
-	  sbc hl,bc
-	  jr nz,flenerr
-	  jr flen_ok
-	  
-notv6c	  push ix
-          pop bc
-          push iy
-          pop de
-          ld hl,$fbdc                   ;check file length for .bin file
-          xor a
-          sbc hl,de
-          jr nz,flenerr
-          ld hl,$0001
-          xor a
-          sbc hl,bc
-          jr z,flen_ok
-flenerr   ld hl,cfg_file_error_text
+	  pop de	  
+	  call test_cfg_file_length
+	  jr z,flen_ok
+
+flenerr   ld hl,cfg_file_error_text	;file is neither .bin or .v6c length
           jp do_end
 
           
@@ -439,14 +423,12 @@ flen_ok   ld hl,loading_txt
           
 
 
-sdownload ld l,(ix+18)                  ;check serial file header 
-          ld h,(ix+19)                  ;config file must be < $1ffff bytes
-          ld a,h
-          or a
-          jp nz,too_big
-          ld a,l
-          and $fe
-          jp nz,too_big
+sdownload ld c,(ix+$12)
+	  ld b,(ix+$13)
+	  ld e,(ix+$10)                  ;check serial file header 
+          ld d,(ix+$11)                  ;config file either .v6c length or .bin length
+          call test_cfg_file_length
+	  jp nz,flenerr
 
           push ix
           pop hl 
@@ -464,9 +446,10 @@ sdownload ld l,(ix+18)                  ;check serial file header
 cfgloaded call check_xilinx_cfg
 	  jp nc,not_cfg_error          
           
-	  call test_v6c_extension
-	  jr z,is_v6c
-          call insert_fn_into_cfg  	; if a raw .bin file, copy filename to label 
+	  ld a,(file_is_v6c)
+	  or a
+	  jr nz,is_v6c
+          call insert_fn_into_cfg  	; if only a raw .bin file, copy filename to Slot ID label 
           jr skippcbt
   
 is_v6c	  call check_pcb_version
@@ -1749,30 +1732,29 @@ cpyfndone pop hl
           ret
           
 	  
-test_v6c_extension
 
-	ld hl,filename_txt
-	ld a,"."
-	ld bc,9
-	cpir
-	ret nz
-
-	ld a,(hl)
-	cp "v"
-	jr z,exok1
-	cp "V"
-	ret nz
-exok1	inc hl
-	ld a,(hl)
-	cp "6"
-	ret nz
-	inc hl
-	ld a,(hl)
-	cp "c"
-	ret z
-	cp "C"
-	ret
-
+test_cfg_file_length
+	 
+	  xor a
+	  ld (file_is_v6c),a
+	  
+	  ld hl,1
+	  sbc hl,bc
+	  ret nz
+	
+	  ld hl,$fbf0
+	  xor a
+	  sbc hl,de
+	  jr nz,notv6c
+	  ld a,1
+	  ld (file_is_v6c),a
+	  cp a
+	  ret
+notv6c	  ld hl,$fbdc
+	  xor a
+	  sbc hl,de
+	  ret
+	  
 ;----------------------------------------------------------------------------------------------------------------
 	
 	
@@ -1919,7 +1901,7 @@ include "FLOS_based_programs\code_library\loading\inc\save_restore_dir_vol.asm"
 
 
 start_text1         db    "                                      ",11
-                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.27   ",11
+                    db    "   V6Z80P ONBOARD EEPROM TOOL V1.28   ",11
                     db    "                                      ",11,0
                     
 start_text2         db 11
