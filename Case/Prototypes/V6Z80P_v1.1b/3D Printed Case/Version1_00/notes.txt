@@ -1,0 +1,14 @@
+
+Prototype design by Phil Ruston 2012. 
+
+Manufacturing by shapeways.com
+
+Notes:
+------
+
+Power LED hole in lid is in incorrect position (LED on test PCB bad location)
+
+Tabs are too weak. Need more of them.
+
+Do not use shiny surface finish - process waprs case.
+

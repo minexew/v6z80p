@@ -1,0 +1,17 @@
+
+V6Z80Pv1.1b case v1_1
+---------------------
+
+Design not manufactured yet
+
+Mesh not tested for watertightness etc.
+
+status LED position corrected.
+
+Two extra tabs at front.
+
+Tab thickness extended (tighter fit)
+
+PCB Mounting pole lengths extended.
+
+Lightpipes dropped (can get off-the-shelf 3mm LED light pipes)
