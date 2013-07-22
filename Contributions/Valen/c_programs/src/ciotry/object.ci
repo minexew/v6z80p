@@ -1,0 +1,79 @@
+
+public class GameObj
+{
+    int x;
+    int y;
+
+    bool isAllocated;
+    
+    /// Constructor
+    GameObj()
+    {
+        Debug.Print("GameObj()\n"); 
+        x = y = 0;
+        isAllocated = false; 
+    }
+
+    public virtual void Move()
+    {
+        // implementation        
+        Debug.Print("GameObj.Move()\n");            
+    }
+    
+    public virtual void Draw()
+    {
+        // implementation
+        Platform.Draw(this);
+        
+    }
+
+}
+
+
+
+public class MovingGameObj : GameObj
+{
+ 
+    int xvel;
+    int yvel;
+    
+    /// Constructor
+    MovingGameObj()
+    {
+        Debug.Print("MovingGameObj()\n");
+        xvel = yvel = 0; 
+    }
+
+    public override void Move()
+    {        
+        Debug.Print("MovingGameObj.Move()\n");            
+        // implementation
+        x += xvel;
+        y += yvel;
+        
+        
+    }
+    
+
+    public override void Draw()
+    {        
+        Debug.Print("MovingGameObj.Draw()\n");            
+
+        
+        
+    }
+
+}
+
+
+
+public class Debug
+{
+    
+    public static void Print(string s)
+    {
+        native {   
+            printf(s);    
+        }
+    }
+}
