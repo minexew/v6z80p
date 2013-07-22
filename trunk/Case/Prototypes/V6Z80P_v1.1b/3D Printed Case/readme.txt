@@ -17,7 +17,9 @@ if need  be).
 
 Do not use shiny surface finish - heat process warps the case.
 
-
+To reduce production costs the bottom of the case is open - the
+PCB is raised but you should still avoid placing the V6Z80P over
+conductive surfaces.
 
 
 V1.00 - Design was OK, if a little flimsy. The tabs are not very strong
