@@ -1,0 +1,15 @@
+import os
+
+env = Environment(CC = 'gcc', CPPPATH='/usr/include/SDL',
+                      CCFLAGS = '-O2', LIBS=['SDL'])
+
+env.Command('../game.c', Glob('../*.ci') + ['../platform/platform.ci'], "cito -l c -o $TARGET  $SOURCES && ../change_text.php $TARGET")
+
+
+
+# propagate PATH to external commans env
+# (thus, program 'cito' will be finded in a proper way)
+env['ENV']['PATH'] = os.environ['PATH']
+
+        
+env.Program('./out/host', '../host.c')
