@@ -1,0 +1,130 @@
+// Platform specific code.
+// Host: PC
+// Lang: C
+// Lib:  SDL
+
+
+public class Platform
+{
+
+    // --------------------- Gfx -----------------------
+
+   public static void OnGameLoopBegin()
+    { 
+        native {
+            if (SDL_Flip(screen_scaled) != 0) {
+                printf("Failed to swap the buffers: %s \n", SDL_GetError() );
+            }   
+            screen_scaled = SDL_GetVideoSurface();
+        }
+    } 
+    
+    public static void OnGameLoopEnd()
+    { 
+        native {
+            assert(screen);
+            //SDL_Surface *tmp = zoomSurface(screen, 2, 2, 0);
+            //assert(tmp);
+            //SDL_BlitSurface(tmp, NULL, screen_scaled, NULL);
+            //SDL_FreeSurface(tmp);
+            
+            SDL_SoftStretch(screen, NULL, screen_scaled, NULL);             
+   
+            
+            // Increment the frame counter 
+            frame++;
+            float fps = frame / ( SDL_GetTicks() / 1000.f );
+            /*if((frame % (60 * 5)) == 0 )*/
+            printf("fps = %f \n", fps);
+            //printf("ticks = %i \n", SDL_GetTicks() ); 
+        }
+    }
+        
+    public static void InitVideo(int screen_w, int screen_h)
+    {   
+        native {
+            // Initialize SDL and the video subsystem
+            SDL_Init(SDL_INIT_VIDEO);
+
+            
+
+            // Set the video mode
+            screen_scaled = SDL_SetVideoMode(screen_w * 2, screen_h * 2, 16, SDL_DOUBLEBUF/*|SDL_FULLSCREEN*/ );
+            if(screen_scaled == NULL) {
+                printf("SDL_SetVideoMode falied. %s \n", SDL_GetError());
+                exit(1);
+            }
+            // create screen
+            screen = SDL_CreateRGBSurface(SDL_SWSURFACE, screen_w, screen_h, 16,  0, 0, 0, 0);
+            if(screen == NULL) {
+                printf("CreateRGBSurface failed: %s\n", SDL_GetError());
+                exit(1);
+            }
+        }
+    }
+    
+   public static void CleanupVideo()
+    { 
+        native {
+            SDL_Quit();
+        }
+    } 
+    
+    public static void Pause()
+    {
+        native {
+            SDL_Delay(8);
+        }
+    }  
+
+    public static void Draw(GameObj obj)
+    {
+        int x = obj.x;
+        int y = obj.y;
+        
+        int w = 32;
+        int h = 32;
+        
+        int color = 16;
+        FillRect(x, y, w, h, color);
+    }     
+    
+    public static void FillRect(int x, int y, int w, int h, int color)
+    {
+        native {
+            static int mycolor = 0;
+            mycolor++;
+            
+            SDL_Rect rect = {x,y,w,h};
+            SDL_FillRect(screen, &rect, mycolor);
+            
+            //printf("mycolor = %i \n", mycolor);
+        }
+   
+    }
+
+    // --------------------- Input -----------------------
+
+    // Return: false - need to exit to OS
+    //         true - all ok
+    public static bool HandleInput()
+    {
+        int isExit = 0;
+        native {
+            
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                switch (event.type) {
+                    case SDL_QUIT: {
+                        isExit = 1;
+                    }
+                    case SDL_KEYDOWN: {
+                        break;
+                    }
+                }
+            } //while
+        }
+        
+        return (isExit == 1) ? false : true;
+    }
+}

@@ -1,0 +1,81 @@
+// Platform specific code.
+// Host: V6Z80P
+// Lang: C
+// Lib:  
+
+
+public class Platform
+{
+
+    // --------------------- Gfx -----------------------
+
+   public static void OnGameLoopBegin()
+    { 
+        native {
+            ;
+        }
+    } 
+    
+    public static void OnGameLoopEnd()
+    { 
+        native {
+            ;
+        }
+    }
+        
+    public static void InitVideo(int screen_w, int screen_h)
+    {   
+        native {
+            ;
+        }
+    }
+    
+   public static void CleanupVideo()
+    { 
+        native {
+            ;
+        }
+    } 
+    
+    public static void Pause()
+    {
+        native {
+            ;
+        }
+    }  
+
+    public static void Draw(GameObj obj)
+    {
+        int x = obj.x;
+        int y = obj.y;
+        
+        int w = 32;
+        int h = 32;
+        
+        int color = 16;
+        FillRect(x, y, w, h, color);
+    }     
+    
+    public static void FillRect(int x, int y, int w, int h, int color)
+    {
+        native {
+            ;
+        }
+   
+    }
+
+    // --------------------- Input -----------------------
+
+    // Return: false - need to exit to OS
+    //         true - all ok
+    public static bool HandleInput()
+    {
+        int isExit = 0;
+        native {
+            ;
+        }
+        
+        return  true;
+    }
+}
+
