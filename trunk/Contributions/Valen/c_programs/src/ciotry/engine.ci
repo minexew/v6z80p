@@ -1,0 +1,78 @@
+public class Engine
+{
+    GameObj[10] obj;
+    
+    bool isExitRequested;
+    
+    public const int screen_width  = 320;
+    public const int screen_height = 240;
+    
+    /// Constructor
+    Engine()
+    {
+        Debug.Print("Engine()\n");    
+                
+        isExitRequested = false;
+        // init with zero (null) value
+        for(int i = 0; i < obj.Length; i++)
+            obj[i] = null;
+            
+        obj[0] = new GameObj();
+        obj[1] = new MovingGameObj();
+        obj[1].x = 0;  obj[1].y = 40; 
+        
+    }
+
+    public void Run()
+    {
+        Debug.Print("Engine.Run()\n");            
+
+        while(!isExitRequested)
+        {
+
+            Platform.OnGameLoopBegin();
+                        
+            if(!Platform.HandleInput())
+                isExitRequested = true;
+            
+            // move phase
+            for(int i = 0; i < obj.Length; i++)
+                if(obj[i] != null)
+                    obj[i].Move();
+
+            // draw phase
+            for(int i = 0; i < obj.Length; i++)
+                if(obj[i] != null)
+                    obj[i].Draw();
+                                        
+            Platform.OnGameLoopEnd();
+            
+            // do only one pass of loop
+            isExitRequested = true;
+            
+        }
+    }
+    
+
+
+  
+       
+}
+
+
+public class Startup
+{
+    Engine engine;
+    
+    public void Run()
+    {
+        Debug.Print("Startup.Run()\n");    
+        
+        Platform.InitVideo(engine.screen_width, engine.screen_height);        
+        engine = new Engine();
+        engine.Run();
+        Platform.CleanupVideo();
+
+    }
+    
+}
