@@ -1,19 +1,19 @@
-V6Z80P v1.1b - Laser cut acrylic case
--------------------------------------
+V6Z80P+ v1.1b - Laser cut acrylic case
+--------------------------------------
 
 Prototype by John Barker - early 2013 (autocad)
 
-Corrections and further work by Phil ** In development 23-7-2013 ** (inkscape)
+Corrections and further work by Phil ** currently in development 23-7-2013 ** (inkscape)
 
 
 Notes:
 ------
 
-V2 is the latest work in progress drawing 
+V2 is John's latest work in progress drawing 
 
-All the measurements have bee taken off the V61.1b board.
+All the measurements have been taken off the V6+1.1b board.
 
-The 6mm refers to the distance between the base plate and the PCB (ie spacer sizes)
+The "6mm" refers to the distance between the base plate and the PCB (ie spacer sizes)
 
 The material is 3mm acrylic.
 
