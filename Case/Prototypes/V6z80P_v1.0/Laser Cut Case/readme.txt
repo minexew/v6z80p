@@ -1,6 +1,6 @@
 V6Z80P v1.0 - Laser cut acrylic case
 
-A prototype by Graham
+A prototype by Graham Cole
 
 Notes:
 ------
