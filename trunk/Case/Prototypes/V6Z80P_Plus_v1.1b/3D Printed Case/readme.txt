@@ -1,5 +1,5 @@
 
-V6Z80Pv1.1b prototype 3D-printed case prototype design by Phil Ruston 2012. 
+V6Z80Pv1.1b prototype 3D-printed case prototype design by Phil Ruston 2012-2013 
 
 
 Production Notes:
@@ -27,4 +27,10 @@ V1.00 - Design was OK, if a little flimsy. The tabs are not very strong
 
 
 v1.01 - Attempted to fix main problems with v1.00, but has not yet been
-        manufactured.
+        test manufactured (too expensive!) It is available to buy from:
+
+        https://www.shapeways.com/shops/retroleum
+
+        But there are no guarantees that it is OK!
+
+
