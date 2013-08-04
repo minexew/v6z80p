@@ -1,6 +1,7 @@
 
-; Load file to video memory v1.02
+; Load file to video memory v1.03
 ;
+; V1.03 - uses kernal' ascii_to_hex32 routine
 ; v1.02 - allowed path in filename
 
 ;======================================================================================
@@ -19,7 +20,7 @@ my_location	equ $f000
 my_bank		equ $0e
 include 	"flos_based_programs\code_library\program_header\inc\force_load_location.asm"
 
-required_flos	equ $607
+required_flos	equ $613
 include 	"flos_based_programs\code_library\program_header\inc\test_flos_version.asm"
 
 ;---------------------------------------------------------------------------------------------
@@ -50,47 +51,28 @@ loadvram
 		ret nz
 		
 		ld (addr_txt_loc),hl
-		call get_arg_size
-		ld a,b
-		cp 5
-		jr c,lword
-
-		push hl
-		call kjt_ascii_to_hex_word	; 5 char address
-		pop hl
-		or a
+		call kjt_ascii_to_hex32
 		ret nz
-		inc hl
-		push de			; push higher word
-		call kjt_ascii_to_hex_word
-		pop hl				; hl = higher word (chars 4,3,2,1) , DE = chars 3,2,1,0
-		or a
-		ret nz
-		srl h
-		srl h
-		srl h
-		srl h
-		jr got_dest
-lword		call kjt_ascii_to_hex_word	; standard 4 char address in DE
-		or a
-		ret nz
-		ld hl,0
-
-got_dest	ld a,e				; convert linear address to 8KB page and address between 2000-3fff
+		ld hl,$0007
+		xor a
+		sbc hl,bc
+		jp c,out_of_range
+		
+		ld a,e				; convert linear address to 8KB page and address between 2000-3fff
 		ld (page_address),a
 		ld a,d
 		and $1f
 		or $20
 		ld (page_address+1),a
-		srl h
+		srl c
 		rr d
-		srl h
+		srl c
 		rr d
-		srl h
+		srl c
 		rr d
-		srl h
+		srl c
 		rr d
-		srl h
+		srl c
 		rr d
 		ld a,d
 		and $7f
@@ -314,7 +296,7 @@ to_txt		db " to VRAM $",0
 addr_txt_loc	dw 0
 cr_txt		db 11,0
 
-use_txt		db "USAGE:",11
+use_txt		db "LOADVRAM v1.03 - USAGE:",11
 		db "LOADVRAM Filename VRAM_Address",11,0
 
 load_error_txt	db "Load error - File not found?",11,0
