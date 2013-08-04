@@ -1,4 +1,4 @@
-; EMU.exe - A boot util for emulators (only useful for V6Z80P v1.1)
+; EMU - A boot util for emulators (only useful for V6Z80P v1.1)
 ; -----------------------------------------------------------------
 ;
 ; Currently configured to support:
@@ -12,6 +12,7 @@
 ; Changes:
 ; --------
 ;
+; v0.15 - Clears VRAM 40000-41fff removing esxDOS ID tag from memory 
 ; v0.14 - Removed Residos NVR type
 ; v0.13 - corrected paths (vol:0/) for FLOS 6.12
 ; v0.12 - Reassembled with EEPROM routines v1.03
@@ -196,7 +197,8 @@ preload_tap
 
 ;------------------------------------------------------------------------------------------
 
-boot_nvr  call nvr_reconfig 
+boot_nvr  call clear_esxdos_id			;currently hardwired to clear VRAM $40000-$41fff 
+  	  call nvr_reconfig 
           jr nz,error_menu
           jr menu_text
 
@@ -550,7 +552,7 @@ msok	ld (machine_selection),a
 
 
 
-	  call kjt_clear_screen			; alterntaive menu based selection
+	  call kjt_clear_screen			; alternative menu based selection
 	  
 	  call inverse_video
           ld hl,banner_txt
@@ -1415,6 +1417,22 @@ slot_value_txt      db "00]",0
          
 ;-----------------------------------------------------------------------------------------------------------
 
+clear_esxdos_id
+
+	call kjt_page_in_video					;wipe vram $40000-$42000
+	ld a,$20
+	ld (vreg_vidpage),a
+	ld hl,$2000
+clredid	ld (hl),0
+	inc hl
+	ld a,h
+	cp $40
+	jr nz,clredid
+	call kjt_page_out_video
+	ret
+
+;-----------------------------------------------------------------------------------------------------------
+
 
 maskable_menu1	dw go_basic
 		db " Reset/boot machine (BASIC)",11,0
@@ -1609,7 +1627,7 @@ saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 bad_fn_txt          db 11,"Can't find that file.",11,11,0
 
 banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.14   ",11
+                    db "   Emulator Kickstart V0.15   ",11
                     db "                              ",11,0
           
 machine_txt         db 11,"Selected machine: ",11,11," ",0
