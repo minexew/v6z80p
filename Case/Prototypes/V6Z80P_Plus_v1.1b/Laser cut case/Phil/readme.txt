@@ -14,3 +14,10 @@ mainly fine. Currently updating design..
 Prototyped various clip designs - submitted to razorlab, and received.
 Clip problem solved, currently adapting drawings with working clip.
 
+
+08/08/2013
+----------
+
+Received 2 cases with modified clips - and they broke! The tolerances
+of of the laser cutting seemed much finer on this run and things were
+tight. I have redesigned the clips again and sent them to razorlab...
