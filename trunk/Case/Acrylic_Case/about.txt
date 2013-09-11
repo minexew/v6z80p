@@ -1,0 +1,9 @@
+
+A laser cut acrylic case for the V6Z80P v1.1b based on a Raspberry Pi case.
+
+Adapted by Graham Cole, John Barker and Phil Ruston 2013.
+
+Notes: 
+
+To be cut from 3mm acrylic.
+
