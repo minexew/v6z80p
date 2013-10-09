@@ -12,6 +12,7 @@
 ; Changes:
 ; --------
 ;
+; v0,16 - Attempts to locate config if a machine's slot is not set
 ; v0.15 - Clears VRAM 40000-41fff removing esxDOS ID tag from memory 
 ; v0.14 - Removed Residos NVR type
 ; v0.13 - corrected paths (vol:0/) for FLOS 6.12
@@ -443,7 +444,7 @@ cpyfndone pop hl
 nvr_reconfig
           
           call check_reconf_slot
-          ret nz                                  ; if  not set up correctly, exit
+	  ret nz                                  ; if  not set up correctly, exit
           
 	  ld a,(machine_selection)
           call get_machine_nvr_filename
@@ -470,165 +471,204 @@ nvr_reconfig
          
 check_reconf_slot
           
-          ld a,(machine_selection)
-          call get_machines_slot_address
-	  ld a,(hl)
-          or a
-          jr z,set_machines_config_slot           ; If slot for the chosen machine hasnt been set
-          xor a                                   ; prompt for slot number
-          ret
-          
+		ld a,(machine_selection)
+		call get_machines_slot_address
+		ld a,(hl)
+		or a
+		jr z,auto_find_config_slot           	; If slot for the chosen machine hasnt been set
+		xor a                                   ; try to find the correct slot automatically.
+		ret
 
+
+
+auto_find_config_slot
+
+		call get_eeprom_size			; set "number_of_slots" variable
+		
+		ld c,0					; slot to scan
+afcs_lp		ld a,c
+		call get_eeprom_slot_name		; hl = addr of slot name
+		
+		ld b,16					; 16 chars in eeprom slot name max
+est_lp1		push hl
+
+		call get_machines_search_tag		; set de = machine tag string
+esn_lp		ld a,(de)
+		or a
+		jr nz,noteot				; if reached a zero in tag string, all chars match
+		pop hl					; level stack before leaving loop
+		jr found_likely_slot
+noteot		cp (hl)
+		jr z,ftmatch
+		or $20					; lower case match test also
+		cp (hl)
+		jr nz,next_ciesnt
+ftmatch		inc hl
+		inc de
+		jr esn_lp
+		
+next_ciesnt	pop hl					; a character didnt match, scan from next char 
+		inc hl
+		djnz est_lp1				; scan 16 chars max
+		
+		inc c
+		ld a,(number_of_slots)
+		cp c
+		jr nz,afcs_lp
+		jr set_machines_config_slot		; didn't find a likely candidate, have to set slot manually
+	
+found_likely_slot
+	
+		ld hl,candidate_slot_pt1_txt
+		call kjt_print_string
+		push bc
+		ld a,c
+		call show_slot_name
+		ld hl,candidate_slot_pt2_txt
+		call kjt_print_string
+		call kjt_wait_key_press			; if pressed "y" go with the suggested slot
+		pop de
+		cp $35
+		jr z,set_slot				; else show the entire list of slot contents
+
+
+	
 set_machines_config_slot
           
-          call show_eeprom_slot_contents
+		call show_eeprom_slot_contents		; manually set slot from list
           
-          ld hl,slot_prompt_txt
-          call kjt_print_string
-	  ld a,(machine_selection)
-          call get_machine_name
-	  call kjt_print_string
-          ld hl,slot_prompt2_txt
-	  call kjt_print_string
-	  ld a,2
-          call kjt_get_input_string
-          or a
-          jr nz,gotstr
-          inc a                                   ; return with ZF not set: error
-          ret
+		ld hl,slot_prompt_txt
+		call kjt_print_string
+		ld a,(machine_selection)
+		call get_machine_name
+		call kjt_print_string
+		ld hl,slot_prompt2_txt
+		call kjt_print_string
+		ld a,2
+		call kjt_get_input_string
+		or a
+		jr nz,gotstr
+ret_err		xor a					; return with ZF not set: error
+		inc a
+		ret
 
-gotstr    call kjt_ascii_to_hex_word              ; is entered text a valid number (result in DE)?
-          or a
-          ret nz
-      	  ld a,(machine_selection)
-	  call get_machines_slot_address
-	  ld (hl),e
+gotstr    	call kjt_ascii_to_hex_word              ; is entered text a valid number (result in DE)?
+		or a
+		ret nz
+		or d
+		ret nz
+		or e
+		jr z,ret_err
+		ld a,(number_of_slots)			; and is it > 0 and < number of slots
+		cp e
+		jr c,ret_err
+		jr z,ret_err
+
+set_slot  	ld a,(machine_selection)
+		call get_machines_slot_address
+		ld (hl),e
 	   	  
 	  
 save_config_file
 
-	  call push_dir_vol
-	  call save_cfg
-	  call pop_dir_vol
-	  ret
+		call push_dir_vol
+		call save_cfg
+		call pop_dir_vol
+		ret
 
-save_cfg  call build_new_config_file
+save_cfg  	call build_new_config_file
 
-gsdir     call goto_settings_dir		  ;save config file "EMU.CFG" in VOL:SETTINGS dir
-	  jr z,setdok
-	  call make_settings_dir
-	  ret nz
-	  call goto_settings_dir
-	  ret nz
+gsdir     	call goto_settings_dir		  		; save config file "EMU.CFG" in VOL0:/SETTINGS dir
+		jr z,setdok
+		call make_settings_dir
+		ret nz
+		call goto_settings_dir
+		ret nz
           
-setdok    ld hl,cfg_fn                            ;remove old cfg file (if exists)
-          call kjt_erase_file
+setdok    	ld hl,cfg_fn                            	; remove old cfg file (if exists)
+		call kjt_erase_file
           
-          ld hl,saving_cfg_txt
-          call kjt_print_string
-          
-          ld hl,cfg_fn
-          ld ix,config_file_buffer
-          ld b,0
-          ld c,0
-          ld de,(config_file_size)
-          call kjt_save_file
-          ret
-          
+		ld hl,saving_cfg_txt
+		call kjt_print_string
+		  
+		ld hl,cfg_fn
+		ld ix,config_file_buffer
+		ld b,0
+		ld c,0
+		ld de,(config_file_size)
+		call kjt_save_file
+		ret
+
+		
+;---------------------------------------------------------------------------------------
+  
+get_machines_search_tag
+
+		push hl			
+		push bc
+		ld hl,slot_search_tags
+		ld a,(machine_selection)
+		or a
+		jr z,first_tag
+		ld e,a
+		ld bc,32
+		xor a
+find_taglp	cpir
+		dec e
+		jr nz,find_taglp					
+first_tag	pop bc				; loop until arrive at correct ID
+		ex de,hl
+		pop hl				; on exit, DE points at tag string
+		ret
+			  
 ;---------------------------------------------------------------------------------------
           
           
 select_machine
 
-	ld a,(machine_selection)		;simple flip through selection
-	inc a
-	cp number_of_machines
-	jr nz,msok
-	xor a
-msok	ld (machine_selection),a
-	xor a					;so no error on return
-	ret
+		ld a,(machine_selection)		;simple flip through selection
+		inc a
+		cp number_of_machines
+		jr nz,msok
+		xor a
+msok		ld (machine_selection),a
+		xor a					;so no error on return
+		ret
 	
 
+;----------------------------------------------------------------------------------------
 
 
-	  call kjt_clear_screen			; alternative menu based selection
+new_line	push hl
+		ld hl,crx3_txt+2
+		call kjt_print_string
+		pop hl
+		ret
+
+
+;----------------------------------------------------------------------------------------
+
+menu_header
+
+		call kjt_clear_screen			; alternative menu based selection
 	  
-	  call inverse_video
-          ld hl,banner_txt
-          call kjt_print_string
-          call normal_video
-
-	  ld hl,machine_list_txt
-	  call kjt_print_string
-	  ld b,number_of_machines
-	  ld c,$31
-maclistlp push bc
-	  ld a,c
-	  ld hl,menu_numchr_txt+1
-	  ld (hl),a
-	  dec hl
-	  call kjt_print_string
-	  ld a,c
-	  sub $31
-	  call get_machine_name
-	  call kjt_print_string
-	  call new_line
-	  pop bc
-	  inc c
-	  djnz maclistlp
-	  
-	  call kjt_wait_key_press
-	  ld a,b
-	  or a
-	  ret z
-	  sub $31
-	  jr c,ms_bad
-	  cp number_of_machines
-	  jr nc,ms_bad
-	 
-          ld (machine_selection),a
-
-ms_bad    xor a
-          ret
-           
-	   
-machine_list_txt
-
-	  db 11,"Select a machine:",11,11,0
-
-;----------------------------------------------------------------------------------------
-
-
-new_line	
-
-	push hl
-	ld hl,cr_txt
-	call kjt_print_string
-	pop hl
-	ret
-
-cr_txt	db 11,0
-
-
-;----------------------------------------------------------------------------------------
-;----------------------------------------------------------------------------------------
+		call inverse_video
+		ld hl,banner_txt
+		call kjt_print_string
+		call normal_video
+		ret
+	
 ;---------------------------------------------------------------------------------------- 
           
 show_eeprom_slot_contents
 	  
-          call kjt_clear_screen
-
-          call inverse_video
-          ld hl,banner_txt
-          call kjt_print_string
-          call normal_video
-
-          ld hl,eeprom_contents_txt
-          call kjt_print_string
+		call menu_header
+		
+		ld hl,eeprom_contents_txt
+		call kjt_print_string
           
-	  call eeprom_slot_list
-	  ret
+		call eeprom_slot_list
+		ret
 
 ;----------------------------------------------------------------------------------------
 
@@ -926,7 +966,7 @@ push_dir_vol
 	call kjt_get_dir_cluster
 	ld (prior_dir),de
 	
-	pop bc
+popregs	pop bc
 	pop de
 	pop hl
 	pop af
@@ -944,13 +984,9 @@ pop_dir_vol
 	call kjt_change_volume
 	ld de,(prior_dir)
 	call kjt_set_dir_cluster
-
-	pop bc
-	pop de
-	pop hl
-	pop af
-	ret
 	
+	jr popregs
+
 
 prior_dir	dw 0
 prior_vol	db 0
@@ -1330,10 +1366,19 @@ clmjplp	ld (hl),e
         call get_machine_name
 	call kjt_print_string
           
-        call show_slot
+	ld a,(machine_selection)			;show slot info if it's been set up in config file
+	call get_machines_slot_address
+	ld a,(hl)
+        or a
+        jr z,slotns
+	push af
+	ld hl,slot_txt
+	call kjt_print_string
+	pop af
+	call show_slot_name
 	
-	call new_line
-	call new_line
+slotns	ld hl,options_txt
+	call kjt_print_string
 	
 	ld a,(machine_selection)
 	call get_nvr_type
@@ -1382,7 +1427,7 @@ mmloop	srl e
 	ld a,(machine_selection)
 	call get_machine_nvr_name
 	call kjt_print_string
-	ld hl,cr_txt
+	ld hl,crx3_txt+2
 normtxt	call kjt_print_string
 	inc d
 	
@@ -1399,21 +1444,21 @@ restofmenu
 	
 ;----------------------------------------------------------------------------------------
 
-show_slot
+show_slot_name
 
-	  ld a,(machine_selection)
-	  call get_machines_slot_address
-	  ld a,(hl)
-          or a
-          ret z
-          ld hl,slot_value_txt
-          call kjt_hex_byte_to_ascii
-          ld hl,slot_txt
-          call kjt_print_string
-          ret
+          push af
+	  ld hl,slot_value_txt
+          push hl
+	  call kjt_hex_byte_to_ascii
+	  pop hl
+	  call kjt_print_string
+          pop af
+	  call get_eeprom_slot_name
+	  call kjt_print_string
+	  ret
 
-slot_txt            db " [Slot:"
-slot_value_txt      db "00]",0
+slot_txt            	db 11,11," In FPGA CFG Slot ",0
+slot_value_txt      	db "00:",0
          
 ;-----------------------------------------------------------------------------------------------------------
 
@@ -1458,11 +1503,11 @@ maskable_menu7	dw menu_wait
 maskable_menu8	dw menu_wait
 		db 0
 		                              
-fixed_menu_txt	db 11," S. Select a machine"
-                db 11," C. Choose config slot for this machine"
+fixed_menu_txt	db 11," S. Select machine"
+                db 11," C. Change config slot for this machine"
                 db 11," M. Make machine selection default"
 
-                db 11,11," ESC - Quit to FLOS.",11,11,0
+                db 11,11," ESC - Quit to FLOS",11,11,0
 
 menu_numchr_txt db " x.",0
 
@@ -1499,6 +1544,10 @@ machine_slot_list	ds 10,0             ;slot for machine 0, slot for machine 1, e
 
 
 number_of_machines	equ 3			;max = 10 machines
+
+slot_search_tags	db "48K",0		;for machine type 0
+			db "128K",0		;for machine type 1
+			db "PENT",0		;for machine type 2
 
 machine0_name		db "Spectrum 48K",0
 machine1_name  	 	db "Spectrum 128K",0
@@ -1624,26 +1673,38 @@ press_a_key_txt     db 11,11,"Press any key.",11,0
 
 saving_cfg_txt      db 11,11,"OK, saving config file..",11,11,0
 
-bad_fn_txt          db 11,"Can't find that file.",11,11,0
-
-banner_txt          db "                              ",11
-                    db "   Emulator Kickstart V0.15   ",11
-                    db "                              ",11,0
+banner_txt          db "                            ",11
+                    db "  Emulator Kickstart V0.16  ",11
+                    db "                            ",11,0
           
-machine_txt         db 11,"Selected machine: ",11,11," ",0
+machine_txt         db 11,"Selected machine: ",0
 
 boot_into_txt	    db " Boot into ",0
+
+crx3_txt	db 11,11,11,0
+
+options_txt	db 11,11,11,"OPTIONS:",11,"--------",11,11,0
 
 ;---------------------------------------------------------------------------------------------
 
 eeprom_contents_txt db 11,"EEPROM contents:",11,11,0        
 
-slot_prompt_txt     db 11,"Please enter the slot which contains",11
-		    db "the FPGA Config file for:" ,11,11,0
+slot_prompt_txt     db 11,"Choose a slot which contains an",11
+		    db "FPGA config file for the machine:" ,11,11,0
 
 slot_prompt2_txt    db 11,11,"SLOT? :",0
 	                  
-error_txt           db 11,11,"THERE HAS BEEN AN ERROR!",0
+error_txt           db 11,11,"THERE'S BEEN AN ERROR!",0
+
+;-------------------------------------------------------------------------------------------------
+
+candidate_slot_pt1_txt
+
+		db 11,11,"Config slot has not yet been set.",11,11,"Use Slot ",0
+
+candidate_slot_pt2_txt
+		
+		db "?",11,11,"(y/n)",11,11,0
 
 ;-------------------------------------------------------------------------------------------------
 

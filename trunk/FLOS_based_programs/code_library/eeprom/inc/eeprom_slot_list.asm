@@ -5,7 +5,8 @@
 ; Routine List
 ; ------------
 ;
-; eeprom_slot_list - displays the contents of the EEPROM's slots
+; eeprom_slot_list     - displays the contents of the EEPROM's slots
+; get_eeprom_slot_name - sets HL to the address of the text ID string associated with the slot number held in A
 ;
 ;------------------------------------------------------------------------------------------------------------------
 	  
@@ -53,12 +54,31 @@ leftside  	call kjt_set_cursor_position
 		call kjt_print_string
 		  
 		ld a,(ee_working_slot)                  ; read in EEPROM page that contains the ID string
-		or a
-		jr nz,notszero
-		ld hl,bootcode_txt
-		jr id_ok  
+		call get_eeprom_slot_name
+		call kjt_print_string
+		ld hl,number_of_slots
+		ld a,(ee_working_slot)
+		inc a
+		cp (hl)
+		jr nz,id_loop
+		
+		inc c
+		ld b,0
+		call kjt_set_cursor_position
+		
+		xor a
+		ret
 
-notszero  	ld h,a
+
+;--------------------------------------------------------------------------------------------------------------------
+
+get_eeprom_slot_name
+
+		ld hl,bootcode_txt			;set A to slot number
+		or a
+		ret z
+		
+		ld h,a
 		ld l,0
 		add hl,hl
 		ld de,$01fb
@@ -75,19 +95,9 @@ eerep_ok	ld hl,page_buffer+$de                   ;location of ID (filename ASCII
 		bit 7,a
 		jr z,id_ok
 unk_id    	ld hl,unknown_txt
-id_ok     	call kjt_print_string
-		ld hl,number_of_slots
-		ld a,(ee_working_slot)
-		inc a
-		cp (hl)
-		jr nz,id_loop
-		
-		inc c
-		ld b,0
-		call kjt_set_cursor_position
-		
-		xor a
-		ret
+id_ok     	ret
+
+;----------------------------------------------------------------------------------------------------------------------
 
 est_size_txt	db "Note: Command GET_EEPROM_SIZE failed..",11
 
