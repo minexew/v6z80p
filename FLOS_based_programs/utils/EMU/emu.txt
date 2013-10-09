@@ -1,5 +1,5 @@
 
-EMU.EXE - Emulator Launcher v0.14
+EMU.EXE - Emulator Launcher v0.16
 ---------------------------------
 
 Used to start Alessandro's cycle
@@ -18,16 +18,17 @@ is supplied, menu option 1 is used)
 
 Notes:
 
-If the program has not been run
-before you will be prompted to set
-the config slot for each emulator
-that is to be used.
+If the file emu.cfg does not exist
+in VOL0:/settings (EG: because
+EMU has not been run before) then
+the program will scan the EEPROM and
+suggest a config slot. If no likely
+candidate can be found or you wish
+to choose a different slot, the Slot
+contents will be listed.
 
-The settings (slots used, currently
-selected emulator) are saved in a
-file called emu.cfg in a root folder
-named SETTINGS (both are created if
-necessary).
+EMU.CFG is a text file containing the
+slots used and default emulator.
 
 Emulators can use the status of
 the expansion pin EXT_B to determine

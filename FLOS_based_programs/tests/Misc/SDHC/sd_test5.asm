@@ -2,9 +2,9 @@
 
 ;---Standard header for OSCA and FLOS ----------------------------------------
 
-include "kernal_jump_table.asm"
-include "osca_hardware_equates.asm"
-include "system_equates.asm"
+include "\equates\kernal_jump_table.asm"
+include "\equates\osca_hardware_equates.asm"
+include "\equates\system_equates.asm"
 
 	org $5000
 	
@@ -216,7 +216,7 @@ done_txt	db 11,11,"All done..",11,11,0
 
 ;-----------------------------------------------------------------------------
 
-include	"sdcard_driver_v110.asm"
+include	"FLOS_based_programs\tests\Misc\SDHC\inc\sdcard_driver_v110.asm"
 
 ;-----------------------------------------------------------------------------
 
