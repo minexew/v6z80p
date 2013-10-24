@@ -2,3 +2,6 @@
 The light pipes are for the opaque cases which have square holes near
 the onboard LEDs - they should be cut from clear acrylic.
 
+Note that due to varying tolerances of source materials and laser,
+the light pipes may not be an exact fit and may require either filing
+to size for press fit or gluing in place.
