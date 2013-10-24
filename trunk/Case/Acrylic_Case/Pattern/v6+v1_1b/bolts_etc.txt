@@ -1,0 +1,5 @@
+Fixing hardware required - to mount PCB on base plate:
+
+8 x 5mm M2.5 bolts
+
+4 x 6mm M2.5 threaded hex stand-offs
