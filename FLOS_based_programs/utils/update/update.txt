@@ -1,0 +1,61 @@
+UPDATE.EXE
+----------
+
+Normally 'EEPROM' should be used to
+update the data on the V6Z80P's
+EEPROM but if the system is quite
+old the EEPROM util may not run.
+
+If there any such problems, this
+program can be used to update
+OSCA, the Bootcode and the version
+of FLOS (stored on the EEPROM) in
+one go.
+
+This is a single file util that
+contains all the necessary data
+for all versions of the V6Z80P.
+It can be loaded from SD card
+or sent to the V6Z80P via serial
+link. To run it via serial link
+enter the FLOS command:
+
+RX * 5000
+
+Wait for the file to transfer
+(it will take a while). Then
+enter:
+
+
+G 5000
+
+And follow the instructions on screen.
+
+After the program has completed its
+work, you should update the version of
+FLOS on your SD Card and use the latest
+SD card apps etc from the latest version
+of the project archive.
+
+In future you can use the 'EEPROM'
+util to update the system.
+
+
+Notes:
+
+* Only the PRIMARY bootcode is
+updated by this util. You should
+use EEPROM to update the backup
+bootcode afterwards.
+
+* Only Slot 1 is updated with the
+latest version of OSCA. This will
+be the PAL version, so if you need
+the NTSC version active - you'll
+want to use EEPROM to place it in
+another slot and set the power-on
+boot slot.
+
+* The boot slot will be set to
+SLOT 1.
+
