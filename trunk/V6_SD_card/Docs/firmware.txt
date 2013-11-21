@@ -28,3 +28,7 @@ versions of FLOS and OSCA so it is
 provided as a backup method of
 updating the system.
 
+See UPDATE.EXE for a more user
+friendly version of this app.
+
+
