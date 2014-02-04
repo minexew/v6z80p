@@ -9,19 +9,19 @@ import serial
 import ConfigParser             # to read ini file
 from SCons.Script import *
 
+from  project_helper import Project_Helper
+
 class V6_Project(object):
-    def __init__(self):
-                      
-        if 'v6z80pdir' not in os.environ:
-            print 'Error: v6z80pdir env var is not set!'
-            print '(for example, on my system this var have value  ~/sharedFolder1/v6z80p_SVN)'
-            exit()
-            
-            
-        self.v6_dir  = os.environ['v6z80pdir']
-        self.basedir = os.environ['v6z80pdir'] + '/Contributions/Valen/c_programs/'
+    def __init__(self):                      
         
-        self.base_variant_dir = 'build/v6/c_programs/'
+        # call project helper, to setup dirs: v6_dir, basedir, base_variant_dir
+        self.project_helper = Project_Helper()
+        self.project_helper.SetupDirs(self)
+        #print self.v6_dir
+        #print self.basedir 
+        #print self.base_variant_dir
+        #exit()
+        
         
         self.depend  = V6_Project_Dependencies()
         self.depend.Init(self)
@@ -145,7 +145,7 @@ class V6_Project(object):
         env['ENV']['PATH'] = os.environ['PATH']
 
 
-        env['CPPPATH'] =  [self.basedir + 'inc/']
+        env['CPPPATH'] =  [self.basedir + 'inc/', '.']        # '.' represent current project dir
         env['CPPDEFINES'] = []      # env wide defines (just an empty list)        can be somethisng like [{'MYDEFINEVAR' : 'MYGOODVALUE'}]
 
         env['PROGSUFFIX'] = '.ihx'
