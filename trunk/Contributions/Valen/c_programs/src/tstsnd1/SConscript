@@ -1,3 +1,9 @@
+#  Project targets: v6z80p
+from  project_helper import Project_Helper
+if Project_Helper.Is_Target_V6Z80P() == False:
+    Return('')
+
+
 Import('v6_prj')
 
 v6_prj.name     = 'tstsnd1'

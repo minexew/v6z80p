@@ -1,42 +1,63 @@
-# v6_prj - V6 Project object 
-Import('v6_prj')
+# Project targets: v6z80p, pc
 
 import os
+from  project_helper import Project_Helper
 
-v6_prj.name     = 'ciotry'
-v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0'
-v6_prj.stack    = '0xffff'
-# v6_prj.heapsize = '0'     # uncomment this line, if you realy need a heap
+if Project_Helper.Is_Target_PC():
+    Import('pc_prj')
+    current_proj = pc_prj
+    env = pc_prj.env
+else:
+    # v6_prj - V6 Project object 
+    Import('v6_prj')
+    current_proj = v6_prj
+
+    v6_prj.name     = 'ciotry'
+    v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0'
+    v6_prj.stack    = '0xffff'
+    # v6_prj.heapsize = '0'     # uncomment this line, if you realy need a heap
+
+    # In this project we need only sdcc environment  (to compile C source files)
+    env = v6_prj.env
 
 
-# In this project we need only sdcc environment  (to compile C source files)
-env = v6_prj.env
-
-
-# generate .c file , from all *.ci files
+# generate .c file , from all *.ci files (and apply valen patch on the generated C souce file)
 game_c = env.Command('game.c', Glob('*.ci') + ['platform/platform_v6z80p.ci'], "cito -l c -o $TARGET  $SOURCES" +
-" && " + v6_prj.basedir + "src/ciotry/change_text.php $TARGET")
+" && " + current_proj.basedir + "src/ciotry/change_text.php $TARGET")
 game_c[0].my_progress_message = '------------- Generate C file  from CIO files ---------'
 
-# compile user .c files to object files
-objs = env.Object(   ['host.c'], 
-                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
-                CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
-                )
+# add header text to the begining of game.c
+env_textfile  = Environment(tools = ['default', 'textfile'])
+game_c_final = env_textfile.Substfile('game.final.c', [ 'game.header.c', game_c, 'game.footer.c' ])
+
+
+if Project_Helper.Is_Target_PC():    
+    objs = env.Object( [game_c_final, 'host.c'],
+                    CPPPATH     = env['CPPPATH']           + ['/usr/include'],
+                    LIBS=['SDL']                    
+                    )
+else:
+    # compile user .c files to object files
+    objs = env.Object(   [game_c_final, 'host.c'],                     
+                    CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
+                    CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
+                    )
 
 # here, for some reason, the scons cant make auto depend 
-# so? we need to set depend manualy
+# so, we need to set depend manualy
 env.Depends(objs, game_c)
 
-# link to .ihx and convert .ihx to .exe
-final_exe = v6_prj.FLOS_Program(objs)
 
-
-v6_prj.Upload(final_exe)
+if Project_Helper.Is_Target_PC():
+    final_exe = env.Program(target='ciotry', source=objs)
+else:
+    # link to .ihx and convert .ihx to .exe
+    final_exe = v6_prj.FLOS_Program(objs)
+    v6_prj.Upload(final_exe)
 
 
 
 
 # propagate PATH to external commands env
 # (thus, program 'cito' will be finded in a PATH dirs)
-env['ENV']['PATH'] = os.environ['PATH']
+#env['ENV']['PATH'] = os.environ['PATH']
