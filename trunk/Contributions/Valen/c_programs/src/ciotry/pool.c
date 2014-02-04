@@ -1,3 +1,7 @@
+//#include "game.h"
+#include "pool.h"
+
+
 #define MAX_OBJ_POOL_1     1
 #define MAX_OBJ_POOL_2     1
 #define MAX_OBJ_POOL_3     5
@@ -36,7 +40,7 @@ static unsigned char pool_4_is_used[MAX_OBJ_POOL_4];
     for(i=0; i<MAX_OBJ_POOL_##number; i++) {        \
         if(p == pool_##number[i]) {                 \
             pool_##number##_is_used[i] = 0;         \
-            printf("pool_: mem free. Size: %u, ptr: %u \n", 0, (unsigned int) p ) ;     \
+            DEBUG_PRINT("%s: mem free. Size: %u, ptr: %u \n",  "pool_" #number, sizeof(pool_##number[0]), (unsigned int) p ) ;     \
         }                                           \
     }
     
@@ -51,7 +55,7 @@ static void* pool_find_free_mem_chunk(unsigned char *p, unsigned short itemSize,
             pIsUsed[i] = 1;           
             
             p_result = p + i * itemSize;
-            printf("%s: mem allocated. Size: %u, ptr: %u \n", strBufName, itemSize, (unsigned int) p_result ) ;
+            DEBUG_PRINT("%s: mem allocated. Size: %u, ptr: %u,  pool base ptr = %u \n", strBufName, itemSize, (unsigned int) p_result, p ) ;
             return p_result;           
         }                                    
     }
@@ -60,15 +64,14 @@ static void* pool_find_free_mem_chunk(unsigned char *p, unsigned short itemSize,
         
 
 
-// Allocate memory area from a pool of pre-reserved memory areas.
+// Allocate memory chunk from a pool of pre-reserved memory chunks.
 void* pool_malloc(unsigned int size)
-{
-
-            
-    static unsigned char isNeedPoolInit = 1;
-    
+{      
+    static unsigned char isNeedPoolInit = 1;  
     //unsigned short i;
     void* ptr;
+    
+    DEBUG_PRINT("pool_malloc() entered \n");
     // init pool area with zero
     if(isNeedPoolInit) {
         isNeedPoolInit = 0;
@@ -85,18 +88,23 @@ void* pool_malloc(unsigned int size)
     //printf("addr: %u \n", (unsigned int)   (pool_1[1] - pool_1[0]) );
     
 
-
+	DEBUG_PRINT("pool_malloc() DO_POOL \n");
     DO_POOL(1);
     DO_POOL(2);
     DO_POOL(3);
     DO_POOL(4);
     
-    printf("pool: FAILED to alloc size: %u \n", size);
+    printf("pool_malloc(): FAILED to alloc size: %u \n", size);
     //exit(1);
+    DEBUG_PRINT("pool_malloc() exited with err \n");
     return NULL;
 }
 
 
+// for every pool buffer
+//   for every mem slot
+//     if addreess of memslot is equ to p
+//       set "is used" to 0 for this mem slot
 void pool_free(void* p)
 {
     unsigned short i;

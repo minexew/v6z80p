@@ -21,8 +21,9 @@ public class GameObj
     }
     
     public virtual void Draw()
-    {
+    {        
         // implementation
+        Debug.Print("GameObj.Draw()\n");
         Platform.Draw(this);
         
     }
@@ -58,9 +59,7 @@ public class MovingGameObj : GameObj
     public override void Draw()
     {        
         Debug.Print("MovingGameObj.Draw()\n");            
-
-        
-        
+  
     }
 
 }
@@ -73,7 +72,7 @@ public class Debug
     public static void Print(string s)
     {
         native {   
-            printf(s);    
+            DEBUG_PRINT(s);    
         }
     }
 }
