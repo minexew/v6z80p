@@ -1,5 +1,7 @@
 # Project targets: v6z80p, pc
 
+Return('') # RETURT AND NOT BUILD ! because this proj is not finished!
+
 import os
 from  project_helper import Project_Helper
 
