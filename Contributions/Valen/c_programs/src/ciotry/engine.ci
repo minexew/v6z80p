@@ -1,3 +1,4 @@
+// Engine
 public class Engine
 {
     GameObj[10] obj;
@@ -47,7 +48,7 @@ public class Engine
                                         
             Platform.OnGameLoopEnd();
             
-            // do only one pass of loop
+            // do only one pass of loop (for debug reasone)
             isExitRequested = true;
             
         }
@@ -63,6 +64,11 @@ public class Engine
 public class Startup
 {
     Engine engine;
+    
+    Startup()
+    {
+        Debug.Print("Startup()\n");  
+    }
     
     public void Run()
     {

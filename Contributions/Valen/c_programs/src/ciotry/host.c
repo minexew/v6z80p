@@ -1,5 +1,6 @@
 //#include <stdlib.h>
 #include <stdio.h>
+#include "debug_print.h"
 
 #ifndef SDCC
 #include <SDL/SDL.h>
@@ -34,18 +35,19 @@ int frame = 0;
 #endif
 
 
-void* pool_malloc(unsigned int size);
-void  pool_free(void* p);
-#define malloc pool_malloc
-#define free   pool_free
-#include "game.c"
-#undef malloc
-#undef free
 
-#include "pool.c"
+struct {
+	unsigned char isPrintToSerial;
+} program;
+
+void Program_Set_IsPrintToSerial(unsigned char val)
+{
+    program.isPrintToSerial = val;
+}
 
 
 #ifdef SDCC
+extern void ValenPatch_init_virt_tables(void);
 int main(void)
 #else
 int main(int argc, char *argv[])
@@ -53,12 +55,36 @@ int main(int argc, char *argv[])
 {
     Startup *startup;
     
+    DEBUG_PRINT("CIOTRY started...\n");
     ValenPatch_init_virt_tables();
     
-    startup = Startup_New();
+    startup = Startup_New();    
+    
+//return 0;    //
     Startup_Run(startup);
     
     return 0;
 }
 
 
+#ifdef SDCC
+// -------------- 
+// 
+void putchar(char c)
+{
+    BYTE str[2];
+
+    str[0] = str[1] = 0;
+    str[0] = c;
+
+    if(program.isPrintToSerial) {
+        if(c == '\n')   { FLOS_SerialTxByte(0xA); FLOS_SerialTxByte(0xD); }
+        else            FLOS_SerialTxByte(c);
+    } else {
+        if(c == '\n')   FLOS_PrintStringLFCR("");
+        else            FLOS_PrintString(str);
+    }
+
+
+}
+#endif
