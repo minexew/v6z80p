@@ -1,23 +1,35 @@
 /* Footer begin */
 
+
 #undef malloc
 #undef free
 
-#include "pool.c"
-
-
-/*
-typedef struct {
-	short t1;
+void* my_malloc(size_t i)
+{
+	void *pMem = NULL;
+	
+	pMem = malloc(i);
+	if(!pMem) {
+		DEBUG_PRINT("my_malloc() FAILED mem allocation. Size: %u, ptr: %u \n", i, (unsigned int) pMem);
+		Host_ExitToOS(1);
+	}
+		
+	DEBUG_PRINT("my_malloc() mem allocated. Size: %u, ptr: %u \n", i, (unsigned int) pMem);
+		
+	return pMem;
 	
 }
-foo_struct;
+void my_free(void* memblock)
+{
+	return free(memblock);
+}
 
-const foo_struct var_foo_struct = {	
-	sizeof(Startup)
-};
-*/
 
-  
+
+
+
+//#include "pool.c"
+
+
 
 /* Footer end */

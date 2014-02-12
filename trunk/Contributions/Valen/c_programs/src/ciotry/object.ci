@@ -3,31 +3,78 @@ public class GameObj
 {
     int x;
     int y;
+    
+    int width;
+    int height;
 
-    bool isAllocated;
+    //bool isAllocated;
+    
+    Behavior[3] behaviors;
+    Engine      engine;
     
     /// Constructor
     GameObj()
     {
         Debug.Print("GameObj()\n"); 
         x = y = 0;
-        isAllocated = false; 
+        width = height = 20;
+        
+        // init
+        for(int i = 0; i < behaviors.Length; i++)
+            behaviors[i] = null;
+        
+        //isAllocated = false; 
+        engine = null;
+    }
+    
+    public void Init(Engine e)
+    {
+        engine = e;
     }
 
+    public Engine GetEngine()
+    {
+        return engine;
+    }
+
+    // ---- Virtual funcs ----
     public virtual void Move()
     {
         // implementation        
-        Debug.Print("GameObj.Move()\n");            
+        //Debug.Print("GameObj.Move()\n");            
     }
     
     public virtual void Draw()
     {        
         // implementation
-        Debug.Print("GameObj.Draw()\n");
-        Platform.Draw(this);
+        //Debug.Print("GameObj.Draw()\n");
+        GetEngine().myPlatformGfx.Draw(this);
         
     }
 
+    // ---- Other funcs ----
+    public void DoAllBehaviors()
+    {        
+        // if not null, do 
+        for(int i = 0; i < behaviors.Length; i++)
+            if(behaviors[i] != null)
+                behaviors[i].DoBehavior(this);
+        
+    }
+    
+    
+    // null - on error
+    public bool AddBehavior(Behavior beh)
+    {        
+        // if null (not used), add and exit 
+        for(int i = 0; i < behaviors.Length; i++)
+            if(behaviors[i] == null) {
+                behaviors[i] = beh;
+                return true;
+            }
+        
+        return false;    // add beh failed
+    }
 }
 
 
@@ -47,7 +94,7 @@ public class MovingGameObj : GameObj
 
     public override void Move()
     {        
-        Debug.Print("MovingGameObj.Move()\n");            
+        //Debug.Print("MovingGameObj.Move()\n");            
         // implementation
         x += xvel;
         y += yvel;
@@ -56,13 +103,24 @@ public class MovingGameObj : GameObj
     }
     
 
-    public override void Draw()
+    #if false
+    /*public override void Draw()
     {        
-        Debug.Print("MovingGameObj.Draw()\n");            
+        //Debug.Print("MovingGameObj.Draw()\n");
+
   
+    }*/
+    #endif
+    
+    public void SetVelXY(int vel_x, int vel_y)
+    {
+        xvel = vel_x;
+        yvel = vel_y; 
     }
 
 }
+
+
 
 
 
