@@ -1,7 +1,9 @@
-// Engine
+//// Engine
 public class Engine
 {
     GameObj[10] obj;
+    
+    PlatformGfx() myPlatformGfx;
     
     bool isExitRequested;
     
@@ -18,9 +20,29 @@ public class Engine
         for(int i = 0; i < obj.Length; i++)
             obj[i] = null;
             
+        
+        
+        // create obj and add  behavior
         obj[0] = new GameObj();
-        obj[1] = new MovingGameObj();
-        obj[1].x = 0;  obj[1].y = 40; 
+        obj[0].Init(this);
+        MovingBehavior moving_behavior = new MovingBehavior();
+        moving_behavior.xvel = 1;        
+        obj[0].AddBehavior(moving_behavior);
+
+        // create obj and add  behavior
+        obj[1] = new GameObj();
+        obj[1].Init(this);
+        BouncedBehavior bounced_behavior = new BouncedBehavior();
+        bounced_behavior.xvel = 1;
+        bounced_behavior.x1_bounce = 0;
+        bounced_behavior.x2_bounce = 160;
+        obj[1].AddBehavior(bounced_behavior);
+                
+
+        
+        obj[0].x = 0;  obj[0].y = 0;         
+        obj[1].x = 0;  obj[1].y = 40;         
+        //obj[2].x = 0;  obj[2].y = 80; 
         
     }
 
@@ -31,28 +53,41 @@ public class Engine
         while(!isExitRequested)
         {
 
-            Platform.OnGameLoopBegin();
+            
+            myPlatformGfx.OnGameLoopBegin();
                         
-            if(!Platform.HandleInput())
+            if(!PlatformInput.HandleInput())
                 isExitRequested = true;
             
             // move phase
             for(int i = 0; i < obj.Length; i++)
-                if(obj[i] != null)
+                if(obj[i] != null) {
+                    obj[i].DoAllBehaviors();    // do all behaviors
                     obj[i].Move();
+                }
 
             // draw phase
             for(int i = 0; i < obj.Length; i++)
                 if(obj[i] != null)
                     obj[i].Draw();
                                         
-            Platform.OnGameLoopEnd();
+            myPlatformGfx.OnGameLoopEnd();
             
-            // do only one pass of loop (for debug reasone)
-            isExitRequested = true;
+            
+            //native {   
+            //    DEBUG_PRINT("obj x = %i, y = %i \n",  self->obj[0]->x, self->obj[0]->y);    
+            //}
+            //if(obj[0].x > 20) isExitRequested = true;
+            
+            
+            
+            // do only one pass of loop (for debug reason)
+            //isExitRequested = true;
             
         }
     }
+    
+
     
 
 
@@ -73,11 +108,13 @@ public class Startup
     public void Run()
     {
         Debug.Print("Startup.Run()\n");    
+    
         
-        Platform.InitVideo(engine.screen_width, engine.screen_height);        
+        PlatformGfx.InitVideo(engine.screen_width, engine.screen_height);        
         engine = new Engine();
+        
         engine.Run();
-        Platform.CleanupVideo();
+        PlatformGfx.CleanupVideo();
 
     }
     

@@ -4,8 +4,16 @@
 // Lib:  SDL
 
 
-public class Platform
+public class PlatformGfx
 {
+    // private
+    static void ClearScreen()
+    {
+        native {
+            SDL_Rect rect = {0,0, Engine_SCREEN_WIDTH, Engine_SCREEN_HEIGHT};
+            SDL_FillRect(screen, &rect, 0);
+        }
+    }
 
     // --------------------- Gfx -----------------------
 
@@ -17,6 +25,8 @@ public class Platform
             }   
             screen_scaled = SDL_GetVideoSurface();
         }
+        
+       PlatformGfx.ClearScreen();
     } 
     
     public static void OnGameLoopEnd()
@@ -35,7 +45,7 @@ public class Platform
             frame++;
             float fps = frame / ( SDL_GetTicks() / 1000.f );
             /*if((frame % (60 * 5)) == 0 )*/
-            printf("fps = %f \n", fps);
+            //printf("fps = %f \n", fps);
             //printf("ticks = %i \n", SDL_GetTicks() ); 
         }
     }
@@ -49,7 +59,7 @@ public class Platform
             
 
             // Set the video mode
-            screen_scaled = SDL_SetVideoMode(screen_w * 2, screen_h * 2, 16, SDL_DOUBLEBUF/*|SDL_FULLSCREEN*/ );
+            screen_scaled = SDL_SetVideoMode(screen_w * 2, screen_h * 2, 16, SDL_HWSURFACE | SDL_DOUBLEBUF/*|SDL_FULLSCREEN*/ );
             if(screen_scaled == NULL) {
                 printf("SDL_SetVideoMode falied. %s \n", SDL_GetError());
                 exit(1);
@@ -82,11 +92,12 @@ public class Platform
         int x = obj.x;
         int y = obj.y;
         
-        int w = 32;
-        int h = 32;
+        int w = obj.width;
+        int h = obj.height;
         
-        int color = 16;
-        FillRect(x, y, w, h, color);
+        //int color = 16;
+        //FillRect(x, y, w, h, color);        
+        DrawRect(x, y, w, h,    255,255,255);        
     }     
     
     public static void FillRect(int x, int y, int w, int h, int color)
@@ -102,7 +113,21 @@ public class Platform
         }
    
     }
+    
+    public static void DrawRect(int x, int y, int w, int h,
+                            int r, int g, int b)
+    {
+        native {
+            //SDL_Rect rect = {x,y,w,h};
+            rectangleRGBA(screen, x,y, x + w, y + h,
+                        r, g, b,   255);
+        }
 
+    }
+}
+
+public class PlatformInput
+{
     // --------------------- Input -----------------------
 
     // Return: false - need to exit to OS

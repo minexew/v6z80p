@@ -1,5 +1,6 @@
 //#include <stdlib.h>
 #include <stdio.h>
+//#include <malloc.h>
 #include "debug_print.h"
 
 #ifndef SDCC
@@ -8,20 +9,7 @@
 
 #include "game.h"
 
-#ifdef SDL_MAJOR_VERSION
-//#include "resize/resize.h"        // this gives segment fault, when resizing surface
-//#include "SDL_gfx/SDL_rotozoom.h"
-#include <assert.h>
 
-SDL_Surface* screen;
-SDL_Surface* screen_scaled;
-
-// for FPS counting
-//Keep track of the frame count 
-int frame = 0; 
-//Timer used to calculate the frames per second 
-//Timer fps;
-#endif
 
 #ifdef SDCC
 
@@ -32,6 +20,8 @@ int frame = 0;
 #include <set_stack.h>
 
 #include <os_interface_for_c/i_flos.h>
+
+extern void _sdcc_heap_init (void);
 #endif
 
 
@@ -45,27 +35,41 @@ void Program_Set_IsPrintToSerial(unsigned char val)
     program.isPrintToSerial = val;
 }
 
+//void* g_enginePtr;
+Startup *startup;
+
+extern void ValenPatch_init_virt_tables(void);
 
 #ifdef SDCC
-extern void ValenPatch_init_virt_tables(void);
 int main(void)
 #else
 int main(int argc, char *argv[])
 #endif
 {
-    Startup *startup;
+    
     
     DEBUG_PRINT("CIOTRY started...\n");
     ValenPatch_init_virt_tables();
-    
+#ifdef SDCC
+    _sdcc_heap_init();
+#endif
+
     startup = Startup_New();    
-    
+        
 //return 0;    //
     Startup_Run(startup);
     
     return 0;
 }
 
+void Host_ExitToOS(int code)
+{
+#ifdef SDCC
+    FLOS_ExitToFLOS();
+#else
+    exit(1);
+#endif
+}
 
 #ifdef SDCC
 // -------------- 
