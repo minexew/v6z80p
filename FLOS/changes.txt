@@ -2,8 +2,18 @@
 Current FLOS version:
 ---------------------
 
-v6.13 - 22/06/2012
+v6.14 - 10/04/2014
 
+Bugfix: 
+-------
+
+The NMI vector is now set at start up BEFORE the NMI mask bit is cleared. (Previously
+if the NMI jumper was accidentally left on, the FLOS would crash at start up.)
+
+
+
+
+v6.13 - 22/06/2013
 
 IMPROVED:
 ---------
@@ -13,11 +23,7 @@ IMPROVED:
   This means "Unknown command" error appears much sooner and scripts run a lot faster.
 
 
-
-
-
 v6.12  - 12/01/2013
-
 
 NEW:
 ----
@@ -33,7 +39,6 @@ NEW:
   not found there then the executable paths (%EX0-%EX9) are not checked.
 
 * Script lines starting with a semicolon are skipped.
-
 
 
 CHANGED: 

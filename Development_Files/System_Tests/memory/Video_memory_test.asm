@@ -2,8 +2,8 @@
 ; Video Memory Test - fills video memory pages with random bytes then verifies
 ;-----------------------------------------------------------------------------------------
 
-include "OSCA_hardware_equates.asm"
-include "system_equates.asm"
+include "equates\OSCA_hardware_equates.asm"
+include "equates\system_equates.asm"
 
 textwindow_cols 	equ 40		; settings
 textwindow_rows 	equ 25
@@ -336,7 +336,7 @@ twait1	in a,(sys_irq_ps2_flags)	;wait for overflow flag to become set
 	
 ;-------------------------------------------------------------------------------------
 
-fontbase	incbin "philfont.bin"
+fontbase	incbin "development_files\system_tests\memory\data\philfont.bin"
 	
 ;-----------------------------------------------------------------------------------------
 

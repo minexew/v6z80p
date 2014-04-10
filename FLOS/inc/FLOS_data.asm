@@ -14,7 +14,7 @@ flos_version_txt	db "FLOS v"
 
 osca_version_txt	db " / OSCA v",0
 
-author_txt		db "By Phil Ruston 2008-2013"
+author_txt		db "By Phil Ruston 2008-2014"
 crlfx2_txt		db 11,11,0
 		
 storage_txt		db "Drives:",11,0

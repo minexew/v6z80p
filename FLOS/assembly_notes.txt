@@ -1,0 +1,14 @@
+
+FLOS can be assembled from the text editor via
+Pasmo like any other program. The resulting binary
+file needs to have the header populated with the
+PC program "Insert_CRC_into_OS.exe" found in
+the "apps" dir. The creates the .OSF file
+which can be loaded by the bootcode.
+
+Note:
+
+_MAKE_OS_VARIABLES.BAT must be run before assembly
+if the the file "FLOS_VARIABLES.ASM" has been changed.
+(This creates a file called "OS_variables.symbol")
+
