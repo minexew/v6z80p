@@ -51,7 +51,7 @@ nmi_freeze_os_init
 
 		xor a
 		out (sys_audio_enable),a		; disable audio channels
-		out (sys_hw_settings),a
+		out (sys_hw_settings),a                 ; NMI unmasked etc
 
 		
 ;-------------------------------------------------------------------------------
@@ -100,9 +100,19 @@ finvloop	ld a,(bc)
 		call os_page_out_video
 
 		call os_clear_screen			; clear charmap and display
-		call os_restore_video_mode
-		ret
 
+
+os_restore_video_mode
+
+		call os_set_display_mode
+
+enable_video
+	
+		call os_wait_vrt
+		xor a
+		ld (vreg_vidctrl),a			; Enable video & Use set bitmap loc register set A
+		ret
+	
 
 
 os_set_display_mode
@@ -162,37 +172,26 @@ paltv		ld (hl),e				; set y window size/position (200 lines)
 
 		xor a
 		out (sys_irq_enable),a
-		ld hl,default_irq_instructions  	; set interrupts for kernal
-		ld de,irq_jp_inst
-		ld bc,6
-		ldir
-		ld a,%11111111
+		cpl 
 		out (sys_clear_irq_flags),a		; clear irq flags except keyboard, handled later 		
 		ld a,%10000000
 		ld (vreg_rasthi),a			; clear any outstanding video IRQ request
 		in a,(sys_serial_port)			; clear any outstanding serial IRQ request		
 		call clear_keyboard_buffer
+                call set_irq_vectors
 		call os_enable_irq			; enable keyboard (and mouse if enabled) interrupts
 		ret
 	
 
-
-	
-		
-	
 ;-------------------------------------------------------------------------------
 
 
-os_restore_video_mode
-
-		call os_set_display_mode
-
-enable_video
-	
-		call os_wait_vrt
-		xor a
-		ld (vreg_vidctrl),a			; Enable video & Use set bitmap loc register set A
-		ret
+set_irq_vectors	ld hl,default_irq_instructions  	; set interrupts for kernal
+		ld de,irq_jp_inst
+		ld bc,6
+		ldir
+                ret
+                
 	
 	
 ;============================================================================
