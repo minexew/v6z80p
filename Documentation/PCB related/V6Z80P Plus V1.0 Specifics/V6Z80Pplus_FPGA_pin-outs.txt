@@ -186,10 +186,10 @@ FPGA pin connections for V6Z80P+ V1.0
 |P179      |sdc_clk            |
 |P180      |sdc_pow            |
 |P181      |sdc_dout           |
-|P182      |GCLK2 (header pin F)
+|P182      |GCLK2 (header pin G)
 |P183      |                   |
 |P184      |                   |
-|P185      |GCLK3 (header pin G)
+|P185      |GCLK3 (header pin F)
 |P186      |                   |
 |P187      |z80_address_bus<14>|
 |P188      |system_ram_a16     |
