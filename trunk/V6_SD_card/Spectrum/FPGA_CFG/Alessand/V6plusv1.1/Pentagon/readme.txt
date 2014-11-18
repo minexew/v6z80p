@@ -5,9 +5,10 @@ Cycle Perfect Spectrums Emulators:
 --------------------------------------
 
 NOTES:
-------
 
-THiS EMULATOR IS FOR V6Z80P+ v1.1(b) ONLY
+THESE EMULATORS ARE FOR V6Z80P+ v1.1 ONLY
+(Non-Pendulum, using the onboard 14MHz
+oscillator).
 
 ResiDOS support has been removed from
 version 2.3.0 onwards. esxDOS is now
@@ -17,9 +18,9 @@ the preferred alternative Spectrum OS.
 
 1. Install the config .v6c files from:
    
-  FPGA_CFG\Alessand\V6plusv1.1\Pentagon
+  FPGA_CFG\Alessand\V6plusv1.1\Spec_V2
 
-  into a free slot the EEPROM using
+  into 2 free slots the EEPROM using
   the FLOS command "EEPROM"
 
 
@@ -36,16 +37,18 @@ the preferred alternative Spectrum OS.
     zxspec48.rom
     zxspec128.rom
 
-   Optional: if you want to use esxdos:
+  Optional: if you want to use esxdos:
 
-    esxdos.nvr
-  
-    Plus these folders (and the files
-    therein)
- 
+     esxdos.nvr
+
+  Also, the folders (and files therein)
+
     SYS
     BIN
-
+   
+ ..should be in the ROOT dir of the
+ SDcard
+ 
 
 -------------------------------------
 If not present, all of these files
@@ -65,10 +68,10 @@ archive in:
    emulators (a list will be shown).
    Respond as appropriate.
 
-   The jumper on "EXP_B" should be
-   installed if esxDOS is required
-   otherwise EMU will only show
-   the most basic boot options.
+   NOTE: Jumper EXP_B needs to be
+   installed if esxDOS mode is required
+   otherwise EMU will only show the most
+   basic boot options.
 
 
 4. Emulator keys:

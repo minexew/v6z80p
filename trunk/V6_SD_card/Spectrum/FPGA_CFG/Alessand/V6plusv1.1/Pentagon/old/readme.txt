@@ -5,14 +5,14 @@ Cycle Perfect Spectrums Emulators:
 --------------------------------------
 
 
-THiS EMULATOR IS FOR V6Z80P+ v1.1(b) ONLY
+THESE EMULATORS ARE FOR V6Z80P+ v1.1 ONLY
 
 
 1. Install the config .v6c files from:
    
-  FPGA_CFG\Alessand\V6plusv1.1\Pentagon
+  FPGA_CFG\Alessand\V6plusv1.1\Spec_V2
 
-  into a free slot the EEPROM using
+  into 2 free slots the EEPROM using
   the FLOS command "EEPROM"
 
 
