@@ -18,7 +18,11 @@ the active slot before powering off the unmodded board
 but you can use the emergency slot selection procedure
 to set the boot slot once the board is modded if desired.
 
-2. You need to cut two tracks, remove some resistors
+2. The neatest way to way to mod the board is to lift
+the leg "pin 13" of the 74HCT08 chip (making sure the pad
+below is not damaged), then link the lifted leg to pin 14
+
+Otherwise, you need to cut two tracks, remove some resistors
 (if present) and link two pairs of points. See the
 diagram in this folder for details.
 
