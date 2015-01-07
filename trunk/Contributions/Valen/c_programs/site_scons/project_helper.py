@@ -14,14 +14,23 @@ class Project_Helper(object):
 #    def __init__(self):
     
     def SetupDirs(self, project):                  
-        if 'v6z80pdir' not in os.environ:
-            print 'Error: v6z80pdir env var is not set!'
-            print '(for example, on my system this var have value  ~/sharedFolder1/v6z80p_code/trunk)'
-            exit()
+        #if 'v6z80pdir' not in os.environ:
+        #    print 'Error: v6z80pdir env var is not set!'
+        #    print '(for example, on my system this var have value  ~/sharedFolder1/v6z80p_code/trunk)'
+        #    exit()
             
+        
+        # find out the root path of V6Z80P SDK
+        original_path = os.getcwd()
+        p1 = os.path.dirname(os.path.abspath(__file__))     # p1 for example: /home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons
+        os.chdir(p1 + "/../../../../")
+        sdk_root_path = os.getcwd()
+        # resore original cwd
+        os.chdir(original_path)
+        #exit()
             
-        project.v6_dir  = os.environ['v6z80pdir']
-        project.basedir = os.environ['v6z80pdir'] + '/Contributions/Valen/c_programs/'
+        project.v6_dir  = sdk_root_path
+        project.basedir = sdk_root_path + '/Contributions/Valen/c_programs/'
         
         if Project_Helper.Is_Target_PC():
             project.base_variant_dir = 'build/pc/c_programs/'
