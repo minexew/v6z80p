@@ -1,14 +1,55 @@
 # Project targets: v6z80p, pc
 
-Return('') # RETURT AND NOT BUILD ! because this proj is not finished!
+import getpass
+import platform
 
+
+# Build this project only  on valen's Linux machine (home computer).
+# (because this proj is not finished!)
+do_build = False
+if platform.system() == 'Linux':
+    if getpass.getuser() == 'valen':
+        do_build = True
+
+if do_build == False:
+    Return('') # RETURT AND NOT BUILD ! 
+
+
+
+# -------------------------------------------
+import re
 import os
 from  project_helper import Project_Helper
 
+
+# Replace in C file:
+# replace malloc(sizeof(GameObj)) to 
+def ReplaceMallocFunc_In_C_File(target, source, env):
+    src = source[0].abspath
+    trg = target[0].abspath    
+    #print "src=" +src
+    #print "trg=" +trg
+    
+    with open (src, "r") as fileGameC:
+        strFile = fileGameC.read()    
+    #strFile = re.sub(r'malloc\(sizeof\((.*)\)\)',
+    #        r'pool_malloc(sizeof(\1), "\1")', strFile)
+
+    with open(trg, "w") as text_file:
+        text_file.write(strFile)
+    #print strFile
+    return None
+    
+    
+    
+    
 if Project_Helper.Is_Target_PC():
     Import('pc_prj')
     current_proj = pc_prj
     env = pc_prj.env
+    
+    platformSourceFile = ['platform/platform.ci']
+    proj_libs = ['SDL', 'SDL_gfx']
 else:
     # v6_prj - V6 Project object 
     Import('v6_prj')
@@ -21,22 +62,26 @@ else:
 
     # In this project we need only sdcc environment  (to compile C source files)
     env = v6_prj.env
-
+    platformSourceFile = ['platform/platform_v6z80p.ci']
 
 # generate .c file , from all *.ci files (and apply valen patch on the generated C souce file)
-game_c = env.Command('game.c', Glob('*.ci') + ['platform/platform_v6z80p.ci'], "cito -l c -o $TARGET  $SOURCES" +
-" && " + current_proj.basedir + "src/ciotry/change_text.php $TARGET")
+game_c = env.Command('game.c', Glob('*.ci') + platformSourceFile, "cito -l c -o $TARGET  $SOURCES"
+        + " && " + current_proj.basedir + "src/ciotry/change_text.php $TARGET"
+)
 game_c[0].my_progress_message = '------------- Generate C file  from CIO files ---------'
 
-# add header text to the begining of game.c
+
+game1_c = env.Command('game1.c', game_c, ReplaceMallocFunc_In_C_File)
+
+# add header text to the begining of game1.c
 env_textfile  = Environment(tools = ['default', 'textfile'])
-game_c_final = env_textfile.Substfile('game.final.c', [ 'game.header.c', game_c, 'game.footer.c' ])
+game_c_final = env_textfile.Substfile('game.final.c', [ 'game.header.c', game1_c, 'game.footer.c' ])
 
 
 if Project_Helper.Is_Target_PC():    
     objs = env.Object( [game_c_final, 'host.c'],
-                    CPPPATH     = env['CPPPATH']           + ['/usr/include'],
-                    LIBS=['SDL']                    
+                    CPPPATH     = env['CPPPATH']           + ['/usr/include']
+                                        
                     )
 else:
     # compile user .c files to object files
@@ -51,7 +96,7 @@ env.Depends(objs, game_c)
 
 
 if Project_Helper.Is_Target_PC():
-    final_exe = env.Program(target='ciotry', source=objs)
+    final_exe = env.Program(target='ciotry', source=objs, LIBS = proj_libs )
 else:
     # link to .ihx and convert .ihx to .exe
     final_exe = v6_prj.FLOS_Program(objs)
