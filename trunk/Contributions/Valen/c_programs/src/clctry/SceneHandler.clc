@@ -1,0 +1,90 @@
+#include "GameObj.clc"
+#include "BouncedObj.clc"
+#include "MainShipObj.clc"
+#include "EnemyObj.clc"
+// #include "PlatformGfx.clc"
+// #include "PlatformInput.clc"
+#include "Engine.clc"
+// #include "PlatformGfx.clc"
+// #include "MyKeybordBehavior.clc"
+
+
+#include <debug_print.h>
+#include <assert.h>
+
+SceneHandler
+{        
+    Engine* engine;
+
+
+    void Init()
+    {
+        DEBUG_PRINT("Init() in SceneHandler\n");
+
+        engine = NULL;
+    } 
+
+    
+    void SetEngine(Engine* e) {engine = e; }
+
+    void CreateScene1()
+    {                
+        // GameObj*        go;
+        EnemyObj*       o1;
+        MainShipObj*    mso;
+                
+        DEBUG_PRINT("CreateScene1() in SceneHandler\n");
+        assert(engine);
+
+        o1 = engine:FindUnused_EnemyObj();      // FindUnused_BouncedObj();
+        o1:Init();
+        o1:SetUsed();
+        o1:Set_Engine(engine);
+        o1.sprite.LoadFromImageFile_WithColorKey(engine.img_file);
+        o1.sprite.SetSrcImageRect(0,75, 79,45);
+        o1:Set_PosAndVel(FLOAT_TO_FIXED( SCR_START_X ), FLOAT_TO_FIXED( SCR_START_Y ),
+                          FLOAT_TO_FIXED(0.5), FLOAT_TO_FIXED(1.5) );            
+        o1:Set_BouncedCoords(SCR_START_X, SCR_START_Y,  
+                             SCR_START_X + SCR_WIDTH, SCR_START_Y + SCR_HEIGHT);          
+        o1:SetCollideRect(2,2, 74,40);
+        ActivateGameOBj((GameObj*) o1);
+
+
+        mso = engine:FindUnused_MainShipObj();        
+        mso:Init();
+        mso:SetUsed();
+        mso:Set_Engine(engine);
+        mso.sprite.LoadFromImageFile_WithColorKey(engine.img_file);
+        mso.sprite.SetSrcImageRect(40,0, 39,32);
+        mso:Set_PosAndVel(FLOAT_TO_FIXED( SCR_START_X ), FLOAT_TO_FIXED( SCR_START_Y ),
+                            FLOAT_TO_FIXED(0), FLOAT_TO_FIXED(0) );                    
+        mso:SetCollideRect(6,6, 26,22);
+        ActivateGameOBj((GameObj*) mso); 
+    }
+
+    void ActivateGameOBj(GameObj* obj)
+    {  
+        unsigned short i;
+
+        for(i = 0; i < ARR_ACTIVE_SIZE; i++)
+            if(!engine.active[i]) {                
+                engine.active[i] = obj;
+                return;
+            }
+        assert(0);
+    }
+
+    void DeActivateGameOBj(GameObj* obj)
+    {  
+        unsigned short i;
+
+        for(i = 0; i < ARR_ACTIVE_SIZE; i++)
+            if(engine.active[i] == obj) {                
+                engine.active[i] = NULL;
+                return;
+            }
+        assert(0);
+    }
+
+
+}

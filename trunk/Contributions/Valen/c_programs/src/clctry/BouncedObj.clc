@@ -1,0 +1,44 @@
+BouncedObj:GameObj
+{
+
+    unsigned short x1_bounce;
+    unsigned short y1_bounce;
+
+    unsigned short x2_bounce;
+    unsigned short y2_bounce;
+
+    
+    void Init()
+    {
+        DEBUG_PRINT( "Init() in BouncedObj\n" );        
+        GameObj:Init(self);
+
+        x1_bounce = y1_bounce = x2_bounce = y2_bounce = 0;
+    }
+ 
+    void Set_BouncedCoords(unsigned short x1, unsigned short y1, unsigned short x2, unsigned short y2)
+    {
+        DEBUG_PRINT( "Set_BouncedCoords() in BouncedObj\n" );             
+        
+        x1_bounce = x1;
+        y1_bounce = y1;
+        x2_bounce = x2;
+        y2_bounce = y2;
+    }
+
+
+    void Move( )
+    {
+        // DEBUG_PRINT( "Move() in BouncedObj\n" );
+        GameObj:Move(self);
+
+       if( (x >> FIXED_BITS) < x1_bounce || (x >> FIXED_BITS) > x2_bounce )
+            xvel = -xvel;
+
+       if( (y >> FIXED_BITS) < y1_bounce || (y >> FIXED_BITS) > y2_bounce )
+            yvel = -yvel;
+        
+        
+    }
+
+}

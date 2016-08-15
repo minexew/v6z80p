@@ -1,0 +1,305 @@
+#include <string.h>
+#include <debug_print.h>
+#include "my_malloc.h"
+#include "my_types.h"
+
+#include "GameObj.clc"
+#include "Sprite.clc"
+#include "BouncedObj.clc"
+#include "MainShipObj.clc"
+#include "BulletObj.clc"
+#include "EnemyObj.clc"
+#include "SceneHandler.clc"
+// #include "Behavior.clc"
+#include "PlatformGfx.clc"
+#include "PlatformInput.clc"
+// #include "GfxRect.clc"
+
+
+
+
+#define ARR_ACTIVE_SIZE     20
+
+#define ARR_OBJ1_SIZE       4
+#define ARR_OBJ2_SIZE       4
+#define ARR_OBJ3_SIZE       1
+#define ARR_OBJ4_SIZE       6
+#define ARR_OBJ5_SIZE       5
+#define ARR_OBJ6_SIZE       5
+
+
+
+#define FIXED               unsigned short
+#define FIXED_BITS          4
+#define FLOAT_TO_FIXED(v)   (v * 16)
+#define FIXED_TO_INT(v)     (v >> FIXED_BITS)
+
+// this is visible window pos
+#define SCR_START_X        128
+#define SCR_START_Y        128
+
+// Size of video mode
+#define SCR_WIDTH          368UL
+#define SCR_HEIGHT         240UL
+
+
+// for debug  reasone all malloc() calls redirect to my_malloc()
+#define malloc my_malloc
+#define free   my_free
+
+
+
+
+Engine
+{
+    GameObj*        active[ARR_ACTIVE_SIZE];
+    BOOL            isExitRequested;
+
+    GameObj*        obj1[ARR_OBJ1_SIZE];
+    BouncedObj*     obj2[ARR_OBJ2_SIZE];
+    MainShipObj*    obj3[ARR_OBJ3_SIZE];
+    Sprite*         obj4[ARR_OBJ4_SIZE];
+    BulletObj*      obj5[ARR_OBJ5_SIZE];  
+    EnemyObj*       obj6[ARR_OBJ6_SIZE];  
+
+
+    PlatformGfx*    gfx;
+    PlatformInput*  input;
+    SceneHandler*   handler;
+
+    void*           classId_MainShipObj;
+    void*           classId_EnemyObj;
+
+    const char*     img_file;
+
+    void Init()
+    {
+        unsigned short i;
+        // GameObj*    o;
+        BouncedObj* o;
+
+        DEBUG_PRINT( "Init() in Engine\n" );               
+        
+        isExitRequested = 0;
+        memset(active, 0, sizeof(active));
+
+        img_file  =  "/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/clctry/data/free_sprites.bmp";
+        
+        gfx:alloc();        gfx:Init();
+        input:alloc();      input:Init();
+        handler:alloc();    handler:Init();     handler:SetEngine(self);
+        
+
+        // allocate space in heap for future use
+        PreAllocate_And_InitObjects();
+    }
+
+    // we will call malloc() for all gameobjects only once - here, and
+    // never will call free() on gameobjects. Thus no memory fragmentation will occur.
+    // Objects "alloc/dealloc"  in game, wiil be via simple flag 'in_use'.
+    void PreAllocate_And_InitObjects( )
+    {
+        unsigned short i;
+        
+        GameObj*        gameObj;
+        BouncedObj*     bouncedObj;
+        MainShipObj*    mainShipObj;
+        Sprite*         sprite;
+        BulletObj*      bullet;
+        EnemyObj*       enemy;
+
+        DEBUG_PRINT( "--> PreAllocate_And_InitObjects() in Engine\n" );
+
+        
+        // allocate space, init game objects and set all objects to 'unused' state
+
+        for(i = 0; i < ARR_OBJ1_SIZE; i++) {            
+            gameObj:alloc();
+            gameObj:Init();                    
+            gameObj:Unused();
+            obj1[i] = gameObj;
+        }
+        for(i = 0; i < ARR_OBJ2_SIZE; i++) {            
+            bouncedObj:alloc();
+            bouncedObj:Init();                    
+            bouncedObj:Unused();
+            obj2[i] = bouncedObj;
+        }
+        for(i = 0; i < ARR_OBJ3_SIZE; i++) {            
+            mainShipObj:alloc();  mainShipObj:Init(); mainShipObj:Unused();
+            obj3[i] = mainShipObj;
+        }
+        classId_MainShipObj = mainShipObj->_class->classId;
+
+        for(i = 0; i < ARR_OBJ4_SIZE; i++) {            
+            sprite:alloc();  sprite:Init(); sprite:Unused();
+            obj4[i] = sprite;
+        }
+        for(i = 0; i < ARR_OBJ5_SIZE; i++) {            
+            bullet:alloc();  bullet:Init(); bullet:Unused();
+            obj5[i] = bullet;
+        }
+        for(i = 0; i < ARR_OBJ6_SIZE; i++) {            
+            enemy:alloc();  enemy:Init(); enemy:Unused();
+            obj6[i] = enemy;
+        }
+        classId_EnemyObj = enemy->_class->classId;
+
+
+        DEBUG_PRINT( "<-- PreAllocate_And_InitObjects() in Engine\n" );
+
+    }
+
+
+    // find unused gameobj from pre-allocated pool (arrays) and set in to 'used'
+    // You must init() obj, and call others set funcs
+
+
+    GameObj* FindUnused_GameObj()
+    {
+        unsigned short i; GameObj*     go;
+
+        for(i = 0; i < ARR_OBJ1_SIZE; i++) {
+            go = obj1[i];
+            if(!go.isUsed) {
+                go.isUsed = TRUE;                
+                return go;
+            }
+        }            
+        assert(0); return NULL;
+    }
+
+    BouncedObj* FindUnused_BouncedObj()
+    {
+        unsigned short i; BouncedObj*     bo;
+
+        for(i = 0; i < ARR_OBJ2_SIZE; i++) {
+            bo = obj2[i];
+            if(!bo.isUsed) {
+                bo.isUsed = TRUE;                
+                return bo;
+            }
+        }            
+        assert(0); return NULL;
+    }
+
+    MainShipObj* FindUnused_MainShipObj()
+    {
+        unsigned short i; MainShipObj*     o;
+
+        for(i = 0; i < ARR_OBJ3_SIZE; i++) {
+            o = obj3[i];
+            if(!o.isUsed) {
+                o.isUsed = TRUE;                
+                return o;
+            }
+        }            
+        assert(0); return NULL;
+    }
+
+    Sprite* FindUnused_Sprite()
+    {
+        unsigned short i; Sprite*     o;
+        
+        for(i = 0; i < ARR_OBJ4_SIZE; i++) {
+            o = obj4[i];
+            if(!o.isUsed) {
+                o.isUsed = TRUE; 
+                // DEBUG_PRINT( "alloc Sprite = %u, i = %u \n", (unsigned int) o, i );               
+                return o;
+            }
+        }            
+        assert(0); return NULL;
+    }
+
+    BulletObj* FindUnused_BulletObj()
+    {
+        unsigned short i; BulletObj*     o;
+        
+        for(i = 0; i < ARR_OBJ5_SIZE; i++) {
+            o = obj5[i];
+            if(!o.isUsed) {
+                o.isUsed = TRUE; 
+                // DEBUG_PRINT( "alloc Bullet = %u, i = %u \n", (unsigned int) o, i );               
+                return o;
+            }
+        }            
+        assert(0); return NULL;
+    }
+
+    EnemyObj* FindUnused_EnemyObj()
+    {
+        unsigned short i; EnemyObj*     o;
+        
+        for(i = 0; i < ARR_OBJ6_SIZE; i++) {
+            o = obj6[i];
+            if(!o.isUsed) {
+                o.isUsed = TRUE; 
+                // DEBUG_PRINT( "alloc Enemy = %u, i = %u \n", (unsigned int) o, i );               
+                return o;
+            }
+        }            
+        assert(0); return NULL;
+    }
+
+
+
+ 
+    // void MoveObjByKeyboard(GameObj* obj)
+    // {
+
+
+    // }
+
+    void Run( )
+    {
+        unsigned short i;
+        GameObj*        o;
+        BouncedObj*     bo;
+
+        DEBUG_PRINT( "Run() in Engine\n\n" );
+
+
+        gfx:InitVideoMode();
+
+        handler:CreateScene1();
+
+        DEBUG_PRINT( "ptr to o = %u \n", (unsigned int) active[0] );
+        
+
+        o = active[0]; if(o) DEBUG_PRINT( "o = %u, %u, %i, %i \n",   o.x, o.y, o.xvel, o.yvel );               
+
+
+        while(!isExitRequested)
+        {                
+            gfx:OnGameLoopBegin();
+            
+            if(!input.HandleInput())
+                isExitRequested = TRUE;
+            
+            // ProcessInput();
+            
+
+            // move and draw phase
+            for(i = 0; i < ARR_ACTIVE_SIZE; i++)
+                if(active[i]) {                
+                    o = active[i];
+                    o.Move();
+                    // if(o.beh) o.beh.Do();
+
+                    o.Draw();
+                }
+
+            gfx:OnGameLoopEnd();
+
+            // isExitRequested = 1;
+ 
+        }
+
+
+        o = active[0]; if(o) DEBUG_PRINT( "o = %u, %u, %i, %i \n",   o.x, o.y, o.xvel, o.yvel );               
+
+        gfx:Cleanup();
+    }
+
+}

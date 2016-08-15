@@ -1,0 +1,78 @@
+// #include "GameObj.clc"
+// #include "Sprite.clc"
+// #include "BouncedObj.clc"
+// #include "MainShipObj.clc"
+#include "BulletObj.clc"
+// #include "SceneHandler.clc"
+#include "Engine.clc"
+
+
+
+MainShipObj:GameObj
+{
+
+    unsigned short create_bullet_delay;
+
+
+    
+    void Init()
+    {
+        DEBUG_PRINT( "Init() in MainShipObj\n" );        
+        GameObj:Init(self);
+        
+        create_bullet_delay = 0;        
+    }
+ 
+
+
+    void Move( )
+    {        
+        // DEBUG_PRINT( "Move() in MainShipObj\n" );
+        GameObj:Move(self);
+
+        // code
+        yvel = xvel = 0;
+        if(engine.input.IsKeyPressed(/*SDL_SCANCODE_UP*/    0))       yvel =  FLOAT_TO_FIXED(-1.5);
+        if(engine.input.IsKeyPressed(/*SDL_SCANCODE_DOWN*/  0))     yvel =  FLOAT_TO_FIXED( 1.5);
+
+        if(engine.input.IsKeyPressed(/*SDL_SCANCODE_LEFT*/   0 ))      xvel =  FLOAT_TO_FIXED(-1.5);
+        if(engine.input.IsKeyPressed(/*SDL_SCANCODE_RIGHT*/  0))     xvel =  FLOAT_TO_FIXED( 1.5);
+
+        if(engine.input.IsKeyPressed(/*SDL_SCANCODE_SPACE*/  0) && create_bullet_delay == 0) {
+            CreateBullet();
+            create_bullet_delay = 60;
+        }
+
+        if(create_bullet_delay > 0) create_bullet_delay--;
+            
+        
+    }
+
+    void CreateBullet()
+    {
+        BulletObj*  bullet;
+        FIXED  bullet_x, bullet_y;
+
+        bullet_x = x + FLOAT_TO_FIXED( 39 );
+        bullet_y = y + FLOAT_TO_FIXED( 16 );
+
+
+        bullet = engine:FindUnused_BulletObj();
+
+        bullet:Init();
+        bullet:SetUsed();
+        bullet:Set_Engine(engine);
+        bullet.sprite.LoadFromImageFile_WithColorKey(engine.img_file);
+        bullet.sprite.SetSrcImageRect(0 ,36, 21,14);
+        bullet:Set_PosAndVel(bullet_x, bullet_y,
+                            FLOAT_TO_FIXED(0.0), FLOAT_TO_FIXED(0) );           
+        bullet:SetCollideRect(2,2, 16,9);
+        // bullet:SetTarget();
+        engine.handler.ActivateGameOBj((GameObj*) bullet);
+        //  FLOAT_TO_FIXED( SCR_START_X )  FLOAT_TO_FIXED( SCR_START_Y )
+    }
+
+
+
+
+}

@@ -1,0 +1,83 @@
+
+
+
+
+BulletObj:GameObj
+{
+
+    
+
+
+    
+    void Init()
+    {
+        DEBUG_PRINT( "Init() in BulletObj \n" );        
+        GameObj:Init(self);
+
+        
+    }
+ 
+    // void Set_TargetObj(GameObj* target) { theTarget = target; }
+    
+
+
+
+    void Move( )
+    {        
+        // DEBUG_PRINT( "Move() in BulletObj \n" );
+        GameObj:Move(self);
+
+        
+        
+        if(CollideWithAllActiveObjects());
+            // DEBUG_PRINT( "--------------------------------  BULLET COLLLLL WITH SOME OBJ --- \n" );
+        
+
+        DeActivateWhenComingOutOfScreen();
+        
+    }
+
+    void DeActivateWhenComingOutOfScreen()
+    {
+        unsigned short cur_x;
+
+        cur_x = FIXED_TO_INT(x);
+        if( cur_x > SCR_START_X + SCR_WIDTH) {
+            engine.handler.DeActivateGameOBj( (GameObj*)self );
+            Unused();
+            sprite:Unused();
+        }
+        
+    }
+
+
+
+    BOOL CanCollideWithGameObj(GameObj *obj)
+    {
+        return obj.canCollideWith_BulletObj;
+    }
+
+    void Callback_CollideDetectedWith(GameObj *obj)
+    {
+        struct Instance* original1 =   obj._components[0];
+
+        DEBUG_PRINT( "Callback_CollideDetectedWith() in BulletObj \n" );
+
+        // DEBUG_PRINT( "collide class: %s \n", original1->_class->className  );
+        // DEBUG_PRINT( "collide  class id: %u \n", (unsigned int) original1->_class->classId  );
+        // DEBUG_PRINT( "mainship class id: %u \n",  (unsigned int) engine.classId_MainShipObj)
+
+
+        assert(engine.classId_MainShipObj);
+        assert(engine.classId_EnemyObj);
+        // if(original1->_class->classId == engine.classId_MainShipObj)
+        //     DEBUG_PRINT( "bullet collide with mainship ---------- \n");
+        if(original1->_class->classId == engine.classId_EnemyObj)
+            DEBUG_PRINT( "bullet collide with enemyobj -----------\n");
+
+
+
+
+    }
+
+}

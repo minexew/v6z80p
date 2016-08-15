@@ -1,0 +1,312 @@
+// Platform specific code.
+// Host: V6Z80P
+// Lang: C
+// Lib:
+
+#include "my_types.h"
+
+#include "GameObj.clc"
+#include "Sprite.clc"
+
+#include <debug_print.h>
+
+
+
+// Start = 96 Stop = 480 Total:384 pixels   (But with left wideborder Window Width = 368 pixels !)
+#define X_WINDOW_START                0x6
+#define X_WINDOW_STOP                 0xE
+// 240 line display (masks last line of tiles)
+#define Y_WINDOW_START                0x3
+#define Y_WINDOW_STOP                 0xD
+
+#include <base_lib/sprites.h>
+//#include <base_lib/keyboard.h>
+//#include <base_lib/mouse.h>
+#include <base_lib/video_mode.h>
+//#include <base_lib/utils.h>
+
+//
+
+
+#define INVALID_SPRITE_NUMBER     255
+
+PlatformGfx
+{    
+
+    unsigned char freeHardwareSpriteNumber;
+    
+    void Init()
+    {
+        // ren = NULL; win = NULL; backBuffer = NULL;
+
+        freeHardwareSpriteNumber = 0;
+
+    }
+
+
+    void InitVideoMode()
+    {
+        DEBUG_PRINT( "InitVideoMode()) in PlatformGfx \n" );        
+
+
+        VideoMode_InitTilemapMode(WIDE_LEFT_BORDER /*|DUAL_PLAY_FIELD*/, EXTENDED_TILE_MAP_MODE);
+        VideoMode_SetupDisplayWindowSize(X_WINDOW_START, X_WINDOW_STOP, Y_WINDOW_START, Y_WINDOW_STOP);
+
+
+        // Enable sprites
+        mm__vreg_sprctrl = SPRITE_ENABLE;
+
+        // Set display window params to sprite functions.
+        // +1 point to x for wideleft border (one X  window point = 16 pixels)
+        SpritesRegsBuffer_SetDisplayWindowParams(X_WINDOW_START + 1, Y_WINDOW_START);
+
+
+        //
+        PutObjectsToSpriteMemory();
+        SetPalette();
+  
+
+        SetChunkyVideoMode();
+        FillVideoMem();
+
+    }
+
+
+    void SetChunkyVideoMode()
+    {
+        // select bitmap mode + chunky pixel mode (1 byte = 1 pixel)
+        mm__vreg_vidctrl = BITMAP_MODE|CHUNKY_PIXEL_MODE;
+
+        // Setup display window size:
+        VideoMode_SetupDisplayWindowSize(X_WINDOW_START, X_WINDOW_STOP, Y_WINDOW_START, Y_WINDOW_STOP);
+
+
+        // initialize datafetch start address HW pointer
+        mm__bitplane0a_loc__byte0 = 0;      // [7:0] bits
+        mm__bitplane0a_loc__byte1 = 0;      // [15:8]
+        mm__bitplane0a_loc__byte2 = 0;      // [18:16]
+
+    }
+
+    void FillVideoMem()
+    {
+        byte i, totalVideoPages;
+        byte colorIndex = 0;
+
+        totalVideoPages = SCR_WIDTH*SCR_HEIGHT/8192 + 1;      //  / 8KB video pages (calculate how many video pages in video mode)
+
+        for(i=0; i<totalVideoPages; i++) {
+            PAGE_IN_VIDEO_RAM();
+            SET_VIDEO_PAGE(i);
+            memset((byte*)(VIDEO_BASE), colorIndex, 0x2000);        // fill 8KB video page
+            PAGE_OUT_VIDEO_RAM();
+            colorIndex += 1;
+        }
+    }
+
+    void DrawRect(GfxRect* r, byte colorIndex)
+    {
+        word x, y;
+        byte videoPage;        
+        byte *p;
+        word offs;
+
+        videoPage = 0;
+           
+
+
+        PAGE_IN_VIDEO_RAM();
+        
+
+        for(y = r->y; y < r->h;  y++) {
+
+            for(x = r->x; x < r->w;  x++) {
+                // offs can hanle max 512 KB address space (512KB  of 8 bytes chunks)
+                offs = SCR_WIDTH/8 * y/8 + x/8;
+                videoPage = offs >> 10; // divide by 0x2000 (shift right by 13 bits) but offs is alreaddy divided by 8 (SHR 3 bits), so 13-3=10
+
+                SET_VIDEO_PAGE(videoPage);
+                p = VIDEO_BASE + offs;
+                *p = colorIndex;
+            }
+            // memset((byte*)(VIDEO_BASE), colorIndex, 0x2000);        // fill 8KB video page
+        }
+        PAGE_OUT_VIDEO_RAM();
+        
+    }
+
+
+
+    void OnGameLoopBegin()    
+    {
+        GfxRect r;
+
+        FLOS_WaitVRT();
+        SpritesRegsBuffer_CopyToHardwareRegs();         // must be called right after FLOS_WaitVRT()
+        SpritesRegsBuffer_Clear();                      // clear sprite regs shadow buffer
+        // now you can do main game code
+
+
+
+        //int color; native { color = RGB2WORD(255,128,255); }
+        SetBorder(0xff);
+
+        freeHardwareSpriteNumber = 0;    
+
+
+        r.x = 0; r.y = 0; r.w = 100; r.h = 100; DrawRect(&r, 1);
+    }
+
+
+    void OnGameLoopEnd()    
+    {
+
+        SetBorder(0);
+    }
+
+    void SetPalette()
+    {
+    
+        word* Palette = (word*)PALETTE;
+        Palette[0] = RGB2WORD(0,0,0);
+        Palette[100] = RGB2WORD(255,128,255);
+        //Palette[200] = RGB2WORD(255,255,255);
+       
+    }
+    
+    void SetBorder(unsigned short color)
+    {
+
+        word* Palette = (word*)PALETTE;
+        Palette[0] = color;
+        
+    }
+
+
+
+    void PutObjectsToSpriteMemory()
+    {
+               
+        unsigned char Img1[16 * 16];            //  sprite image buffer
+        unsigned char color = 100;
+        // first "corner" debug spr
+        memset(Img1,0,sizeof(Img1));
+
+
+        CreateImg1(Img1, color);
+
+        // copy data to sprite memory at 0
+        PAGE_IN_SPRITE_RAM();
+        SET_SPRITE_PAGE(0);
+        memset((byte*)SPRITE_BASE,0,0x1000);                               //  clear 4kb sprite ram
+        memcpy((byte*)SPRITE_BASE, (byte*)Img1, sizeof(Img1));
+        PAGE_OUT_SPRITE_RAM();
+        
+    }
+
+    void CreateImg1(unsigned char Img1[16 * 16], unsigned char color)
+    {
+        Img1[0 * 16] = color;            Img1[0] = color;
+        Img1[1 * 16] = color;            Img1[1] = color;
+        Img1[2 * 16] = color;            Img1[2] = color;
+        Img1[3 * 16] = color;            Img1[3] = color;
+        Img1[4 * 16] = color;            Img1[4] = color;
+        Img1[5 * 16] = color;            Img1[5] = color;
+        Img1[6 * 16] = color;            Img1[6] = color;
+        Img1[7 * 16] = color;            Img1[7] = color;
+    }
+   
+
+    // void CreateImg2(unsigned char Img1[16 * 16], unsigned char color)
+    // {
+    //     Img1[16 * 16 - 8] = color;            Img1[0 * 15] = color;
+    //     Img1[16 * 16 - 7] = color;            Img1[1] = color;
+    //     Img1[16 * 16 - 6] = color;            Img1[2] = color;
+    //     Img1[16 * 16 - 5] = color;            Img1[3] = color;
+    //     Img1[16 * 16 - 4] = color;            Img1[4] = color;
+    //     Img1[16 * 16 - 3] = color;            Img1[5] = color;
+    //     Img1[16 * 16 - 2] = color;            Img1[6] = color;
+    //     Img1[16 * 16 - 1] = color;            Img1[7] = color;
+    // }
+
+    unsigned char GetFreeHardwareSpriteNumber()
+    {
+        unsigned char r;
+        if(freeHardwareSpriteNumber > 120)
+            return INVALID_SPRITE_NUMBER; // no hw spr number avail
+
+        r = freeHardwareSpriteNumber;
+        freeHardwareSpriteNumber++;
+
+        return r;
+    }
+ 
+
+    void DrawObj(GameObj* obj)    
+    {
+
+        // SDL_Rect r;
+         obj.sprite.DrawGameObj(obj);
+
+        // int x = FIXED_TO_INT(obj.x) - SCR_START_X;
+        // int y = FIXED_TO_INT(obj.y) - SCR_START_Y;
+            
+
+        
+        // dest rect
+        // r.x = x;
+        // r.y = y;
+        // r.w = obj:GetWidth();;
+        // r.h = obj:GetHeight();
+        
+        // if(obj.sprite.rcSource.w == 0 && obj.sprite.rcSource.h == 0) {
+        //     rc.w = obj.width;
+        //     rc.h = obj.height;
+        // }
+        // else {
+        //     rc.w = obj.sprite.rcSource.w;
+        //     rc.h = obj.sprite.rcSource.h;
+        // }
+        // DrawRect(rc,   255,255,255);
+
+        // Set render color
+        // SDL_SetRenderDrawColor( ren, 255, 255, 255, 255 );
+
+        // // Render rect
+        // SDL_RenderFillRect( ren, &r );
+
+
+        // if collide vars are set, draw collide rect
+        // if(obj->col_x_offset != 0 && obj->col_y_offset != 0   &&   obj->col_width != 0 && obj->col_height != 0){
+        //     SDL_Rect coll;
+
+        //     coll.x = x + obj->col_x_offset;
+        //     coll.y = y + obj->col_y_offset;
+
+        //     coll.w = obj->col_width;
+        //     coll.h = obj->col_height;
+
+        //      // Set render color
+        //     SDL_SetRenderDrawColor( ren, 0, 255, 255, 255 );
+
+        //     // Render rect
+        //     SDL_RenderFillRect( ren, &coll );
+
+        // }
+
+
+
+
+        // // Render sprite surf
+        // SDL_RenderCopy( ren, obj->sprite->spriteTexture, &obj->sprite->rcSource, &r );
+    
+    }
+
+
+    void Cleanup() 
+    {
+
+        
+    }
+
+}
