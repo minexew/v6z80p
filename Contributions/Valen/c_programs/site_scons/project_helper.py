@@ -10,6 +10,8 @@ import serial
 import ConfigParser             # to read ini file
 from SCons.Script import *
 
+dictNodesProgressMessages = {}
+
 class Project_Helper(object):
 #    def __init__(self):
     
@@ -34,12 +36,67 @@ class Project_Helper(object):
         
         if Project_Helper.Is_Target_PC():
             project.base_variant_dir = 'build/pc/c_programs/'
-        else:
+        if Project_Helper.Is_Target_IAR_V6Z80P():
+            project.base_variant_dir = 'build/iar_v6z80p/c_programs/'
+        if Project_Helper.Is_Target_V6Z80P():
             project.base_variant_dir = 'build/v6/c_programs/'
+    
+
+    @staticmethod
+    def SetProgressMessageForNode(node, message):                  
+        #
+        global dictNodesProgressMessages
+        tmp = {node : message}
+        dictNodesProgressMessages = dict( dictNodesProgressMessages.items() + tmp.items() )
+      
+    @staticmethod
+    def GetProgressMessageForNode(node):                  
+        #        
+        global dictNodesProgressMessages
+        # print "Length : %d" % len (dictNodesProgressMessages)
+
+        try:
+            str = dictNodesProgressMessages[node]
+        except KeyError:
+            return ''
+
+        # print 'Fouded key  ======================================================================== '
+        # print str
+
+        return str
+
+
+    
+    @staticmethod
+    def IsNode_CanBeCheked_ForProgressMessage(node):                  
+        #
+        if node is None:
+            return False
+
+        
+        try:
+            # if node is already up-to date (node is not building at now), skip node
+            if node.is_up_to_date():        
+                return False
+        except AttributeError:
+            # print("Oops!.  Try again.................")
+            return False
+
+        return True
+
+
 
     @staticmethod
     def Is_Target_PC():
         return (ARGUMENTS.get('target', 'v6z80p') == 'pc')
     @staticmethod
+    def Is_Target_IAR_V6Z80P():
+        return (ARGUMENTS.get('target', 'v6z80p') == 'iar_v6z80p')
+    @staticmethod
     def Is_Target_V6Z80P():
-        return (Project_Helper.Is_Target_PC() == False)
+        return (Project_Helper.Is_Target_PC() == False and Project_Helper.Is_Target_IAR_V6Z80P() == False)
+
+
+
+
+
