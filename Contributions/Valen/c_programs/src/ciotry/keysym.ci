@@ -1,0 +1,306 @@
+// Taken from SDL 1.2 SDL_keysym.h
+
+
+
+
+
+public class KeybSym
+{
+        // @name ASCII mapped keysyms
+        // The keyboard syms have been cleverly chosen to map to ASCII
+         
+        
+	const int kb_unknown		 =  0;
+	const int kb_first		 =  0;
+	const int kb_backspace		 =  8;
+	const int kb_tab		 =  9;
+	const int kb_clear		 =  12;
+	const int kb_return		 =  13;
+	const int kb_pause		 =  19;
+	const int kb_escape		 =  27;
+	const int kb_space		 =  32;
+	const int kb_exclaim		 =  33;
+	const int kb_quotedbl		 =  34;
+	const int kb_hash		 =  35;
+	const int kb_dollar		 =  36;
+	const int kb_ampersand		 =  38;
+	const int kb_quote		 =  39;
+	const int kb_leftparen		 =  40;
+	const int kb_rightparen		 =  41;
+	const int kb_asterisk		 =  42;
+	const int kb_plus		 =  43;
+	const int kb_comma		 =  44;
+	const int kb_minus		 =  45;
+	const int kb_period		 =  46;
+	const int kb_slash		 =  47;
+	const int kb_0			 =  48;
+	const int kb_1			 =  49;
+	const int kb_2			 =  50;
+	const int kb_3			 =  51;
+	const int kb_4			 =  52;
+	const int kb_5			 =  53;
+	const int kb_6			 =  54;
+	const int kb_7			 =  55;
+	const int kb_8			 =  56;
+	const int kb_9			 =  57;
+	const int kb_colon		 =  58;
+	const int kb_semicolon		 =  59;
+	const int kb_less		 =  60;
+	const int kb_equals		 =  61;
+	const int kb_greater		 =  62;
+	const int kb_question		 =  63;
+	const int kb_at			 =  64;
+	
+	   // Skip uppercase letters
+	 
+	const int kb_leftbracket	 =  91;
+	const int kb_backslash		 =  92;
+	const int kb_rightbracket	 =  93;
+	const int kb_caret		 =  94;
+	const int kb_underscore		 =  95;
+	const int kb_backquote		 =  96;
+	const int kb_a			 =  97;
+	const int kb_b			 =  98;
+	const int kb_c			 =  99;
+	const int kb_d			 =  100;
+	const int kb_e			 =  101;
+	const int kb_f			 =  102;
+	const int kb_g			 =  103;
+	const int kb_h			 =  104;
+	const int kb_i			 =  105;
+	const int kb_j			 =  106;
+	const int kb_k			 =  107;
+	const int kb_l			 =  108;
+	const int kb_m			 =  109;
+	const int kb_n			 =  110;
+	const int kb_o			 =  111;
+	const int kb_p			 =  112;
+	const int kb_q			 =  113;
+	const int kb_r			 =  114;
+	const int kb_s			 =  115;
+	const int kb_t			 =  116;
+	const int kb_u			 =  117;
+	const int kb_v			 =  118;
+	const int kb_w			 =  119;
+	const int kb_x			 =  120;
+	const int kb_y			 =  121;
+	const int kb_z			 =  122;
+	const int kb_delete		 =  127;
+	//  End of ASCII mapped keysyms 
+        
+
+	//  @name International keyboard syms 
+        
+	const int kb_world_0		 =  160;		//  Add any other keys here 
+	const int kb_world_1		 =  161;
+	const int kb_world_2		 =  162;
+	const int kb_world_3		 =  163;
+	const int kb_world_4		 =  164;
+	const int kb_world_5		 =  165;
+	const int kb_world_6		 =  166;
+	const int kb_world_7		 =  167;
+	const int kb_world_8		 =  168;
+	const int kb_world_9		 =  169;
+	const int kb_world_10		 =  170;
+	const int kb_world_11		 =  171;
+	const int kb_world_12		 =  172;
+	const int kb_world_13		 =  173;
+	const int kb_world_14		 =  174;
+	const int kb_world_15		 =  175;
+	const int kb_world_16		 =  176;
+	const int kb_world_17		 =  177;
+	const int kb_world_18		 =  178;
+	const int kb_world_19		 =  179;
+	const int kb_world_20		 =  180;
+	const int kb_world_21		 =  181;
+	const int kb_world_22		 =  182;
+	const int kb_world_23		 =  183;
+	const int kb_world_24		 =  184;
+	const int kb_world_25		 =  185;
+	const int kb_world_26		 =  186;
+	const int kb_world_27		 =  187;
+	const int kb_world_28		 =  188;
+	const int kb_world_29		 =  189;
+	const int kb_world_30		 =  190;
+	const int kb_world_31		 =  191;
+	const int kb_world_32		 =  192;
+	const int kb_world_33		 =  193;
+	const int kb_world_34		 =  194;
+	const int kb_world_35		 =  195;
+	const int kb_world_36		 =  196;
+	const int kb_world_37		 =  197;
+	const int kb_world_38		 =  198;
+	const int kb_world_39		 =  199;
+	const int kb_world_40		 =  200;
+	const int kb_world_41		 =  201;
+	const int kb_world_42		 =  202;
+	const int kb_world_43		 =  203;
+	const int kb_world_44		 =  204;
+	const int kb_world_45		 =  205;
+	const int kb_world_46		 =  206;
+	const int kb_world_47		 =  207;
+	const int kb_world_48		 =  208;
+	const int kb_world_49		 =  209;
+	const int kb_world_50		 =  210;
+	const int kb_world_51		 =  211;
+	const int kb_world_52		 =  212;
+	const int kb_world_53		 =  213;
+	const int kb_world_54		 =  214;
+	const int kb_world_55		 =  215;
+	const int kb_world_56		 =  216;
+	const int kb_world_57		 =  217;
+	const int kb_world_58		 =  218;
+	const int kb_world_59		 =  219;
+	const int kb_world_60		 =  220;
+	const int kb_world_61		 =  221;
+	const int kb_world_62		 =  222;
+	const int kb_world_63		 =  223;
+	const int kb_world_64		 =  224;
+	const int kb_world_65		 =  225;
+	const int kb_world_66		 =  226;
+	const int kb_world_67		 =  227;
+	const int kb_world_68		 =  228;
+	const int kb_world_69		 =  229;
+	const int kb_world_70		 =  230;
+	const int kb_world_71		 =  231;
+	const int kb_world_72		 =  232;
+	const int kb_world_73		 =  233;
+	const int kb_world_74		 =  234;
+	const int kb_world_75		 =  235;
+	const int kb_world_76		 =  236;
+	const int kb_world_77		 =  237;
+	const int kb_world_78		 =  238;
+	const int kb_world_79		 =  239;
+	const int kb_world_80		 =  240;
+	const int kb_world_81		 =  241;
+	const int kb_world_82		 =  242;
+	const int kb_world_83		 =  243;
+	const int kb_world_84		 =  244;
+	const int kb_world_85		 =  245;
+	const int kb_world_86		 =  246;
+	const int kb_world_87		 =  247;
+	const int kb_world_88		 =  248;
+	const int kb_world_89		 =  249;
+	const int kb_world_90		 =  250;
+	const int kb_world_91		 =  251;
+	const int kb_world_92		 =  252;
+	const int kb_world_93		 =  253;
+	const int kb_world_94		 =  254;
+	const int kb_world_95		 =  255;		//  Add any other keys here 
+        
+
+	//  @name Numeric keypad 
+        
+	const int kb_kp0		 =  256;
+	const int kb_kp1		 =  257;
+	const int kb_kp2		 =  258;
+	const int kb_kp3		 =  259;
+	const int kb_kp4		 =  260;
+	const int kb_kp5		 =  261;
+	const int kb_kp6		 =  262;
+	const int kb_kp7		 =  263;
+	const int kb_kp8		 =  264;
+	const int kb_kp9		 =  265;
+	const int kb_kp_period		 =  266;
+	const int kb_kp_divide		 =  267;
+	const int kb_kp_multiply	 =  268;
+	const int kb_kp_minus		 =  269;
+	const int kb_kp_plus		 =  270;
+	const int kb_kp_enter		 =  271;
+	const int kb_kp_equals		 =  272;
+        
+
+	//  @name Arrows + Home/End pad 
+        
+	const int kb_up			 =  273;
+	const int kb_down		 =  274;
+	const int kb_right		 =  275;
+	const int kb_left		 =  276;
+	const int kb_insert		 =  277;
+	const int kb_home		 =  278;
+	const int kb_end		 =  279;
+	const int kb_pageup		 =  280;
+	const int kb_pagedown		 =  281;
+        
+
+	//  @name Function keys 
+        
+	const int kb_f1			 =  282;
+	const int kb_f2			 =  283;
+	const int kb_f3			 =  284;
+	const int kb_f4			 =  285;
+	const int kb_f5			 =  286;
+	const int kb_f6			 =  287;
+	const int kb_f7			 =  288;
+	const int kb_f8			 =  289;
+	const int kb_f9			 =  290;
+	const int kb_f10		 =  291;
+	const int kb_f11		 =  292;
+	const int kb_f12		 =  293;
+	const int kb_f13		 =  294;
+	const int kb_f14		 =  295;
+	const int kb_f15		 =  296;
+        
+
+	//  @name Key state modifier keys 
+        
+	const int kb_numlock		 =  300;
+	const int kb_capslock		 =  301;
+	const int kb_scrollock		 =  302;
+	const int kb_rshift		 =  303;
+	const int kb_lshift		 =  304;
+	const int kb_rctrl		 =  305;
+	const int kb_lctrl		 =  306;
+	const int kb_ralt		 =  307;
+	const int kb_lalt		 =  308;
+	const int kb_rmeta		 =  309;
+	const int kb_lmeta		 =  310;
+	const int kb_lsuper		 =  311;		// < Left "Windows" key 
+	const int kb_rsuper		 =  312;		// < Right "Windows" key 
+	const int kb_mode		 =  313;		// < "Alt Gr" key 
+	const int kb_compose		 =  314;		// < Multi-key compose key 
+        
+
+	//  Enumeration of valid key mods (possibly OR'd together) 
+        
+	const int kb_help		 =  315;
+	const int kb_print		 =  316;
+	const int kb_sysreq		 =  317;
+	const int kb_break		 =  318;
+	const int kb_menu		 =  319;
+	const int kb_power		 =  320;		// < Power Macintosh power key 
+	const int kb_euro		 =  321;		// < Some european keyboards 
+	const int kb_undo		 =  322;		// < Atari keyboard has Undo 
+        
+
+	//  Add any other keys here 
+
+	// SDLK_LAST
+
+
+
+
+//  Enumeration of valid key mods (possibly OR'd together) 
+
+	const int kmod_none   =  0x0000;
+	const int kmod_lshift =  0x0001;
+	const int kmod_rshift =  0x0002;
+	const int kmod_lctrl  =  0x0040;
+	const int kmod_rctrl  =  0x0080;
+	const int kmod_lalt   =  0x0100;
+	const int kmod_ralt   =  0x0200;
+	const int kmod_lmeta  =  0x0400;
+	const int kmod_rmeta  =  0x0800;
+	const int kmod_num    =  0x1000;
+	const int kmod_caps   =  0x2000;
+	const int kmod_mode   =  0x4000;
+	// KMOD_RESERVED = 0x8000
+
+
+// ToDo: Convert nwxt lines to cito.
+// #define KMOD_CTRL	(KMOD_LCTRL|KMOD_RCTRL)
+// #define KMOD_SHIFT	(KMOD_LSHIFT|KMOD_RSHIFT)
+// #define KMOD_ALT	(KMOD_LALT|KMOD_RALT)
+// #define KMOD_META	(KMOD_LMETA|KMOD_RMETA)
+
+}
