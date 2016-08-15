@@ -1,6 +1,14 @@
+$include("fixed.inc")
+
 public class Behavior
 {
     int foo;    // at least one var must be here (for correct code generation for C)
+    // Engine engine;
+
+    // public void Init(Engine e)
+    // {
+    //     engine = e;
+    // }
     
     public virtual void DoBehavior(GameObj game_obj)
     {
@@ -13,8 +21,8 @@ public class Behavior
 
 public class MovingBehavior : Behavior
 {    
-    int xvel;
-    int yvel;
+    $FIXED xvel;
+    $FIXED yvel;
     
     /// Constructor
     MovingBehavior()
@@ -23,7 +31,7 @@ public class MovingBehavior : Behavior
     }
     
     // workaround 
-    public          void DoBehavior_ClassBehavior(GameObj game_obj)
+    public void Virtual_MovingBehavior_DoBehavior(GameObj game_obj)
     {
         game_obj.x += xvel;
         game_obj.y += yvel;        
@@ -32,7 +40,7 @@ public class MovingBehavior : Behavior
     public override void DoBehavior(GameObj game_obj)
     {
         //Debug.Print("MovingBehavior.()\n");
-        DoBehavior_ClassBehavior(game_obj);
+        Virtual_MovingBehavior_DoBehavior(game_obj);
     }
 
 }
@@ -55,11 +63,89 @@ public class BouncedBehavior : MovingBehavior
     {
         //Debug.Print("BouncedBehavior.()\n");
         // call base class func 
-        DoBehavior_ClassBehavior(game_obj);
+        Virtual_MovingBehavior_DoBehavior(game_obj);
         
-        if(game_obj.x < x1_bounce || game_obj.x > x2_bounce)
+        if( (game_obj.x >> $FIXED_BITS) < x1_bounce || (game_obj.x >> $FIXED_BITS) > x2_bounce )
             xvel = -xvel;
         
     }
 
 }
+
+
+
+public class KeysControlledBehavior : MovingBehavior
+{    
+
+    int foo;
+
+    KeysControlledBehavior()
+    {        
+
+    }
+    
+    public override void DoBehavior(GameObj game_obj)
+    {
+        //Debug.Print("BouncedBehavior.()\n");
+        // call base class func 
+        Virtual_MovingBehavior_DoBehavior(game_obj);
+        
+        yvel = 0;
+        if(game_obj.engine.myPlatformInput.IsKeyPressed(KeybSym.kb_up))   yvel = $FLOAT_TO_FIXED(-1);
+        if(game_obj.engine.myPlatformInput.IsKeyPressed(KeybSym.kb_down)) yvel = $FLOAT_TO_FIXED( 1);
+
+
+        xvel = 0;
+        if(game_obj.engine.myPlatformInput.IsKeyPressed(KeybSym.kb_left))  xvel = $FLOAT_TO_FIXED(-1);
+        if(game_obj.engine.myPlatformInput.IsKeyPressed(KeybSym.kb_right)) xvel = $FLOAT_TO_FIXED( 1);
+
+        if(game_obj.engine.myPlatformInput.IsKeyPressed(KeybSym.kb_space)) {
+            GameObj obj = game_obj.engine.AllocateGameObj();            
+            if(obj == null)
+                Debug.Print("ERR: cant alloc gameobj - Bullet \n");
+            else {
+                // re-init obj and add  behavior
+                obj.Constructor();
+                obj.Init(game_obj.engine);
+                obj.sprite.LoadFromImageFile("free_sprites.bmp");
+                obj.sprite.SetSrcImageRect(0,37, 24,12);
+                MovingBehavior moving_behavior = new MovingBehavior();
+                moving_behavior.xvel = $FLOAT_TO_FIXED(1);
+                obj.AddBehavior(moving_behavior);
+
+                BulletBehavior beh = new BulletBehavior();                
+                obj.AddBehavior(beh);
+
+                obj.x = game_obj.x;
+                obj.y = game_obj.y;
+            }
+        
+        }
+
+        native {
+            // DEBUG_PRINT("Obj x =  %i, y =  %i \n", game_obj->x, game_obj->y);
+        }
+        
+    }
+}
+
+
+public class BulletBehavior : Behavior
+{    
+
+    int foo;
+
+    BulletBehavior()
+    {        
+
+    }
+    
+    public override void DoBehavior(GameObj game_obj)
+    {
+        // Debug.Print("BulletBehavior.DoBehavior()\n");
+        int x = game_obj.x >> $FIXED_BITS;
+        if(x < -32 || x > 320)
+            game_obj.Unused();
+    }
+}
+
