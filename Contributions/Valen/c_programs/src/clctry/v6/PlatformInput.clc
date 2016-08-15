@@ -1,0 +1,77 @@
+// Platform specific code.
+// Host: V6Z80P
+// Lang: C
+// Lib:
+
+
+
+#include <debug_print.h>
+
+// #define ARR_KEYS_PRESSED_SIZE     5
+//
+PlatformInput
+{
+        
+    // int  keys_pressed[ARR_KEYS_PRESSED_SIZE];       // array for pressed keys
+
+    void Init()
+    {
+        DEBUG_PRINT( "Init() in PlatformInput\n" );       
+
+        // for (int k = 0; k < ARR_KEYS_PRESSED_SIZE; k++)
+        //     keys_pressed[k] = 0;
+
+
+
+    }
+
+    BOOL HandleInput()    
+    {
+
+        // SDL_Event event;
+        
+        
+        // const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
+        // while(SDL_PollEvent(&event))
+        // {
+
+        //     //If user closes the window
+        //     if (event.type == SDL_QUIT) {
+        //         return FALSE;
+        //     }
+
+            
+        //     // if (event.type == SDL_KEYDOWN){
+        //     //     // convert SDL code of pressed key to platform independent code
+        //     // }
+
+        //     // if((keyboardState[SDL_SCANCODE_UP])||(keyboardState[SDL_SCANCODE_W]))
+        //         // return FALSE;    // move_UP(ren,player,player_RECT);
+
+        //     // SDL_PumpEvents(); // обработчик событий.
+        // }
+
+
+        return TRUE;
+    }
+
+
+
+    
+    BOOL IsKeyPressed(unsigned int scancode)
+    {
+        // const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
+
+        // if( keyboardState[scancode] ) return TRUE;
+        // else return FALSE;
+
+
+        return FALSE;
+
+    }
+
+
+    
+
+
+}

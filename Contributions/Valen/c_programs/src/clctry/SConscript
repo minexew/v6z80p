@@ -1,0 +1,121 @@
+# Project targets: v6z80p, pc
+
+import getpass
+import platform
+from  project_helper import Project_Helper
+
+
+# Build this project only  on valen's Linux machine (home computer).
+# (because this proj is not finished!)
+do_build = False
+if platform.system() == 'Linux':
+    if getpass.getuser() == 'valen':
+        do_build = True
+
+if do_build == False:
+    Return('') # RETURT AND NOT BUILD ! 
+
+
+# this proj, will build only for sdcc and pc
+if Project_Helper.Is_Target_V6Z80P() == False and Project_Helper.Is_Target_PC() == False:
+    Return('')
+
+# -------------------------------------------
+import re
+import os
+from  project_helper import Project_Helper 
+    
+    
+    
+if Project_Helper.Is_Target_PC():
+    Import('current_project')
+    current_proj = current_project
+    env = current_project.env
+    
+    platformSourceFile = ['platform/platform.ci']
+    proj_libs = ['SDL2', 'SDL2_image']      # []
+
+    basedir          = current_proj.basedir
+    base_variant_dir = current_proj.base_variant_dir
+
+    includes = '/pc/'
+else:
+    # current_project - V6 Project object 
+    Import('current_project')
+    current_proj = current_project
+
+    current_project.name     = 'clctry'
+    current_project.linkopt  = '--code-loc 0x5A80 --data-loc 0'
+    current_project.stack    = '0xffff'
+    current_project.heapsize = '2048'     # set sdcc heap to  2KB       (uncomment this line, if you realy need a more heap than default 1024 bytes)
+
+    # In this project we need only sdcc environment  (to compile C source files)
+    env = current_project.env
+    platformSourceFile = ['platform/platform_v6z80p.ci']
+    basedir = current_project.basedir
+    base_variant_dir = current_project.base_variant_dir
+
+    includes = '/v6/'
+
+
+proj_dir  = basedir + 'src/clctry'
+build_dir = base_variant_dir + 'clctry'
+
+
+all_clc_files = Glob(proj_dir + '/*.clc') + Glob(proj_dir + includes + '/*.clc')
+
+#exit()
+
+
+# Generate .c file , from all *.clc files 
+# '-p' switch - for clc include dirs
+includes1 = proj_dir + includes
+includes2 = proj_dir + "/"
+output = GetLaunchDir() + '/$TARGET.dir/clcsrc'     # Class-C compiler want full path for output file
+clcsrc_c = env.Command('clcsrc.c', all_clc_files, "cd $SOURCE.dir && clcc Engine.clc  -o " + output + "  -p " + includes1 + "  -p " + includes2)
+Project_Helper.SetProgressMessageForNode(clcsrc_c[0], '------------- Generate C file  from CLC files ---------')
+
+
+
+#game1_c = env.Command('game1.c', game_c, ReplaceMallocFunc_In_C_File)
+
+
+
+if Project_Helper.Is_Target_PC():    
+    objs = env.Object( ['main.c', 'my_malloc.c', clcsrc_c],
+                    CPPPATH     = env['CPPPATH']           + ['/usr/include']
+                                        
+                    )
+else:
+    env_sdasz80 = current_project.env_sdasz80
+    # obj_heap = env_sdasz80.Object('heap.s')
+
+    # compile user .c files to object files (with special DEFINES in command line)
+    objs  = env.Object(   [clcsrc_c, 'my_malloc'],                     
+                    CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed', '--max-allocs-per-node 3000'],  
+                    CPPDEFINES  = env['CPPDEFINES']        + [{}]       # 'malloc': 'my_malloc', 'free': 'my_free'
+                    )
+
+    # compile main .c files to object files
+    objs += env.Object(   ['main.c'],                     
+                CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed', '--max-allocs-per-node 3000'],  
+                CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : current_project.stack}]
+                )
+
+    objs = objs #+ obj_heap
+
+# here, for some reason, the scons cant make auto depend 
+# so, we need to set depend manualy
+# env.Depends(objs, game_c)
+
+
+if Project_Helper.Is_Target_PC():
+    final_exe = env.Program(target='clctry', source=objs, LIBS = proj_libs )
+else:
+    # link to .ihx and convert .ihx to .exe
+    final_exe = current_project.FLOS_Program(objs)
+    current_project.Upload(final_exe)
+
+
+
+

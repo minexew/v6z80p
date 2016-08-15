@@ -1,0 +1,135 @@
+// Platform specific code.
+// Host: V6Z80P
+// Lang: C
+// Lib:
+
+
+#include "PlatformGfx.clc"
+#include "GameObj.clc"
+
+
+#include <debug_print.h>
+#include <assert.h>
+
+
+
+Sprite
+{    
+    BOOL    isUsed;
+
+    // SDL_Texture*    spriteTexture;     // SDL sprite texture
+    // SDL_Rect        rcSource;
+    GfxRect         rcSource;    
+    
+    
+    PlatformGfx*    gfx;
+
+    
+
+    void Init()
+    {
+        DEBUG_PRINT("Init() in Sprite\n");
+
+        isUsed = FALSE;
+        rcSource.x = rcSource.y = rcSource.w = rcSource.h = 0;
+        // spriteTexture = NULL;
+        gfx = NULL;
+
+        
+
+    }    
+
+    void SetPlatformGfx(PlatformGfx* g)
+    {        
+  
+        assert(g);
+
+        gfx = g;
+    }
+
+    
+    unsigned short GetWidth()
+    { 
+       return rcSource.w;
+    }
+
+    unsigned short GetHeight()
+    { 
+       return rcSource.h;
+    }
+
+
+
+    void LoadFromImageFile(const char* filename)
+    {
+        
+    }
+
+
+    void LoadFromImageFile_WithColorKey(const char* filename)
+    {
+
+    }
+
+    
+
+
+    void SetSrcImageRect(int x, int y, int w, int h)
+    {
+        
+        rcSource.x = x;
+        rcSource.y = y;
+        
+        rcSource.w = w;
+        rcSource.h = h;
+
+
+    }
+
+    
+
+    void DrawGameObj(GameObj* game_obj)
+    {
+        // int x = game_obj.x;
+        // int y = game_obj.y;
+        unsigned short x = FIXED_TO_INT(game_obj.x) - SCR_START_X;
+        unsigned short y = FIXED_TO_INT(game_obj.y) - SCR_START_Y;
+    
+        
+        sprite_regs_t r;
+        
+        unsigned char sprNumber = gfx:GetFreeHardwareSpriteNumber();
+
+        if(sprNumber == INVALID_SPRITE_NUMBER) {
+            DEBUG_PRINT("Sprite.DrawGameObj() FAILED, no HW spr number avail. Got INVALID_SPRITE_NUMBER. \n");            
+            return;
+        }
+    
+        //int color = 16;
+        //FillRect(x, y, w, h, color);
+
+
+        //DEBUG_PRINT("HW spr number = %u \n", sprNumber);
+        r.sprite_number            = sprNumber;
+        r.x                        = x;
+        r.y                        = y;
+        r.height                   = 1;                       // 16 pixels tall       (height in 16pixels chunks)
+        r.sprite_definition_number = 0;
+        r.x_flip                   = FALSE;
+        SpritesRegsBuffer_SetSpriteRegs(&r);
+                       
+    }   
+
+
+    void Unused()
+    {
+        isUsed = FALSE;
+    }
+
+    void SetUsed()
+    {
+        isUsed = TRUE;
+    }   
+
+
+}

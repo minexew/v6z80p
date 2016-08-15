@@ -1,0 +1,44 @@
+
+
+
+
+EnemyObj:BouncedObj
+{
+
+        
+    void Init()
+    {
+        DEBUG_PRINT( "Init() in EnemyObj \n" );        
+        BouncedObj:Init(self);
+
+        canCollideWith_BulletObj = TRUE;        
+    }
+    
+    
+
+    void Move( )
+    {
+        unsigned short cur_x;
+
+        // DEBUG_PRINT( "Move() in EnemyObj \n" );
+        BouncedObj:Move(self);
+
+        
+        
+        // if(CollideWithAllActiveObjects());
+        //     // DEBUG_PRINT( "--------------------------------  BULLET COLLLLL WITH SOME OBJ --- \n" );
+
+        
+        // cur_x = FIXED_TO_INT(x);
+        // if( cur_x > SCR_START_X + SCR_WIDTH) {
+        //     engine.handler.DeActivateGameOBj( (GameObj*)self );
+        //     Unused();
+        //     sprite:Unused();
+        // }
+        
+        
+    }
+
+
+
+}

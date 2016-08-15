@@ -1,0 +1,155 @@
+#include "PlatformGfx.clc"
+
+
+#ifdef PC
+#include <SDL2/SDL.h>
+
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_image.h>
+#endif
+
+
+#include <debug_print.h>
+#include <assert.h>
+
+Sprite
+{    
+    BOOL    isUsed;
+
+    SDL_Texture*    spriteTexture;     // SDL sprite texture
+    SDL_Rect        rcSource;
+    
+    
+    PlatformGfx*    gfx;
+
+    
+
+    void Init()
+    {
+        DEBUG_PRINT("Init() in Sprite\n");
+
+        isUsed = FALSE;
+        rcSource.x = rcSource.y = rcSource.w = rcSource.h = 0;
+        spriteTexture = NULL;
+        gfx = NULL;
+
+    }    
+
+    void SetPlatformGfx(PlatformGfx* g)
+    {        
+        if(g == NULL) {
+            DEBUG_PRINT("SetPlatformGfx() Error: g is NULL.\n"); exit(1);
+        }
+        
+        gfx = g;
+    }
+
+    
+    unsigned short GetWidth()
+    { 
+       return rcSource.w;
+    }
+
+    unsigned short GetHeight()
+    { 
+       return rcSource.h;
+    }
+
+
+
+    void LoadFromImageFile(const char* filename)
+    {
+        spriteTexture = NULL;
+
+        if(gfx == NULL) {
+            DEBUG_PRINT("LoadFromImageFile() Error: gfx is NULL.\n");   exit(1);
+        }
+
+        
+        // SDL_Surface *temp, *sprite;
+        // int colorkey;
+
+        // printf("SDL_yoyo \n");
+
+        /* load sprite */
+        
+        spriteTexture =  IMG_LoadTexture(gfx.ren, filename);            
+        if(spriteTexture == NULL) {
+            DEBUG_PRINT("IMG_LoadTexture falied. %s \n", SDL_GetError());  exit(1);
+        }
+        // printf("SDL_yoyo  2\n");
+
+        
+    }
+
+
+    void LoadFromImageFile_WithColorKey(const char* filename)
+    {
+        spriteTexture = NULL;
+        assert(gfx); assert(gfx->win);
+        if(gfx == NULL) {
+            DEBUG_PRINT("LoadFromImageFile_WithColorKey Error: gfx is NULL.\n");   exit(1);
+        }
+
+        
+        SDL_Surface *temp;
+        int colorkey;
+
+        // printf("SDL_yoyo \n");
+
+        /* load sprite */
+        temp   = SDL_LoadBMP(filename);            
+        if(temp == NULL) {
+            DEBUG_PRINT("SDL_LoadBMP falied. %s \n", SDL_GetError());  exit(1);
+        }
+        // printf("SDL_yoyo  2\n");
+
+
+        Uint32 uint_pf      = SDL_GetWindowPixelFormat( gfx->win );
+        SDL_PixelFormat* pf = SDL_AllocFormat(uint_pf);
+
+        // printf("pf = %u, ",  (unsigned int) pf->BitsPerPixel   );
+
+        // printf("SDL_yoyo  3\n");      
+
+        // printf("SDL_yoyo  4\n");
+        /* setup sprite colorkey and turn on RLE */
+        colorkey = SDL_MapRGB(pf, 255, 0, 255);
+        // printf("SDL_yoyo  5\n");
+        SDL_SetColorKey(temp, SDL_TRUE, colorkey);
+
+
+        spriteTexture = SDL_CreateTextureFromSurface(gfx->ren, temp);
+
+        SDL_FreeSurface(temp);
+
+    }
+
+    
+
+
+    void SetSrcImageRect(int x, int y, int w, int h)
+    {
+        
+        rcSource.x = x;
+        rcSource.y = y;
+        
+        rcSource.w = w;
+        rcSource.h = h;
+
+
+    }
+
+    
+    void Unused()
+    {
+        isUsed = FALSE;
+    }
+
+    void SetUsed()
+    {
+        isUsed = TRUE;
+    }   
+
+
+}

@@ -1,0 +1,205 @@
+// #include "Behavior.clc"
+#include "Sprite.clc"
+#include "Engine.clc"
+
+GameObj
+{
+    
+    BOOL    isUsed;
+
+    FIXED x;
+    FIXED y;
+
+    short xvel;
+    short yvel;
+
+
+    unsigned short col_x_offset;
+    unsigned short col_y_offset;
+    unsigned short col_width;
+    unsigned short col_height;
+    
+    // Behavior*   beh;
+    Sprite*    sprite;
+
+    Engine* engine;
+
+    BOOL    canCollideWith_BulletObj;
+
+    void Init()
+    {
+        DEBUG_PRINT( "Init() in GameObj\n" );        
+
+        isUsed = FALSE;
+        x = y = 0;
+        xvel = yvel = 0;           
+        col_x_offset = col_y_offset = col_width = col_height = 0;
+
+        engine = NULL;
+        // beh = NULL;
+        sprite = NULL;
+
+        canCollideWith_BulletObj = FALSE;
+        
+    }
+
+    void Set_PosAndVel(FIXED px, FIXED py, short vx, short vy)
+    {
+        DEBUG_PRINT( "Set_PosAndVel() in GameObj\n" );        
+
+        x = px;     y = py;
+        xvel = vx;  yvel = vy;
+    }
+
+
+    void SetCollideRect(unsigned short x_offset, unsigned short y_offset, unsigned short width, unsigned short height)
+    {
+        col_x_offset = x_offset;    col_y_offset = y_offset;    
+        col_width = width;          col_height = height;
+    }
+
+    unsigned short GetWidth()
+    {
+       return sprite:GetWidth();
+    }
+    unsigned short GetHeight()
+    {
+       return sprite:GetHeight();
+    }
+
+
+
+
+    void Set_Engine(Engine* e)
+    {
+        assert(e);
+        
+        engine = e;
+
+
+        sprite = engine:FindUnused_Sprite();
+        sprite:Init();
+        sprite:SetUsed();
+        sprite:SetPlatformGfx(engine.gfx);
+    }
+
+
+    BOOL CanCollideWithOthers()
+    {
+        return !(col_x_offset == 0 && col_y_offset == 0   &&   col_width == 0 && col_height == 0);
+    }
+
+
+    void Move( )
+    {
+        // DEBUG_PRINT( "Move() in GameObj\n" );
+        
+        x += xvel;
+        y += yvel;
+
+    }
+
+
+    void Draw( )
+    {
+        // DEBUG_PRINT( "Draw() in GameObj\n" );
+
+        engine.gfx.DrawObj( (GameObj*) self );             
+
+    }
+
+
+    BOOL IsCollidedWith(GameObj *other)
+    {
+        
+        unsigned short left1, left2;
+        unsigned short right1, right2;
+        unsigned short top1, top2;
+        unsigned short bottom1, bottom2;
+
+        
+        left1 = FIXED_TO_INT(x)         + col_x_offset;
+        left2 = FIXED_TO_INT(other.x)   + other.col_x_offset;
+
+        right1 = left1 + col_width;
+        right2 = left2 + other.col_width;
+
+        top1 = FIXED_TO_INT(y)          + col_y_offset;
+        top2 = FIXED_TO_INT(other.y)    + other.col_y_offset;
+
+        bottom1 = top1 + col_height;
+        bottom2 = top2 + other.col_height;
+
+        if (bottom1 < top2) return(FALSE);
+        if (top1 > bottom2) return(FALSE);
+
+        if (right1 < left2) return(FALSE);
+        if (left1 > right2) return(FALSE);
+
+        return(TRUE);        
+    }
+
+
+    BOOL CollideWithAllActiveObjects()
+    {
+        unsigned short i;
+        BOOL isAnyCollided;
+        GameObj *obj;
+        GameObj *o;
+
+        isAnyCollided =  FALSE;
+        obj = (GameObj*) self;
+
+         if(!obj:CanCollideWithOthers()) return FALSE;
+         // collide with all active gameobjects (except self and objects in non-colided state)
+        for(i = 0; i < ARR_ACTIVE_SIZE; i++) {
+            o = engine.active[i];
+            if(o == NULL) continue;
+            if(o == obj)  continue;
+            if(!o:CanCollideWithOthers()) continue;
+            if(!obj.CanCollideWithGameObj(o)) continue;
+
+                           
+            // DEBUG_PRINT( "obj for collide: %u, i = %u \n", (unsigned int)o, i );
+            if(obj:IsCollidedWith(o)) {                
+                Callback_CollideDetectedWith(o);
+                // struct Instance* original1 =   o._components[0];
+                // struct Instance* original2 = obj._components[0];
+
+                // printf("class 1: %u \n",  (unsigned int)   original1->_class->className );
+                // printf("class 2: %u \n",  (unsigned int)   original2->_class->className );                
+                // DEBUG_PRINT("class 1: %s \n",     original1->_class->className );
+                // DEBUG_PRINT("class 2: %s \n",     original2->_class->className );
+                isAnyCollided =  TRUE;
+            }
+            
+        }
+
+        return isAnyCollided;
+    }
+
+    void Callback_CollideDetectedWith(GameObj *obj)
+    {
+    }
+
+
+    // You shuold check the obj and return true, if u want to perform collision checking with that obj.
+    BOOL CanCollideWithGameObj(GameObj *obj)
+    {
+        return FALSE;
+    }
+
+
+
+    void Unused()
+    {
+        isUsed = FALSE;
+    }
+
+    void SetUsed()
+    {
+        isUsed = TRUE;
+    }
+
+
+}
