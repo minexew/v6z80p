@@ -168,3 +168,9 @@ int main(void)
 }
 
 
+
+void putchar(char c)
+{
+
+
+}
