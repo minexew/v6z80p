@@ -1,0 +1,1211 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"bri",
+				"Briefing"
+			],
+			[
+				"l",
+				"list"
+			],
+			[
+				"in",
+				"info"
+			],
+			[
+				"spri",
+				"sprite_t"
+			],
+			[
+				"si",
+				"sizeof"
+			],
+			[
+				"Ex",
+				"Exit"
+			],
+			[
+				"is",
+				"isUsed"
+			],
+			[
+				"arr",
+				"arrDate"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "platform_v6.c",
+			"settings":
+			{
+				"buffer_size": 6905,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "game.h",
+			"settings":
+			{
+				"buffer_size": 528,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "platform_pc.c",
+			"settings":
+			{
+				"buffer_size": 7020,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "platform.h",
+			"settings":
+			{
+				"buffer_size": 811,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "obj_moving.h",
+			"settings":
+			{
+				"buffer_size": 654,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "obj_ship.c",
+			"settings":
+			{
+				"buffer_size": 1362,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/utils/calc_sprite_def.py",
+			"settings":
+			{
+				"buffer_size": 7458,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/valen/work/v6z80p_projects/ciotry_gfx/convert_to_gimp_palette.py",
+			"settings":
+			{
+				"buffer_size": 5200,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/User/scons_game.sublime-build",
+	"command_palette":
+	{
+		"height": 369.0,
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: list",
+				"Package Control: List Packages"
+			],
+			[
+				"Package Control: li",
+				"Package Control: List Packages"
+			],
+			[
+				"py",
+				"Set Syntax: Python"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
+				"pytho",
+				"Set Syntax: Python"
+			],
+			[
+				"Package Control: re",
+				"Package Control: Remove Package"
+			],
+			[
+				"disa",
+				"SublimeCodeIntel: Disable Plugin"
+			],
+			[
+				"80",
+				"Build: V6Z80P"
+			],
+			[
+				"test",
+				"Build: Test"
+			],
+			[
+				"c+",
+				"Set Syntax: C++"
+			],
+			[
+				"c#",
+				"Set Syntax: C#"
+			],
+			[
+				"C#",
+				"Set Syntax: C#"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: lis",
+				"Package Control: List Packages"
+			],
+			[
+				"Package Control: insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 521.0
+	},
+	"console":
+	{
+		"height": 103.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/media/valen/space1/V_TEST_01/V_TEST_01.a80",
+		"/media/valen/win_xp2/X-Plane 10 Russia edition/X-Plane 10 Russian edition/Aircraft/some_planes/Heavy Metal/IL96-400/clist.txt",
+		"/home/valen/Programs/LiteScript/LiteScript/README.md",
+		"/home/valen/Programs/LiteScript/test.lite",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/inc/scan_codes.h",
+		"/home/valen/Programs/Nim-0.11.2/bin/nimcache/hello.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/game.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/calc_sprite_def.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/platform/platform.ci",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/engine.ci",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/inc/debug_print.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/base_lib/keyboard.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/user_types.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/obj_bounced.c",
+		"/usr/include/SDL/SDL_keysym.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/platform.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/obj_ship.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/SConscript",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/iar_v6z80p_project.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/SConstruct",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/platform_pc.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/inc/mem_and_io_iar.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/inc/base_lib/keyboard.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/platform_v6.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/SConscript",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/obj_ship.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/serial.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/inc/irq.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/obj_moving.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/obj_bounced.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/game.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/v6_project.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/platform_v6.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/iar/os_interface_for_c/FLOS_.s01",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/uploader.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/inc/macros.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/base_lib/SConscript",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/site_tools/iar_az80.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/iar/putchar/putchar.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/iar/crt/Cstartup.s01",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/debug_print.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/pong/pong.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/Lnkz80.xcl",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/iar/putchar/Putchar.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/inc/mem_and_io_sdcc.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/site_tools/iar_iccz80.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/options_handler.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/site_tools/iar_xlink.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/iar/os_interface_for_c/FLOS_WaitVRT.s01",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/iar/os_interface_for_c/FLOS_WaitVRT.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/c_support/iar/os_interface_for_c/SConscript",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/platform/platform_v6z80p.ci",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/game/Cstartup.s01",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/site_tools/sdcc.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/site_tools/iar.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/build/iar_v6z80p/c_programs/game/obj_bounced.r01.lst",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/site_scons/project_helper.py",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/host.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/behavior.ci",
+		"/home/valen/work/v6z80p_projects/iartry/out/main.lst",
+		"/home/valen/work/v6z80p_projects/iartry/main.lst",
+		"/tmp/List.c",
+		"/tmp/list.h",
+		"/tmp/BitArray.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/build/v6/c_programs/game/game.asm",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/fixed.inc",
+		"/home/valen/.config/sublime-text-2/Packages/User/scons_game.sublime-build",
+		"/home/valen/Programs/cito_examples/recoil-code/recoil.ci",
+		"/home/valen/Programs/cito_examples/asap-3.1.4/asapinfo.ci",
+		"/home/valen/e.ci",
+		"/home/valen/fixed.inc",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/keysym.ci",
+		"/home/valen/engine.ci",
+		"/home/valen/.config/sublime-text-2/Packages/User/scons_valen.sublime-build",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/heap.s",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/inc/set_stack.h",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/_heap.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/game.footer.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/build/v6/c_programs/ciotry/game.final.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/build/pc/c_programs/ciotry/game.final.c",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/build/pc/c_programs/ciotry/game.h",
+		"/home/valen/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/src/ciotry/ciotry.sublime-project",
+		"/tmp/switch.cpp",
+		"/tmp/switch.cpp.after",
+		"/tmp/RawProfiling_before.cpp",
+		"/tmp/RawProfiling_after.cpp",
+		"/tmp/mixedCodeGenerator.cpp",
+		"/tmp/inlineCodeExpander.c",
+		"/tmp/Praktika_poletov_na_samolete_Tu-154.txt",
+		"/tmp/smartcopilot.cfg",
+		"/home/valen/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+		"/home/valen/work/myjob/lev/svn_proj/module/Application/src/Application/Controller/IndexController.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Controller/DealController.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Controller/HistoryController.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/config/module.config.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Controller/HistoryDealController.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Controller/IndexController.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Model/Deal.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/Common/src/Common/Model/BaseModel.php",
+		"/home/valen/work/myjob/lev/myproj/module/Application/view/layout/layout.haml",
+		"/home/valen/work/myjob/lev/myproj/module/Application/view/layout/layout.phtml",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Model/Stock.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/Common/src/Common/Model/BaseManager.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Model/Signal.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Model/Order.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Model/History.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Model/HistoryDeal.php",
+		"/home/valen/work/myjob/lev/svn_proj/module/ChartData/src/ChartData/Model/Event.php",
+		"/home/valen/work/myjob/lev/svn_proj/public/model.php",
+		"/home/valen/work/myjob/lev/myproj/composer.lock",
+		"/home/valen/work/myjob/evgeny/www/users.php",
+		"/home/valen/work/myjob/evgeny/www/summary.php",
+		"/home/valen/work/myjob/evgeny/www/status_report.php",
+		"/home/valen/work/myjob/evgeny/www/edit.php",
+		"/home/valen/work/myjob/evgeny/www/admit_pop_med_aps.php",
+		"/home/valen/work/myjob/evgeny/www/functions.php",
+		"/home/valen/work/myjob/evgeny/www/index.php",
+		"/home/valen/work/myjob/evgeny/www/css/style.css",
+		"/home/valen/work/myjob/evgeny/www/evgeny.sublime-project",
+		"/home/valen/work/myjob/evgeny/www/admin.php",
+		"/home/valen/work/myjob/evgeny/www/css/Новый текстовый документ.txt",
+		"/home/valen/work/myjob/evgeny/www/Новый текстовый документ.txt",
+		"/home/valen/work/myjob/evgeny/www/style.css"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"itemin",
+			"landi",
+			"info",
+			"TMP5",
+			" \n",
+			"out_filename",
+			"las",
+			"depth",
+			"rect",
+			"en",
+			"ent",
+			"enter",
+			"esc",
+			"memset",
+			"Platform_InitVideo",
+			"#include \"platform_v6.h\"",
+			"OBJ_BOUNCED_H",
+			"OBJ_H",
+			"Keyboard_IsPressed",
+			"DEBUG_PRINT",
+			"keyboard.isEvent",
+			"Keyboard_HandleScanCode",
+			"DEBUG_PRINT",
+			"DEBUG_P",
+			"Keyboard_HandleScanCode",
+			"memset",
+			"SYS_IRQ_PS2_FLAGS",
+			"GAME_H",
+			"EXTERN	main",
+			"init_C",
+			"c",
+			"isExitRequested",
+			"sprDraw",
+			"\\",
+			"MACROS_H",
+			"env_lib",
+			"GetUtilFilename",
+			"upload",
+			"OptionsHandler",
+			"Is_SerialPort_CanBeOpened",
+			"GetEnv_SDCC",
+			"NAME",
+			"init_A",
+			"ENDMOD",
+			"init_A",
+			"iar_lib_path",
+			"IAR_V6Z80P_Project_Dependencies",
+			"current_proj",
+			"v6_prj",
+			"v6p_prj",
+			"base_va",
+			"p",
+			"xvel",
+			"x",
+			"$",
+			"src",
+			"all_ci_files",
+			"FIXED",
+			"objs",
+			"heapsize",
+			"heap_size",
+			"heap",
+			"null",
+			"space",
+			"DrawRect",
+			"FillRect",
+			"y",
+			"string",
+			"stri",
+			"keys_pressed",
+			"obj",
+			"obj2",
+			"xvel",
+			"*",
+			"kmod",
+			"kb_",
+			"kb_(.*)=..0x",
+			"kb_(.*)=",
+			"\\/\\*(.*)\\*\\/",
+			"\\/\\*\\*(.*)\\*\\/",
+			"{",
+			"}",
+			"KMOD_(.*)=(.*),",
+			"SDLK_(.*)=(.*),",
+			"SDLK(_.*)=(.*),",
+			"SDLK_(.*)=(.*),",
+			"SDLK(_.*)=(.*),",
+			"SDLK(_.*)=",
+			"(SDLK_).*=",
+			"/*@}*/",
+			"/*@{*/",
+			"Virtual_Behavior_DoBehavior",
+			"Virtual_DoBehavior",
+			"DoBehavior_ClassBehavior",
+			"fixed",
+			"macro",
+			"draw",
+			"Gr12GtiaNibbleToGr8",
+			"freeHardwareSpriteNumber",
+			"InitVideo",
+			"myPlatformGfx",
+			"freeHardwareSpriteNumber",
+			"pdir",
+			"z80pdir",
+			"auto",
+			"med_con_cirn_scores_top1",
+			"medcon",
+			"mecon",
+			"meconci",
+			"scores_1",
+			"medconcirn",
+			"patient:",
+			"patient",
+			"pageb",
+			"botto",
+			"risks reso",
+			"safest ",
+			"result",
+			"bed_row",
+			"mysql_query",
+			"safest_data_entrance_1_2",
+			"m13",
+			"perc",
+			"how_much",
+			"caregiver_n",
+			"pagebre"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"OBJ_MOVING_H",
+			"OBJ_BOUNCED_H",
+			"OBJ_SHIP_H",
+			"KEYBOARD_H",
+			"",
+			"PLATFORM_V6_H",
+			"OBJ_H",
+			"GAME_H",
+			"self",
+			"",
+			"self",
+			"kmod_",
+			"// $1",
+			"const int \\Lkb_$1 = $2;",
+			"const int \\L$1 = $2;",
+			"const int \\U\\1 = $2;",
+			"const int \\U$1 = $2\\E;",
+			"const int \\U$1 = $2;",
+			"const int \\1 = $2;",
+			"const int \\U1 = $2;",
+			"const int \\1 = $2;",
+			"const int $U1 = $2;",
+			"const int U$1 = $2;",
+			"const int $1 = $2;",
+			"const int $1 = $2",
+			"const int $1$2",
+			"const int $1 = $2",
+			"$2",
+			"$1",
+			"",
+			"Virtual_MovingBehavior_DoBehavior",
+			"Virtual_Behavior_DoBehavior",
+			"Virtual_DoBehavior"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 7,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "platform_v6.c",
+					"settings":
+					{
+						"buffer_size": 6905,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5255,
+								5255
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3056.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "game.h",
+					"settings":
+					{
+						"buffer_size": 528,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								320,
+								320
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "platform_pc.c",
+					"settings":
+					{
+						"buffer_size": 7020,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2552,
+								2552
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1727.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "platform.h",
+					"settings":
+					{
+						"buffer_size": 811,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								782,
+								782
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "obj_moving.h",
+					"settings":
+					{
+						"buffer_size": 654,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								341,
+								341
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "obj_ship.c",
+					"settings":
+					{
+						"buffer_size": 1362,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1338,
+								1338
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 162.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/home/valen/sharedFolder1/v6z80p-code/trunk/Contributions/Valen/c_programs/utils/calc_sprite_def.py",
+					"settings":
+					{
+						"buffer_size": 7458,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7077,
+								7077
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3213.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/home/valen/work/v6z80p_projects/ciotry_gfx/convert_to_gimp_palette.py",
+					"settings":
+					{
+						"buffer_size": 5200,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2128,
+								2128
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 765.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 358.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"fu",
+				"functions.php"
+			],
+			[
+				"func",
+				"functions.php"
+			],
+			[
+				"indx",
+				"index.php"
+			],
+			[
+				"style",
+				"css/style.css"
+			],
+			[
+				"adm.php",
+				"admin.php"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 126.0,
+	"status_bar_visible": true
+}

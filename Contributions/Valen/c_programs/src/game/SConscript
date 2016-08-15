@@ -1,0 +1,101 @@
+# Game
+
+# Project targets: iar v6z80p, pc
+
+import getpass
+import platform
+
+
+# Build this project only  on valen's Linux machine (home computer).
+# (because this proj is not finished!)
+do_build = False
+if platform.system() == 'Linux':
+    if getpass.getuser() == 'valen':
+        do_build = True
+
+if do_build == False:
+    Return('') # RETURT AND NOT BUILD ! 
+
+
+
+# -------------------------------------------
+import re
+import os
+from  project_helper import Project_Helper
+
+   
+# this proj, will build only for iar and pc
+if Project_Helper.Is_Target_IAR_V6Z80P() == False and Project_Helper.Is_Target_PC() == False:
+    Return('')
+
+    
+if Project_Helper.Is_Target_PC():
+    Import('current_project')
+    current_proj = current_project
+    env = current_proj.env
+    
+    # platformSourceFile = ['platform/platform.ci']
+    proj_libs = ['SDL', 'SDL_gfx']
+
+    basedir          = current_proj.basedir
+    base_variant_dir = current_proj.base_variant_dir
+
+if Project_Helper.Is_Target_IAR_V6Z80P():
+    # current_project - IAR Project object 
+    Import('current_project')    
+
+    current_project.name     = 'game'
+    # current_project.linkopt  = '--code-loc 0x5A80 --data-loc 0'
+    # current_project.stack    = '0xffff'
+    #current_project.heapsize = '1024'     # uncomment this line, if you realy need a heap
+
+    # In this project we need only sdcc environment  (to compile C source files)
+    env = current_project.env
+    # platformSourceFile = ['platform/platform_v6z80p.ci']
+    basedir = current_project.basedir
+
+
+proj_dir  = basedir + 'src/game'
+#build_dir = base_variant_dir + 'game'
+
+
+#all_c_files = Glob(proj_dir + '/*.c')
+all_c_files = ['game.c', 'obj_bounced.c', 'obj_ship.c', ]
+
+
+
+if Project_Helper.Is_Target_PC():    
+    objs = env.Object( all_c_files + ['platform_pc.c'],
+                    CPPPATH     = env['CPPPATH']           + ['/usr/include'],
+                    CPPDEFINES  =  [{'PC' : ''}]
+                                        
+                    )
+
+if Project_Helper.Is_Target_IAR_V6Z80P():
+
+    # compile user .c files to object files
+    objs = env.Object(   all_c_files + ['platform_v6.c']
+                                ,
+                    CCFLAGS     = env['CCFLAGS']           + ['-uua', '-s9', ''],  
+                    # CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : current_project.stack}]
+                    )
+    
+    env.Append(LINKFLAGS='-f ' + proj_dir + '/Lnkz80.xcl')
+    env.Append(LINKFLAGS=current_project.iar_lib_path + '/clz80.r01')   # we use non banked iar lib
+
+
+
+
+
+if Project_Helper.Is_Target_PC():
+    final_exe = env.Program(target='game', source=objs, LIBS = proj_libs )
+
+if Project_Helper.Is_Target_IAR_V6Z80P():
+    # link to .a01 and convert .a01 to .exe
+    final_exe = current_project.FLOS_Program(objs)
+    env.Depends(current_project.file_ihx, 'Lnkz80.xcl')    
+    current_project.uploader.Upload(final_exe)
+    
+    # env.Program(current_project.name , objs)
+
+
