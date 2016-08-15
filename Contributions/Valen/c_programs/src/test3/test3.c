@@ -12,7 +12,8 @@ char myFileBuf[4096];
 char myTestString[128];
 
 
-#ifdef SDCC
+
+#if defined(SDCC) || defined(__SDCC)
     #include <kernal_jump_table.h>
     #include <v6z80p_types.h>
     #include <OSCA_hardware_equates.h>
@@ -78,7 +79,12 @@ BOOL test3(void);
 
 
 int main(void) {
-#ifndef SDCC
+
+#if defined(SDCC) || defined(__SDCC)
+    test0(); test1(); test2(); test3();
+    return NO_REBOOT;
+
+#else
     dir = getenv("v6z80pdir");
     //printf("%s \n", dir); 
     strcat (myFilename, dir);
@@ -88,11 +94,10 @@ int main(void) {
     strcat (myFilenameW, path_for_txt);
 
     //printf("%s \n", myFilenameW); 
-    //exit(0);
+    //exit(0);  
 #endif
 
-    test0(); test1(); test2(); test3();
-    return NO_REBOOT;
+
 }
 
 
@@ -122,7 +127,7 @@ BOOL test1(void)
     FILE *f;
     //size_t r = 1;
     WORD sum = 0;
-    DWORD arr[] = {SEEK_SET,0,100,      SEEK_SET,200,100,   SEEK_SET,300,100,
+    long arr[] = {SEEK_SET,0,100,      SEEK_SET,200,100,   SEEK_SET,300,100,
                    SEEK_CUR,0,100,      SEEK_CUR,200,100,   SEEK_CUR,300,100,
                    SEEK_END,-100,100,   SEEK_END,-200,100,  SEEK_END,-300,100,
                    -1};

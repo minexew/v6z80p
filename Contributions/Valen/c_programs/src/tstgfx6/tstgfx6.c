@@ -166,3 +166,9 @@ int main(void)
 
     return REBOOT;
 }
+
+void putchar(char c)
+{
+
+
+}
