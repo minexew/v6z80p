@@ -2,6 +2,12 @@
 
 import getpass
 import platform
+from  project_helper import Project_Helper
+
+
+Return('')
+
+
 
 
 # Build this project only  on valen's Linux machine (home computer).
@@ -15,6 +21,9 @@ if do_build == False:
     Return('') # RETURT AND NOT BUILD ! 
 
 
+# this proj, will build only for sdcc and pc
+if Project_Helper.Is_Target_V6Z80P() == False and Project_Helper.Is_Target_PC() == False:
+    Return('')
 
 # -------------------------------------------
 import re
@@ -44,31 +53,67 @@ def ReplaceMallocFunc_In_C_File(target, source, env):
     
     
 if Project_Helper.Is_Target_PC():
-    Import('pc_prj')
-    current_proj = pc_prj
-    env = pc_prj.env
+    Import('current_project')
+    current_proj = current_project
+    env = current_project.env
     
     platformSourceFile = ['platform/platform.ci']
     proj_libs = ['SDL', 'SDL_gfx']
-else:
-    # v6_prj - V6 Project object 
-    Import('v6_prj')
-    current_proj = v6_prj
 
-    v6_prj.name     = 'ciotry'
-    v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0'
-    v6_prj.stack    = '0xffff'
-    # v6_prj.heapsize = '0'     # uncomment this line, if you realy need a heap
+    basedir          = current_proj.basedir
+    base_variant_dir = current_proj.base_variant_dir
+else:
+    # current_project - V6 Project object 
+    Import('current_project')
+    current_proj = current_project
+
+    current_project.name     = 'ciotry'
+    current_project.linkopt  = '--code-loc 0x5A80 --data-loc 0'
+    current_project.stack    = '0xffff'
+    #current_project.heapsize = '1024'     # uncomment this line, if you realy need a heap
 
     # In this project we need only sdcc environment  (to compile C source files)
-    env = v6_prj.env
+    env = current_project.env
     platformSourceFile = ['platform/platform_v6z80p.ci']
+    basedir = current_project.basedir
+    base_variant_dir = current_project.base_variant_dir
 
-# generate .c file , from all *.ci files (and apply valen patch on the generated C souce file)
-game_c = env.Command('game.c', Glob('*.ci') + platformSourceFile, "cito -l c -o $TARGET  $SOURCES"
+
+proj_dir  = basedir + 'src/ciotry'
+build_dir = base_variant_dir + 'ciotry'
+
+
+all_ci_files = Glob(proj_dir + '/*.ci') + \
+               Glob(proj_dir + '/' +  platformSourceFile[0])
+
+
+
+# Some times (then error occured), the expander.py is produced a target file with a 0 length. So perform check and delete founded files (with zero length).
+for o in Glob('_*.ci'):
+    if hasattr(o, "get_size") and callable(o.get_size):        
+        if o.get_size() == 0:        
+            os.remove( o.get_abspath() )
+
+
+# 1. call macro processor for every .ci file in the project.
+opt = '-I ' + proj_dir
+all_ci_files_processed = []
+for src in all_ci_files:
+    res = env.Command('_${SOURCE.name}', src, 'expander.py ' + opt + ' $SOURCE > $TARGET')        
+    Project_Helper.SetProgressMessageForNode(res[0], '------------- Macro process CIO files ---------')
+    all_ci_files_processed.append( res )
+Depends(all_ci_files_processed, 'fixed.inc')
+
+
+
+#exit()
+
+
+# 2. Generate .c file , from all *.ci files (and apply valen patch on the generated C souce file)
+game_c = env.Command('game.c', all_ci_files_processed, "cito -l c -o $TARGET  $SOURCES"
         + " && " + current_proj.basedir + "src/ciotry/change_text.php $TARGET"
 )
-game_c[0].my_progress_message = '------------- Generate C file  from CIO files ---------'
+Project_Helper.SetProgressMessageForNode(game_c[0], '------------- Generate C file  from CIO files ---------')
 
 
 game1_c = env.Command('game1.c', game_c, ReplaceMallocFunc_In_C_File)
@@ -84,11 +129,16 @@ if Project_Helper.Is_Target_PC():
                                         
                     )
 else:
+    env_sdasz80 = current_project.env_sdasz80
+    obj_heap = env_sdasz80.Object('heap.s')
+
     # compile user .c files to object files
     objs = env.Object(   [game_c_final, 'host.c'],                     
-                    CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed'],  
-                    CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : v6_prj.stack}]
+                    CCFLAGS     = env['CCFLAGS']           + ['--std-sdcc99', '--opt-code-speed', '--max-allocs-per-node 3000'],  
+                    CPPDEFINES  = env['CPPDEFINES']        + [{'OWN_SP' : current_project.stack}]
                     )
+
+    objs = objs + obj_heap
 
 # here, for some reason, the scons cant make auto depend 
 # so, we need to set depend manualy
@@ -99,8 +149,8 @@ if Project_Helper.Is_Target_PC():
     final_exe = env.Program(target='ciotry', source=objs, LIBS = proj_libs )
 else:
     # link to .ihx and convert .ihx to .exe
-    final_exe = v6_prj.FLOS_Program(objs)
-    v6_prj.Upload(final_exe)
+    final_exe = current_project.FLOS_Program(objs)
+    current_project.Upload(final_exe)
 
 
 

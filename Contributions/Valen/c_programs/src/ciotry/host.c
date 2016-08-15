@@ -41,17 +41,23 @@ Startup *startup;
 extern void ValenPatch_init_virt_tables(void);
 
 #ifdef SDCC
+extern char _sdcc_heap_start;
+extern char _sdcc_heap_end;
+
 int main(void)
 #else
 int main(int argc, char *argv[])
 #endif
 {
-    
+#ifdef SDCC
+    unsigned int heap_size = &_sdcc_heap_end - &_sdcc_heap_start;
+#endif
     
     DEBUG_PRINT("CIOTRY started...\n");
     ValenPatch_init_virt_tables();
 #ifdef SDCC
     _sdcc_heap_init();
+    DEBUG_PRINT("SDCC heap size %i \n",heap_size);
 #endif
 
     startup = Startup_New();    

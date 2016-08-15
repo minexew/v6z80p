@@ -10,13 +10,14 @@ Import('v6_prj')
 v6_prj.name     = 'test0'
 v6_prj.linkopt  = '--code-loc 0x5A80 --data-loc 0'
 v6_prj.stack    = '0xffff'
-# v6_prj.heapsize = '0'     # uncomment this line, if you realy need a heap
+#v6_prj.heapsize = '1800'     # uncomment this line, if you realy need a heap
 
-# There are total 3  environments : 
+# There are total 3  pre-defined environments : 
 # 1. sdcc 2. pasmo 3. sdasz80
 
 # In this project we need only sdcc environment  (to compile C source files)
 env = v6_prj.env
+
 
 
 # compile user .c files to object files
@@ -28,6 +29,7 @@ objs = env.Object(   ['test0.c'],
 # link to .ihx and convert .ihx to .exe
 final_exe = v6_prj.FLOS_Program(objs)
 
+
 # Let's, for example,  send FLOS exe to V6 board.
 
 # Upload FLOS exe file to V6Z80P 
@@ -36,6 +38,7 @@ final_exe = v6_prj.FLOS_Program(objs)
 # TODO: add second boolean param to Upload() func. True - always upload, False - upload only if file (target) was re-builded
 #
 v6_prj.Upload(final_exe)
+
 
 
 

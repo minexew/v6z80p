@@ -4,6 +4,7 @@
 // Lib:  
 
 
+// Some methods are static, others are  non static.
 public class PlatformGfx
 {
     byte freeHardwareSpriteNumber;
@@ -22,12 +23,12 @@ public class PlatformGfx
             FLOS_WaitVRT();            
             SpritesRegsBuffer_CopyToHardwareRegs();         // must be called right after FLOS_WaitVRT()
             SpritesRegsBuffer_Clear();                      // clear sprite regs shadow buffer
-            // now you can can main game code                        
+            // now you can do main game code                        
         }
         
         
         //int color; native { color = RGB2WORD(255,128,255); }
-        //SetBorder(color);
+        SetBorder(0xff);
         
         freeHardwareSpriteNumber = 0;
     } 
@@ -83,28 +84,7 @@ public class PlatformGfx
         
         int w = 32;
         int h = 32;
-        native {
-            sprite_regs_t r;
-        }
-        byte sprNumber = GetFreeHardwareSpriteNumber();
-        if(sprNumber == InvalidSpriteNumber) {
-            Debug.Print("GameObj.Draw() FAILED, no HW spr number avail. Got InvalidSpriteNumber. \n");
-            return;
-        }
-        
-        //int color = 16;
-        //FillRect(x, y, w, h, color);
-        
-        native {
-            //DEBUG_PRINT("HW spr number = %u \n", sprNumber);
-            r.sprite_number            = sprNumber;
-            r.x                        = x;
-            r.y                        = y;
-            r.height                   = 1;                       // 16 pixels tall       (height in 16pixels chunks)
-            r.sprite_definition_number = 0;
-            r.x_flip                   = FALSE;
-            SpritesRegsBuffer_SetSpriteRegs(&r);
-        }
+
     }     
     
     
@@ -196,9 +176,11 @@ public class PlatformInput
 {
     // --------------------- Input -----------------------
 
+    int foo;
+    
     // Return: false - need to exit to OS
     //         true - all ok
-    public static bool HandleInput()
+    public bool HandleInput()
     {
         int isExit = 0;
         native {
@@ -207,5 +189,73 @@ public class PlatformInput
         
         return  true;
     }
+
+    public bool IsKeyPressed(int keySym)
+    {
+        return false;
+    }
 }
 
+
+public class Sprite
+{
+    int foo;
+    
+
+    Sprite()
+    {
+        Debug.Print("Sprite()\n");  
+
+    }    
+
+
+    public void LoadFromImageFile(string filename)
+    {
+        native {
+            filename;
+        }
+
+    }
+
+    public void SetSrcImageRect(int x, int y, int w, int h)
+    {
+        
+        native {
+            x; y; w; h;
+        }
+
+    }
+
+    public void DrawGameObj(GameObj game_obj)
+    {
+        int x = game_obj.x; 
+        int y = game_obj.y;
+
+        native {
+            sprite_regs_t r;
+        }
+        byte sprNumber = game_obj.engine.myPlatformGfx.GetFreeHardwareSpriteNumber();
+        if(sprNumber == PlatformGfx.InvalidSpriteNumber) {
+            Debug.Print("Sprite.DrawGameObj() FAILED, no HW spr number avail. Got InvalidSpriteNumber. \n");
+            return;
+        }
+        
+        //int color = 16;
+        //FillRect(x, y, w, h, color);
+        
+        native {
+            //DEBUG_PRINT("HW spr number = %u \n", sprNumber);
+            r.sprite_number            = sprNumber;
+            r.x                        = x;
+            r.y                        = y;
+            r.height                   = 1;                       // 16 pixels tall       (height in 16pixels chunks)
+            r.sprite_definition_number = 0;
+            r.x_flip                   = FALSE;
+            SpritesRegsBuffer_SetSpriteRegs(&r);
+        }
+
+
+
+    }
+
+}

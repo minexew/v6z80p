@@ -1,6 +1,10 @@
-void irq_handler() NAKED;
+
 void install_irq_handler(byte irq_enable_mask);
 
+
+
+#if defined(SDCC) || defined(__SDCC)
+void irq_handler() NAKED;
 // This is main IRQ handler.
 // It will route call to specific functions.
 void irq_handler() NAKED
@@ -39,6 +43,23 @@ void irq_handler() NAKED
     ENDASM()
 
 }
+#endif
+
+
+#ifdef __IAR_SYSTEMS_ICC__
+interrupt void irq_handler(void);
+interrupt void irq_handler(void)
+{
+
+#ifdef APP_USE_OWN_KEYBOARD_IRQ
+    if(io__sys_irq_ps2_flags & 1)   // Read irq status flags. Keyboard irq set?
+        Keyboard_IRQ_Handler();     // call keyboard irq routine if so
+#endif
+
+
+}
+#endif
+
 
 void install_irq_handler(byte irq_enable_mask)
 {
