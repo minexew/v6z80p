@@ -8,36 +8,64 @@
 # Valen 2009-2014
 
 import os
-from  v6_project import V6_Project
-from  pc_project import PC_Project
+from  v6_project            import V6_Project
+from  iar_v6z80p_project    import IAR_V6Z80P_Project
+from  pc_project            import PC_Project
 from  project_helper import Project_Helper
+
 
 
 if Project_Helper.Is_Target_PC():
     print "*** Build for PC ..."
-    pc_prj = PC_Project()
-    pc_prj.SetupEnv()
-    variantBaseDir = pc_prj.base_variant_dir
-    v6_prj = None
-else:
-    print "***  Build for V6Z80P ..."
+    current_project = PC_Project()
+    current_project.SetupEnv()
+    variantBaseDir = current_project.base_variant_dir
+    
+
+if Project_Helper.Is_Target_IAR_V6Z80P():
+    print "***  Build for IAR V6Z80P ..."
     #
-    v6_prj = V6_Project()
-    if  v6_prj.Init() == False:    
+    current_project = IAR_V6Z80P_Project()
+    if  current_project.Init() == False:    
         Exit()
-    v6_prj.SetupEnv()
-    if v6_prj.checker.Init(v6_prj) == False:
+    current_project.SetupEnv()
+    if current_project.checker.Init(current_project) == False:
         Exit()
 
-    bdir = v6_prj.basedir
+    bdir = current_project.basedir
+    variantBaseDir = current_project.base_variant_dir
 
-    variantBaseDir = v6_prj.base_variant_dir
-    SConscript([bdir + '/c_support/crt/SConscript'],                  exports='v6_prj', variant_dir=variantBaseDir + '/c_support/crt/', duplicate=0)
-    SConscript([bdir + '/c_support/os_interface_for_c/SConscript'],   exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_interface_for_c/', duplicate=0)
-    SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='v6_prj', variant_dir=variantBaseDir + '/c_support/os_proxy/', duplicate=0)
-    SConscript([bdir + '/c_support/stdio_v6z80p/SConscript'],         exports='v6_prj', variant_dir=variantBaseDir + '/c_support/stdio_v6z80p/', duplicate=0)
-    SConscript([bdir + '/c_support/base_lib/SConscript'],         exports='v6_prj', variant_dir=variantBaseDir + '/c_support/base_lib/', duplicate=0)
-      
+    SConscript([bdir + '/c_support/iar/crt/SConscript'],                  exports='current_project', variant_dir=variantBaseDir + '/c_support/crt/', duplicate=0)
+    SConscript([bdir + '/c_support/iar/os_interface_for_c/SConscript'],   exports='current_project', variant_dir=variantBaseDir + '/c_support/os_interface_for_c/', duplicate=0)
+    SConscript([bdir + '/c_support/base_lib/SConscript'],                 exports='current_project', variant_dir=variantBaseDir + '/c_support/base_lib/', duplicate=0)
+    SConscript([bdir + '/c_support/iar/putchar/SConscript'],              exports='current_project', variant_dir=variantBaseDir + '/c_support/iar/putchar/', duplicate=0)
+    # print "iar: exited ok yoyo "
+    # Exit()
+
+if Project_Helper.Is_Target_V6Z80P():
+    print "***  Build for SDCC V6Z80P ..."
+    #
+    current_project = V6_Project()
+    if  current_project.Init() == False:    
+        Exit()
+    current_project.SetupEnv()
+    if current_project.checker.Init(current_project) == False:
+        Exit()
+
+    bdir = current_project.basedir
+    variantBaseDir = current_project.base_variant_dir
+
+    v6_prj = current_project    # alias
+
+
+    SConscript([bdir + '/c_support/crt/SConscript'],                  exports='current_project v6_prj', variant_dir=variantBaseDir + '/c_support/crt/', duplicate=0)
+    SConscript([bdir + '/c_support/os_interface_for_c/SConscript'],   exports='current_project v6_prj', variant_dir=variantBaseDir + '/c_support/os_interface_for_c/', duplicate=0)
+    SConscript([bdir + '/c_support/os_proxy/SConscript'],             exports='current_project v6_prj', variant_dir=variantBaseDir + '/c_support/os_proxy/', duplicate=0)
+    SConscript([bdir + '/c_support/stdio_v6z80p/SConscript'],         exports='current_project v6_prj', variant_dir=variantBaseDir + '/c_support/stdio_v6z80p/', duplicate=0)
+    SConscript([bdir + '/c_support/base_lib/SConscript'],             exports='current_project v6_prj', variant_dir=variantBaseDir + '/c_support/base_lib/', duplicate=0)
+
+
+        
   
 
             
@@ -50,9 +78,14 @@ for projectSconscript in files:
     #print projectDir
     projectName = os.path.split(projectDir)[1]
     #print projectName
-    if Project_Helper.Is_Target_PC():
-        SConscript([projectSconscript], exports='pc_prj', variant_dir=variantBaseDir + projectName, duplicate=0)
+    if Project_Helper.Is_Target_V6Z80P():
+        varsForExport = 'current_project v6_prj'
     else:
-        SConscript([projectSconscript], exports='v6_prj', variant_dir=variantBaseDir + projectName, duplicate=0)
-        
+        varsForExport = 'current_project'
+
+
+    SConscript([projectSconscript], exports=varsForExport,     variant_dir=variantBaseDir + projectName, duplicate=0)
+
+
+
       
