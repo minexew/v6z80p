@@ -1,4 +1,4 @@
-SDCC problem (error)
+some old SDCC problem (error)
 
             set_sprite_regs(50/*+this->offset*/, this->gobj.x /*+ i*16*/,  this->gobj.y, 
                             this->spr_height, 

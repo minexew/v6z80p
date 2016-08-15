@@ -4,9 +4,25 @@
 // Lib:  SDL
 
 
+$include("fixed.inc")
+
+
+public class Rect
+{
+    int x;
+    int y;
+    
+    int w;
+    int h;
+}
+
+
 public class PlatformGfx
 {
-    // private
+    int foo;
+    
+
+
     static void ClearScreen()
     {
         native {
@@ -17,7 +33,7 @@ public class PlatformGfx
 
     // --------------------- Gfx -----------------------
 
-   public static void OnGameLoopBegin()
+   public void OnGameLoopBegin()
     { 
         native {
             if (SDL_Flip(screen_scaled) != 0) {
@@ -29,7 +45,7 @@ public class PlatformGfx
        PlatformGfx.ClearScreen();
     } 
     
-    public static void OnGameLoopEnd()
+    public void OnGameLoopEnd()
     { 
         native {
             assert(screen);
@@ -87,26 +103,38 @@ public class PlatformGfx
         }
     }  
 
-    public static void Draw(GameObj obj)
+    public void Draw(GameObj obj)
     {
-        int x = obj.x;
-        int y = obj.y;
+        int x = obj.x >> $FIXED_BITS;
+        int y = obj.y >> $FIXED_BITS;
         
         int w = obj.width;
         int h = obj.height;
         
         //int color = 16;
-        //FillRect(x, y, w, h, color);        
-        DrawRect(x, y, w, h,    255,255,255);        
+        //FillRect(x, y, w, h, color);
+        Rect() rc;
+        rc.x = x;
+        rc.y = y;
+        
+        if(obj.sprite.rcSource.w == 0 && obj.sprite.rcSource.h == 0) {
+            rc.w = obj.width;
+            rc.h = obj.height;
+        }
+        else {
+            rc.w = obj.sprite.rcSource.w;
+            rc.h = obj.sprite.rcSource.h;
+        }
+        DrawRect(rc,   255,255,255);        
     }     
     
-    public static void FillRect(int x, int y, int w, int h, int color)
+    public static void FillRect(Rect rc, int color)
     {
         native {
             static int mycolor = 0;
             mycolor++;
             
-            SDL_Rect rect = {x,y,w,h};
+            SDL_Rect rect = {rc->x, rc->y, rc->w, rc->h};
             SDL_FillRect(screen, &rect, mycolor);
             
             //printf("mycolor = %i \n", mycolor);
@@ -114,12 +142,13 @@ public class PlatformGfx
    
     }
     
-    public static void DrawRect(int x, int y, int w, int h,
+    public static void DrawRect(Rect rc,
                             int r, int g, int b)
     {
         native {
             //SDL_Rect rect = {x,y,w,h};
-            rectangleRGBA(screen, x,y, x + w, y + h,
+            rectangleRGBA(screen,   rc->x, rc->y, 
+                                    rc->x + rc->w, rc->y + rc->h,
                         r, g, b,   255);
         }
 
@@ -128,22 +157,79 @@ public class PlatformGfx
 
 public class PlatformInput
 {
+    int foo;
+    // int[10]  sym;    
+    // byte[10] is_pressed;
+
+    int[10]  keys_pressed; // array for pressed keys
+
+
     // --------------------- Input -----------------------
+
+    PlatformInput()
+    {        
+        keys_pressed.Clear();
+    }
 
     // Return: false - need to exit to OS
     //         true - all ok
-    public static bool HandleInput()
+    public bool HandleInput()
     {
+        foo = 1;        // we need do write to any class field (var) and thus make 'self' pointer (generated in C file) non const
         int isExit = 0;
+        // sym.Clear();    // clear old keys
+        // is_pressed.Clear();
+
+
+
+        
+
         native {
             
             SDL_Event event;
+            int i = 0;
+            int k = 0;
+            int cur_sym = 0;
+            // const int sym_len = sizeof(self->sym)/sizeof(int);
+            // printf("aa %i \n", sym_len); exit(0);
+
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                     case SDL_QUIT: {
                         isExit = 1;
                     }
-                    case SDL_KEYDOWN: {
+                    case SDL_KEYDOWN:
+                    case SDL_KEYUP: {
+                        SDL_KeyboardEvent *e = &event.key;
+                        // if(i < sym_len) {
+                        //     self->sym[i]        = /*(unsigned short)*/ event.key.keysym.sym;
+                        //     self->is_pressed[i] = (event.type == SDL_KEYDOWN) ?  1 :  0;
+                        //     i++;
+                        // }
+
+                        
+                        cur_sym = event.key.keysym.sym;
+                        const int len2 = sizeof(self->keys_pressed)/sizeof(int);
+                        // printf("aa %i \n", len2); exit(0);
+                        if(event.type == SDL_KEYDOWN) {
+                            // find free slot and put pressed key in this free slot                                
+                            for (k = 0; k < len2; k++)
+                                if(self->keys_pressed[k] == 0) {
+                                    self->keys_pressed[k] = cur_sym;
+                                    // printf("k = %i, sym = %i \n", k, cur_sym);
+                                    break;
+                                }
+                        }
+                        if(event.type == SDL_KEYUP) {
+                            // find slot, with the key and make finded slot a free slot
+                            for (k = 0; k < len2; k++)
+                                if(self->keys_pressed[k] == cur_sym) {
+                                    self->keys_pressed[k] = 0;
+                                    // printf("kk = %i, sym = %i \n", k, cur_sym);
+                                    break;
+                                }
+                        }
+                        
                         break;
                     }
                 }
@@ -152,4 +238,124 @@ public class PlatformInput
         
         return (isExit == 1) ? false : true;
     }
+
+    public bool IsKeyPressed(int keySym)
+    {
+     
+        for(byte i = 0; i < keys_pressed.Length; i++)
+            if(keys_pressed[i] != 0)
+                // check if a pressed key, is a key what we are looking for
+                if(keys_pressed[i] == keySym) return true;
+
+        return false;
+    }
+    
 }
+
+public class Sprite
+{
+    byte[]   spriteSurface;     // SDL sprite surf
+    Rect()   rcSource;
+    
+
+    Sprite()
+    {
+        Debug.Print("Sprite()\n");  
+
+        rcSource.x = rcSource.y = rcSource.w = rcSource.h = 0;
+        spriteSurface = null;
+
+    }    
+
+
+    public void LoadFromImageFile(string filename)
+    {
+        spriteSurface = null;
+
+        native {
+            SDL_Surface *temp, *sprite;
+            int colorkey;
+
+            // printf("SDL_yoyo \n");
+
+            /* load sprite */
+            temp   = SDL_LoadBMP(filename);            
+            if(temp == NULL) {
+                printf("SDL_LoadBMP falied. %s \n", SDL_GetError());
+                exit(1);
+            }
+            // printf("SDL_yoyo  2\n");
+
+            sprite = SDL_DisplayFormat(temp);
+
+            // printf("SDL_yoyo  3\n");
+            assert(sprite);
+            SDL_FreeSurface(temp);
+
+            self->spriteSurface = (unsigned char *) sprite;
+
+            // printf("SDL_yoyo  4\n");
+            /* setup sprite colorkey and turn on RLE */
+            colorkey = SDL_MapRGB(screen->format, 255, 0, 255);
+            // printf("SDL_yoyo  5\n");
+            SDL_SetColorKey(sprite, SDL_SRCCOLORKEY | SDL_RLEACCEL, colorkey);
+
+        }
+    }
+
+    public void SetSrcImageRect(int x, int y, int w, int h)
+    {
+        
+        rcSource.x = x;
+        rcSource.y = y;
+        
+        rcSource.w = w;
+        rcSource.h = h;
+
+
+    }
+
+    public void DrawGameObj(GameObj game_obj)
+    {
+        int x = game_obj.x >> $FIXED_BITS;
+        int y = game_obj.y >> $FIXED_BITS;
+        
+
+        if(spriteSurface == null)
+            return;
+
+        if(rcSource.x == 0 && rcSource.y == 0  &&  rcSource.w == 0 && rcSource.h == 0)
+            return;
+
+
+        native {
+            SDL_Surface *sprite = NULL;        //, *temp, *sprite, *grass;            
+            
+            /* source and destination rectangles */
+            SDL_Rect rcSrc, rcSprite;
+
+            sprite = (SDL_Surface *) self->spriteSurface;
+
+            /* set sprite position */
+            rcSprite.x = x;
+            rcSprite.y = y;
+
+
+
+            /* set animation frame */
+            rcSrc.x = self->rcSource.x;
+            rcSrc.y = self->rcSource.y;
+            
+            rcSrc.w = self->rcSource.w;
+            rcSrc.h = self->rcSource.h;
+
+            // printf("SDL_ sprite  %i, screen  %i \n", sprite, screen);
+            /* draw the sprite */
+            SDL_BlitSurface(sprite, &rcSrc, screen, &rcSprite);
+
+        }
+
+    }
+
+}
+

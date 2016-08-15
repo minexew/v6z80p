@@ -16,6 +16,7 @@ v0.05:
 - added disk error diagnostic (Gracefully exits to FLOS:  restore FLOS display and font and print error.)
 v0.06:
 - load all pong files (resources) from one big bulk file (.DAT file)
+- updated to SDCC 3.6
 */
 
 
@@ -574,8 +575,10 @@ void Game_EnableMatteMode(BOOL isEnable)
 
 
 // --------------
-void putchar(char c)
+int putchar(int arg)
 {
+    // TODO: retturn value
+    unsigned char c = arg;
     BYTE str[2];
 
     str[0] = str[1] = 0;
