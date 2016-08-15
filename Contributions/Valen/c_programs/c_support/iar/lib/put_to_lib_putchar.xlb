@@ -1,0 +1,3 @@
+def-cpu z80
+rep-mod putchar clz80
+exit

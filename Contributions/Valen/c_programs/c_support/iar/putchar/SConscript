@@ -1,0 +1,5 @@
+#  make rules
+Import('current_project')
+
+current_project.depend.Make_putchar_Obj()
+
