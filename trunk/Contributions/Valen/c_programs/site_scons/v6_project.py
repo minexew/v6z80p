@@ -9,7 +9,10 @@ import serial
 import ConfigParser             # to read ini file
 from SCons.Script import *
 
-from  project_helper import Project_Helper
+
+from  project_helper    import Project_Helper
+from  uploader          import Uploader   
+from  options_handler   import Project_OptionsHandler, Project_PlatformInfo
 
 class V6_Project(object):
     def __init__(self):                      
@@ -23,45 +26,37 @@ class V6_Project(object):
         #exit()
         
         
-        self.depend  = V6_Project_Dependencies()
+        self.depend          = V6_Project_Dependencies()
         self.depend.Init(self)
+
+        self.uploader        = Uploader()
+        self.uploader.Init(self)  
+
+        self.platform        = Project_PlatformInfo()
+        self.platform.Init(self)          
         
         self.checker         = V6_Project_SystemChecker()
-        self.options_handler = V6_Project_OptionsHandler()  
+        self.options_handler = Project_OptionsHandler()  
+
         self.misc_tools      = V6_Project_MiscTools()
         
-        self.utilFilename_xd     = self.GetUtilFilename('xd')
-        self.utilFilename_sendv6 = self.GetUtilFilename('sendv6')
+        self.utilFilename_xd     = self.platform.GetUtilFilename('xd')
+        self.utilFilename_sendv6 = self.platform.GetUtilFilename('sendv6')
         
-        # this files (objects) will be passed to link command
-        # NOTE: CRT object file (crt0_v6z80p) must be first in this list!! 
-        ## c_support/crt/obj/crt0_v6z80p.rel     c_support/os_interface_for_c/obj/i_flos.rel c_support/os_proxy/obj/flos_proxy_code.rel        
-        #self.link_objects = Split("""                                                
-        #""")
-        #for i in range(len(self.link_objects)):
-            #self.link_objects[i] = self.basedir + self.link_objects[i]
-        
-    #self._stack = None   
-    #def get_stack(self):
-        #return self._stack
-    #def set_stack(self, stack):
-        #self._stack = stack        
-        ##self.env.Append(CPPDEFINES = [{'OWN_SP' : self._stack}])
-        ##print 'dddddddddddddddddddddd'
-    #stack = property(get_stack, set_stack) 
+
+        # register our own scons progress function
+        Progress(progress_function)
+
 
 
     def Init(self):
-      
-        
-        
-        
+ 
         return True
     
     """This func will be called from SConscript file."""
-    def FLOS_Program(self, objs):       
-        objs[0].my_progress_message = '------------- Compile user files ---------'
-        
+    def FLOS_Program(self, objs):               
+        Project_Helper.SetProgressMessageForNode(objs[0], '------------- Compile user files ---------')
+                
         obj_heap = self.MakeHeapObj()
         self.obj_proj_info = self.Make_ProjectInfo_Obj()
         # 
@@ -71,9 +66,11 @@ class V6_Project(object):
         #print ' ======= ' + variant_dir
         
         # NOTE: CRT object file (crt0_v6z80p) must be first in this sources list!!!
-        file_ihx = self.env.Program(self.name , self.depend.obj_crt + self.depend.obj_iflos
-                    + self.depend.obj_flosproxy
-                    + obj_heap + objs, LINKFLAGS=self.env['LINKFLAGS'] + self.linkopt,
+        file_ihx = self.env.Program(self.name , 
+                    self.depend.obj_crt +
+                    self.depend.obj_iflos +
+                    self.depend.obj_flosproxy +
+                    obj_heap + objs, LINKFLAGS=self.env['LINKFLAGS'] + self.linkopt,
                       
                     # Wee need to link file proj_info.rel, with our .ihx file.
                     # But  we can't just add  proj_info.rel to 'sources' of .ihx file, because proj_info.rel file is 'order-only' dependency.
@@ -87,7 +84,7 @@ class V6_Project(object):
         Requires(file_ihx, self.obj_proj_info)
         
         # convert IHX to BIN
-        srec_util = self.GetUtilFilename('srec_cat')
+        srec_util = self.platform.GetUtilFilename('srec_cat')
         
         command1 = srec_util + ' $SOURCE -intel -offset -0x5000   -o $TARGET -binary'
         return self.env.Command(self.name + '.exe', file_ihx, command1)         #, "cp $SOURCE $TARGET")
@@ -97,17 +94,26 @@ class V6_Project(object):
 
         subst = Environment(tools = ['textfile'])
         # generate asm file, concatenate another asm file with a string
-        heap_size = 0
+        heap_size = 1024            # this is default sdcc heap size
         if hasattr(self, 'heapsize'):
             heap_size = self.heapsize
-        asm_heap = subst.Textfile(target = 'myheap.s',              
-                                source = [self.env.File(file1), heap_size], 
-                                LINESEPARATOR=' ')
+            # print self.name
+            # print "heap_size: "
+            # print heap_size
+
+        # asm_heap = subst.Textfile(target = 'myheap.s',              
+        #                         source = [self.env.File(file1), heap_size], 
+        #                         LINESEPARATOR=' ')
+        script_dict = {'HEAP_TOTAL_BYTES': heap_size }  # replace string with heap size string
+        asm_heap = subst.Substfile(target='myheap.s', source=file1, SUBST_DICT = script_dict)
+        
+
         self.env.Depends(asm_heap, 'SConscript')
         
         # compile asm to obj
         env_sdasz80 = self.env_sdasz80        
         obj_heap = env_sdasz80.Object('myheap' + env_sdasz80['OBJSUFFIX'], asm_heap)     #"cp $SOURCE $TARGET")
+        self.heapsize = 1024
         return obj_heap
         #src/$(prjname)/obj/myheap.rel
         
@@ -164,13 +170,11 @@ class V6_Project(object):
                             
 
         
-        env.Append( SENDV6_UTIL = self.v6_dir + '/Contributions/Daniel/Linux_tools/sendv6/' + self.utilFilename_sendv6,
-                    SENDV6_PORT = self.options_handler.config.get('SendV6', 'port'),
-                    SLEEP_UTIL  = 'sleep')
-        
         #print env['CC']
         #print env['ENV']['PATH']
         self.env = env
+
+        self.uploader.SetupEnv()
         
         self.env_pasmo   = self.env.Clone(tools=['pasmo'],      CPPPATH = '')
         self.env_sdasz80 = self.env.Clone(tools=['sdasz80'],    CPPPATH = '')
@@ -178,51 +182,10 @@ class V6_Project(object):
     def GetEnv_SDCC(self):
         return self.env
         
-    def GetUtilFilename(self, strName):
-        env = DefaultEnvironment()
-        platform = env['PLATFORM']
-        
-        # for now, even in linux we just use win32 exe file (because someone (valen :) is too lazy to download the source http://www.fourmilab.ch/xd/ and build xd utility )
-        # (sure, wine is required)
-        if strName == 'xd':
-            return self.basedir + 'c_support/tools/xd.exe' 
+            
+    def Upload(self, upload_target):
+        self.uploader.Upload(upload_target)
 
-        if strName == 'sendv6':                   
-            if platform == 'win32':
-                return os.path.join(self.v6_dir, 'Contributions/Daniel/Linux_tools/sendv6')
-            else:                
-                return 'sendv6'
-            
-                         
-        if platform == 'win32':
-            # in win32 we have all utils in this dir
-            util = self.basedir + 'c_support/tools/' + strName
-        else:
-            # on non win systems, you need to install req. utils
-            util = strName
-        return util
-            
-    def Upload(self, upload_target):     #, is_upload_always):
-        # Note: Why we need pause a few seconds, between file uploads :
-        # when FILERX is writing the last sended 32KB buffer to disk, it may be about 1.5-2 seconds to complete disk write,
-        # but (on the side of fast PC), the sendv6 exits immidiatly  and will re-run again, and thus will fail to connect to v6,
-        # because on v6 board, FILERX is still in disk write mode (not in listening mode).
-        
-        port = self.options_handler.config.get('SendV6', 'port')
-        if self.misc_tools.Is_SerialPort_CanBeOpened(port):
-            upload_command = 'cd ${SOURCE.dir} && $SENDV6_UTIL $SENDV6_PORT ${SOURCE.file}  &&  $SLEEP_UTIL 2'   
-        else:
-            upload_command = '@@echo WARNING The serial port $SENDV6_PORT is BUSY ! Cant upload the file. '
-            #upload_command = 'echo zzzzzz';
-        #upload_command = 'sendv6 S0 $SOURCE'       # (via COM1, 'S0' - part of linux specific name ttyS0 of COM1)
-        
-        upload = self.env.Alias('upload_' + self.name + '_' + str(upload_target[0]), upload_target, upload_command)
-        if 1:        #is_upload_always:
-            AlwaysBuild(upload)
-        upload[0].my_progress_message = '------------- Upload file to V6 -------------'
-        
-        upload2 = self.env.Alias('upload_' + self.name, upload)
-        Alias('upload_all', upload)
 
 
 # this class know, how to build all v6 proj depend. (CRT for FLOS, C FLOS interface, asm FLOS proxy, C libs)
@@ -279,12 +242,15 @@ class V6_Project_Dependencies():
         env_lib = self.v6_project.env
         
         obj = env_lib.Object(   Glob('FLOS_*.c'), 
-                CCFLAGS     = env_lib['CCFLAGS'] + ['--std-sdcc99', '--opt-code-speed', ]  )                
-        obj[0].my_progress_message = '------------- C FLOS Lib: Compile C to object files ---------'
+                CCFLAGS     = env_lib['CCFLAGS'] + ['--std-sdcc99', '--opt-code-speed', ]  ) 
+
+
+        Project_Helper.SetProgressMessageForNode(obj[0], '------------- C FLOS Lib: Compile C to object files ---------')
+        # exit()
         
             
         self.lib_c_flos = env_lib.Library('i_flos_lib', obj)
-        self.lib_c_flos[0].my_progress_message = '------------- C FLOS Lib: Add objects to Lib ---------'
+        Project_Helper.SetProgressMessageForNode(self.lib_c_flos[0], '------------- C FLOS Lib: Add objects to Lib ---------')
         #pprint.pprint( lib)
         
     def Make_stdio_Lib(self):
@@ -297,12 +263,11 @@ class V6_Project_Dependencies():
         debug = ARGUMENTS.get('DEBUG_LIB_STDIO', 0)
         if int(debug):
 			env_lib.Append(CPPDEFINES = 'DEBUG_LIB_STDIO')        
-        
-        obj[0].my_progress_message = '------------- stdio Lib: Compile C to object files ---------'
-        
+                
+        Project_Helper.SetProgressMessageForNode(obj[0], '------------- stdio Lib: Compile C to object files ---------')
             
-        self.lib_stdio = env_lib.Library('stdio_v6z80p_lib', obj)
-        self.lib_stdio[0].my_progress_message = '------------- stdio Lib: Add objects to Lib ---------'        
+        self.lib_stdio = env_lib.Library('stdio_v6z80p_lib', obj)        
+        Project_Helper.SetProgressMessageForNode(self.lib_stdio[0], '------------- stdio Lib: Add objects to Lib ---------')
         
         
 class V6_Project_SystemChecker():
@@ -351,7 +316,7 @@ class V6_Project_SystemChecker():
 
     def Check_srec_cat(self):
         # check, if srec_cat is installed in system
-        str =  self.v6_project.GetUtilFilename('srec_cat')
+        str =  self.v6_project.platform.GetUtilFilename('srec_cat')
         print 'Check for: srec_cat. Executing: ' + str
         pipe = SCons.Action._subproc(self.v6_project.env, [str],                                                       
                              stdin = 'devnull',                                                                    
@@ -396,35 +361,7 @@ class V6_Project_SystemChecker():
 
 			
         
-# this class know how to handle specific ini file options
-class V6_Project_OptionsHandler():
-    
-    def __init__(self):
-        # add options for sendv6 'port'
-        #AddOption('--sendv6_port',
-                  #dest='sendv6_port',
-                  #type='string',
-                  #nargs=1,
-                  #action='store',   
-                  #default='USB0',
-                  #help='sendv6 connection port')
-                  
-        
-        try:
-            file_ini = open('sdccfw_config.ini')
-            config = ConfigParser.ConfigParser()
-            config.readfp(file_ini)
-            #config.get('SendV6', 'port')
-            self.config = config
-            
-        except IOError as (errno, strerror):
-            print "I/O warning({0}): {1}".format(errno, strerror) + ' sdccfw_config.ini'
-            
-            # if no ini was readed, we build ini file, in memory, with default values
-            config = ConfigParser.RawConfigParser()
-            config.add_section('SendV6')
-            config.set('SendV6', 'port', 'USB0')
-            self.config = config
+
            
 
 # this class 
@@ -441,42 +378,35 @@ class V6_Project_MiscTools():
             command += 'xxd' + ' -i  $SOURCE  >> $TARGET  '
             command += " && sed 's/char.*\[/char " + label_name + "[/' $TARGET > $TARGET.dir/tmp   && mv $TARGET.dir/tmp  $TARGET"
         node =  Command(target, source, command)  
-        node[0].my_progress_message = '---- binary file to C source file ------'
+        
+        Project_Helper.SetProgressMessageForNode(node[0], '---- binary file to C source file ------')
         return node
 
-        
-    def Is_SerialPort_CanBeOpened(self, port):
-        try:    
-            ser = serial.Serial()
-            ser.port = "/dev/tty"  + port 
-            ser.baudrate = 115200 
-            ser.open()
-            ser.close()
-            return True
-        except serial.SerialException:
-            return False
-            
-        #if ser.isOpen():
-            #ser.write("hello")
-            #response = ser.read(ser.inWaiting())
-            #ser.close()
+
     
             
                         
 #screen = open('/dev/tty', 'w')
 def progress_function(node):
+
     str_node = str(node)
     #count += 1
     #print('Node %4d: %s\r' % (count, node))
     #pprint.pprint (node)
     
-    if node.is_up_to_date():
-        #print 'node: ' + str(node)
+
+    # print '--'
+    # print node
+
+    if(Project_Helper.IsNode_CanBeCheked_ForProgressMessage(node) == False):
         return
 
-    if hasattr(node, 'my_progress_message'):
-        print node.my_progress_message
+
+    mess = Project_Helper.GetProgressMessageForNode(node)
+    if(mess != ''):
+        print mess
         return
+
     
     if string.find(str_node, '.exe') >= 0:
         print "------------- IHX to BIN convertion ---------"
@@ -507,8 +437,7 @@ def progress_function(node):
         
     
         
-# register our own progress function
-Progress(progress_function)
+
 
 
 
