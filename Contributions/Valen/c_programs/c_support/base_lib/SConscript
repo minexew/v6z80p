@@ -1,18 +1,34 @@
 #  Base lib
 # 
-Import('v6_prj')
+Import('current_project')
+from  project_helper import Project_Helper
+
+if Project_Helper.Is_Target_V6Z80P():    
+    Import('v6_prj')
 
 
-env_lib = v6_prj.env
+    env_lib = v6_prj.env
 
-obj = env_lib.Object(  [ Glob('*.c')
-                       ], 
-        CCFLAGS     = env_lib['CCFLAGS'] + ['--std-sdcc89', '--opt-code-size' ]  )
-obj[0].my_progress_message = '-------------  Misc lib: Compile C to object files ---------'
+    obj = env_lib.Object(  [ Glob('*.c')
+                           ], 
+            CCFLAGS     = env_lib['CCFLAGS'] + ['--std-sdcc99', '--opt-code-size' ]  )    
+    Project_Helper.SetProgressMessageForNode(obj[0], '-------------  Misc lib: Compile C to object files ---------')
 
-    
-v6_prj.depend.lib_misc = env_lib.Library('base_lib', obj)
-v6_prj.depend.lib_misc[0].my_progress_message = '------------- Misc lib: Add objects to Lib ---------'  
+        
+    v6_prj.depend.lib_misc = env_lib.Library('base_lib', obj)    
+    Project_Helper.SetProgressMessageForNode(v6_prj.depend.lib_misc[0], '------------- Misc lib: Add objects to Lib ---------')
 
 
-#print "aaa ---------"
+    #print "aaa ---------"
+if Project_Helper.Is_Target_IAR_V6Z80P():
+    # print "yoyoyo"
+
+    env_lib = current_project.env
+
+    obj = env_lib.Object(  ['video_mode.c', 'sprites.c', 'keyboard.c']  , 
+            CCFLAGS     = env_lib['CCFLAGS'] + ['-uua', '-s9', 
+                                                '-b'  # -b mean, produce lib module (lib module will be linked with a program, only if module referenced (used) by  a program)
+             ]  )    
+    Project_Helper.SetProgressMessageForNode(obj[0], '-------------  Misc lib: Compile C to object files ---------')
+
+    current_project.misc_lib = obj

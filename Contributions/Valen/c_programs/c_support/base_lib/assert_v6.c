@@ -1,6 +1,24 @@
-//
+#include <kernal_jump_table.h> 
+#include <v6z80p_types.h> 
+#include <OSCA_hardware_equates.h> 
+#include <scan_codes.h> 
+#include <macros.h> 
+#include <macros_specific.h> 
+#include <os_interface_for_c/i_flos.h> 
+ 
+#include <string.h> 
+#include <stdlib.h> 
 
-#ifdef DEBUG
+#include "assert_v6.h"
+
+
+
+void _assert_v6(char *expr, const char *filename, unsigned int linenumber)
+{
+
+}
+
+/*
 void _assert_v6(char *expr, const char *filename, unsigned int linenumber)
 {
         BYTE myBuf[32];
@@ -31,4 +49,6 @@ void _assert_v6(char *expr, const char *filename, unsigned int linenumber)
 
 
 }
-#endif
+*/
+
+
