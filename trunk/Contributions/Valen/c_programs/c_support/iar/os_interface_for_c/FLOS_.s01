@@ -1,0 +1,91 @@
+;
+;
+;
+#include <kernal_jump_table.h>
+
+PUSH_ALL_REGS    MACRO
+    PUSH AF
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    
+    EXX
+    EX   AF,AF'
+    PUSH AF
+    PUSH BC
+    PUSH DE
+    PUSH HL
+    EXX
+    EX   AF,AF'
+    PUSH IX
+    PUSH IY
+    ENDM
+
+POP_ALL_REGS    MACRO
+    POP  IY
+    POP  IX
+
+    EXX
+    EX   AF,AF'
+    POP  HL
+    POP  DE
+    POP  BC
+    POP  AF
+    EXX
+    EX   AF,AF'
+    POP  HL
+    POP  DE
+    POP  BC
+    POP  AF
+    ENDM
+
+  
+
+
+	MODULE	FLOS_WaitVRT
+	RSEG	RCODE
+	PUBLIC FLOS_WaitVRT
+
+FLOS_WaitVRT
+    PUSH_ALL_REGS
+	CALL	KJT_WAIT_VRT
+    POP_ALL_REGS
+	RET
+	ENDMOD
+
+; --------------------------------
+    MODULE  FLOS_GetKeyPress
+    RSEG    RCODE
+    PUBLIC FLOS_GetKeyPress
+
+FLOS_GetKeyPress
+    PUSH_ALL_REGS
+    
+    push bc             ; de, bc = first and second args
+    push de  
+    CALL   KJT_GET_KEY
+    pop  de
+    pop  hl
+
+    ld  (hl), a         ; a = scancode, b = ascii
+    ld  a,b
+    ld  (de), a
+    POP_ALL_REGS
+    RET
+    ENDMOD
+
+; --------------------------------
+    MODULE  FLOS_SerialTxByte
+    RSEG    RCODE
+    PUBLIC FLOS_SerialTxByte
+
+FLOS_SerialTxByte
+    PUSH_ALL_REGS
+    ld      a, e                ; e = byte to send
+    CALL   KJT_SERIAL_TX_BYTE  
+    POP_ALL_REGS
+    RET
+    ENDMOD
+
+
+	END

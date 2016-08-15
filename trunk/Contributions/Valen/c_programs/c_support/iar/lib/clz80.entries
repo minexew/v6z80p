@@ -1,0 +1,688 @@
+##############################################################################
+#                                                                            #
+#     IAR Universal Librarian V3.28A/386             12/Mar/2015  18:23:15   #
+#                                                                            #
+#           Command           = list-entries                                 #
+#           Object file       = clz80.r01                                    #
+#           List file         = clz80.entries                                #
+#           Start module      = Default parameter                            #
+#           End module        = Default parameter                            #
+#                                                                            #
+#                      Copyright 1988-2000 IAR Systems. All rights reserved. #
+##############################################################################
+
+
+       1.  Pgm  CSTARTUP
+       2.  Lib  exit
+             Ent   exit
+             Ent   ?C_EXIT
+       3.  Lib  longjmp
+             Ent   longjmp
+             Ent   ?C_LONGJMP
+             Ent   ?DBG_2
+       4.  Lib  getchar
+             Ent   getchar
+             Ent   ?C_GETCHAR
+             Ent   ?DBG_0T
+       5.  Lib  putchar
+             Ent   putchar
+       6.  Lib  getchar
+             Ent   getchar
+             Ent   ?C_GETCHAR
+             Ent   ?DBG_1T
+       7.  Lib  putchar
+             Ent   putchar
+             Ent   ?C_PUTCHAR
+             Ent   ?DBG_1T
+       8.  Lib  getchar
+             Ent   getchar
+             Ent   ?C_GETCHAR
+             Ent   ?DBG_2T
+       9.  Lib  putchar
+             Ent   putchar
+             Ent   ?C_PUTCHAR
+             Ent   ?DBG_2T
+      10.  Lib  exit
+             Ent   exit
+             Ent   ?C_EXIT
+             Ent   ?C_FUNCALL
+             Ent   ?DBG_0
+      11.  Lib  exit
+             Ent   exit
+             Ent   ?C_EXIT
+             Ent   ?C_FUNCALL
+             Ent   ?DBG_1
+      12.  Lib  exit
+             Ent   exit
+             Ent   ?C_EXIT
+             Ent   ?C_FUNCALL
+             Ent   ?DBG_2
+      13.  Lib  ?MONITOR
+             Ent   ?MONITOR
+             Ent   ?C_MON_BREAK
+             Ent   ?DBG_2
+             Ent   ?C_MON_CURR_ADDR
+             Ent   ?C_MON_ADDR_SIZE
+      14.  Lib  ?LIB_VERSION_L00
+             Ent   ?CLZ80L_4_06_L00
+      15.  Lib  ?C_LSH_L01
+             Ent   ?C_LSH_L01
+      16.  Lib  ?UC_RSH_L01
+             Ent   ?UC_RSH_L01
+      17.  Lib  ?SC_RSH_L01
+             Ent   ?SC_RSH_L01
+      18.  Lib  ?UC_DIV_L01
+             Ent   ?UC_DIV_L01
+      19.  Lib  ?SC_DIV_L01
+             Ent   ?SC_DIV_L01
+      20.  Lib  ?UC_MOD_L01
+             Ent   ?UC_MOD_L01
+      21.  Lib  ?SC_MOD_L01
+             Ent   ?SC_MOD_L01
+      22.  Lib  ?C_FIND_SIGN_L01
+             Ent   ?C_FIND_SIGN_L01
+      23.  Lib  ?C_DIVMOD_L01
+             Ent   ?C_DIVMOD_L01
+      24.  Lib  ?C_MUL_L01
+             Ent   ?C_MUL_L01
+      25.  Lib  ?C_LSHASG_L01
+             Ent   ?C_LSHASG_L01
+      26.  Lib  ?UC_RSHASG_L01
+             Ent   ?UC_RSHASG_L01
+      27.  Lib  ?SC_RSHASG_L01
+             Ent   ?SC_RSHASG_L01
+      28.  Lib  ?C_MULASG_L01
+             Ent   ?C_MULASG_L01
+      29.  Lib  ?S_LSH_L02
+             Ent   ?S_LSH_L02
+      30.  Lib  ?US_RSH_L02
+             Ent   ?US_RSH_L02
+      31.  Lib  ?SS_RSH_L02
+             Ent   ?SS_RSH_L02
+      32.  Lib  ?US_DIV_L02
+             Ent   ?US_DIV_L02
+      33.  Lib  ?SS_DIV_L02
+             Ent   ?SS_DIV_L02
+      34.  Lib  ?US_MOD_L02
+             Ent   ?US_MOD_L02
+      35.  Lib  ?SS_MOD_L02
+             Ent   ?SS_MOD_L02
+      36.  Lib  ?S_FIND_SIGN_L02
+             Ent   ?S_FIND_SIGN_L02
+      37.  Lib  ?S_DIVMOD_L02
+             Ent   ?S_DIVMOD_L02
+      38.  Lib  ?S_MUL_L02
+             Ent   ?S_MUL_L02
+      39.  Lib  ?SS_CMP_L02
+             Ent   ?SS_CMP_L02
+      40.  Lib  ?S_LSHASG_L02
+             Ent   ?S_LSHASG_L02
+      41.  Lib  ?US_RSHASG_L02
+             Ent   ?US_RSHASG_L02
+      42.  Lib  ?SS_RSHASG_L02
+             Ent   ?SS_RSHASG_L02
+      43.  Lib  ?SS_MODASG_L02
+             Ent   ?SS_MODASG_L02
+      44.  Lib  ?US_MODASG_L02
+             Ent   ?US_MODASG_L02
+      45.  Lib  ?SS_DIVASG_L02
+             Ent   ?SS_DIVASG_L02
+      46.  Lib  ?US_DIVASG_L02
+             Ent   ?US_DIVASG_L02
+      47.  Lib  ?S_MULASG_L02
+             Ent   ?S_MULASG_L02
+      48.  Lib  ?L_LSH_L03
+             Ent   ?L_LSH_L03
+      49.  Lib  ?UL_RSH_L03
+             Ent   ?UL_RSH_L03
+      50.  Lib  ?SL_RSH_L03
+             Ent   ?SL_RSH_L03
+      51.  Lib  ?L_MUL_L03
+             Ent   ?L_MUL_L03
+      52.  Lib  ?UL_DIV_L03
+             Ent   ?UL_DIV_L03
+      53.  Lib  ?SL_DIV_L03
+             Ent   ?SL_DIV_L03
+      54.  Lib  ?UL_MOD_L03
+             Ent   ?UL_MOD_L03
+      55.  Lib  ?SL_MOD_L03
+             Ent   ?SL_MOD_L03
+      56.  Lib  ?L_FIND_SIGN_L03
+             Ent   ?L_FIND_SIGN_L03
+      57.  Lib  ?L_DIVMOD_L03
+             Ent   ?L_DIVMOD_L03
+      58.  Lib  ?L_AND_L03
+             Ent   ?L_AND_L03
+      59.  Lib  ?L_OR_L03
+             Ent   ?L_OR_L03
+      60.  Lib  ?L_XOR_L03
+             Ent   ?L_XOR_L03
+      61.  Lib  ?SL_CMP_L03
+             Ent   ?SL_CMP_L03
+      62.  Lib  ?L_INC_L03
+             Ent   ?L_INC_L03
+      63.  Lib  ?L_DEC_L03
+             Ent   ?L_DEC_L03
+      64.  Lib  ?L_NOT_L03
+             Ent   ?L_NOT_L03
+      65.  Lib  ?L_NEG_L03
+             Ent   ?L_NEG_L03
+      66.  Lib  ?L_MULASG_L03
+             Ent   ?L_MULASG_L03
+      67.  Lib  ?UL_DIVASG_L03
+             Ent   ?UL_DIVASG_L03
+      68.  Lib  ?SL_DIVASG_L03
+             Ent   ?SL_DIVASG_L03
+      69.  Lib  ?UL_MODASG_L03
+             Ent   ?UL_MODASG_L03
+      70.  Lib  ?SL_MODASG_L03
+             Ent   ?SL_MODASG_L03
+      71.  Lib  ?L_END_MULDIVASG_L03
+             Ent   ?L_END_MULDIVASG_L03
+      72.  Lib  ?L_ADDASG_L03
+             Ent   ?L_ADDASG_L03
+      73.  Lib  ?L_SUBASG_L03
+             Ent   ?L_SUBASG_L03
+      74.  Lib  ?L_ANDASG_L03
+             Ent   ?L_ANDASG_L03
+      75.  Lib  ?L_ORASG_L03
+             Ent   ?L_ORASG_L03
+      76.  Lib  ?L_XORASG_L03
+             Ent   ?L_XORASG_L03
+      77.  Lib  ?L_LSHASG_L03
+             Ent   ?L_LSHASG_L03
+      78.  Lib  ?UL_RSHASG_L03
+             Ent   ?UL_RSHASG_L03
+      79.  Lib  ?SL_RSHASG_L03
+             Ent   ?SL_RSHASG_L03
+      80.  Lib  ?L_NOTASG_L03
+             Ent   ?L_NOTASG_L03
+      81.  Lib  ?L_NEGASG_L03
+             Ent   ?L_NEGASG_L03
+      82.  Lib  ?L_INCASG_L03
+             Ent   ?L_INCASG_L03
+      83.  Lib  ?L_DECASG_L03
+             Ent   ?L_DECASG_L03
+      84.  Lib  ?L_END_ASG_L03
+             Ent   ?L_END_ASG_L03
+      85.  Lib  ?F_MUL_L04
+             Ent   ?F_MUL_L04
+      86.  Lib  ?F_DIV_L04
+             Ent   ?F_DIV_L04
+      87.  Lib  ?F_ADD_SUB_L04
+             Ent   ?F_SUB_L04
+             Ent   ?F_ADD_L04
+      88.  Lib  ?F_CMP_L04
+             Ent   ?F_CMP_L04
+      89.  Lib  ?F_INC_L04
+             Ent   ?F_INC_L04
+      90.  Lib  ?F_DEC_L04
+             Ent   ?F_DEC_L04
+      91.  Lib  ?F_TO_L_L04
+             Ent   ?F_TO_L_L04
+      92.  Lib  ?L_TO_F_L04
+             Ent   ?SL_TO_F_L04
+             Ent   ?UL_TO_F_L04
+      93.  Lib  ?F_INCASG_L04
+             Ent   ?F_INCASG_L04
+      94.  Lib  ?F_DECASG_L04
+             Ent   ?F_DECASG_L04
+      95.  Lib  ?F_NEGASG_L04
+             Ent   ?F_NEGASG_L04
+      96.  Lib  ?F_MULASG_L04
+             Ent   ?F_MULASG_L04
+      97.  Lib  ?F_DIVASG_L04
+             Ent   ?F_DIVASG_L04
+      98.  Lib  ?F_ADDASG_L04
+             Ent   ?F_ADDASG_L04
+      99.  Lib  ?F_SUBASG_L04
+             Ent   ?F_SUBASG_L04
+     100.  Lib  ?F_END_ASG2_L04
+             Ent   ?F_END_ASG2_L04
+     101.  Lib  ?F_ROUND_L04
+             Ent   ?F_ROUND_L04
+             Ent   ?F_UP_ROUND_L04
+     102.  Lib  ?F_UNPACK_L04
+             Ent   ?F_UNPACK_L04
+     103.  Lib  ?F_PACK_L04
+             Ent   ?F_PACK_L04
+             Ent   ?F_OVERFLOW_L04
+             Ent   ?F_UNDERFLOW2_L04
+             Ent   ?F_UNDERFLOW_L04
+             Ent   ?F_NO_PACK_L04
+     104.  Lib  ?C_S_SWITCH_L06
+             Ent   ?C_S_SWITCH_L06
+     105.  Lib  ?S_S_SWITCH_L06
+             Ent   ?S_S_SWITCH_L06
+     106.  Lib  ?L_S_SWITCH_L06
+             Ent   ?L_S_SWITCH_L06
+     107.  Lib  ?S_SWITCH_END_L06
+             Ent   ?S_SWITCH_END_L06
+     108.  Lib  ?C_V_SWITCH_L06
+             Ent   ?C_V_SWITCH_L06
+     109.  Lib  ?S_V_SWITCH_L06
+             Ent   ?S_V_SWITCH_L06
+     110.  Lib  ?L_V_SWITCH_L06
+             Ent   ?L_V_SWITCH_L06
+     111.  Lib  ?V_SWITCH_END_L06
+             Ent   ?V_SWITCH_END_L06
+     112.  Lib  setjmp
+             Ent   setjmp
+     113.  Lib  longjmp
+             Ent   longjmp
+     114.  Lib  ?BANK_CALL_EXAF_L08
+             Ent   ?BANK_CALL_EXAF_L08
+     115.  Lib  ?BANK_CALL_DIRECT_EXAF_L08
+             Ent   ?BANK_CALL_DIRECT_EXAF_L08
+     116.  Lib  ?BANK_CALL_L08
+             Ent   ?BANK_CALL_L08
+     117.  Lib  ?BANK_CALL_DIRECT_L08
+             Ent   ?BANK_CALL_DIRECT_L08
+     118.  Lib  ?BANK_LEAVE_L08
+             Ent   ?BANK_LEAVE_L08
+     119.  Lib  ?BANK_LEAVE_DIRECT_L08
+             Ent   ?BANK_LEAVE_DIRECT_L08
+             Ent   ?BANK_FAST_LEAVE_L08
+     120.  Lib  ?BANK_LEAVE_32_L08
+             Ent   ?BANK_LEAVE_32_L08
+     121.  Lib  ?ENT_PARM_L09
+             Ent   ?ENT_PARM_L09
+     122.  Lib  ?ENT_PARM_DIRECT_L09
+             Ent   ?ENT_PARM_DIRECT_L09
+     123.  Lib  ?ENT_AUTO_L09
+             Ent   ?ENT_AUTO_L09
+     124.  Lib  ?ENT_AUTO_DIRECT_L09
+             Ent   ?ENT_AUTO_DIRECT_L09
+     125.  Lib  ?LEAVE_L09
+             Ent   ?LEAVE_L09
+     126.  Lib  ?LEAVE_DIRECT_L09
+             Ent   ?LEAVE_DIRECT_L09
+     127.  Lib  ?LEAVE_32_L09
+             Ent   ?LEAVE_32_L09
+     128.  Lib  ?MONITOR_LEAVE_L09
+             Ent   ?MONITOR_LEAVE_L09
+     129.  Lib  ?MONITOR_LEAVE_PA_L09
+             Ent   ?MONITOR_LEAVE_PA_L09
+     130.  Lib  ?MONITOR_LEAVE_POP_L09
+             Ent   ?MONITOR_LEAVE_POP_L09
+     131.  Lib  ?MONITOR_LEAVE_32_L09
+             Ent   ?MONITOR_LEAVE_32_L09
+     132.  Lib  ?MONITOR_LEAVE_IX_L09
+             Ent   ?MONITOR_LEAVE_IX_L09
+     133.  Lib  ?MONITOR_LEAVE_IX_PA_L09
+             Ent   ?MONITOR_LEAVE_IX_PA_L09
+     134.  Lib  ?MONITOR_BANK_LEAVE_L09
+             Ent   ?MONITOR_BANK_LEAVE_L09
+     135.  Lib  ?MONITOR_BANK_LEAVE_POP_L09
+             Ent   ?MONITOR_BANK_LEAVE_POP_L09
+     136.  Lib  ?MONITOR_BANK_LEAVE_32_L09
+             Ent   ?MONITOR_BANK_LEAVE_32_L09
+     137.  Lib  ?MONITOR_BANK_LEAVE_IX_L09
+             Ent   ?MONITOR_BANK_LEAVE_IX_L09
+     138.  Lib  ?CALL_IND_L09
+             Ent   ?CALL_IND_L09
+     139.  Lib  ?BF_C_MULASG_L10
+             Ent   ?BF_C_MULASG_L10
+     140.  Lib  ?BF_UC_MODASG_L10
+             Ent   ?BF_UC_MODASG_L10
+     141.  Lib  ?BF_UC_DIVASG_L10
+             Ent   ?BF_UC_DIVASG_L10
+     142.  Lib  ?BF_SC_MODASG_L10
+             Ent   ?BF_SC_MODASG_L10
+     143.  Lib  ?BF_SC_DIVASG_L10
+             Ent   ?BF_SC_DIVASG_L10
+     144.  Lib  ?BF_C_ANDASG_L10
+             Ent   ?BF_C_ANDASG_L10
+     145.  Lib  ?BF_C_ORASG_L10
+             Ent   ?BF_C_ORASG_L10
+     146.  Lib  ?BF_C_XORASG_L10
+             Ent   ?BF_C_XORASG_L10
+     147.  Lib  ?BF_UC_RSHASG_L10
+             Ent   ?BF_UC_RSHASG_L10
+     148.  Lib  ?BF_SC_RSHASG_L10
+             Ent   ?BF_SC_RSHASG_L10
+     149.  Lib  ?BF_C_LSHASG_L10
+             Ent   ?BF_C_LSHASG_L10
+     150.  Lib  ?BF_SC_EXT_L10
+             Ent   ?BF_SC_EXT_L10
+     151.  Lib  ?BF_SC_LD_SHIFT_DOWN_L10
+             Ent   ?BF_SC_LD_SHIFT_DOWN_L10
+     152.  Lib  ?BF_UC_LD_SHIFT_DOWN_L10
+             Ent   ?BF_UC_LD_SHIFT_DOWN_L10
+     153.  Lib  ?BF_C_SHIFT_UP_L10
+             Ent   ?BF_C_SHIFT_UP_L10
+     154.  Lib  ?BF_C_RET_VAL_L10
+             Ent   ?BF_C_RET_VAL_L10
+     155.  Lib  ?BF_S_SUBASG_L10
+             Ent   ?BF_S_SUBASG_L10
+     156.  Lib  ?BF_S_ADDASG_L10
+             Ent   ?BF_S_ADDASG_L10
+     157.  Lib  ?BF_S_MULASG_L10
+             Ent   ?BF_S_MULASG_L10
+     158.  Lib  ?BF_US_MODASG_L10
+             Ent   ?BF_US_MODASG_L10
+     159.  Lib  ?BF_US_DIVASG_L10
+             Ent   ?BF_US_DIVASG_L10
+     160.  Lib  ?BF_SS_MODASG_L10
+             Ent   ?BF_SS_MODASG_L10
+     161.  Lib  ?BF_SS_DIVASG_L10
+             Ent   ?BF_SS_DIVASG_L10
+     162.  Lib  ?BF_S_ANDASG_L10
+             Ent   ?BF_S_ANDASG_L10
+     163.  Lib  ?BF_S_ORASG_L10
+             Ent   ?BF_S_ORASG_L10
+     164.  Lib  ?BF_S_XORASG_L10
+             Ent   ?BF_S_XORASG_L10
+     165.  Lib  ?BF_US_RSHASG_L10
+             Ent   ?BF_US_RSHASG_L10
+     166.  Lib  ?BF_SS_RSHASG_L10
+             Ent   ?BF_SS_RSHASG_L10
+     167.  Lib  ?BF_S_LSHASG_L10
+             Ent   ?BF_S_LSHASG_L10
+     168.  Lib  ?BF_S_POST_INC_L10
+             Ent   ?BF_S_POST_INC_L10
+     169.  Lib  ?BF_S_POST_DEC_L10
+             Ent   ?BF_S_POST_DEC_L10
+     170.  Lib  ?BF_S_PRE_INC_L10
+             Ent   ?BF_S_PRE_INC_L10
+     171.  Lib  ?BF_S_PRE_DEC_L10
+             Ent   ?BF_S_PRE_DEC_L10
+     172.  Lib  ?BF_S_NEGASG_L10
+             Ent   ?BF_S_NEGASG_L10
+     173.  Lib  ?BF_SS_EXT_L10
+             Ent   ?BF_SS_EXT_L10
+     174.  Lib  ?BF_MASKED_LD_L10
+             Ent   ?BF_MASKED_LD_L10
+     175.  Lib  ?BF_SS_LD_SHIFT_DOWN_L10
+             Ent   ?BF_SS_LD_SHIFT_DOWN_L10
+     176.  Lib  ?BF_US_LD_SHIFT_DOWN_L10
+             Ent   ?BF_US_LD_SHIFT_DOWN_L10
+     177.  Lib  ?BF_S_SHIFT_UP_L10
+             Ent   ?BF_S_SHIFT_UP_L10
+     178.  Lib  ?BF_MASKED_ST_L10
+             Ent   ?BF_MASKED_ST_L10
+     179.  Lib  ?BF_S_RET_VAL_L10
+             Ent   ?BF_S_RET_VAL_L10
+             Ent   ?BF_S_RET_VAL2_L10
+     180.  Lib  ?STRCPY_L11
+             Ent   ?STRCPY_L11
+     181.  Lib  ?STRLEN_L11
+             Ent   ?STRLEN_L11
+     182.  Lib  ?STRCAT_L11
+             Ent   ?STRCAT_L11
+     183.  Lib  ?MEMSET_L11
+             Ent   ?MEMSET_L11
+     184.  Lib  ?MEMCMP_L11
+             Ent   ?MEMCMP_L11
+     185.  Lib  ?STRCMP_L11
+             Ent   ?STRCMP_L11
+     186.  Lib  ?STRCHR_L11
+             Ent   ?STRCHR_L11
+     187.  Lib  ?__daddexp_L11
+             Ent   ?__daddexp_L11
+     188.  Lib  ?S_MULASG_IX_L12
+             Ent   ?S_MULASG_IX_L12
+     189.  Lib  ?S_MULASG_IY_L12
+             Ent   ?S_MULASG_IY_L12
+     190.  Lib  ?S_MULASG_DE_prim_L12
+             Ent   ?S_MULASG_DE_prim_L12
+     191.  Lib  ?S_MULASG_BC_prim_L12
+             Ent   ?S_MULASG_BC_prim_L12
+     192.  Lib  ?SS_DIVASG_IX_L12
+             Ent   ?SS_DIVASG_IX_L12
+     193.  Lib  ?SS_DIVASG_IY_L12
+             Ent   ?SS_DIVASG_IY_L12
+     194.  Lib  ?SS_DIVASG_DE_prim_L12
+             Ent   ?SS_DIVASG_DE_prim_L12
+     195.  Lib  ?SS_DIVASG_BC_prim_L12
+             Ent   ?SS_DIVASG_BC_prim_L12
+     196.  Lib  ?US_DIVASG_IX_L12
+             Ent   ?US_DIVASG_IX_L12
+     197.  Lib  ?US_DIVASG_IY_L12
+             Ent   ?US_DIVASG_IY_L12
+     198.  Lib  ?US_DIVASG_DE_prim_L12
+             Ent   ?US_DIVASG_DE_prim_L12
+     199.  Lib  ?US_DIVASG_BC_prim_L12
+             Ent   ?US_DIVASG_BC_prim_L12
+     200.  Lib  ?US_MODASG_IX_L12
+             Ent   ?US_MODASG_IX_L12
+     201.  Lib  ?US_MODASG_IY_L12
+             Ent   ?US_MODASG_IY_L12
+     202.  Lib  ?US_MODASG_DE_prim_L12
+             Ent   ?US_MODASG_DE_prim_L12
+     203.  Lib  ?US_MODASG_BC_prim_L12
+             Ent   ?US_MODASG_BC_prim_L12
+     204.  Lib  ?SS_MODASG_IX_L12
+             Ent   ?SS_MODASG_IX_L12
+     205.  Lib  ?SS_MODASG_IY_L12
+             Ent   ?SS_MODASG_IY_L12
+     206.  Lib  ?SS_MODASG_DE_prim_L12
+             Ent   ?SS_MODASG_DE_prim_L12
+     207.  Lib  ?SS_MODASG_BC_prim_L12
+             Ent   ?SS_MODASG_BC_prim_L12
+     208.  Lib  ?SS_RSHASG_IX_L12
+             Ent   ?SS_RSHASG_IX_L12
+     209.  Lib  ?US_RSHASG_IX_L12
+             Ent   ?US_RSHASG_IX_L12
+     210.  Lib  ?SS_RSHASG_IX_L12
+             Ent   ?SS_RSHASG_IX_L12
+     211.  Lib  ?SS_RSHASG_IY_L12
+             Ent   ?SS_RSHASG_IY_L12
+     212.  Lib  ?US_RSHASG_IY_L12
+             Ent   ?US_RSHASG_IY_L12
+     213.  Lib  ?S_LSHASG_BC_prim_L12
+             Ent   ?S_LSHASG_BC_prim_L12
+     214.  Lib  ?US_RSHASG_BC_prim_L12
+             Ent   ?US_RSHASG_BC_prim_L12
+     215.  Lib  ?SS_RSHASG_BC_prim_L12
+             Ent   ?SS_RSHASG_BC_prim_L12
+     216.  Lib  ?S_LSHASG_DE_prim_L12
+             Ent   ?S_LSHASG_DE_prim_L12
+     217.  Lib  ?US_RSHASG_DE_prim_L12
+             Ent   ?US_RSHASG_DE_prim_L12
+     218.  Lib  ?SS_RSHASG_DE_prim_L12
+             Ent   ?SS_RSHASG_DE_prim_L12
+     219.  Lib  _medium_write
+             Ent   _medium_write
+     220.  Lib  _medium_read
+             Ent   _medium_read
+     221.  Lib  _small_write
+             Ent   _small_write
+     222.  Lib  assert
+             Ent   _Assert
+     223.  Lib  cosh
+             Ent   cosh
+     224.  Lib  sinh
+             Ent   sinh
+     225.  Lib  tanh
+             Ent   tanh
+     226.  Lib  ctype
+             Ent   _Small_Ctype
+     227.  Lib  large_ctype
+             Ent   _Large_Ctype
+     228.  Lib  isalpha
+             Ent   isalpha
+     229.  Lib  islower
+             Ent   islower
+     230.  Lib  isupper
+             Ent   isupper
+     231.  Lib  isdigit
+             Ent   isdigit
+     232.  Lib  isxdigit
+             Ent   isxdigit
+     233.  Lib  isspace
+             Ent   isspace
+     234.  Lib  ispunct
+             Ent   ispunct
+     235.  Lib  isalnum
+             Ent   isalnum
+     236.  Lib  isprint
+             Ent   isprint
+     237.  Lib  isgraph
+             Ent   isgraph
+     238.  Lib  iscntrl
+             Ent   iscntrl
+     239.  Lib  errno
+             Ent   errno
+     240.  Lib  heap
+             Ent   _heap_of_memory
+             Ent   _last_heap_object
+             Ent   _top_of_heap
+     241.  Lib  abort
+             Ent   abort
+     242.  Lib  strcoll
+             Ent   strcoll
+     243.  Lib  rand
+             Ent   __next_rand
+             Ent   rand
+     244.  Lib  srand
+             Ent   srand
+     245.  Lib  acos
+             Ent   acos
+     246.  Lib  atan
+             Ent   atan
+     247.  Lib  atan2
+             Ent   atan2
+     248.  Lib  exp10
+             Ent   exp10
+     249.  Lib  fmod
+             Ent   fmod
+     250.  Lib  log10
+             Ent   log10
+     251.  Lib  printf
+             Ent   printf
+     252.  Lib  scanf
+             Ent   scanf
+     253.  Lib  asin
+             Ent   asin
+     254.  Lib  atoi
+             Ent   atoi
+     255.  Lib  atol
+             Ent   atol
+     256.  Lib  ceil
+             Ent   ceil
+     257.  Lib  cos
+             Ent   cos
+     258.  Lib  getchar
+             Ent   getchar
+     259.  Lib  gets
+             Ent   gets
+     260.  Lib  ldexp
+             Ent   ldexp
+     261.  Lib  malloc
+             Ent   _make_new_mem_hole
+             Ent   malloc
+     262.  Lib  memchr
+             Ent   memchr
+     263.  Lib  memcpy
+             Ent   memcpy
+     264.  Lib  memset
+             Ent   memset
+     265.  Lib  modf
+             Ent   modf
+     266.  Lib  puts
+             Ent   puts
+     267.  Lib  realloc
+             Ent   realloc
+     268.  Lib  satan
+             Ent   __satan
+     269.  Lib  sin
+             Ent   sin
+     270.  Lib  sqrt
+             Ent   sqrt
+     271.  Lib  sscanf
+             Ent   sscanf
+     272.  Lib  strcat
+             Ent   strcat
+     273.  Lib  strchr
+             Ent   strchr
+     274.  Lib  strcmp
+             Ent   strcmp
+     275.  Lib  strcpy
+             Ent   strcpy
+     276.  Lib  strcspn
+             Ent   strcspn
+     277.  Lib  strlen
+             Ent   strlen
+     278.  Lib  strncat
+             Ent   strncat
+     279.  Lib  strncpy
+             Ent   strncpy
+     280.  Lib  strpbrk
+             Ent   strpbrk
+     281.  Lib  strrchr
+             Ent   strrchr
+     282.  Lib  strspn
+             Ent   strspn
+     283.  Lib  strstr
+             Ent   strstr
+     284.  Lib  _formatted_write
+             Ent   _formatted_write
+     285.  Lib  _formatted_read
+             Ent   _formatted_read
+     286.  Lib  abs
+             Ent   abs
+     287.  Lib  atof
+             Ent   atof
+     288.  Lib  fabs
+             Ent   fabs
+     289.  Lib  free
+             Ent   free
+     290.  Lib  frexp
+             Ent   frexp
+     291.  Lib  memcmp
+             Ent   memcmp
+     292.  Lib  labs
+             Ent   labs
+     293.  Lib  pow
+             Ent   pow
+     294.  Lib  strncmp
+             Ent   strncmp
+     295.  Lib  tolower
+             Ent   tolower
+     296.  Lib  toupper
+             Ent   toupper
+     297.  Lib  putchar
+             Ent   putchar
+     298.  Lib  exp
+             Ent   exp
+     299.  Lib  log
+             Ent   log
+     300.  Lib  sprintf
+             Ent   sprintf
+     301.  Lib  floor
+             Ent   floor
+     302.  Lib  sinus
+             Ent   __sinus
+     303.  Lib  tan
+             Ent   tan
+     304.  Lib  calloc
+             Ent   calloc
+     305.  Lib  strtol
+             Ent   strtol
+     306.  Lib  strtod
+             Ent   strtod
+     307.  Lib  strtoul
+             Ent   strtoul
+     308.  Lib  div
+             Ent   div
+     309.  Lib  ldiv
+             Ent   ldiv
+     310.  Lib  memmove
+             Ent   memmove
+     311.  Lib  bsearch
+             Ent   bsearch
+     312.  Lib  qsort
+             Ent   _qbuf
+             Ent   qsort
+     313.  Lib  strerror
+             Ent   strerror
+     314.  Lib  strtok
+             Ent   strtok
+     315.  Lib  strxfrm
+             Ent   strxfrm
+     316.  Lib  vprintf
+             Ent   vprintf
+     317.  Lib  vsprintf
+             Ent   vsprintf
+
